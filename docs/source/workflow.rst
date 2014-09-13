@@ -2,9 +2,6 @@
 Workflow
 ########
 
-Overview
-========
-
 **PCBmodE** was originally conceived as a tool that enables the designer to precisely define and position design elements in a text file, and not through a GUI. For practical reasons, **PCBmodE** does not have a GUI of its own, and uses an unmodified Inkscape for visual representation and some editing that cannot practically be done textually. 
 
 A typical **PCBmodE** design workflow is the following:
