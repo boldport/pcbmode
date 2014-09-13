@@ -12,13 +12,19 @@ A typical **PCBmodE** design workflow is the following:
 1) Edit JSON files with a text editor
 2) "Compile" the board using **PCBmodE**
 3) View the generated SVG in Inkscape
+
 Then, optionally
+
 4) Make modifications in Inkscape
 5) Extract changes using **PCBmodE**
+
 and then
+
 6) Back to step 1 or step 2
 
-Once the design is complete, use **PCBmodE** to convert the SVG into Gerber and Excellon files that are used to manufacture the board
+or 
+
+7) Generate production files using **PCBmodE**
 
 .. note:: It is possible to design a complete circuit in a text editor without using Inkscape at all! This would only require generating, or hand crafting, SVG paths for the routing.
 
