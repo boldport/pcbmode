@@ -12,6 +12,7 @@ Contents:
    quickstart
    structure
    shapes
+   routing
    solder-on
 
 
