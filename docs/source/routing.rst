@@ -2,7 +2,7 @@
 Routing
 #######
 
-Routing, of course, is an essential part of a circuit board. **PCBmodE** does not have an auto-router, and routing is typically done in Inkscape, although theoretically, routing can be added manually in a text editor. All routing shapes reside in the routing SVG layer of each PCB layer. 
+Routing, of course, is an essential part of a circuit board. *PCBmodE* does not have an auto-router, and routing is typically done in Inkscape, although theoretically, routing can be added manually in a text editor. All routing shapes reside in the routing SVG layer of each PCB layer. 
 
 .. important:: Make sure that you place the routes and vias on the routing SVG layer of the desired PCB layer. To choose that layer either click on an element in the layer or open the layer pane by pressing ``CTRL+SHIFT+L``.
 
@@ -21,7 +21,7 @@ For a stroke, in the ``Fill and stroke`` pane (``SHIFT+CTRL+F``) click on the ``
 
 .. note:: Shapes can be either stroke or fill, not both. If you'd like a filled and stroked shape, you'll need to create two shapes. 
 
-Finally, you ***must*** move the shape with the mouse or with the arrows.
+Finally, you *must* move the shape with the mouse or with the arrows.
 
 .. note:: When creating a new shape Inkscape adds a matrix transform, which is removed when the shape is moved because of the ``optimise`` settings as described above. This minor inconvenience is a compromise that greatly simplifies the extraction process.
 
