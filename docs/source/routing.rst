@@ -13,7 +13,7 @@ Routing, of course, is an essential part of a circuit board. **PCBmodE** does no
 Adding routes
 -------------
 
-Choose the desired routing SVG layer. Using the Bezier tool (```SHIFT+F6``) draw the shape you want to add. 
+Choose the desired routing SVG layer. Using the Bezier tool (``SHIFT+F6``) to draw a shape. 
 
 For a filled shape, make sure that it is a closed path and in the ``Fill and stroke`` pane (``SHIFT+CTRL+F``) click on the ``flat color`` button on the ``Fill`` tab, and the ``No paint`` (marked with an ``X``) on the ``Stroke point`` tab.
 
