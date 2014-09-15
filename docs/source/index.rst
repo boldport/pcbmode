@@ -13,6 +13,7 @@ Contents:
    structure
    shapes
    routing
+   extraction
    solder-on
 
 

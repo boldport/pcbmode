@@ -2,7 +2,7 @@
 Extraction
 ##########
 
-One of the common steps of the ***PCBmodE*** workflow is extracting information from the SVG and storing it in primary JSON files.
+One of the common steps of the *PCBmodE* workflow is extracting information from the SVG and storing it in primary JSON files.
 
 The following will be extracted from the SVG:
 
