@@ -17,6 +17,7 @@ Contents:
    text
    routing
    extraction
+   layer-polarity
    hello-solder
 
 
