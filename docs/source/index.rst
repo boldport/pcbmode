@@ -12,9 +12,10 @@ Contents:
    quickstart
    structure
    shapes
+   pours
    routing
    extraction
-   solder-on
+   hello-solder
 
 
 Indices and tables
