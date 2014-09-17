@@ -3,6 +3,15 @@ PCBmodE is a printed circuit board design Python script that creates an SVG from
 
 PCBmodE gives the designer the freedome to place any arbitrary shape on any layer, as it is natively vector-based. Much of the design is done in a text editor -- editing JSON -- with viewing and some editing -- routing mostly -- done with [Inkscape](http://inkscape.org).
 
+### Requirements
+
+You'll need:
+* Python 2.7
+* [PyParsing](http://pyparsing.wikispaces.com/)
+* [Inkscape](http://inkscape.org)
+
+PCBmodE is developed and tested under Linux, so it might or might not work under other OSs. (It'd be helpful to know success or failure of attempts!)
+
 ### Resources
 [Documentation](http://pcbmode.readthedocs.org)  
 [Boards repository](https://github.com/boldport/boards)
