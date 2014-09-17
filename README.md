@@ -14,7 +14,7 @@ PCBmodE is developed and tested under Linux, so it might or might not work under
 
 ### Resources
 [Documentation](http://pcbmode.readthedocs.org)  
-[Boards repository](https://github.com/boldport/boards)
+[Boards repository](https://github.com/boldport/PCBmodE-boards)
 
 ### The name
 The 'mod' in PCBmodE has a double meaning. The first is short for 'modern' (in contrast to tired old EDA tools). The second is a play on the familiar 'modifications' or 'mods' done to imperfect PCBs. Call it 'PCB mode' or 'PCB mod E', whichever you prefer. 
