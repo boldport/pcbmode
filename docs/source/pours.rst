@@ -9,8 +9,9 @@ Defining pours
 
 Pours are defined in their own section in the board's JSON under ``shapes``
 
+
 .. code-block:: json
-    
+        
     {
       "shapes": {
         "pours": 
@@ -25,6 +26,7 @@ Pours are defined in their own section in the board's JSON under ``shapes``
         ]
       }
     } 
+
 
 The above will place a pour over the entire top and bottom layer of the board. It's possible to pour a specific shape, and that's done just like any other shape definition. 
 

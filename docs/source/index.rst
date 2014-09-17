@@ -11,6 +11,7 @@ Contents:
    workflow
    quickstart
    structure
+   components
    shapes
    pours
    text
