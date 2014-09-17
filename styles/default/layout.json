@@ -1,0 +1,395 @@
+{
+  "defaults":
+  {
+    "font-family": "UbuntuMono-R-webfont",
+    "style":
+    {
+      "outline": "stroke",
+      "copper": "fill",
+      "silkscreen": "stroke",
+      "documentation": "fill",
+      "assembly": "stroke",
+      "soldermask": "fill",
+      "solderpaste": "fill",
+      "drills": "fill",
+      "refdef": "fill",
+      "dimensions": "stroke"
+    }
+  },
+  "board":
+  {
+    "board_background":
+    {
+      "fill-opacity": 1,
+      "fill": "#000000",
+      "stroke": "none"
+    },
+    "pad-labels":
+    {
+      "font-size": "0.1px",
+      "font-style": "normal",
+      "font-variant": "normal",
+      "font-weight": "bold",
+      "font-stretch": "normal",
+      "text-align": "center",
+      "line-height":" 100%",
+      "letter-spacing": "0",
+      "word-spacing": "0",
+      "writing-mode": "lr-tb",
+      "text-anchor": "middle",
+      "fill": "#f3ff00",
+      "fill-opacity": 0.8,
+      "stroke": "none",
+      "font-family": "Courier 10 Pitch"
+    }
+  },
+  "dimensions":
+  {
+    "default":
+    {
+      "stroke": "#555555",
+      "stroke-opacity": 1,
+      "fill": "#555555"
+    },
+    "stroke":
+    {
+      "stroke-width": 0.2
+    },
+    "text":
+    {
+      "font-family": "UbuntuMono-R-webfont",
+      "font-size": "1.5mm",
+      "line-height": "1mm",
+      "letter-spacing": "0mm"
+    }
+  },
+  "origin":
+  {
+    "default":
+    {
+      "stroke": "#555555",
+      "stroke-width": 0.05,
+      "stroke-opacity": 1,
+      "fill": "none"
+    }
+  },
+  "outline":
+  {
+    "default":
+    {
+      "stroke": "#555555",
+      "stroke-opacity": 1,
+      "fill": "none"
+    },
+    "stroke":
+    {
+      "stroke-width": 0.05
+    },
+    "fill":
+    {
+    }
+  },
+  "copper": 
+  {
+    "default":
+    {
+      "top":
+      {
+        "stroke": "#008500",
+        "fill": "#008500",
+        "stroke-opacity": 0.6,
+        "fill-opacity": 0.6   
+      },
+      "bottom":
+      {
+        "stroke": "#A60000",
+        "fill": "#A60000",
+        "stroke-opacity": 0.6,
+        "fill-opacity": 0.6   
+      }
+    },
+    "pads":
+    {
+      "top":
+      {
+        "stroke": "none"
+      },
+      "bottom":
+      {
+        "stroke": "none"
+      }
+    },
+    "routing":
+    {
+      "top":
+      {
+        "stroke": "#269926",
+        "fill": "#269926",
+        "fill-opacity": 0.6
+      },
+      "bottom":
+      {
+        "stroke": "#BF3030",
+        "fill": "#BF3030",
+        "fill-opacity": 0.6
+      }
+    },
+    "pours":
+    {
+      "top":
+      {
+        "fill-opacity": 0.2,
+        "stroke": "none"
+      },
+      "bottom":
+      {
+        "fill-opacity": 0.2,
+        "stroke": "none"
+      }
+    },
+    "fill":
+    {
+      "fill-opacity": 0.6,
+      "stroke": "none"
+    },
+    "stroke":
+    {
+      "fill": "none",
+      "stroke-width": 0.15,
+      "stroke-linejoin": "round",
+      "stroke-linecap": "round"
+    }
+  },
+  "silkscreen":
+  {
+    "default":
+    {
+      "top":
+      {
+        "stroke": "#9FEE00",
+        "fill": "#9FEE00",
+        "stroke-opacity": 0.6,
+        "fill-opacity": 0.6   
+      },
+      "bottom":
+      {
+        "stroke": "#CD0074",
+        "fill": "#CD0074",
+        "stroke-opacity": 0.6,
+        "fill-opacity": 0.6   
+      }
+    },
+    "stroke":
+    {
+      "fill": "none",
+      "stroke-width": 0.15,
+      "stroke-linejoin": "round",
+      "stroke-linecap": "round"
+    },
+    "fill":
+    {
+      "fill-opacity": 0.6,
+      "stroke": "none"
+    },
+    "refdef":
+    {
+      "font-family": "UbuntuMono-R-webfont",
+      "font-size": "2mm",
+      "line-height": "2mm",
+      "letter-spacing": "0mm"
+    },
+    "text":
+    {
+      "font-family": "UbuntuMono-R-webfont",
+      "font-size": "1mm",
+      "line-height": "1mm",
+      "letter-spacing": "0mm"
+    }
+  },
+  "solderpaste":
+  {
+    "default":
+    {
+      "top":
+      {
+        "stroke": "#A0A0A0",
+        "fill": "#A0A0A0",
+        "stroke-opacity": 0.6,
+        "fill-opacity": 0.6   
+      },
+      "bottom":
+      {
+        "stroke": "#A0A0A0",
+        "fill": "#A0A0A0",
+        "stroke-opacity": 0.6,
+        "fill-opacity": 0.6   
+      }
+    },
+    "stroke":
+    {
+      "fill": "none",
+      "stroke-width": 0.15,
+      "stroke-linejoin": "round",
+      "stroke-linecap": "round"
+    },
+    "fill":
+    {
+      "fill-opacity": 0.6,
+      "stroke": "none"
+    }
+  },
+  "documentation":
+  {
+    "default":
+    {
+      "fill": "#000455",
+      "fill-opacity": 1,
+      "stroke": "#000000",
+      "stroke-width": 0,
+      "stroke-opacity": 1,
+      "stroke-dasharray": "none"
+    },
+    "text":
+    {
+      "font-family": "Overlock-Regular-OTF-webfont", 
+      "font-size": "1.5mm", 
+      "letter-spacing": "0mm", 
+      "line-height": "1.5mm"
+    }
+  },
+  "assembly":
+  {
+    "default":
+    {
+      "top":
+      {
+        "stroke": "#009999",
+        "fill": "#009999",
+        "stroke-opacity": 0.6,
+        "fill-opacity": 0.6   
+      },
+      "bottom":
+      {
+        "stroke": "#FF7400",
+        "fill": "#FF7400",
+        "stroke-opacity": 0.6,
+        "fill-opacity": 0.6   
+      }
+    },
+    "stroke":
+    {
+      "fill": "none",
+      "stroke-width": 0.15,
+      "stroke-linejoin": "round",
+      "stroke-linecap": "round"
+    },
+    "fill":
+    {
+      "fill-opacity": 0.6,
+      "stroke": "none"
+    },
+    "refdef":
+    {
+      "font-family": "UbuntuMono-R-webfont",
+      "font-size": "2mm",
+      "line-height": "2mm",
+      "letter-spacing": "0mm"
+    },
+    "text":
+    {
+      "font-family": "UbuntuMono-R-webfont",
+      "font-size": "1mm",
+      "line-height": "1mm",
+      "letter-spacing": "0mm"
+    }
+  },
+  "soldermask":
+  {
+    "default":
+    {
+      "top":
+      {
+        "stroke": "#67E667",
+        "fill": "#67E667",
+        "stroke-opacity": 0.6,
+        "fill-opacity": 0.6
+      },
+      "bottom":
+      {
+        "stroke": "#FF7373",
+        "fill": "#FF7373",
+        "stroke-opacity": 0.6,
+        "fill-opacity": 0.6
+      }
+    },
+    "fill":
+    {
+      "stroke": "none"
+    },
+    "stroke":
+    {
+      "fill": "none",
+      "stroke-width": 0.15,
+      "stroke-linejoin": "round",
+      "stroke-linecap": "round"
+    }
+  },
+  "drills":
+  {
+    "default":
+    {
+      "fill": "#444444",
+      "fill-opacity": 0.6,
+      "stroke": "none",
+      "fill-rule": "evenodd"
+    }
+  },
+  "drill-index":
+  {
+    "count-text":
+    {
+      "fill": "#111111",
+      "fill-opacity": 0.8,
+      "font-size": 1.0,
+      "font-style": "normal",
+      "font-variant": "normal",
+      "font-weight": "bold",
+      "font-stretch": "normal",
+      "text-align": "center",
+      "line-height": "100%",
+      "letter-spacing": "0",
+      "word-spacing": "0",
+      "writing-mode": "lr-tb",
+      "text-anchor": "middle",
+      "stroke": "none",
+      "font-family": "Courier 10 Pitch"
+    },
+    "text":
+    {
+      "fill": "#111111",
+      "fill-opacity": 0.8,
+      "font-style": "normal",
+      "font-size": 1.6, 
+      "font-variant": "normal",
+      "font-weight": "bold",
+      "font-stretch": "normal",
+      "line-height": "100%",
+      "letter-spacing": "0",
+      "word-spacing": "0",
+      "writing-mode": "lr-tb",
+      "text-anchor": "start",
+      "stroke": "none",
+      "font-family": "Courier 10 Pitch"
+    }
+  },
+  "layer-index":
+  {
+    "text":
+    {
+      "font-family": "Overlock-Regular-OTF-webfont", 
+      "font-size": "1.2mm", 
+      "letter-spacing": "0mm",
+      "line-height": "1.2mm"
+    }
+  }
+}

@@ -1,0 +1,188 @@
+{
+  "locations":
+  {
+    "boards": "boards/",
+    "components": "components/",
+    "fonts": "fonts/",
+    "build": "build/",
+    "styles": "styles/"
+  },
+  "refdef-index":
+  {
+    "common":
+    {
+      "AT": "Attenuator",
+      "BR": "Bridge rectifier",
+      "BT": "Battery",
+      "C": "Capacitor",
+      "CN": "Capacitor network",
+      "D": "Diode",
+      "DL": "Delay line",
+      "DS": "Display",
+      "F": "Fuse",
+      "FB": "Ferrite bead",
+      "FD": "Fiducial",
+      "J": "Jack connector",
+      "JP": "Link (Jumper)",
+      "K": "Relay",
+      "L": "Inductor",
+      "LS": "Loudspeaker or buzzer",
+      "M": "Motor",
+      "MK": "Microphone",
+      "MP": "Mechanical part",
+      "P": "Plug connector",
+      "PS": "Power supply",
+      "Q": "Transistor",
+      "R": "Resistor",
+      "RN": "Resistor network",
+      "RT": "Thermistor",
+      "RV": "Varistor",
+      "S": "Switch",
+      "T": "Transformer",
+      "TC": "Thermocouple",
+      "TUN": "Tuner",
+      "TP": "Test point",
+      "U": "Integrated circuit",
+      "V": "Vacuum tube",
+      "VR": "Variable resistor",
+      "X": "Transducer",
+      "Y": "Crystal / oscillator",
+      "Z": "Zener diode"
+    },
+    "pcbmode":
+    {
+      "BJT": "BJT",
+      "C": "Capacitor",
+      "D": "Diode",
+      "F": "Fuse",
+      "FB": "Ferrite bead",
+      "FD": "Fiducial",
+      "FET": "FET",
+      "IC": "Integrated circuit",
+      "J": "Connector",
+      "L": "Inductor",
+      "LED": "LED",
+      "MH": "Mounting hole",
+      "MIC": "Microphone",
+      "PB": "Pushbutton",
+      "POT": "Potentiometer",
+      "R": "Resistor",
+      "REL": "Relay",
+      "SKD": "Schottkey diode",
+      "SW": "Switch",
+      "TP": "Test point",
+      "TVS": "TVS",
+      "ZEN": "Zener diode"
+    }
+  },
+  "manufacturers":
+  {
+    "default":
+    {
+      "filenames":
+      {
+        "gerbers":
+        {
+          "top":
+          {
+            "copper": {"ext": "ger"},
+            "soldermask": {"ext": "ger"},
+            "silkscreen": {"ext": "ger"},
+            "solderpaste": {"ext": "ger"}
+          },
+          "bottom":
+          {
+            "copper": {"ext": "ger"},
+            "soldermask": {"ext": "ger"},
+            "silkscreen": {"ext": "ger"},
+            "solderpaste": {"ext": "ger"}
+          },
+          "other":
+   	  {
+            "documentation": {"ext": "ger"},
+            "outline": {"ext": "ger"}
+          }
+        },
+        "drills":
+        {
+          "plated": {"ext": "txt"},
+          "non-plated": {"ext": "txt"}
+        },
+        "text":
+	{
+          "readme": {"ext": "txt"}
+        }
+      }
+    },
+    "hackvana":
+    {
+      "filenames":
+      {
+        "gerbers":
+        {
+          "top":
+          {
+            "copper": {"ext": "gtl"},
+            "soldermask": {"ext": "gts"},
+            "silkscreen": {"ext": "gto"}
+          },
+          "bottom":
+          {
+            "copper": {"ext": "gbl"},
+            "soldermask": {"ext": "gbs"},
+            "silkscreen": {"ext": "gbo"}  
+          },
+          "other":
+   	  {
+            "documentation": {"ext": "gbr"},
+            "outline": {"ext": "gbr"}
+          }
+        },
+        "drills":
+        {
+          "plated": {"ext": "drl"},
+          "non-plated": {"end": "_NPTH", "ext": "drl"}
+        },
+        "text":
+	{
+          "readme": {"ext": "txt"}
+        }
+      }
+    },
+    "oshpark":
+    {
+      "filenames":
+      {
+        "gerbers":
+        {
+          "top":
+          {
+            "copper": {"ext": "GTL"},
+            "soldermask": {"ext": "GTS"},
+            "silkscreen": {"ext": "GTO"}
+          },
+          "bottom":
+          {
+            "copper": {"ext": "GBL"},
+            "soldermask": {"ext": "GBS"},
+            "silkscreen": {"ext": "GBO"}  
+          },
+          "other":
+   	  {
+            "documentation": {"ext": "GBR"},
+            "outline": {"ext": "GKO"}
+          }
+        },
+        "drills":
+        {
+          "plated": {"ext": "XLN"},
+          "non-plated": {"end": "_NPTH", "ext": "drl"}
+        },
+        "text":
+	{
+          "readme": {"ext": "txt"}
+        }
+      }
+    }
+  }
+}
