@@ -5,7 +5,7 @@ Shapes
 Overview
 ========
 
-Shapes are the basic building blocks of **PCBmodE**, and are defined in JSON format. Here's an example of a 'path' shape:
+Shapes are the basic building blocks of *PCBmodE*, and are defined in JSON format. Here's an example of a 'path' shape:
 
 .. code-block:: json
 
@@ -54,10 +54,10 @@ height
   The height of the rectangle
 radii
   The radius of round corners
-    tl: top left
-    tr: top right
-    bl: bottom left
-    br: bottom right
+    tl: top left, 
+    tr: top right, 
+    bl: bottom left, 
+    br: bottom right,
 rotate
   Rotation in clock-wise angles
 style

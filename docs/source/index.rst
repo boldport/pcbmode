@@ -13,6 +13,7 @@ Contents:
    structure
    shapes
    pours
+   text
    routing
    extraction
    hello-solder

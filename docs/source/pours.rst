@@ -2,32 +2,33 @@
 Copper pours
 ############
 
-Defining pours
---------------
-
 A `copper pour <http://en.wikipedia.org/wiki/Copper_pour>`_ covers the surface area of a board with copper while maintaining a certain buffer from other copper features, such as routes and pads. A 'bridge' can connect between a copper feature and a pour.
 
-.. warning:: Since *PCBmodE* does not have a netlist, those bridges need to be added manually, and careful attention needs to be paid to prevent shorts -- there's no DRC!
-
+Defining pours
+--------------
 
 Pours are defined in their own section in the board's JSON under ``shapes``
 
 .. code-block:: json
-
-    "shapes": {
-      "pours": 
-      [
-        {
-          "layers": [
-            "bottom", 
-            "top"
-          ], 
-          "type": "layer"
-        }
-      ]
+    
+    {
+      "shapes": {
+        "pours": 
+        [
+          {
+            "layers": [
+              "bottom", 
+              "top"
+            ], 
+            "type": "layer"
+          }
+        ]
+      }
     } 
 
 The above will place a pour over the entire top and bottom layer of the board. It's possible to pour a specific shape, and that's done just like any other shape definition. 
+
+.. warning:: Since *PCBmodE* does not have a netlist, those bridges need to be added manually, and careful attention needs to be paid to prevent shorts -- there's no DRC!
 
 .. info:: Even if you're pouring over a single layer, the ``layers`` definition only accepts a list, so you'd use ``["bottom"]``, not ``"bottom"``.
 
