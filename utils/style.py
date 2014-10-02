@@ -39,8 +39,11 @@ class Style():
         else:
             self._style = shape_dict['style']
 
-        self._style_dict = layer_style.get(self._style)
-
+        try:
+            self._style_dict = layer_style.get(self._style).copy()
+        except:
+            self._style_dict = None
+            
         # Apply defaults if style dict wasn't found
         if self._style_dict == None:
             if self._style == 'fill':
@@ -54,7 +57,7 @@ class Style():
         # setting with a possible custom definition
         if self._style == 'stroke':
             self._style_dict['stroke-width'] = (shape_dict.get('stroke-width') or
-                                                layer_style[self._style]['stroke-width'])
+                                                layer_style[self._style].get('stroke-width'))
 
 
     def getStyleType(self):
