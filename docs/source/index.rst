@@ -9,7 +9,7 @@ Contents:
 
    introduction
    workflow
-   quickstart
+   setup
    structure
    components
    shapes
