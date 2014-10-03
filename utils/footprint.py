@@ -82,7 +82,7 @@ class Footprint():
                 shape_dict = shape_dict.copy()
 
                 # Which layer(s) to place the shape on
-                layers = shape_dict.get('layer') or ['top']
+                layers = shape_dict.get('layers') or ['top']
 
                 # Add the pin's location to the pad's location
                 shape_location = shape_dict.get('location') or [0, 0]
