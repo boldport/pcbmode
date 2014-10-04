@@ -1,6 +1,6 @@
 ## PCBmodE
 PCBmodE is a printed circuit board design Python script that creates an SVG from [JSON](http://en.wikipedia.org/wiki/JSON) input files, and then creates [Gerber](http://en.wikipedia.org/wiki/Gerber_format) and Excellon files for manufacturing. 
- 
+
 PCBmodE gives the designer the freedome to place any arbitrary shape on any layer, as it is natively vector-based. Much of the design is done in a text editor -- editing JSON -- with viewing and some editing -- routing mostly -- done with [Inkscape](http://inkscape.org).
 
 ### Requirements
