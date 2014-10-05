@@ -11,14 +11,14 @@ Setup
 
 Get the boards repository from `here <https://github.com/boldport/boards>`_ and follow the instructions :doc:`setup` to 'compile' the board. This command should do it
 
-    python pcbmode/pcbmode.py -b hello-solder -m
+    ``python pcbmode/pcbmode.py -b hello-solder -m``
 
 
 .. info:: *PCBmodE* caches some of the heavy computations in a file in the ``build`` directory, so subsequent invocations will run much faster.
 
 Then open the SVG you produced with Inkscape
 
-    inkscape path/to/project/boards/hello-solder/build/hello-solder.svg
+    ``inkscape path/to/project/boards/hello-solder/build/hello-solder.svg``
 
 Once opened, open the layers pane by pressing ``CTRL+SHIFT+L`` and get familiar with the layers of the board by making some hidden and visible.
 
@@ -83,7 +83,7 @@ Placing components is done by "instantiating" a component that is defined in ano
 
 ``R2`` is the unique name for this instantiation of footprint ``0805``. It can be any unique (for the design) name, but convention is to keep it short, one or two letters followed by a number.
 
-.. tip:: There are no hard rules about reference designator format and prefixes, so they vary depending on the context. Wikipedia has a `list <http://en.wikipedia.org/wiki/Reference_designator>`_ that's you can follow in the absence of other guidelines. 
+.. tip:: There are no hard rules about reference designator format and prefixes, so they vary depending on the context. Wikipedia has a `list <http://en.wikipedia.org/wiki/Reference_designator>`_ that you can follow in the absence of other guidelines. 
  
 The footprint for ``0805`` is defined in the file
 
