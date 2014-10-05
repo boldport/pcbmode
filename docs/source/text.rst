@@ -37,7 +37,8 @@ A text definition looks like the following
 .. code-block:: json
 
     {
-      "type": "text", 
+      "type": "text",
+      "layers": ["bottom"],
       "font-family": "Overlock-Regular-OTF-webfont", 
       "font-size": "1.5mm", 
       "letter-spacing": "0mm", 
@@ -52,38 +53,27 @@ A text definition looks like the following
     }
 
 type
-  ``text``
+  ``text``: place a text element
+layers (optional; default ``["top"]``)
+  list: layers to place the shape on (even if placing on a single layer, the definition needs to be in a form of a list)
 font-family
-  The name of the font file, without the ``.svg``
+  text: The name of the font file, without the ``.svg``
 font-size
-  Font size in mm (the ``mm`` must be present)
+  float: font size in mm (the ``mm`` must be present)
 value
-  The text to display; use ``\n`` for newline
-letter-spacing
-  Optional; default is ``0mm``
-  ``0mm`` maintains the natural spacing defined by the font. A positive/negative value will increase/decrease the spacing.
-line-height
-  Optional; default is equal to ``font-size``
-  Controls the distance between lines; a negative value is allowed
-location
-  Optional; default is ``[0, 0]``
-  The *center* of the text object will be placed at coordinates ``x`` and ``y`` 
-rotate
-  Optional; default is ``0``
-  Clock-wise rotation in degrees
-style
-  Optional; default is ``fill``
-  ``fill`` or ``stroke``
-
-When defining text for placement on a particular PCB layer, add a list of layers where the shape is to be placed
-
-.. code-block:: json
-
-    {
-      "layers": [
-        "bottom"
-      ] 
-    }
+  text: the text to display; use ``\n`` for newline
+letter-spacing (optional; default ``0mm``)
+  float: positive/negative value increases/decreases the spacing. ``0mm`` maintains the natural spacing defined by the font
+line-height (optional; defaults to ``font-size``)
+  float: the distance between lines; a negative value is allowed
+location (optional; default ``[0, 0]``)
+  list: ``x`` and ``y`` to place the *center* of the text object  
+rotate (optional; default ``0``)
+  float: rotation, clock-wise degrees
+style (optional; default depends on sheet)
+  ``stroke`` or ``fill``: style of the shape
+stroke-width (optional; default depends on sheet; ignored unless ``style`` is ``stroke``)
+  float: stroke width
 
 
 
