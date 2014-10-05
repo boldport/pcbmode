@@ -15,6 +15,8 @@ What you'll need
 Setup
 =====
 
+.. tip:: To see all the options that *PCBmodE* supports, use ``python pcbmode.py --help``
+
 By default *PCBmodE* expects to find the board files under
 
     boards/<board-name>
@@ -48,3 +50,5 @@ Then open the SVG with Inkscape
 If the SVG opens you're good to go!
 
 .. note:: *PCBmodE* processes a lot of shapes on the first time it is run, so it will take a noticeable time. This time will be dramatically reduced on subsequent invocations since *PCBmodE* caches the shapes in a datafile within the project's build directory.
+
+
