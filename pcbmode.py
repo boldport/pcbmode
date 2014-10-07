@@ -122,9 +122,15 @@ def makeConfig(name, version, cmdline_args):
                             config.cfg['name'] + '.json')
     config.brd = utils.dictFromJsonFile(filename)
 
-    config.brd['config']['units'] = config.brd['config'].get('units', 'mm') or 'mm'
-    config.brd['config']['style-layout'] = config.brd['config'].get('style-layout', 'default') or 'default'
-    
+    tmp_dict = config.brd.get('config')
+    if tmp_dict != None:
+        config.brd['config']['units'] = tmp_dict.get('units', 'mm') or 'mm'
+        config.brd['config']['style-layout'] = tmp_dict.get('style-layout', 'default') or 'default'
+    else:
+        config.brd['config'] = {}
+        config.brd['config']['units'] = 'mm'
+        config.brd['config']['style-layout'] = 'default'
+
     # Get style file; search for it in the project directory and 
     # where the script it
     layout_style = config.brd['config']['style-layout']
