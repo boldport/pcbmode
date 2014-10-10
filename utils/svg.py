@@ -949,6 +949,9 @@ def width_and_height_to_path(width, height, radii=None):
     can be defined with radii
     """
 
+    width = float(width)
+    height = float(height)
+
     # The calculation to obtain the 'k' coefficient can be found here:
     # http://itc.ktu.lt/itc354/Riskus354.pdf
     # "APPROXIMATION OF A CUBIC BEZIER CURVE BY CIRCULAR ARCS AND VICE VERSA"
