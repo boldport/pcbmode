@@ -488,7 +488,7 @@ class Module():
         """
 
         routing = config.rte
-        routes = routing.get('routes')
+        routes = routing.get('routes') or {}
         vias = routing.get('vias') 
 
         # Path effects are used for meandering paths, for example
@@ -509,7 +509,7 @@ class Module():
             # Place defined routes on this SVG layer
             sheet = self._layers[pcb_layer]['copper']['routing']['layer']
 
-            for route_key in routes[pcb_layer]:
+            for route_key in (routes.get(pcb_layer) or {}):
                 shape_dict = routes[pcb_layer][route_key]
                 shape = Shape(shape_dict)
                 style = Style(shape_dict, 'copper')
