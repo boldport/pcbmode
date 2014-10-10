@@ -256,11 +256,17 @@ def makeConfig(name, version, cmdline_args):
     # control if things change.
     config.cfg['invert-y'] = -1
 
-    # soldemask
+    # Soldemask scale
     soldermask = {
       "scale": 1.1
     }
     config.brd['soldermask'] = config.brd.get('soldermask') or soldermask
+
+    # Solderpaste scale
+    solderpaste = {
+      "scale": 0.9
+    }
+    config.brd['solderpaste'] = config.brd.get('solderpaste') or solderpaste
 
     return
 
