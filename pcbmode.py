@@ -175,7 +175,8 @@ def makeConfig(name, version, cmdline_args):
     # ots initial state of {}
     if os.path.isfile(filename):
         config.rte = utils.dictFromJsonFile(filename)
-
+    else:
+        config.rte = {}
 
 
     # namespace URLs
