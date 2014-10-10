@@ -121,8 +121,22 @@ class Footprint():
                     if sm_dict == None:
                         sm_dict = shape_dict.copy()
                         sp_dict = shape_dict.copy()
-                        sm_dict['scale'] = shape.getScale()*config.brd['soldermask']['scale']
-                        sp_dict['scale'] = shape.getScale()*config.brd['solderpaste']['scale']
+
+                        shape_type = shape.getType()
+                        if shape_type == 'path':
+                            sm_dict['scale'] = shape.getScale()*config.brd['soldermask']['path-scale']
+                            sp_dict['scale'] = shape.getScale()*config.brd['solderpaste']['path-scale']
+                        elif shape_type in ['rect', 'rectangle']:
+                            sm_dict['width'] += config.brd['soldermask']['rect-buffer']
+                            sm_dict['height'] += config.brd['soldermask']['rect-buffer']
+                            sp_dict['width'] += config.brd['solderpaste']['rect-buffer']
+                            sp_dict['height'] += config.brd['solderpaste']['rect-buffer']
+                        elif shape_type in ['circ', 'circle']:
+                            sm_dict['diameter'] += config.brd['soldermask']['circle-buffer']
+                            sp_dict['diameter'] += config.brd['solderpaste']['circle-buffer']
+                        else:
+                            pass
+
                         sm_shape = Shape(sm_dict)
                         sp_shape = Shape(sp_dict)
                         sm_style = Style(sm_dict, 'soldermask')

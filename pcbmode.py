@@ -257,17 +257,35 @@ def makeConfig(name, version, cmdline_args):
     # control if things change.
     config.cfg['invert-y'] = -1
 
-    # Soldemask scale
-    soldermask = {
-      "scale": 1.1
+    # Applying a scale factor to a rectanle can look bad if the height
+    # and width are different. For paths, since they are typically
+    # irregular, we apply a scale, but for rectangles and circles we
+    # apply a buffer
+
+    # Soldemask scales and buffers
+    soldermask_dict = {
+      "path-scale": 1.05,
+      "rect-buffer": 0.05,
+      "circle-buffer": 0.05
     }
-    config.brd['soldermask'] = config.brd.get('soldermask') or soldermask
+    config.brd['soldermask'] = config.brd.get('soldermask') or {}
+    for key in soldermask_dict:
+        value = config.brd['soldermask'].get(key)
+        if value == None:
+            config.brd['soldermask'][key] = soldermask_dict[key]
 
     # Solderpaste scale
-    solderpaste = {
-      "scale": 0.9
+    solderpaste_dict = {
+      "path-scale": 0.9,
+      "rect-buffer": -0.5,
+      "circle-buffer": -0.5
     }
-    config.brd['solderpaste'] = config.brd.get('solderpaste') or solderpaste
+    config.brd['solderpaste'] = config.brd.get('solderpaste') or {}
+    for key in solderpaste_dict:
+        value = config.brd['solderpaste'].get(key)
+        if value == None:
+            config.brd['solderpaste'][key] = solderpaste_dict[key]
+
 
     return
 
