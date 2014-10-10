@@ -277,8 +277,8 @@ def makeConfig(name, version, cmdline_args):
     # Solderpaste scale
     solderpaste_dict = {
       "path-scale": 0.9,
-      "rect-buffer": -0.5,
-      "circle-buffer": -0.5
+      "rect-buffer": -0.1,
+      "circle-buffer": -0.1
     }
     config.brd['solderpaste'] = config.brd.get('solderpaste') or {}
     for key in solderpaste_dict:
