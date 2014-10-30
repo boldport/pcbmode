@@ -117,7 +117,7 @@ class Component():
 
                 # Add the refdef to the silkscreen/assembly list. It's
                 # important that this is added at the very end since the
-                # plcament process assumes the refdef is that very 
+                # plcament process assumes the refdef is last
                 footprint_shapes[sheet][layer].append(refdef_shape)
 
 
