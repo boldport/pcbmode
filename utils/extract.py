@@ -82,6 +82,7 @@ def extractComponents(svg_in):
             refdef_texts = svg_in.findall(xpath_expr_refdefs % (pcb_layer, refdef), 
                                           namespaces={'pcbmode':config.cfg['ns']['pcbmode'],
                                                       'svg':config.cfg['ns']['svg']})
+
             for refdef_text in refdef_texts:
 
                 # Get refdef group location
@@ -94,11 +95,13 @@ def extractComponents(svg_in):
                 # Get the refdef text path inside the refdef group
                 refdef_path = refdef_text.find("svg:path", 
                                                namespaces={'svg':config.cfg['ns']['svg']})
-                transform_data = utils.parseTransform(refdef_path.get('transform'))
+                try:
+                    transform_data = utils.parseTransform(refdef_path.get('transform'))
+                except:
+                    transform_data['location'] = Point(0,0)
                 refdef_loc = transform_data['location']
                 # Invert 'y' coordinate
                 refdef_loc.y *= config.cfg['invert-y']
-
 
                 # Current ('old') location of the component
                 current_component_loc = utils.toPoint(comp_dict.get('location', [0, 0]))
@@ -106,10 +109,6 @@ def extractComponents(svg_in):
                     current_refdef_loc = utils.toPoint(comp_dict['silkscreen']['refdef']['location'])
                 except:
                     current_refdef_loc = Point()
-
-
-                print group_loc, refdef_loc, current_component_loc, current_refdef_loc
-
 
                 # TODO: this is an embarassing mess, but I have too much of
                 # a headache to tidy it up!
