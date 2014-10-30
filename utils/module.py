@@ -442,10 +442,10 @@ class Module():
                         # Refdefs need to be in their own groups so that their
                         # location can later be extracted, hence this...
                         try:
-                            is_refdef = getattr(shape, 'is-refdef')
+                            is_refdef = getattr(shape, 'is_refdef')
                         except:
                             is_refdef = False
-     
+
                         if is_refdef == True:
                             refdef_group = et.SubElement(svg_layer, 'g', transform=transform)
                             refdef_group.set('{'+config.cfg['ns']['pcbmode']+'}type', 'refdef')
