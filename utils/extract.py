@@ -37,7 +37,7 @@ def extractComponents(svg_in):
     """
     
     # Get copper refdef shape groups from SVG data
-    xpath_expr_copper_pads = '//svg:g[@pcbmode:pcb-layer="%s"]//svg:g[@pcbmode:place="copper"][@pcbmode:refdef]'
+    xpath_expr_copper_pads = '//svg:g[@pcbmode:pcb-layer="%s"]//svg:g[@pcbmode:sheet="copper"]//svg:g[@pcbmode:sheet="pads"]//svg:g[@pcbmode:refdef]'
 
     xpath_expr_refdefs = '//svg:g[@pcbmode:pcb-layer="%s"]//svg:g[@pcbmode:sheet="silkscreen"]//svg:g[@pcbmode:type="refdef"][@pcbmode:refdef="%s"]'
 
@@ -45,6 +45,7 @@ def extractComponents(svg_in):
         shapes = svg_in.findall(xpath_expr_copper_pads % pcb_layer, 
                                 namespaces={'pcbmode':config.cfg['ns']['pcbmode'],
                                             'svg':config.cfg['ns']['svg']})
+
         for shape in shapes:
             transform_data = utils.parseTransform(shape.get('transform'))
             refdef = shape.get('{'+config.cfg['ns']['pcbmode']+'}refdef')
