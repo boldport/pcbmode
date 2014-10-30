@@ -134,8 +134,6 @@ def extractComponents(svg_in):
                     comp_dict['silkscreen']['refdef']['location'] = [new_refdef_loc.x,
                                                                      new_refdef_loc.y] 
 
-                print new_refdef_loc
-
 
     # Save board config to file (everything is saved, not only the
     # component data)
