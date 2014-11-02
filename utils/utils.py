@@ -464,20 +464,16 @@ def getTextParams(font_size, letter_spacing, line_height):
     try:
         letter_spacing, letter_spacing_unit = parseDimension(letter_spacing)
     except:
-        utils.throw("There's a problem with parsing the 'letter-spacing' property with value '%s'. The format should be an integer or float followed by 'mm' (the only unit supported). For example, '0.3mm' or '-2 mm' should work." % letter_spacing)
+        msg.error("There's a problem with parsing the 'letter-spacing' property with value '%s'. The format should be an integer or float followed by 'mm' (the only unit supported). For example, '0.3mm' or '-2 mm' should work." % letter_spacing)
 
-    if letter_spacing == None:
-        letter_spacing = 0
     if letter_spacing_unit == None:
         letter_spacing_unit = 'mm'
 
     try:
         line_height, line_height_unit = parseDimension(line_height)
     except:
-        throw("There's a problem parsing the 'line-height' property with value '%s'. The format should be an integer or float followed by 'mm' (the only unit supported). For example, '0.3mm' or '-2 mm' should work." % line_height)
+        msg.error("There's a problem parsing the 'line-height' property with value '%s'. The format should be an integer or float followed by 'mm' (the only unit supported). For example, '0.3mm' or '-2 mm' should work." % line_height)
 
-    if line_height == None:
-        line_height = 0
     if line_height_unit == None:
         line_height_unit = 'mm'
     
@@ -486,11 +482,8 @@ def getTextParams(font_size, letter_spacing, line_height):
     except:
         throw("There's a problem parsing the 'font-size'. It's most likely missing. The format should be an integer or float followed by 'mm' (the only unit supported). For example, '0.3mm' or '2 mm' should work. Of course, it needs to be a positive figure.")
 
-    if font_size == None:
-        font_size = 0
     if font_size_unit == None:
         font_size_unit = 'mm'
-
 
     return float(font_size), float(letter_spacing), float(line_height)
 

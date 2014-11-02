@@ -75,10 +75,17 @@ class Shape():
             if font_data == None:
                 msg.error("Couldn't find style file %s. Looked for it here:\n%s" % (font_filename, filenames))
 
-       
-            font_size, letter_spacing, line_height = utils.getTextParams(shape.get('font-size'),
-                                                                         shape.get('letter-spacing'),
-                                                                         shape.get('line-height'))
+            try:
+                fs = shape['font-size']
+            except:
+                msg.error("A 'font-size' attribute must be specified for a 'text' type")
+
+            ls = shape.get('letter-spacing') or '0mm'
+            lh = shape.get('line-height') or fs
+
+            font_size, letter_spacing, line_height = utils.getTextParams(fs,
+                                                                         ls, 
+                                                                         lh)
 
             # With the units-per-em we can figure out the scale factor
             # to use for the desired font size
@@ -104,7 +111,7 @@ class Shape():
         elif self._type in ['path']:
             path = shape.get('value')
         else:
-            msg.error("'%s' is not a recongnised shape type." % self._type)
+            msg.error("'%s' is not a recongnised shape type" % self._type)
 
 
         self._path = SvgPath(path, gerber_lp)
