@@ -558,29 +558,29 @@ class Module():
                                     'route',
                                     use_original_path)
 
-                # Due to the limitation of the Gerber format, and the method chosen
-                # for applying masks onto pours, it is not possible to have copper
-                # pour material inside of paths that have more than a single segment.
-                # In order to make the apperance in the SVG and Gerbers consistent, 
-                # each path segment is added with a 'fill'. In the future, when the
-                # *actual* shape is calculated, it may be possible to avoid this
-                # hack. On the other hand, one can argue that having pours inside of
-                # shapes doesn't make sense anyway, because it alters its apperance, 
-                # and such shapes are stylistic anyway. OK, back to code now...
-                gerber_lp = shape.getGerberLP()
-                if gerber_lp is not None:
-                    if len(gerber_lp) > 1:
-                        path_segments = path.split('m')
-                        i = 0
-                        for path_segment in path_segments[1:]:
-                            # only mask dark bits
-                            if gerber_lp[i] == 'd':
-                                mask_element = et.SubElement(mask_group, 'path',
-                                                             type="mask_shape",
-                                                             style="fill:#000;stroke:none;",
-                                                             d='m '+path_segment)
-
-                            i += 1
+#                # Due to the limitation of the Gerber format, and the method chosen
+#                # for applying masks onto pours, it is not possible to have copper
+#                # pour material inside of paths that have more than a single segment.
+#                # In order to make the apperance in the SVG and Gerbers consistent, 
+#                # each path segment is added with a 'fill'. In the future, when the
+#                # *actual* shape is calculated, it may be possible to avoid this
+#                # hack. On the other hand, one can argue that having pours inside of
+#                # shapes doesn't make sense anyway, because it alters its apperance, 
+#                # and such shapes are stylistic anyway. OK, back to code now...
+#                gerber_lp = shape.getGerberLP()
+#                if gerber_lp is not None:
+#                    if len(gerber_lp) > 1:
+#                        path_segments = path.split('m')
+#                        i = 0
+#                        for path_segment in path_segments[1:]:
+#                            # only mask dark bits
+#                            if gerber_lp[i] == 'd':
+#                                mask_element = et.SubElement(mask_group, 'path',
+#                                                             type="mask_shape",
+#                                                             style="fill:#000;stroke:none;",
+#                                                             d='m '+path_segment)
+# 
+#                            i += 1
 
 
 

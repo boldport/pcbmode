@@ -271,6 +271,12 @@ def extractRouting(svg_in):
             if custom_buffer != None:
                 routes_dict[pcb_layer][digest]['buffer-to-pour'] = float(custom_buffer)
 
+            gerber_lp = route.get('{'+config.cfg['ns']['pcbmode']+'}gerber-lp')
+            if gerber_lp != None:
+                routes_dict[pcb_layer][digest]['gerber-lp'] = gerber_lp
+
+
+
     routing_dict['routes'] = routes_dict
 
     # Create simple stats and display them
