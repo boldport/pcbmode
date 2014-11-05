@@ -205,7 +205,7 @@ class Footprint():
             return
 
         for shape_dict in shapes:
-            layers = shape_dict.get('layer') or ['top']
+            layers = shape_dict.get('layers') or ['top']
             shape = Shape(shape_dict)
             style = Style(shape_dict, 'silkscreen')
             shape.setStyle(style)
