@@ -65,6 +65,8 @@ style (optional; default depends on sheet)
   ``stroke`` or ``fill``: style of the shape
 stroke-width (optional; default depends on sheet; ignored unless ``style`` is ``stroke``)
   float: stroke width
+buffer-to-pour (optional; defaults to global setting)
+  float: custom buffer from shape to copper pour; 0 for no buffer
 
 
 
@@ -96,6 +98,8 @@ style (optional; default depends on sheet)
   ``stroke`` or ``fill``: style of the shape
 stroke-width (optional; default depends on sheet; ignored unless ``style`` is ``stroke``)
   float: stroke width
+buffer-to-pour (optional; defaults to global setting)
+  float: custom buffer from shape to copper pour; 0 for no buffer
 
 
 Path
@@ -134,6 +138,8 @@ rotate (optional; default ``0``)
   float: rotation, clock-wise degrees
 scale (optional; default ``1``)
   float: scale factor to apply to the path
+buffer-to-pour (optional; defaults to global setting)
+  float: custom buffer from shape to copper pour; 0 for no buffer
 
 
 Text
