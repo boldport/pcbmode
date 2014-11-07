@@ -380,15 +380,13 @@ class Module():
                         pass
 
                     for shape in shapes:
-                        place.placeShape(shape, group, invert)
+                        place.placeShape(shape, group)
                         if there_are_pours == True:
                             mask_group = et.SubElement(self._masks[pcb_layer], 'g', 
                                                        transform=transform)
                             self._placeMask(mask_group, 
                                             shape,
-                                            'pad',
-                                            False,
-                                            invert)
+                                            'pad')
 
                     # Add pin labels
                     labels = shapes_dict['pin-labels'][pcb_layer]
@@ -419,7 +417,7 @@ class Module():
                     group = et.SubElement(svg_layer, 'g', transform=transform)
                     group.set('{'+config.cfg['ns']['pcbmode']+'}type', 'component-shapes')
                     for shape in shapes:
-                        placed_element = place.placeShape(shape, group, invert)
+                        placed_element = place.placeShape(shape, group)
      
                     # Solderpaste
                     shapes = shapes_dict['solderpaste'][pcb_layer]
@@ -453,9 +451,9 @@ class Module():
                             refdef_group = et.SubElement(svg_layer, 'g', transform=transform)
                             refdef_group.set('{'+config.cfg['ns']['pcbmode']+'}type', 'refdef')
                             refdef_group.set('{'+config.cfg['ns']['pcbmode']+'}refdef', refdef)
-                            placed_element = place.placeShape(shape, refdef_group, invert)
+                            placed_element = place.placeShape(shape, refdef_group)
                         else:
-                            placed_element = place.placeShape(shape, shape_group, invert)
+                            placed_element = place.placeShape(shape, shape_group)
 
 
                 # Assembly
@@ -466,7 +464,7 @@ class Module():
                                                       config.cfg['invert-y']*location[1])
                     group = et.SubElement(svg_layer, 'g', transform=transform)
                     for shape in shapes:
-                        placed_element = place.placeShape(shape, group, invert)
+                        placed_element = place.placeShape(shape, group)
 
                 # Drills
                 shapes = shapes_dict['drills'][pcb_layer]
@@ -477,7 +475,7 @@ class Module():
                     group = et.SubElement(svg_layer, 'g', transform=transform)
                     group.set('{'+config.cfg['ns']['pcbmode']+'}type', 'component-shapes')
                     for shape in shapes:
-                        placed_element = place.placeShape(shape, group, invert)
+                        placed_element = place.placeShape(shape, group)
                         placed_element.set('{'+config.cfg['ns']['pcbmode']+'}diameter',
                                            str(shape.getDiameter()))
 
