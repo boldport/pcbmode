@@ -386,7 +386,10 @@ class Module():
                                                        transform=transform)
                             self._placeMask(mask_group, 
                                             shape,
-                                            'pad')
+                                            'pad',
+                                            False,
+                                            invert)
+
                     # Add pin labels
                     labels = shapes_dict['pin-labels'][pcb_layer]
                     if labels != []:
