@@ -163,7 +163,9 @@ class Footprint():
                             sdict = sdict.copy()
                             shape_location = sdict.get('location') or [0, 0]
                             sdict['location'] = [shape_location[0] + pin_location[0],
-                                                   shape_location[1] + pin_location[1]]                                          # Create new shape
+                                                 shape_location[1] + pin_location[1]]
+
+                            # Create new shape
                             sshape = Shape(sdict)
 
                             # Create new style
@@ -181,72 +183,6 @@ class Footprint():
                             label['text'] = pin_label
                             label['location'] = shape_dict['location']
                             self._shapes['pin-labels'][layer].append(label)
-
-
-
-
-#                    # Soldermask shape, if any is specified
-#                    sm_dict = shape_dict.get('soldermask') 
-# 
-#                    if sm_dict == None:
-#                        sm_dict = shape_dict.copy()
-#                        sp_dict = shape_dict.copy()
-# 
-#                        shape_type = shape.getType()
-#                        if shape_type == 'path':
-#                            sm_dict['scale'] = shape.getScale()*config.brd['soldermask']['path-scale']
-#                            sp_dict['scale'] = shape.getScale()*config.brd['solderpaste']['path-scale']
-#                        elif shape_type in ['rect', 'rectangle']:
-#                            sm_dict['width'] += config.brd['soldermask']['rect-buffer']
-#                            sm_dict['height'] += config.brd['soldermask']['rect-buffer']
-#                            sp_dict['width'] += config.brd['solderpaste']['rect-buffer']
-#                            sp_dict['height'] += config.brd['solderpaste']['rect-buffer']
-#                        elif shape_type in ['circ', 'circle']:
-#                            sm_dict['diameter'] += config.brd['soldermask']['circle-buffer']
-#                            sp_dict['diameter'] += config.brd['solderpaste']['circle-buffer']
-#                        else:
-#                            pass
-# 
-#                        sm_shape = Shape(sm_dict)
-#                        sp_shape = Shape(sp_dict)
-#                        sm_style = Style(sm_dict, 'soldermask')
-#                        sp_style = Style(sp_dict, 'soldermask')
-#                        sm_shape.setStyle(sm_style)
-#                        sp_shape.setStyle(sp_style)
-#                        self._shapes['soldermask'][layer].append(sm_shape)
-#                        self._shapes['solderpaste'][layer].append(sp_shape)
-#                    elif sm_dict == {}:
-#                        # This indicates that we don't want any soldermask
-#                        # for this shape
-#                        pass
-#                    else:
-#                        # Soldermask is a shape definition of its own
-#                        sm_dict = sm_dict.copy()
-#                        sp_dict = sm_dict.copy()
-#                        shape_location = sm_dict.get('location') or [0, 0]
-#                        sm_dict['location'] = [shape_location[0] + pin_location[0],
-#                                               shape_location[1] + pin_location[1]]                        
-#                        sp_dict['location'] = [shape_location[0] + pin_location[0],
-#                                               shape_location[1] + pin_location[1]]                        
-#                        sm_shape = Shape(sm_dict)
-#                        sp_shape = Shape(sp_dict)
-#                        sm_style = Style(sm_dict, 'soldermask')
-#                        sp_style = Style(sp_dict, 'solderpaste')
-#                        sm_shape.setStyle(sm_style)
-#                        sp_shape.setStyle(sp_style)
-#                        self._shapes['soldermask'][layer].append(sm_shape)
-#                        self._shapes['solderpaste'][layer].append(sp_shape)
-# 
-#                    # Add pin label
-#                    if pin_label != None:
-#                        label = {}
-#                        label['text'] = pin_label
-#                        label['location'] = shape_dict['location']
-#                        self._shapes['pin-labels'][layer].append(label)
-
-
-
-
 
 
 
