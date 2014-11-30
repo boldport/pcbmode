@@ -144,7 +144,6 @@ class Shape():
 
     def rotateLocation(self, angle, point=Point()):
         """
-        Accepts a new location as Point()
         """
         self._location.rotate(angle, point)
 

@@ -12,6 +12,7 @@ import messages as msg
 import svg 
 import utils
 import place
+import copy
 from style import Style
 from point import Point
 from shape import Shape
@@ -215,11 +216,10 @@ class Footprint():
 
         for shape_dict in shapes:
             layers = shape_dict.get('layers') or ['top']
-            shape = Shape(shape_dict)
-            style = Style(shape_dict, 'silkscreen')
-            shape.setStyle(style)
-
             for layer in layers:
+                shape = Shape(shape_dict)
+                style = Style(shape_dict, 'silkscreen')
+                shape.setStyle(style)
                 self._shapes['silkscreen'][layer].append(shape)
 
 
@@ -236,11 +236,10 @@ class Footprint():
 
         for shape_dict in shapes:
             layers = shape_dict.get('layer') or ['top']
-            shape = Shape(shape_dict)
-            style = Style(shape_dict, 'assembly')
-            shape.setStyle(style)
-
             for layer in layers:
+                shape = Shape(shape_dict)
+                style = Style(shape_dict, 'assembly')
+                shape.setStyle(style)
                 self._shapes['assembly'][layer].append(shape)
 
 

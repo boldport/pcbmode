@@ -59,7 +59,6 @@ class Component():
                                         False,
                                         True)
 
-
         #--------------------------------------
         # Remove silkscreen and assembly shapes
         #--------------------------------------
