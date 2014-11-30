@@ -1113,7 +1113,7 @@ def makeSvgLayers(top_layer, transform=None, refdef=None):
     Returns a dictionary of layer instantiations.
     """
 
-    # Contols the visibility of layers and whether they are locked by
+    # Controls the visibility of layers and whether they are locked by
     # default. This is the "master" control; settings in the board's
     # config file will override these settings
     layer_control = {
