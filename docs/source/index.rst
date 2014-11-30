@@ -18,6 +18,7 @@ Contents:
    routing
    extraction
    layer-polarity
+   layer-control
    hello-solder
 
 
