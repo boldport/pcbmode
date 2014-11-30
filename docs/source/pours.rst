@@ -32,7 +32,7 @@ The above will place a pour over the entire top and bottom layer of the board. I
 
 .. warning:: Since *PCBmodE* does not have a netlist, those bridges need to be added manually, and careful attention needs to be paid to prevent shorts -- there's no DRC!
 
-.. info:: Even if you're pouring over a single layer, the ``layers`` definition only accepts a list, so you'd use ``["bottom"]``, not ``"bottom"``.
+.. tip:: Even if you're pouring over a single layer, the ``layers`` definition only accepts a list, so you'd use ``["bottom"]``, not ``"bottom"``.
 
 
 Defining buffers
