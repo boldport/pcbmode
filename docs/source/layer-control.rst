@@ -2,13 +2,10 @@
 Layer control
 ############
 
-When opening a *PCBmodE* SVG in Inkscape, the board's layers can be manipulated by opening the layer pane (``CTRL+SHIFT+L``). Each layer can be hidden/visible or editable/locked. The default for each layer is defined in ``utils/svg.py``
+When opening a *PCBmodE* SVG in Inkscape, the board's layers can be manipulated by opening the layer pane (``CTRL+SHIFT+L``). Each layer can then be set to be hidden/visible or editable/locked. The default for each layer is defined in ``utils/svg.py``
 
 .. code-block:: python
 
-    # Contols the visibility of layers and whether they are locked by
-    # default. This is the "master" control; settings in the board's
-    # config file will override these settings
     layer_control = {
       "copper": { 
         "hidden": False, "locked": False, 
@@ -39,7 +36,7 @@ but can be overridden in the board's configuration file. So, for example, if we 
       }
     }
 
-Or if we'd like the outline to be editable (instead of the defalt 'locked') we'd add 
+Or if we'd like the outline to be editable (instead of the default 'locked') we'd add 
 
 .. code-block:: json
 
