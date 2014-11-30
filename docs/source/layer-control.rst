@@ -50,5 +50,5 @@ Or if we'd like the outline to be editable (instead of the default 'locked') we'
 
 
 
-.. tip:: The reason that some layers are locked by default -- 'outline' is a good example -- is because they are not edited regularly, but span the entire board so very often take focus when slecting objects. Locking them puts them out of the way until an edit is required.
+.. tip:: The reason that some layers are locked by default -- 'outline' is a good example -- is because they are not edited regularly, but span the entire board so very often take focus when selecting objects. Locking them puts them out of the way until an edit is required.
 
