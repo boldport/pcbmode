@@ -8,6 +8,7 @@ PCBmodE gives the designer the freedome to place any arbitrary shape on any laye
 You'll need:
 * Python 2.7
 * [PyParsing](http://pyparsing.wikispaces.com/)
+* [lxml](http://lxml.de/)
 * [Inkscape](http://inkscape.org)
 
 PCBmodE is developed and tested under Linux, so it might or might not work under other OSs. (It'd be helpful to know success or failure of attempts!)
