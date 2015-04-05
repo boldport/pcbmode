@@ -120,9 +120,10 @@ class Footprint():
 
                     for stype in ['soldermask', 'solderpaste']:
 
-                        # Get shape spec if exists
+                        # Get a custom shape specification if it exists
                         sdict = shape_dict.get(stype) 
 
+                        # No defined; default
                         if sdict == None:
                             # Use default settings for shape based on
                             # the pad shape
@@ -131,7 +132,7 @@ class Footprint():
                             # Which shape type is the pad?
                             shape_type = shape.getType()
 
-                            # Apply modifier based on shape
+                            # Apply modifier based on shape type
                             if shape_type == 'path':
                                 sdict['scale'] = shape.getScale()*config.brd[stype]['path-scale']
                             elif shape_type in ['rect', 'rectangle']:
@@ -154,17 +155,20 @@ class Footprint():
                             # Add shape to footprint's shape dictionary
                             self._shapes[stype][layer].append(sshape)
 
+                        # An empty dictionary is used to tell PCBmodE
+                        # not to place any shape
                         elif sdict == {}:
-                            # An empty dictionary is used to tell
-                            # PCBmodE not to place any shape
                             pass
 
+                        # Custom shape definition
                         else:
-                            # A custom shape
                             sdict = sdict.copy()
                             shape_location = sdict.get('location') or [0, 0]
                             sdict['location'] = [shape_location[0] + pin_location[0],
                                                  shape_location[1] + pin_location[1]]
+
+                            # Apply rotation
+                            sdict['rotate'] = (sdict.get('rotate') or 0) + pin_rotate
 
                             # Create new shape
                             sshape = Shape(sdict)
