@@ -90,7 +90,6 @@ class Footprint():
                 shape_dict['location'] = [shape_location[0] + pin_location[0],
                                           shape_location[1] + pin_location[1]]
 
-                
                 # Add the pin's rotation to the pad's rotation
                 shape_dict['rotate'] = (shape_dict.get('rotate') or 0) + pin_rotate
 
@@ -171,9 +170,11 @@ class Footprint():
                             # Process list of shapes
                             for sdict in sdict_list:
                                 sdict = sdict.copy()
-                                shape_location = sdict.get('location') or [0, 0]
-                                sdict['location'] = [shape_location[0] + pin_location[0],
-                                                     shape_location[1] + pin_location[1]]
+                                shape_loc = sdict.get('location') or [0, 0]
+
+                                print pin_location
+                                sdict['location'] = [shape_loc[0] + pin_location[0],
+                                                     shape_loc[1] + pin_location[1]]
      
                                 # Apply rotation
                                 sdict['rotate'] = (sdict.get('rotate') or 0) + pin_rotate
