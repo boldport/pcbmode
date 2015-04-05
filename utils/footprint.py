@@ -155,7 +155,7 @@ class Footprint():
                             self._shapes[stype][layer].append(sshape)
 
                         # Do not place shape
-                        elif sdict_list == {}:
+                        elif (sdict_list == {}) or (sdict_list == []):
                             pass
 
                         # Custom shape definition
