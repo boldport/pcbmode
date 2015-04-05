@@ -172,7 +172,6 @@ class Footprint():
                                 sdict = sdict.copy()
                                 shape_loc = sdict.get('location') or [0, 0]
 
-                                print pin_location
                                 sdict['location'] = [shape_loc[0] + pin_location[0],
                                                      shape_loc[1] + pin_location[1]]
      
