@@ -115,7 +115,7 @@ class Footprint():
                         # doing this
                         self._shapes['copper'][layer].append(shape)
                     except:
-                        msg.error("The same pad shape can be placed on multiple layers. Even if it is only placed on a single layer, the layer needs to be defined as an array, for example, 'layer':['top']")
+                        msg.error("The same pad shape can be placed on multiple layers. Even if it is only placed on a single layer, the layer needs to be defined as a list, for example, 'layer':['top']")
 
 
                     for stype in ['soldermask', 'solderpaste']:
