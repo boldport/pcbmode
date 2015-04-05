@@ -121,10 +121,10 @@ class Footprint():
                     for stype in ['soldermask', 'solderpaste']:
 
                         # Get a custom shape specification if it exists
-                        sdict = shape_dict.get(stype) 
+                        sdict_list = shape_dict.get(stype) 
 
                         # No defined; default
-                        if sdict == None:
+                        if sdict_list == None:
                             # Use default settings for shape based on
                             # the pad shape
                             sdict = shape_dict.copy()
@@ -155,32 +155,41 @@ class Footprint():
                             # Add shape to footprint's shape dictionary
                             self._shapes[stype][layer].append(sshape)
 
-                        # An empty dictionary is used to tell PCBmodE
-                        # not to place any shape
-                        elif sdict == {}:
+                        # Do not place shape
+                        elif sdict_list == {}:
                             pass
 
                         # Custom shape definition
                         else:
-                            sdict = sdict.copy()
-                            shape_location = sdict.get('location') or [0, 0]
-                            sdict['location'] = [shape_location[0] + pin_location[0],
-                                                 shape_location[1] + pin_location[1]]
 
-                            # Apply rotation
-                            sdict['rotate'] = (sdict.get('rotate') or 0) + pin_rotate
+                            # If dict (as before support of multiple
+                            # shapes) then append to a single element
+                            # list
+                            if type(sdict_list) is dict:
+                                sdict_list = [sdict_list]
 
-                            # Create new shape
-                            sshape = Shape(sdict)
+                            # Process list of shapes
+                            for sdict in sdict_list:
+                                sdict = sdict.copy()
+                                shape_location = sdict.get('location') or [0, 0]
+                                sdict['location'] = [shape_location[0] + pin_location[0],
+                                                     shape_location[1] + pin_location[1]]
+     
+                                # Apply rotation
+                                sdict['rotate'] = (sdict.get('rotate') or 0) + pin_rotate
+     
+                                # Create new shape
+                                sshape = Shape(sdict)
+     
+                                # Create new style
+                                sstyle = Style(sdict, stype)
+     
+                                # Apply style
+                                sshape.setStyle(sstyle)
+     
+                                # Add shape to footprint's shape dictionary
+                                self._shapes[stype][layer].append(sshape)
 
-                            # Create new style
-                            sstyle = Style(sdict, stype)
-
-                            # Apply style
-                            sshape.setStyle(sstyle)
- 
-                            # Add shape to footprint's shape dictionary
-                            self._shapes[stype][layer].append(sshape)
      
                         # Add pin label
                         if pin_label != None:
