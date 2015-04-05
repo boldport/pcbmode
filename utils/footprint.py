@@ -170,20 +170,23 @@ class Footprint():
                             # Process list of shapes
                             for sdict in sdict_list:
                                 sdict = sdict.copy()
-                                shape_loc = sdict.get('location') or [0, 0]
+                                shape_loc = utils.toPoint(sdict.get('location') or [0, 0])
 
-                                sdict['location'] = [shape_loc[0] + pin_location[0],
-                                                     shape_loc[1] + pin_location[1]]
-     
                                 # Apply rotation
                                 sdict['rotate'] = (sdict.get('rotate') or 0) + pin_rotate
-     
+
+                                # Rotate location
+                                shape_loc.rotate(pin_rotate, Point())
+
+                                sdict['location'] = [shape_loc.x + pin_location[0],
+                                                     shape_loc.y + pin_location[1]]
+
                                 # Create new shape
                                 sshape = Shape(sdict)
      
                                 # Create new style
                                 sstyle = Style(sdict, stype)
-     
+                                
                                 # Apply style
                                 sshape.setStyle(sstyle)
      
