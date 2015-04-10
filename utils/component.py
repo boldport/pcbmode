@@ -109,6 +109,7 @@ class Component():
                 refdef_dict['font-size'] = (config.stl['layout'][sheet]['refdef'].get('font-size') or 
                                               "2mm")
                 refdef_shape = Shape(refdef_dict)
+
                 refdef_shape.is_refdef = True
                 refdef_shape.rotateLocation(self._rotate, self._rotate_point)
                 style = Style(refdef_dict, sheet, 'refdef')
@@ -116,7 +117,7 @@ class Component():
 
                 # Add the refdef to the silkscreen/assembly list. It's
                 # important that this is added at the very end since the
-                # plcament process assumes the refdef is last
+                # placement process assumes the refdef is last
                 footprint_shapes[sheet][layer].append(refdef_shape)
 
 
