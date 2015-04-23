@@ -892,11 +892,11 @@ class Module():
         # Add a welcome message as a comment in the SVG
         welcome_message = """
 Hello! This SVG file was generated using PCBmodE version %s on %s GMT. 
-PCBmodE is open source software, found here:
+PCBmodE is open source software
 
-  http://bitbucket.org/boldport/pcbmode
+  http://pcbmode.com
 
-and is maintained by Boldport:
+and is maintained by Boldport
 
   http://boldport.com
 
