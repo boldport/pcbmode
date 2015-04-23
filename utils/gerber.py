@@ -286,6 +286,10 @@ class Gerber():
         paths += self._svg.findall(".//svg:g[@pcbmode:type='component-shapes']//svg:path",
                                      namespaces=self._ns)
 
+        # Get refdefs
+        paths += self._svg.findall(".//svg:g[@pcbmode:type='refdef']//svg:path",
+                                     namespaces=self._ns)
+
         # Get component shapes
         paths += self._svg.findall(".//svg:g[@pcbmode:type='layer-index']//svg:path",
                                      namespaces=self._ns)
