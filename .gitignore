@@ -56,4 +56,5 @@ target/
 # Virtualenv
 bin/
 include/
+pip-selfcheck.json
 
