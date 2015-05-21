@@ -398,10 +398,7 @@ class Module():
                         for label in labels:
                             t = et.SubElement(label_group, 'text',
                                               x=str(label['location'][0]),
-                                              # TODO: get rid of this hack
-                                              y=str(-label['location'][1]))
-                                              #y=str(-pin_location.y + pad_numbers_font_size/3),
-                                              #refdef=self._refdef)
+                                              y=str(config.cfg['invert-y']*label['location'][1]))
                             t.text = label['text']
 
 
