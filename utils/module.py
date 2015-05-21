@@ -380,9 +380,6 @@ class Module():
                         pass
 
                     for shape in shapes:
-
-                        #((1,-1)[invert])
-                        
                         place.placeShape(shape, group, invert)
                         if there_are_pours == True:
                             mask_group = et.SubElement(self._masks[pcb_layer], 'g', 
@@ -391,16 +388,23 @@ class Module():
                                             shape,
                                             'pad')
 
-                    # Add pin labels
-                    labels = shapes_dict['pin-labels'][pcb_layer]
+                    # Add pin labels 
+
+                    # There's a bit of a hack here that won't work in
+                    # all possible cases (where pads are placed on
+                    # bottom layer in a component that has pins placed
+                    # both on the top and on the bottom -- a rare
+                    # case). Good enough for now
+
+                    labels = shapes_dict['pin-labels']['top']#[pcb_layer]
                     if labels != []:
                         style = utils.dictToStyleText(config.stl['layout']['board']['pad-labels'])
                         label_group = et.SubElement(group, 'g', 
-                                                    transform="rotate(%s)" % component.getRotation(),
+                                                    transform="rotate(%s)" % ((1,-1)[invert])*component.getRotation(),
                                                     style=style)
                         for label in labels:
                             t = et.SubElement(label_group, 'text',
-                                              x=str(label['location'][0]),
+                                              x=str(((1,-1)[invert])*label['location'][0]),
                                               y=str(config.cfg['invert-y']*label['location'][1]))
                             t.text = label['text']
 
