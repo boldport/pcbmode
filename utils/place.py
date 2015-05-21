@@ -28,8 +28,8 @@ def placeShape(shape, svg_layer, invert=False, original=False):
     gerber_lp = shape.getGerberLP()
     location = shape.getLocation()
 
-#    if invert == True:
-#        location.x = -location.x
+    if invert == True:
+        location.x = -location.x
 
     if original == False:
         translate = 'translate(%s,%s)' % (round(location.x, sig_dig),

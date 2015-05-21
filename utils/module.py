@@ -343,14 +343,14 @@ class Module():
             shapes_dict = component.getShapes()
             location = component.getLocation()
 
-            # If the component is placed on the bottom layer we need
-            # to invert the shapes AND their 'x' coordinate.  This is
-            # sone using the 'invert' indicator set below
             refdef = component.getRefdef()
 
             if print_refdef == True:
                 print refdef,
 
+            # If the component is placed on the bottom layer we need
+            # to invert the shapes AND their 'x' coordinate.  This is
+            # done using the 'invert' indicator set below
             placement_layer = component.getPlacementLayer()
             if placement_layer == 'bottom':
                 invert = True
@@ -380,7 +380,10 @@ class Module():
                         pass
 
                     for shape in shapes:
-                        place.placeShape(shape, group)
+
+                        #((1,-1)[invert])
+                        
+                        place.placeShape(shape, group, invert)
                         if there_are_pours == True:
                             mask_group = et.SubElement(self._masks[pcb_layer], 'g', 
                                                        transform=transform)
@@ -414,7 +417,7 @@ class Module():
                     group = et.SubElement(svg_layer, 'g', transform=transform)
                     group.set('{'+config.cfg['ns']['pcbmode']+'}type', 'component-shapes')
                     for shape in shapes:
-                        placed_element = place.placeShape(shape, group)
+                        placed_element = place.placeShape(shape, group, invert)
      
                     # Solderpaste
                     shapes = shapes_dict['solderpaste'][pcb_layer]
@@ -448,12 +451,9 @@ class Module():
                             refdef_group = et.SubElement(svg_layer, 'g', transform=transform)
                             refdef_group.set('{'+config.cfg['ns']['pcbmode']+'}type', 'refdef')
                             refdef_group.set('{'+config.cfg['ns']['pcbmode']+'}refdef', refdef)
-                            # reference designators need to be flipped
-                            # if they are placed on the bottom layer
-                            place_mirrored = (pcb_layer=='bottom')
-                            placed_element = place.placeShape(shape, refdef_group, place_mirrored)
+                            placed_element = place.placeShape(shape, refdef_group, invert)
                         else:
-                            placed_element = place.placeShape(shape, shape_group)
+                            placed_element = place.placeShape(shape, shape_group, invert)
 
 
                 # Assembly
@@ -464,7 +464,7 @@ class Module():
                                                       config.cfg['invert-y']*location[1])
                     group = et.SubElement(svg_layer, 'g', transform=transform)
                     for shape in shapes:
-                        placed_element = place.placeShape(shape, group)
+                        placed_element = place.placeShape(shape, group, invert)
 
                 # Drills
                 shapes = shapes_dict['drills'][pcb_layer]
