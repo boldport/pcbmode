@@ -400,7 +400,7 @@ class Module():
                     if labels != []:
                         style = utils.dictToStyleText(config.stl['layout']['board']['pad-labels'])
                         label_group = et.SubElement(group, 'g', 
-                                                    transform="rotate(%s)" % ((1,-1)[invert])*component.getRotation(),
+                                                    transform="rotate(%s)" % (((1,-1)[invert])*component.getRotation()),
                                                     style=style)
                         for label in labels:
                             t = et.SubElement(label_group, 'text',
