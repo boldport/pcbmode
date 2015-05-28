@@ -431,7 +431,7 @@ class Module():
                     group = et.SubElement(svg_layer, 'g', transform=transform)
                     group.set('{'+config.cfg['ns']['pcbmode']+'}type', 'component-shapes')
                     for shape in shapes:
-                        placed_element = place.placeShape(shape, group)
+                        placed_element = place.placeShape(shape, group, invert)
 
 
                 # Silkscreen
