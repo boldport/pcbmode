@@ -313,6 +313,7 @@ class Module():
                         mirror = True
                     else:
                         mirror = False
+
                     shape = Shape(shape_dict)
                     style = Style(shape_dict, sheet)
                     shape.setStyle(style)
@@ -325,11 +326,11 @@ class Module():
                         mask_group = et.SubElement(self._masks[pcb_layer], 'g')
                                                    #id="routing_masks") 
                                                    #transform=transform)
-                        self._placeMask(mask_group, 
-                                        shape,
-                                        'pad',
-                                        False,
-                                        mirror)
+                        self._placeMask(svg_layer=mask_group, 
+                                        shape=shape,
+                                        kind='pad',
+                                        original=False,
+                                        mirror=mirror)
 
 
      
@@ -386,7 +387,9 @@ class Module():
                                                        transform=transform)
                             self._placeMask(mask_group, 
                                             shape,
-                                            'pad')
+                                            'pad',
+                                            original=False,
+                                            mirror=False)
 
                     # Add pin labels 
 
