@@ -78,8 +78,11 @@ def gerberise(manufacturer='default'):
                             steps,
                             length)
 
-            add = '_%s_%s.%s' % (pcb_layer, sheet,
-                                 filename_info[pcb_layer][sheet].get('ext') or 'ger')
+            try:
+                ext = filename_info[pcb_layer][sheet]['ext']
+            except KeyError:
+                ext = 'ger'
+            add = '_%s_%s.%s' % (pcb_layer, sheet, ext)
             filename = os.path.join(base_dir, base_name + add)
 
             with open(filename, "wb") as f:
