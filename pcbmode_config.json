@@ -159,13 +159,15 @@
           {
             "copper": {"ext": "GTL"},
             "soldermask": {"ext": "GTS"},
-            "silkscreen": {"ext": "GTO"}
+            "silkscreen": {"ext": "GTO"},
+            "solderpaste": {"ext": "GTP"}
           },
           "bottom":
           {
             "copper": {"ext": "GBL"},
             "soldermask": {"ext": "GBS"},
-            "silkscreen": {"ext": "GBO"}  
+            "silkscreen": {"ext": "GBO"},
+            "solderpaste": {"ext": "GBP"}
           },
           "other":
    	  {
