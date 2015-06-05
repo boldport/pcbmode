@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import os
+import copy
 from lxml import etree as et
 
 import config
@@ -23,6 +24,8 @@ class Shape():
 
         gerber_lp = None
         mirror = False
+
+        self._shape_dict = shape
 
         # Invert rotation so it's clock-wise. Inkscape is counter-clockwise and
         # it's unclear to ma what's the "right" direction. clockwise makse more
@@ -127,7 +130,6 @@ class Shape():
 
 
 
-
     def transformPath(self, scale=1, rotate=0, rotate_point=Point(), mirror=False, add=False):
         if add == False:
             self._path.transform(scale,
@@ -148,6 +150,14 @@ class Shape():
         self._location.rotate(angle, point)
 
 
+
+    def getRotation(self):
+        return self._rotate
+
+
+
+    def setRotation(self, rotate):
+        self._rotate = rotate
 
 
 
@@ -205,12 +215,17 @@ class Shape():
         style = self._style.getStyleType()
         return style
 
+
     def getScale(self):
         return self._scale
 
 
     def getLocation(self):
         return self._location
+
+  
+    def setLocation(self, location):
+        self._location = location
 
 
     def getParsedPath(self):

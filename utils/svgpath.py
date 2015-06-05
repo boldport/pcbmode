@@ -52,6 +52,8 @@ class SvgPath():
 
 
 
+
+
     def _parseResultsToList(self, parsed):
         """
         PyParsing returnd an object that looks like a list, but itsn't

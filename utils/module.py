@@ -2,6 +2,7 @@
 
 import os
 import datetime
+import copy
 from lxml import etree as et
 
 import config
@@ -313,6 +314,7 @@ class Module():
                         mirror = True
                     else:
                         mirror = False
+
                     shape = Shape(shape_dict)
                     style = Style(shape_dict, sheet)
                     shape.setStyle(style)
@@ -325,11 +327,11 @@ class Module():
                         mask_group = et.SubElement(self._masks[pcb_layer], 'g')
                                                    #id="routing_masks") 
                                                    #transform=transform)
-                        self._placeMask(mask_group, 
-                                        shape,
-                                        'pad',
-                                        False,
-                                        mirror)
+                        self._placeMask(svg_layer=mask_group, 
+                                        shape=shape,
+                                        kind='pad',
+                                        original=False,
+                                        mirror=False)
 
 
      
@@ -343,14 +345,14 @@ class Module():
             shapes_dict = component.getShapes()
             location = component.getLocation()
 
-            # If the component is placed on the bottom layer we need
-            # to invert the shapes AND their 'x' coordinate.  This is
-            # sone using the 'invert' indicator set below
             refdef = component.getRefdef()
 
             if print_refdef == True:
                 print refdef,
 
+            # If the component is placed on the bottom layer we need
+            # to invert the shapes AND their 'x' coordinate.  This is
+            # done using the 'invert' indicator set below
             placement_layer = component.getPlacementLayer()
             if placement_layer == 'bottom':
                 invert = True
@@ -363,11 +365,14 @@ class Module():
 
                 # Copper
                 shapes = shapes_dict['copper'][pcb_layer]
+
                 if len(shapes) > 0:
+
                     svg_layer = self._layers[pcb_layer]['copper']['pads']['layer']
      
                     transform = "translate(%s,%s)" % (location[0],
                                                       config.cfg['invert-y']*location[1])
+
                     group = et.SubElement(svg_layer, 'g', 
                                           transform=transform)
 
@@ -380,28 +385,34 @@ class Module():
                         pass
 
                     for shape in shapes:
-                        place.placeShape(shape, group)
+                        place.placeShape(shape, group, invert)
                         if there_are_pours == True:
                             mask_group = et.SubElement(self._masks[pcb_layer], 'g', 
                                                        transform=transform)
                             self._placeMask(mask_group, 
                                             shape,
-                                            'pad')
+                                            'pad',
+                                            original=False,
+                                            mirror=invert)
 
-                    # Add pin labels
-                    labels = shapes_dict['pin-labels'][pcb_layer]
+                    # Add pin labels 
+
+                    # There's a bit of a hack here that won't work in
+                    # all possible cases (where pads are placed on
+                    # bottom layer in a component that has pins placed
+                    # both on the top and on the bottom -- a rare
+                    # case). Good enough for now
+
+                    labels = shapes_dict['pin-labels']['top']#[pcb_layer]
                     if labels != []:
                         style = utils.dictToStyleText(config.stl['layout']['board']['pad-labels'])
                         label_group = et.SubElement(group, 'g', 
-                                                    transform="rotate(%s)" % component.getRotation(),
+                                                    transform="rotate(%s)" % (((1,-1)[invert])*component.getRotation()),
                                                     style=style)
                         for label in labels:
                             t = et.SubElement(label_group, 'text',
-                                              x=str(label['location'][0]),
-                                              # TODO: get rid of this hack
-                                              y=str(-label['location'][1]))
-                                              #y=str(-pin_location.y + pad_numbers_font_size/3),
-                                              #refdef=self._refdef)
+                                              x=str(((1,-1)[invert])*label['location'][0]),
+                                              y=str(config.cfg['invert-y']*label['location'][1]))
                             t.text = label['text']
 
 
@@ -417,7 +428,7 @@ class Module():
                     group = et.SubElement(svg_layer, 'g', transform=transform)
                     group.set('{'+config.cfg['ns']['pcbmode']+'}type', 'component-shapes')
                     for shape in shapes:
-                        placed_element = place.placeShape(shape, group)
+                        placed_element = place.placeShape(shape, group, invert)
      
                     # Solderpaste
                     shapes = shapes_dict['solderpaste'][pcb_layer]
@@ -427,7 +438,7 @@ class Module():
                     group = et.SubElement(svg_layer, 'g', transform=transform)
                     group.set('{'+config.cfg['ns']['pcbmode']+'}type', 'component-shapes')
                     for shape in shapes:
-                        placed_element = place.placeShape(shape, group)
+                        placed_element = place.placeShape(shape, group, invert)
 
 
                 # Silkscreen
@@ -451,12 +462,9 @@ class Module():
                             refdef_group = et.SubElement(svg_layer, 'g', transform=transform)
                             refdef_group.set('{'+config.cfg['ns']['pcbmode']+'}type', 'refdef')
                             refdef_group.set('{'+config.cfg['ns']['pcbmode']+'}refdef', refdef)
-                            # reference designators need to be flipped
-                            # if they are placed on the bottom layer
-                            place_mirrored = (pcb_layer=='bottom')
-                            placed_element = place.placeShape(shape, refdef_group, place_mirrored)
+                            placed_element = place.placeShape(shape, refdef_group, invert)
                         else:
-                            placed_element = place.placeShape(shape, shape_group)
+                            placed_element = place.placeShape(shape, shape_group, invert)
 
 
                 # Assembly
@@ -467,7 +475,7 @@ class Module():
                                                       config.cfg['invert-y']*location[1])
                     group = et.SubElement(svg_layer, 'g', transform=transform)
                     for shape in shapes:
-                        placed_element = place.placeShape(shape, group)
+                        placed_element = place.placeShape(shape, group, invert)
 
                 # Drills
                 shapes = shapes_dict['drills'][pcb_layer]

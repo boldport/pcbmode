@@ -96,10 +96,7 @@ class Footprint():
                 # Determine if and which label to show
                 show_name = pins[pin]['layout'].get('show-label') or True
                 if show_name == True:
-                    pin_label = pins[pin]['layout'].get('label')
-                    if pin_label == None:
-                        pin_label = pin
-                pn_label = None
+                    pin_label = pins[pin]['layout'].get('label') or pin
 
                 # The same shape can go on multiple layers
                 for layer in layers:
