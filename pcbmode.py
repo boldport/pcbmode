@@ -80,6 +80,10 @@ def cmdArgSetup(pcbmode_version):
                       dest='renumber', default=False,
                       help="Renumber refdefs (valid options are 'top-to-bottom' (default), 'bottom-to-top', 'left-to-right', 'right-to-left'")
 
+    argp.add_argument('--create-bom',
+                      action='store_true', dest='create_bom', default=False,
+                      help='Create a bill of materials (BoM)')
+
     return argp
 
 
