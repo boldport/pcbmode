@@ -929,8 +929,16 @@ and is maintained by Boldport
         # Get shapes for each component definition
         for refdef in components_dict:
             component_dict = components_dict[refdef]
+            
+            # Show or hide the component.
+            # This will still account the component for the BoM
             show = component_dict.get('show', True)
-            if show == True:
+
+            # Place or do not place the component
+            # Also ignored for BoM
+            place = component_dict.get('place', True)
+
+            if (show == True) and (place == True):
                 component = Component(refdef, component_dict)
                 components.append(component)
         
