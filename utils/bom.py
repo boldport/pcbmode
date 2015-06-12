@@ -132,41 +132,93 @@ def create_bom():
           ]
 
 
-    # Output header
-    length = 20
+
+    # Set up the BoM file name
+    bom_path = os.path.join(config.cfg['base-dir'],
+                            config.cfg['locations']['build'],
+                            'bom')
+    # Create path if it doesn't exist already
+    utils.create_dir(bom_path)
+
+    board_name = config.cfg['name']
+    board_revision = config.brd['config'].get('rev')
+    base_name = "%s_rev_%s" % (board_name, board_revision)
+
+    bom_html = os.path.join(bom_path, base_name + '_%s.html'% 'bom')
+    bom_csv = os.path.join(bom_path, base_name + '_%s.csv'% 'bom')
+
+
+    html = []
+    csv = []
+
+
+    html.append('<html>')
+    html.append('<style type="text/css">')
+    try:
+        css = config.stl['layout']['bom']['css']
+    except:
+        css = []
+    for line in css:
+        html.append(line)
+    html.append('</style>')
+    html.append('<table class="tg">')
+
+    header = []
     for item in bom_content:
         if item['field'] == 'suppliers':
             for supplier in item['suppliers']:
-                print "%s" % (supplier['text']).ljust(length),
+                header.append("%s" % supplier['text'])
         else:
-            print "%s" % (item['text']).ljust(length),
-    print
+            header.append("%s" % item['text'])
+
+    html.append('  <tr>')
+    html.append('    <th class="tg-title" colspan="%s">Bill of materials -- %s rev %s</th>' % (len(header), board_name, board_revision))
+    html.append('  </tr>') 
+    html.append('  <tr>')
+    for item in header:
+        html.append('    <th class="tg-header">%s</th>' % item)
+    html.append('  </tr>')
+    
 
     for i, desc in enumerate(bom_dict):
+        content = []
         for item in bom_content:
             if item['field'] == 'line-item':
-                print i+1,
+                content.append(str(i+1))
             elif item['field'] == 'suppliers':
                 for supplier in item['suppliers']:
                     try:
-                        print bom_dict[desc][item['field']][supplier['field']].ljust(length),
+                        content.append(bom_dict[desc][item['field']][supplier['field']])
                     except:
-                        print "".ljust(length),
+                        content.append("")
             elif item['field'] == 'quantity':
-                print "%s" % (str(len(bom_dict[desc]['refdefs']))).ljust(length),
+                content.append("%s" % (str(len(bom_dict[desc]['refdefs']))))
             elif item['field'] == 'designators':
-                for refdef in bom_dict[desc]['refdefs']:
-                    print "%s " % refdef,
+                refdefs = ''
+                for refdef in bom_dict[desc]['refdefs'][:-1]:
+                    refdefs += "%s " % refdef
+                refdefs += "%s" % bom_dict[desc]['refdefs'][-1]
+                content.append("%s " % refdefs)
             elif item['field'] == 'description':
-                print "%s " % desc,
+                content.append("%s " % desc)
             else:
                 try:
-                    print bom_dict[desc][item['field']].ljust(length),
+                    content.append(bom_dict[desc][item['field']])
                 except:
-                    print "".ljust(length),
-        print
+                    content.append("")
 
-    print
+        html.append('  <tr>')
+        for item in content:
+            html.append('    <td class="tg-item-%s">%s</td>' % (('odd','even')[i%2==0], item))
+        html.append('  </tr>')
+
+    html.append('</table>')
+    html.append('</html>')
+
+    with open(bom_html, "wb") as f:
+        for line in html:
+            f.write(line+'\n')
+
     
     #print bom_dict
 
