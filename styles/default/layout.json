@@ -391,5 +391,17 @@
       "letter-spacing": "0mm",
       "line-height": "1.2mm"
     }
+  },
+  "bom":
+  {
+    "css": [
+      ".tg   {border-collapse:collapse;border-spacing:0;border-color:#aabcfe;}",
+      ".tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#aabcfe;color:#669;background-color:#e8edff;border-top-width:1px;border-bottom-width:1px;}",
+      ".tg th{font-family:Ubuntu, Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#aabcfe;color:#039;background-color:#b9c9fe;border-top-width:1px;border-bottom-width:1px;}",
+      ".tg .tg-title{font-weight:strong;background-color:#D2E4FC}",
+      ".tg .tg-header{font-weight:strong;background-color:#D2E4FC}",
+      ".tg .tg-item-odd{background-color:#D2E4FC}",
+      ".tg .tg-item-even{background-color:#e8edff}"
+    ]
   }
 }
