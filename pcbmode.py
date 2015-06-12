@@ -11,6 +11,7 @@ import utils.gerber as gerber
 import utils.extract as extract
 import utils.excellon as excellon
 import utils.messages as msg
+import utils.bom as bom
 from utils.board import Board
 
 
@@ -325,10 +326,13 @@ def main():
 
         utils.renumberRefdefs(order)
 
-    # extract routing from input SVG file
+    # Extract routing from input SVG file
     elif cmdline_args.extract is True:
-        #msg.info("Extracting")
         extract.extract()
+
+    # Create a BoM
+    elif cmdline_args.create_bom is True:
+        bom.create_bom()
 
     else:
         # make the board
