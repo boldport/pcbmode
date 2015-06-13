@@ -84,50 +84,50 @@ def create_bom():
             },
             {
               "field": "quantity",
-              "text": "qty"
+              "text": "Qty"
             },
             {
               "field": "designators",
-               "text": "designators"
+               "text": "Designators"
             }, 
             {
               "field": "description",
-              "text": "description"
+              "text": "Description"
             }, 
             {
               "field": "package",
-              "text": "package"
+              "text": "Package"
             }, 
             {
               "field": "manufacturer",
-              "text": "manuf."
+              "text": "Manufacturer"
             }, 
             {
-              "field": "manufacturer-part-number",
-              "text": "manuf. part #"
+              "field": "part-number",
+              "text": "Part #"
             },
             {
               "field": "suppliers",
-              "text": "suppliers",
+              "text": "Suppliers",
               "suppliers": 
               [
                 {
                   "field": "farnell",
-                  "text": "Farnell"
+                  "text": "Farnell #"
                 },
                 { 
                   "field": "mouser",
-                  "text": "Mouser"
+                  "text": "Mouser #"
                 }
               ]
             }, 
             {
               "field": "placement",
-              "text": "layer"
+              "text": "Layer"
             }, 
             {
               "field": "notes",
-              "text": "notes"
+              "text": "Notes"
             }
           ]
 
@@ -187,10 +187,17 @@ def create_bom():
                 content.append(str(i+1))
             elif item['field'] == 'suppliers':
                 for supplier in item['suppliers']:
+
                     try:
-                        content.append(bom_dict[desc][item['field']][supplier['field']])
+                        number = bom_dict[desc][item['field']][supplier['field']]
                     except:
-                        content.append("")
+                        number = ""
+
+                    if supplier['field'] == 'farnell':
+                        content.append('<a href="http://uk.farnell.com/catalog/Search?st=%s">%s</a>' % (number, number))
+                    else:
+                        content.append(number)
+
             elif item['field'] == 'quantity':
                 content.append("%s" % (str(len(bom_dict[desc]['refdefs']))))
             elif item['field'] == 'designators':
