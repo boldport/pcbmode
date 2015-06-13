@@ -94,12 +94,12 @@ def create_bom():
             if dnp == True:
                 description = dnp_text
  
-        if description not in bom_dict:
-            bom_dict[description] = fp_bom_dict
-            bom_dict[description]['refdefs'] = []
-        bom_dict[description]['refdefs'].append(refdef)
-        
-        bom_dict[description]['placement'] = components_dict[refdef]['layer']
+            if description not in bom_dict:
+                bom_dict[description] = fp_bom_dict
+                bom_dict[description]['refdefs'] = []
+            bom_dict[description]['refdefs'].append(refdef)
+            
+            bom_dict[description]['placement'] = components_dict[refdef]['layer']
     
 
     try:
