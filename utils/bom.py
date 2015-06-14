@@ -2,7 +2,7 @@
 
 #import json
 import os
-#import re
+import re
 #import subprocess as subp # for shell commands
 #import math
 #from operator import itemgetter # for sorting lists by dict value
@@ -25,15 +25,35 @@ def create_bom():
     
     """
 
+    def natural_key(string_):
+        """See http://www.codinghorror.com/blog/archives/001018.html"""
+        return [int(s) if s.isdigit() else s for s in re.split(r'(\d+)', string_)]
+
+
+     
+    dnp_text = 'Do not populate'
+    uncateg_text = 'Uncategorised'
+
     components_dict = config.brd['components']
     
     bom_dict = {}
 
     for refdef in components_dict:
-        place = components_dict.get('place', True)
+
+        description = ''
+
+        try:
+            place = components_dict[refdef]['place']
+        except:
+            place = True
+
+        try:
+            ignore = components_dict[refdef]['bom']['ignore']
+        except:
+            ignore = False
 
         # If component isn't placed, ignore it
-        if place == True:
+        if place == True and ignore == False:
 
             # Get footprint definition and shapes
             try:
@@ -46,26 +66,34 @@ def create_bom():
                                  config.cfg['locations']['components'],
                                  footprint_name + '.json')
             footprint_dict = utils.dictFromJsonFile(fname)
-
+ 
             info_dict = footprint_dict.get('info') or {}
-
+ 
             try: 
                 comp_bom_dict = components_dict[refdef]['bom']
             except:
                 comp_bom_dict = {}
-
+ 
             try: 
                 fp_bom_dict = footprint_dict['info']
             except:
                 fp_bom_dict = {}
-
-
+ 
+ 
             # Override component BoM info on top of footprint info
             for key in comp_bom_dict:
                 fp_bom_dict[key] = comp_bom_dict[key]
 
-            description = fp_bom_dict.get('description') or 'Uncategorised'
+            description = fp_bom_dict.get('description') or uncateg_text
 
+            try:
+                dnp = components_dict[refdef]['bom']['dnp']
+            except:
+                dnp = False            
+
+            if dnp == True:
+                description = dnp_text
+ 
             if description not in bom_dict:
                 bom_dict[description] = fp_bom_dict
                 bom_dict[description]['refdefs'] = []
@@ -84,89 +112,184 @@ def create_bom():
             },
             {
               "field": "quantity",
-              "text": "qty"
+              "text": "Qty"
             },
             {
               "field": "designators",
-               "text": "designators"
+               "text": "Designators"
             }, 
             {
               "field": "description",
-              "text": "description"
+              "text": "Description"
             }, 
             {
               "field": "package",
-              "text": "package"
+              "text": "Package"
             }, 
             {
               "field": "manufacturer",
-              "text": "manuf."
+              "text": "Manufacturer"
             }, 
             {
-              "field": "manufacturer-part-number",
-              "text": "manuf. part #"
+              "field": "part-number",
+              "text": "Part #"
             },
             {
               "field": "suppliers",
-              "text": "suppliers",
+              "text": "Suppliers",
               "suppliers": 
               [
                 {
                   "field": "farnell",
-                  "text": "Farnell"
+                  "text": "Farnell #",
+                  "search-url": "http://uk.farnell.com/catalog/Search?st="
                 },
                 { 
                   "field": "mouser",
-                  "text": "Mouser"
+                  "text": "Mouser #",
+                  "search-url": "http://uk.mouser.com/Search/Refine.aspx?Keyword="
+                },
+                {
+                  "field": "octopart",
+                  "text": "Octopart",
+                  "search-url": "https://octopart.com/search?q="
                 }
               ]
             }, 
             {
               "field": "placement",
-              "text": "layer"
+              "text": "Layer"
             }, 
             {
               "field": "notes",
-              "text": "notes"
+              "text": "Notes"
             }
           ]
 
 
-    # Output header
-    length = 20
+
+    # Set up the BoM file name
+    bom_path = os.path.join(config.cfg['base-dir'],
+                            config.cfg['locations']['build'],
+                            'bom')
+    # Create path if it doesn't exist already
+    utils.create_dir(bom_path)
+
+    board_name = config.cfg['name']
+    board_revision = config.brd['config'].get('rev')
+    base_name = "%s_rev_%s" % (board_name, board_revision)
+
+    bom_html = os.path.join(bom_path, base_name + '_%s.html'% 'bom')
+    bom_csv = os.path.join(bom_path, base_name + '_%s.csv'% 'bom')
+
+
+    html = []
+    csv = []
+
+
+    html.append('<html>')
+    html.append('<style type="text/css">')
+    try:
+        css = config.stl['layout']['bom']['css']
+    except:
+        css = []
+    for line in css:
+        html.append(line)
+    html.append('</style>')
+    html.append('<table class="tg">')
+
+    header = []
     for item in bom_content:
         if item['field'] == 'suppliers':
             for supplier in item['suppliers']:
-                print "%s" % (supplier['text']).ljust(length),
+                header.append("%s" % supplier['text'])
         else:
-            print "%s" % (item['text']).ljust(length),
-    print
+            header.append("%s" % item['text'])
 
-    for i, desc in enumerate(bom_dict):
+    html.append('  <tr>')
+    html.append('    <th class="tg-title" colspan="%s">Bill of materials -- %s rev %s</th>' % (len(header), board_name, board_revision))
+    html.append('  </tr>') 
+    html.append('  <tr>')
+    for item in header:
+        html.append('    <th class="tg-header">%s</th>' % item)
+    html.append('  </tr>')
+    
+
+    uncateg_content = []
+    dnp_content = []
+    index = 1
+
+    for desc in bom_dict:
+        content = []
         for item in bom_content:
             if item['field'] == 'line-item':
-                print i+1,
+                content.append(str(index))
             elif item['field'] == 'suppliers':
                 for supplier in item['suppliers']:
+
                     try:
-                        print bom_dict[desc][item['field']][supplier['field']].ljust(length),
+                        number = bom_dict[desc][item['field']][supplier['field']]
                     except:
-                        print "".ljust(length),
+                        number = ""
+
+                    search_url = supplier.get('search-url')
+                    if search_url != None:
+                        content.append('<a href="%s%s">%s</a>' % (search_url, number, number))
+                    else:
+                        content.append(number)
+
             elif item['field'] == 'quantity':
-                print "%s" % (str(len(bom_dict[desc]['refdefs']))).ljust(length),
+                content.append("%s" % (str(len(bom_dict[desc]['refdefs']))))
             elif item['field'] == 'designators':
-                for refdef in bom_dict[desc]['refdefs']:
-                    print "%s " % refdef,
+                # Natural/human sort the list of designators
+                sorted_list = sorted(bom_dict[desc]['refdefs'], key=natural_key)
+
+                refdefs = ''
+                for refdef in sorted_list[:-1]:
+                    refdefs += "%s " % refdef
+                refdefs += "%s" % sorted_list[-1]
+                content.append("%s " % refdefs)
             elif item['field'] == 'description':
-                print "%s " % desc,
+                content.append("%s " % desc)
             else:
                 try:
-                    print bom_dict[desc][item['field']].ljust(length),
+                    content.append(bom_dict[desc][item['field']])
                 except:
-                    print "".ljust(length),
-        print
+                    content.append("")
 
-    print
+        if desc == uncateg_text:
+            uncateg_content = content
+        elif desc == dnp_text:
+            dnp_content = content
+        else:
+            html.append('  <tr>')
+            for item in content:
+                html.append('    <td class="tg-item-%s">%s</td>' % (('odd','even')[index%2==0], item))
+            html.append('  </tr>')
+            index += 1
+
+
+    for content in (dnp_content, uncateg_content):
+        html.append('  <tr class="tg-skip">')
+        html.append('  </tr>')        
+        html.append('  <tr>')
+        content[0] = index
+        for item in content:
+            html.append('    <td class="tg-item-%s">%s</td>' % (('odd','even')[index%2==0], item))
+        html.append('  </tr>')
+        index += 1
+
+
+    html.append('</table>')
+
+    html.append('<p>Generated by <a href="http://pcbmode.com">PCBmodE</a>, an open source PCB design software. PCBmodE was written and is maintained by <a href="http://boldport.com">Boldport</a>, creators of beautifully functional circuits.')
+
+    html.append('</html>')
+
+    with open(bom_html, "wb") as f:
+        for line in html:
+            f.write(line+'\n')
+
     
     #print bom_dict
 
