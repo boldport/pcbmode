@@ -311,6 +311,7 @@ class Module():
                             shape_mirror = False
                         
                     if (pcb_layer == 'bottom') and (shape_mirror != False):
+                        shape_dict['location'][0] *= -1
                         mirror = True
                     else:
                         mirror = False
@@ -325,13 +326,11 @@ class Module():
                         location = shape.getLocation()
                         transform = "translate(%s,%s)" % (location.x, location.y)
                         mask_group = et.SubElement(self._masks[pcb_layer], 'g')
-                                                   #id="routing_masks") 
-                                                   #transform=transform)
                         self._placeMask(svg_layer=mask_group, 
                                         shape=shape,
                                         kind='pad',
                                         original=False,
-                                        mirror=False)
+                                        mirror=mirror)
 
 
      
