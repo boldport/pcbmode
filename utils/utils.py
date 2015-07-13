@@ -80,7 +80,7 @@ def parseDimension(string):
     if specified, from the value
     """
     if string != None:
-        result = re.match('(-?\d+\.?\d?)\s?(\w+)', string)
+        result = re.match('(-?\d*\.?\d+)\s?(\w+)?', string)
         value = float(result.group(1))
         unit = result.group(2)
     else:
