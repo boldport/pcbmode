@@ -316,22 +316,21 @@ def extractRouting(svg_in):
     #-------------
 
     # XPATH expression for extracting vias
-    xpath_expr = "//svg:g[@pcbmode:pcb-layer='%s']//svg:g[@pcbmode:sheet='routing']//svg:path[@pcbmode:type='via']"
+    xpath_expr = "//svg:g[@pcbmode:pcb-layer='%s']//svg:g[@pcbmode:sheet='routing']//svg:*[@pcbmode:type='via']"
     # Get new vias; only search the top layer
     new_vias = svg_in.xpath(xpath_expr % 'top', 
                             namespaces={'pcbmode':config.cfg['ns']['pcbmode'], 
                                         'svg':config.cfg['ns']['svg']})    
 
-
     # XPATH expression for extracting vias
     xpath_expr = "//svg:g[@pcbmode:pcb-layer='%s']//svg:g[@pcbmode:sheet='pads']//svg:g[@pcbmode:type='via']"
-    # Get new vias; only search the top layer
+    # Get nexisting vias; only search the top layer
     vias = svg_in.xpath(xpath_expr % 'top', 
                         namespaces={'pcbmode':config.cfg['ns']['pcbmode'], 
                                     'svg':config.cfg['ns']['svg']})    
 
-    vias_dict = {}
 
+    vias_dict = {}
 
     for via in vias:
 
@@ -363,10 +362,15 @@ def extractRouting(svg_in):
         # A newly-defined via will have a location set through the
         # 'sodipodi' namespace and possible also through a transform
         try:
-            sodipodi_loc = Point(via.get('{'+config.cfg['ns']['sodipodi']+'}cx'), 
-                            via.get('{'+config.cfg['ns']['sodipodi']+'}cy'))
+            # The commented lines below wored fro Inkscape prior to 0.91
+            #sodipodi_loc = Point(via.get('{'+config.cfg['ns']['sodipodi']+'}cx'), 
+            #                via.get('{'+config.cfg['ns']['sodipodi']+'}cy'))
+            sodipodi_loc = Point(via.get('cx'), 
+                            via.get('cy'))
         except:
-            sodipodi_loc = Pound()
+            sodipodi_loc = Point()
+
+        print sodipodi_loc
 
         transform = via.get('transform')
         if transform != None:
