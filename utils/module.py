@@ -251,11 +251,13 @@ class Module():
                 new_pour_dict = self._module_dict['outline'].get('shape').copy()
                 new_pour_dict['style'] = 'fill'
                 shape = Shape(new_pour_dict)
-                style = Style(new_pour_dict, 'outline')
+                style = Style(new_pour_dict, layer_name='outline')
                 shape.setStyle(style)
             else:
+                #pour_dict['style'] = pour_dict.get('style', 'fill')
+                print pour_dict['style']
                 shape = Shape(pour_dict)
-                style = Style(pour_dict, 'outline')
+                style = Style(pour_dict, layer_name='outline')
                 shape.setStyle(style)
 
             # Place on all specified layers

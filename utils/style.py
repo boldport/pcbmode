@@ -58,6 +58,7 @@ class Style():
         if self._style == 'stroke':
             self._style_dict['stroke-width'] = (shape_dict.get('stroke-width') or
                                                 layer_style[self._style].get('stroke-width'))
+            self._style_dict['fill'] = "none"
 
 
     def getStyleType(self):
