@@ -254,8 +254,6 @@ class Module():
                 style = Style(new_pour_dict, layer_name='outline')
                 shape.setStyle(style)
             else:
-                #pour_dict['style'] = pour_dict.get('style', 'fill')
-                print pour_dict['style']
                 shape = Shape(pour_dict)
                 style = Style(pour_dict, layer_name='outline')
                 shape.setStyle(style)
