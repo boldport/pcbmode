@@ -139,12 +139,16 @@
       "top":
       {
         "fill-opacity": 0.2,
-        "stroke": "none"
+        "stroke-opacity": 0.2,
+        "stroke-linejoin": "round",
+        "stroke-linecap": "round"
       },
       "bottom":
       {
         "fill-opacity": 0.2,
-        "stroke": "none"
+        "stroke-opacity": 0.2,
+        "stroke-linejoin": "round",
+        "stroke-linecap": "round"
       }
     },
     "fill":
