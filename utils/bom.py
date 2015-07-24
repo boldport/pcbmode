@@ -20,7 +20,7 @@ import messages as msg
 
 
 
-def create_bom():
+def make_bom(quantity=None):
     """
     
     """
@@ -205,6 +205,8 @@ def create_bom():
                 header.append("%s" % supplier['text'])
         else:
             header.append("%s" % item['text'])
+            if item['field'] == 'quantity' and quantity != None:
+                header.append("@%s" % quantity)
 
     html.append('  <tr>')
     html.append('    <th class="tg-title" colspan="%s">Bill of materials -- %s rev %s</th>' % (len(header), board_name, board_revision))
@@ -223,7 +225,7 @@ def create_bom():
         content = []
         for item in bom_content:
             if item['field'] == 'line-item':
-                content.append(str(index))
+                content.append("<strong>%s</strong>" % str(index))
             elif item['field'] == 'suppliers':
                 for supplier in item['suppliers']:
 
@@ -239,7 +241,10 @@ def create_bom():
                         content.append(number)
 
             elif item['field'] == 'quantity':
-                content.append("%s" % (str(len(bom_dict[desc]['refdefs']))))
+                units = len(bom_dict[desc]['refdefs'])
+                content.append("%s" % (str(units)))
+                if quantity != None:
+                    content.append("%s" % (str(units*int(quantity))))
             elif item['field'] == 'designators':
                 # Natural/human sort the list of designators
                 sorted_list = sorted(bom_dict[desc]['refdefs'], key=natural_key)
@@ -273,7 +278,8 @@ def create_bom():
         html.append('  <tr class="tg-skip">')
         html.append('  </tr>')        
         html.append('  <tr>')
-        content[0] = index
+        if len(content) > 0:
+            content[0] = index
         for item in content:
             html.append('    <td class="tg-item-%s">%s</td>' % (('odd','even')[index%2==0], item))
         html.append('  </tr>')
