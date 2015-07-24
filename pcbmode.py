@@ -81,9 +81,9 @@ def cmdArgSetup(pcbmode_version):
                       dest='renumber', default=False,
                       help="Renumber refdefs (valid options are 'top-to-bottom' (default), 'bottom-to-top', 'left-to-right', 'right-to-left'")
 
-    argp.add_argument('--create-bom',
-                      action='store_true', dest='create_bom', default=False,
-                      help='Create a bill of materials (BoM)')
+    argp.add_argument('--make-bom', nargs='?',
+                      dest='make_bom', default=False, 
+                      help='Create a bill of materials')
 
     return argp
 
@@ -331,8 +331,8 @@ def main():
         extract.extract()
 
     # Create a BoM
-    elif cmdline_args.create_bom is True:
-        bom.create_bom()
+    elif cmdline_args.make_bom is not False:
+        bom.make_bom(cmdline_args.make_bom)
 
     else:
         # make the board
