@@ -264,6 +264,9 @@ def extractRouting(svg_in):
 
             stroke_width = utils.getStyleAttrib(style_text, 'stroke-width')
             if stroke_width != None:
+                # Sometimes Inkscape will add a 'px' suffix to the stroke-width 
+                #property pf a path; this removes it
+                stroke_width = stroke_width.rstrip('px')
                 routes_dict[pcb_layer][digest]['style'] = 'stroke'
                 routes_dict[pcb_layer][digest]['stroke-width'] = round(float(stroke_width), 4)
 
