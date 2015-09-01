@@ -242,7 +242,7 @@ class Module():
             try:
                 pour_type = pour_dict['type']
             except:
-                msg.error("Can't find a 'type' for a pour shape. Pours can be any 'shape', or simply 'type':'layer' to cover the entire layer.")
+                msg.error("Cannot find a 'type' for a pour shape. Pours can be any 'shape', or simply 'type':'layer' to cover the entire layer.")
 
             layers = pour_dict.get('layers') or ['top']
 
@@ -251,11 +251,13 @@ class Module():
                 new_pour_dict = self._module_dict['outline'].get('shape').copy()
                 new_pour_dict['style'] = 'fill'
                 shape = Shape(new_pour_dict)
-                style = Style(new_pour_dict, layer_name='outline')
+                # Get the appropriate style from copper->pours
+                style = Style(new_pour_dict, layer_name='copper', sub_item='pours')
                 shape.setStyle(style)
             else:
                 shape = Shape(pour_dict)
-                style = Style(pour_dict, layer_name='outline')
+                # Get the appropriate style from copper->pours
+                style = Style(pour_dict, layer_name='copper', sub_item='pours')
                 shape.setStyle(style)
 
             # Place on all specified layers
