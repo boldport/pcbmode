@@ -136,6 +136,11 @@ def makeConfig(name, version, cmdline_args):
         config.brd['config']['units'] = 'mm'
         config.brd['config']['style-layout'] = 'default'
 
+
+    #=================================
+    # Style
+    #=================================
+
     # Get style file; search for it in the project directory and 
     # where the script it
     layout_style = config.brd['config']['style-layout']
@@ -155,6 +160,36 @@ def makeConfig(name, version, cmdline_args):
 
     if config.stl['layout'] == {}:
         msg.error("Couldn't find style file %s. Looked for it here:\n%s" % (layout_style_filename, filenames))
+
+    #=================================
+    # Stackup
+    #=================================
+    try:
+        stackup_filename = config.brd['stackup']['name'] + '.json'
+    except:
+        stackup_filename = 'default.json'
+
+    paths = [os.path.join(config.cfg['base-dir']), # project dir
+             os.path.join(os.path.dirname(os.path.realpath(__file__)))] # script dir
+
+    filenames = ''
+    for path in paths:
+        filename = os.path.join(path, config.cfg['locations']['stackups'],
+                                stackup_filename)
+        filenames += "  %s \n" % filename
+        if os.path.isfile(filename):
+            config.stk = utils.dictFromJsonFile(filename)
+            break
+
+    if config.stk == {}:
+        msg.error("Couldn't find stackup file %s. Looked for it here:\n%s" % (stackup_filename, filenames))
+
+    config.stk['layer-dicts'], config.stk['layer-names'] = utils.getLayerList()
+    config.stk['surface-layers'] = [config.stk['layer-dicts'][0], config.stk['layer-dicts'][-1]]
+    config.stk['internal-layers'] = config.stk['layer-dicts'][1:-1]
+    config.stk['surface-layers-names'] = [config.stk['layer-names'][0], config.stk['layer-names'][-1]]
+    config.stk['internal-layers-names'] = config.stk['layer-names'][1:-1]
+
 
     #=================================
     # Path database

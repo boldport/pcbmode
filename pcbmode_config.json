@@ -5,7 +5,8 @@
     "components": "components/",
     "fonts": "fonts/",
     "build": "build/",
-    "styles": "styles/"
+    "styles": "styles/",
+    "stackups": "stackups/"
   },
   "refdef-index":
   {

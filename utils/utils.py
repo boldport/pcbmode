@@ -206,28 +206,40 @@ def dictFromJsonFile(filename, error=True):
 
 
 
+def getLayerList():
+    """
+    """
+    layer_list = []
+    for record in config.stk['stackup']:
+        if record['type'] == 'layer':
+            layer_list.append(record)
+
+    layer_names = []
+    for record in layer_list:
+        layer_names.append(record['name'])
+
+    return layer_list, layer_names
+
+
 
 def getSurfaceLayers():
     """
-    Returns a list of sorface layer names
+    Returns a list of surface layer names
+    Only here until this function is purged from the
+    codebase
     """    
+    return config.stk['surface-layers-names']
 
-    board_stackup = config.brd['physical'].get('stackup')
-    if board_stackup is not None:
-        if len(board_stackup) == 1:
-            surface_layers = ['top']
-        elif len(board_stackup) == 2:
-            surface_layers = ['top', 'bottom']
-        else:
-            msg.error("PCBmodE currently only supports two layers, found %s." % len(board_stackup))
-            
-    return surface_layers
+
 
 
 def getInternalLayers():
     """
-    """
-    return []
+    Returns a list of internal layer names
+    Only here until this function is purged from the
+    codebase
+    """    
+    return config.stk['internal-layers-names']
 
 
 
