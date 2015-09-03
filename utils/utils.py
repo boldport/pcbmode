@@ -211,7 +211,7 @@ def getLayerList():
     """
     layer_list = []
     for record in config.stk['stackup']:
-        if record['type'] == 'layer':
+        if record['type'] == 'signal-layer-surface' or record['type'] == 'signal-layer-internal':
             layer_list.append(record)
 
     layer_names = []

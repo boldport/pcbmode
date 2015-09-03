@@ -100,6 +100,13 @@
         "stroke-opacity": 0.6,
         "fill-opacity": 0.6   
       },
+      "internal":
+      {
+        "stroke": "#F2B705",
+        "fill": "#F2B705",
+        "stroke-opacity": 0.6,
+        "fill-opacity": 0.6   
+      },
       "bottom":
       {
         "stroke": "#A60000",
