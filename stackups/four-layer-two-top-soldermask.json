@@ -2,20 +2,23 @@
   "stackup": [
     {
       "name": "top",
-      "display-name": "top",
       "type": "signal-layer-surface",
       "stack": [
         {
-          "type": "silkscreen"
+          "type": "silkscreen",
+          "name": "silkscreen"
         },
         {
-          "type": "soldermask"
+          "type": "soldermask",
+          "name": "soldermask-1"
         },
         {
-          "type": "soldermask"
+          "type": "soldermask",
+          "name": "soldermask-2"
         },
         {
           "type": "conductor",
+          "name": "copper",
           "material": "copper"
         }
       ]
@@ -31,11 +34,12 @@
     },
     {
       "name": "internal-1",
-      "display-name": "int-1",
       "type": "signal-layer-internal",
       "stack": [
         {
-          "material": "copper"
+          "material": "copper",
+          "name": "copper",
+          "type": "conductor"
         }
       ]
     },
@@ -50,11 +54,12 @@
     },
     {
       "name": "internal-2",
-      "display-name": "int-2",
       "type": "signal-layer-internal",
       "stack": [
         {
-          "material": "copper"
+          "material": "copper",
+          "name": "copper",
+          "type": "conductor"
         }
       ]
     },
@@ -69,18 +74,20 @@
     },
     {
       "name": "bottom",
-      "display-name": "bot",
       "type": "signal-layer-surface",
       "stack": [
         {
           "type": "conductor",
+          "name": "copper",
           "material": "copper"
         },
         {
-          "type": "soldermask"
+          "type": "soldermask",
+          "name": "soldermask"
         },
         {
-          "type": "silkscreen"
+          "type": "silkscreen",
+          "name": "soldermask"
         }
       ]
     }

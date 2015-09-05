@@ -5,7 +5,7 @@
     "style":
     {
       "outline": "stroke",
-      "copper": "fill",
+      "conductor": "fill",
       "silkscreen": "stroke",
       "documentation": "fill",
       "assembly": "stroke",
@@ -89,7 +89,7 @@
     {
     }
   },
-  "copper": 
+  "conductor": 
   {
     "default":
     {

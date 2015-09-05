@@ -234,7 +234,7 @@ class Module():
 
         shape_group = {}
         for pcb_layer in utils.getSurfaceLayers():
-            svg_layer = self._layers[pcb_layer]['copper']['pours']['layer']
+            svg_layer = self._layers[pcb_layer]['conductor']['pours']['layer']
             shape_group[pcb_layer] = et.SubElement(svg_layer, 'g',
                                                    mask='url(#mask-%s)' % pcb_layer)
 
@@ -251,13 +251,13 @@ class Module():
                 new_pour_dict = self._module_dict['outline'].get('shape').copy()
                 new_pour_dict['style'] = 'fill'
                 shape = Shape(new_pour_dict)
-                # Get the appropriate style from copper->pours
-                style = Style(new_pour_dict, layer_name='copper', sub_item='pours')
+                # Get the appropriate style from conductor->pours
+                style = Style(new_pour_dict, layer_name='conductor', sub_item='pours')
                 shape.setStyle(style)
             else:
                 shape = Shape(pour_dict)
-                # Get the appropriate style from copper->pours
-                style = Style(pour_dict, layer_name='copper', sub_item='pours')
+                # Get the appropriate style from conductor->pours
+                style = Style(pour_dict, layer_name='conductor', sub_item='pours')
                 shape.setStyle(style)
 
             # Place on all specified layers
@@ -280,7 +280,7 @@ class Module():
             return
 
 
-        for sheet in ['copper','soldermask','solderpaste','silkscreen']:
+        for sheet in ['conductor','soldermask','solderpaste','silkscreen']:
             try:
                 shapes = shapes_dict[sheet]
             except KeyError:
@@ -324,7 +324,7 @@ class Module():
                     place.placeShape(shape, shape_groups[pcb_layer], mirror)
      
                     # Place mask for pour if copper shape
-                    if (sheet == 'copper') and (there_are_pours[pcb_layer] == True):
+                    if (sheet == 'conductor') and (there_are_pours[pcb_layer] == True):
                         location = shape.getLocation()
                         transform = "translate(%s,%s)" % (location.x, location.y)
                         mask_group = et.SubElement(self._masks[pcb_layer], 'g')
@@ -365,11 +365,11 @@ class Module():
                 there_are_pours = utils.checkForPoursInLayer(pcb_layer)
 
                 # Copper
-                shapes = shapes_dict['copper'][pcb_layer]
+                shapes = shapes_dict['conductor'][pcb_layer]
 
                 if len(shapes) > 0:
 
-                    svg_layer = self._layers[pcb_layer]['copper']['pads']['layer']
+                    svg_layer = self._layers[pcb_layer]['conductor']['pads']['layer']
      
                     transform = "translate(%s,%s)" % (location[0],
                                                       config.cfg['invert-y']*location[1])
@@ -520,12 +520,12 @@ class Module():
             mask_group = et.SubElement(self._masks[pcb_layer], 'g')
 
             # Place defined routes on this SVG layer
-            sheet = self._layers[pcb_layer]['copper']['routing']['layer']
+            sheet = self._layers[pcb_layer]['conductor']['routing']['layer']
 
             for route_key in (routes.get(pcb_layer) or {}):
                 shape_dict = routes[pcb_layer][route_key]
                 shape = Shape(shape_dict)
-                style = Style(shape_dict, 'copper')
+                style = Style(shape_dict, 'conductor')
                 shape.setStyle(style)
 
                 # Routes are a special case where they are used as-is
@@ -731,7 +731,7 @@ class Module():
 
         # Create group for placing index
         for pcb_layer in utils.getSurfaceLayers():
-            for sheet in ['copper', 'soldermask', 'silkscreen', 'assembly', 'solderpaste']:
+            for sheet in ['conductor', 'soldermask', 'silkscreen', 'assembly', 'solderpaste']:
                 layer = self._layers[pcb_layer][sheet]['layer']
                 transform = "translate(%s,%s)" % (location.x, config.cfg['invert-y']*location.y)
                 group = et.SubElement(layer, 'g',
