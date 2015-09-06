@@ -1146,7 +1146,7 @@ def makeSvgLayers(top_layer, transform=None, refdef=None):
     layers = {}
 
     # Create layers for top and bottom PCB layers
-    for layer_dict in reversed(config.stk['layer-dicts']):
+    for layer_dict in reversed(config.stk['layers-dict']):
 
         layer_type = layer_dict['type']
         layer_name = layer_dict['name']

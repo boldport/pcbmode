@@ -184,12 +184,12 @@ def makeConfig(name, version, cmdline_args):
     if config.stk == {}:
         msg.error("Couldn't find stackup file %s. Looked for it here:\n%s" % (stackup_filename, filenames))
 
-    config.stk['layer-dicts'], config.stk['layer-names'] = utils.getLayerList()
-    config.stk['surface-layers'] = [config.stk['layer-dicts'][0], config.stk['layer-dicts'][-1]]
-    config.stk['internal-layers'] = config.stk['layer-dicts'][1:-1]
-    config.stk['surface-layers-names'] = [config.stk['layer-names'][0], config.stk['layer-names'][-1]]
-    config.stk['internal-layers-names'] = config.stk['layer-names'][1:-1]
-
+    config.stk['layers-dict'], config.stk['layer-names'] = utils.getLayerList()
+    config.stk['surface-layers'] = [config.stk['layers-dict'][0], config.stk['layers-dict'][-1]]
+    config.stk['internal-layers'] = config.stk['layers-dict'][1:-1]
+    config.stk['surface-layer-names'] = [config.stk['layer-names'][0], config.stk['layer-names'][-1]]
+    config.stk['internal-layer-names'] = config.stk['layer-names'][1:-1]
+    config.stk['layer-names'] = config.stk['surface-layer-names'] + config.stk['internal-layer-names']
 
     #=================================
     # Path database

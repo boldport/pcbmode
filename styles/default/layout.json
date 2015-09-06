@@ -150,6 +150,13 @@
         "stroke-linejoin": "round",
         "stroke-linecap": "round"
       },
+      "internal":
+      {
+        "fill-opacity": 0.2,
+        "stroke-opacity": 0.2,
+        "stroke-linejoin": "round",
+        "stroke-linecap": "round"
+      },
       "bottom":
       {
         "fill-opacity": 0.2,

@@ -228,7 +228,7 @@ def getSurfaceLayers():
     Only here until this function is purged from the
     codebase
     """    
-    return config.stk['surface-layers-names']
+    return config.stk['surface-layer-names']
 
 
 
@@ -239,7 +239,7 @@ def getInternalLayers():
     Only here until this function is purged from the
     codebase
     """    
-    return config.stk['internal-layers-names']
+    return config.stk['internal-layer-names']
 
 
 

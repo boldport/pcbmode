@@ -46,9 +46,9 @@ class Component():
         #------------------------------------------------        
         # Apply component-specific modifiers to footprint
         #------------------------------------------------
-        for sheet in ['copper', 'soldermask', 'solderpaste', 'silkscreen', 'assembly', 'drills']:
-            for layer in utils.getSurfaceLayers() + utils.getInternalLayers():
-                for shape in footprint_shapes[sheet][layer]:
+        for sheet in ['conductor', 'soldermask', 'solderpaste', 'silkscreen', 'assembly', 'drills']:
+            for layer in config.stk['layer-names']: #utils.getSurfaceLayers() + utils.getInternalLayers():
+                for shape in footprint_shapes[sheet].get(layer) or []:
                     # In order to apply the rotation we need to adust the location
                     # of each element
                     shape.rotateLocation(self._rotate, self._rotate_point)
@@ -130,7 +130,7 @@ class Component():
             layers = utils.getSurfaceLayers()
             layers_reversed = reversed(utils.getSurfaceLayers())
            
-            for sheet in ['copper', 'soldermask', 'solderpaste', 'silkscreen', 'assembly']:
+            for sheet in ['conductor', 'soldermask', 'solderpaste', 'silkscreen', 'assembly']:
                 sheet_dict = footprint_shapes[sheet]
                 # TODO: this nasty hack won't work for more than two
                 # layers, so when 2+ are supported this needs to be

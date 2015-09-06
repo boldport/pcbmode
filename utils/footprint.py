@@ -27,14 +27,15 @@ class Footprint():
 
         self._footprint = footprint
 
-        self._shapes = {'copper': {'top': [], 'bottom': [], 'internal': []},
-                        'soldermask': {'top': [], 'bottom': []},
-                        'silkscreen': {'top': [], 'bottom': []},
-                        'assembly': {'top': [], 'bottom': []},
-                        'solderpaste': {'top': [], 'bottom': []},
-                        'drills': {'top': [], 'bottom': [], 'internal': []},
-                        'pin-labels': {'top': [], 'bottom': [], 'internal': []}}
+        
 
+        self._shapes = {'conductor': {},
+                        'soldermask': {},
+                        'silkscreen': {},
+                        'assembly': {},
+                        'solderpaste': {},
+                        'drills': {},
+                        'pin-labels': {}}
 
         self._processPins()
         self._processSilkscreenShapes()
@@ -102,16 +103,23 @@ class Footprint():
                 for layer in layers:
                     
                     shape = Shape(shape_dict)
-                    style = Style(shape_dict, 'copper')
+                    style = Style(shape_dict, 'conductor')
                     shape.setStyle(style)
                     try:
-                        # This will pass if 'layer' is defined as a
-                        # list rather than a string.
-                        # TODO: There's bound to be a better way of 
-                        # doing this
-                        self._shapes['copper'][layer].append(shape)
+                        self._shapes['conductor'][layer].append(shape)
                     except:
-                        msg.error("The same pad shape can be placed on multiple layers. Even if it is only placed on a single layer, the layer needs to be defined as a list, for example, 'layer':['top']")
+                        self._shapes['conductor'][layer] = []
+                        self._shapes['conductor'][layer].append(shape)
+                        
+#                    try:
+#                        # This will pass if 'layer' is defined as a
+#                        # list rather than a string.
+#                        # TODO: There's bound to be a better way of 
+#                        # doing this
+#                        self._shapes['copper'][layer].append(shape)
+#                    except:
+#                        msg.error("The same pad shape can be placed on multiple layers. Even if it is only placed on a single layer, the layer needs to be defined as a list, for example, 'layer':['top']")
+
 
 
                     for stype in ['soldermask', 'solderpaste']:
@@ -149,7 +157,13 @@ class Footprint():
                             sshape.setStyle(sstyle)
 
                             # Add shape to footprint's shape dictionary
-                            self._shapes[stype][layer].append(sshape)
+                            #self._shapes[stype][layer].append(sshape)
+                            try:
+                                self._shapes[stype][layer].append(shape)
+                            except:
+                                self._shapes[stype][layer] = []
+                                self._shapes[stype][layer].append(shape)
+
 
                         # Do not place shape
                         elif (sdict_list == {}) or (sdict_list == []):
@@ -188,15 +202,25 @@ class Footprint():
                                 sshape.setStyle(sstyle)
      
                                 # Add shape to footprint's shape dictionary
-                                self._shapes[stype][layer].append(sshape)
+                                #self._shapes[stype][layer].append(sshape)
+                                try:
+                                    self._shapes[stype][layer].append(shape)
+                                except:
+                                    self._shapes[stype][layer] = []
+                                    self._shapes[stype][layer].append(shape)
 
      
-                        # Add pin label
-                        if pin_label != None:
-                            label = {}
-                            label['text'] = pin_label
-                            label['location'] = shape_dict['location']
-                            self._shapes['pin-labels'][layer].append(label)
+                # Add pin label
+                if pin_label != None:
+                    label = {}
+                    label['text'] = pin_label
+                    label['location'] = shape_dict['location']
+                    #self._shapes['pin-labels'][layer].append(label)
+                    try:
+                        self._shapes['pin-labels'][layer].append(shape)
+                    except:
+                        self._shapes['pin-labels'][layer] = []
+                        self._shapes['pin-labels'][layer].append(shape)
 
 
 
@@ -211,7 +235,12 @@ class Footprint():
                 shape = Shape(drill_dict)
                 style = Style(drill_dict, 'drills')
                 shape.setStyle(style)
-                self._shapes['drills']['top'].append(shape)                
+                #self._shapes['drills']['top'].append(shape)                
+                try:
+                    self._shapes['drills']['top'].append(shape)
+                except:
+                    self._shapes['drills']['top'] = []
+                    self._shapes['drills']['top'].append(shape)
                         
 
 
@@ -233,7 +262,12 @@ class Footprint():
                 shape = Shape(shape_dict)
                 style = Style(shape_dict, 'silkscreen')
                 shape.setStyle(style)
-                self._shapes['silkscreen'][layer].append(shape)
+                #self._shapes['silkscreen'][layer].append(shape)
+                try:
+                    self._shapes['silkscreen'][layer].append(shape)
+                except:
+                    self._shapes['silkscreen'][layer] = []
+                    self._shapes['silkscreen'][layer].append(shape)
 
 
 
@@ -253,7 +287,12 @@ class Footprint():
                 shape = Shape(shape_dict)
                 style = Style(shape_dict, 'assembly')
                 shape.setStyle(style)
-                self._shapes['assembly'][layer].append(shape)
+                #self._shapes['assembly'][layer].append(shape)
+                try:
+                    self._shapes['assembly'][layer].append(shape)
+                except:
+                    self._shapes['assembly'][layer] = []
+                    self._shapes['assembly'][layer].append(shape)
 
 
 
