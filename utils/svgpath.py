@@ -93,10 +93,6 @@ class SvgPath():
         return self._first_point
 
 
-#    def getOriginalParsed(self):
-#        return self._original_parsed
-
-
     def getTransformed(self):
         return self._transformed
 

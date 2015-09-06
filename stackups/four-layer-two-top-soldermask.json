@@ -87,7 +87,7 @@
         },
         {
           "type": "silkscreen",
-          "name": "soldermask"
+          "name": "silkscreen"
         }
       ]
     }

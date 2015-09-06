@@ -80,7 +80,7 @@ def placeDrill(drill,
     """
 
     diameter = drill.get('diameter')
-    offset = utils.to_Point(drill.get('offset') or [0, 0]) 
+    offset = utils.to_Point(drill.get('offset') or [0, 0])
     path = svg.drill_diameter_to_path(diameter)
     mask_path = svg.circle_diameter_to_path(diameter)
 

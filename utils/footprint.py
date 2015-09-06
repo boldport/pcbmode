@@ -99,7 +99,16 @@ class Footprint():
                 if show_name == True:
                     pin_label = pins[pin]['layout'].get('label') or pin
 
-                # The same shape can go on multiple layers
+                # For the list of layers we may get a list of all
+                # internal layers ('internal-1', 'internal-2, etc.) or
+                # simply 'internal', meaning that that shape is meant
+                # to go into all internal layers, which is the most
+                # common case. The following 'expands' the layer list
+                if 'internal' in layers:
+                    layers.remove('internal')
+                    layers.extend(config.stk['internal-layer-names']) 
+                
+
                 for layer in layers:
                     
                     shape = Shape(shape_dict)
@@ -111,17 +120,6 @@ class Footprint():
                         self._shapes['conductor'][layer] = []
                         self._shapes['conductor'][layer].append(shape)
                         
-#                    try:
-#                        # This will pass if 'layer' is defined as a
-#                        # list rather than a string.
-#                        # TODO: There's bound to be a better way of 
-#                        # doing this
-#                        self._shapes['copper'][layer].append(shape)
-#                    except:
-#                        msg.error("The same pad shape can be placed on multiple layers. Even if it is only placed on a single layer, the layer needs to be defined as a list, for example, 'layer':['top']")
-
-
-
                     for stype in ['soldermask', 'solderpaste']:
 
                         # Get a custom shape specification if it exists

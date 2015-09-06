@@ -1060,7 +1060,6 @@ def circle_diameter_to_path(d, offset=Point()):
 
 
 
-# drill_diameter_to_path
 def drillPath(diameter):
     """
     Returns an SVG path for a drill symbol of diameter 'diameter'
@@ -1078,6 +1077,30 @@ def drillPath(diameter):
     b = r*0.9
 
     return "m %s,%s c %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s z m %s,%s %s,%s c %s,%s %s,%s %s,%s l %s,%s %s,%s c %s,%s %s,%s %s,%s z" % (0,r, k*r,0, r,-r*(1-k), r,-r, 0,-r*k, -r*(1-k),-r, -r,-r, -r*k,0, -r,r*(1-k), -r,r, 0,r*k, r*(1-k),r, r,r, 0,-(r-b), 0,-2*b, -b*k,0, -b,b*(1-k), -b,b, b,0, b,0, 0,k*b, -b*(1-k),b, -b,b)
+
+
+
+
+
+def placementMarkerPath():
+    """
+    Returns a path for the placement marker
+    """
+    diameter = 0.3
+ 
+    r = diameter/2.0
+ 
+    # The calculation to obtain the 'k' coefficient can be found here:
+    # http://itc.ktu.lt/itc354/Riskus354.pdf
+    # "APPROXIMATION OF A CUBIC BEZIER CURVE BY CIRCULAR ARCS AND VICE VERSA"
+    # by Aleksas Riskus
+    k = 0.5522847498
+ 
+    # extension
+    b = r*1.8
+
+    return "m %s,%s c %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s m %s,%s %s,%s m %s,%s %s,%s z" % (0,r, k*r,0, r,-r*(1-k), r,-r, 0,-r*k, -r*(1-k),-r, -r,-r, -r*k,0, -r,r*(1-k), -r,r, 0,r*k, r*(1-k),r, r,r, 0,-(r-b), 0,-2*b, -b,b, 2*b,0)
+
 
 
 
@@ -1131,6 +1154,7 @@ def makeSvgLayers(top_layer, transform=None, refdef=None):
       "dimensions": { "hidden": False, "locked": True },
       "origin": { "hidden": False, "locked": True },
       "drills": { "hidden": False, "locked": False },
+      "placement": { "hidden": False, "locked": False },
       "outline": { "hidden": False, "locked": True }
     }
 
@@ -1216,7 +1240,12 @@ def makeSvgLayers(top_layer, transform=None, refdef=None):
                 conductor_types = ['routing', 'pads', 'pours']
          
                 for cond_type in conductor_types:
-                    style = utils.dict_to_style(config.stl['layout']['conductor'][cond_type].get(layer_name))
+                    try:
+                        style = utils.dict_to_style(config.stl['layout']['conductor'][cond_type].get(layer_name))
+                    except:
+                        # See comment above for rationalle
+                        style = utils.dictToStyleText(config.stl['layout'][sheet_type]['default'][layer_name.split('-')[0]])
+
 
                     if combined_lc['conductor'][cond_type]['hidden'] == True:
                         style += 'display:none;'
@@ -1235,7 +1264,7 @@ def makeSvgLayers(top_layer, transform=None, refdef=None):
 
 
 
-    for info_layer in ['origin', 'dimensions', 'outline', 'drills', 'documentation']:
+    for info_layer in ['origin', 'dimensions', 'outline', 'drills', 'placement', 'documentation']:
         style = utils.dict_to_style(config.stl['layout'][info_layer].get('default'))
         if combined_lc[info_layer]['hidden'] == True:
             style += 'display:none;'

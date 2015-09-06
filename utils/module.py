@@ -15,6 +15,7 @@ import place
 from shape import Shape
 from style import Style
 from component import Component
+from point import Point
 
 
 
@@ -236,7 +237,7 @@ class Module():
             return
 
         shape_group = {}
-        #for pcb_layer in utils.getSurfaceLayers():
+
         for pcb_layer in config.stk['layer-names']:
             svg_layer = self._layers[pcb_layer]['conductor']['pours']['layer']
             shape_group[pcb_layer] = et.SubElement(svg_layer, 'g',
@@ -256,12 +257,16 @@ class Module():
                 new_pour_dict['style'] = 'fill'
                 shape = Shape(new_pour_dict)
                 # Get the appropriate style from conductor->pours
-                style = Style(new_pour_dict, layer_name='conductor', sub_item='pours')
+                style = Style(shape_dict=new_pour_dict,
+                              layer_name='conductor',
+                              sub_item='pours')
                 shape.setStyle(style)
             else:
                 shape = Shape(pour_dict)
                 # Get the appropriate style from conductor->pours
-                style = Style(pour_dict, layer_name='conductor', sub_item='pours')
+                style = Style(shape_dict=pour_dict,
+                              layer_name='conductor',
+                              sub_item='pours')
                 shape.setStyle(style)
 
             # Place on all specified layers
@@ -356,7 +361,7 @@ class Module():
         for component in components:
             shapes_dict = component.getShapes()
             location = component.getLocation()
-
+            rotation = component.getRotation()
             refdef = component.getRefdef()
 
             if print_refdef == True:
@@ -516,6 +521,26 @@ class Module():
                                            str(shape.getDiameter()))
 
 
+                
+            # Place origin marker
+            svg_layer = self._layers['placement']['layer']
+            group = et.SubElement(svg_layer, 'g', transform=transform)
+            path = svg.placementMarkerPath()
+            transform = "translate(%s,%s)" % (location[0],
+                                              config.cfg['invert-y']*location[1])
+            marker_element = et.SubElement(group, 'path',
+                                           d=path,
+                                           id='component-marker')
+
+            style = utils.dictToStyleText(config.stl['layout']['placement']['text'])
+
+            t = et.SubElement(group, 'text', x="0", y="-0.17", style=style)
+            ts = et.SubElement(t, 'tspan', x="0", dy="0.1")
+            ts.text = "%s" % (refdef)
+            ts = et.SubElement(t, 'tspan', x="0", dy="0.1")
+            ts.text = "%s" % (rotation)
+            ts = et.SubElement(t, 'tspan', x="0", dy="0.1")
+            ts.text = "[%.2f,%.2f]" % (location[0], location[1])
 
 
 
@@ -676,7 +701,8 @@ class Module():
         except:
             pour_buffer = config.brd['distances']['from-pour-to']['outline']
 
-        for pcb_layer in utils.getSurfaceLayers():
+        #for pcb_layer in utils.getSurfaceLayers():
+        for pcb_layer in config.stk['layer-names']:
             if utils.checkForPoursInLayer(pcb_layer) is True:
                 mask_element = place.placeShape(self._outline, self._masks[pcb_layer])
                 # Override style so that we get the desired effect
@@ -754,6 +780,7 @@ class Module():
         rect_dict['height'] = rect_height
 
         # Create group for placing index
+        #for pcb_layer in utils.getSurfaceLayers():
         for pcb_layer in utils.getSurfaceLayers():
             for sheet in ['conductor', 'soldermask', 'silkscreen', 'assembly', 'solderpaste']:
                 layer = self._layers[pcb_layer][sheet]['layer']
