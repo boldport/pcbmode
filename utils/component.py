@@ -46,11 +46,12 @@ class Component():
         #------------------------------------------------        
         # Apply component-specific modifiers to footprint
         #------------------------------------------------
-        for sheet in ['conductor', 'soldermask', 'solderpaste', 'silkscreen', 'assembly', 'drills']:
-            for layer in config.stk['layer-names']: #utils.getSurfaceLayers() + utils.getInternalLayers():
+        #for sheet in ['conductor', 'soldermask', 'solderpaste', 'silkscreen', 'assembly', 'drills']:
+        for sheet in ['conductor', 'silkscreen', 'assembly', 'drills']:
+            for layer in config.stk['layer-names']:
                 for shape in footprint_shapes[sheet].get(layer) or []:
+
                     # In order to apply the rotation we need to adust the location
-                    # of each element
                     shape.rotateLocation(self._rotate, self._rotate_point)
 
                     shape.transformPath(self._scale,

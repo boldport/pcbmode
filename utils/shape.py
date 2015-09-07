@@ -150,7 +150,6 @@ class Shape():
         self._location.rotate(angle, point)
 
 
-
     def getRotation(self):
         return self._rotate
 

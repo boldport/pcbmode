@@ -507,6 +507,7 @@ class Module():
                     for shape in shapes:
                         placed_element = place.placeShape(shape, group, invert)
 
+
                 # Drills
                 shapes = shapes_dict['drills'].get(pcb_layer) or []
                 if len(shapes) > 0:
@@ -530,10 +531,11 @@ class Module():
                                               config.cfg['invert-y']*location[1])
             marker_element = et.SubElement(group, 'path',
                                            d=path,
+                                           transform="rotate(%s)" % rotation,
                                            id='component-marker')
-
+ 
             style = utils.dictToStyleText(config.stl['layout']['placement']['text'])
-
+ 
             t = et.SubElement(group, 'text', x="0", y="-0.17", style=style)
             ts = et.SubElement(t, 'tspan', x="0", dy="0.1")
             ts.text = "%s" % (refdef)
@@ -541,6 +543,9 @@ class Module():
             ts.text = "%s" % (rotation)
             ts = et.SubElement(t, 'tspan', x="0", dy="0.1")
             ts.text = "[%.2f,%.2f]" % (location[0], location[1])
+
+
+
 
 
 
