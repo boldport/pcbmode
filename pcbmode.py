@@ -189,7 +189,6 @@ def makeConfig(name, version, cmdline_args):
     config.stk['internal-layers'] = config.stk['layers-dict'][1:-1]
     config.stk['surface-layer-names'] = [config.stk['layer-names'][0], config.stk['layer-names'][-1]]
     config.stk['internal-layer-names'] = config.stk['layer-names'][1:-1]
-    config.stk['layer-names'] = config.stk['surface-layer-names'] + config.stk['internal-layer-names']
 
     #=================================
     # Path database
