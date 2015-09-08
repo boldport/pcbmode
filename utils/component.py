@@ -3,6 +3,7 @@
 import os
 
 import config
+import copy
 import messages as msg
 
 # pcbmode modules
@@ -129,20 +130,21 @@ class Component():
         #------------------------------------------------------
         if self._layer == 'bottom':
             layers = config.stk['layer-names']
-            layers_reversed = reversed(config.stk['layer-names'])
+            #layers_rev = copy.copy(reversed(config.stk['layer-names'])
            
             for sheet in ['conductor', 'soldermask', 'solderpaste', 'silkscreen', 'assembly']:
                 sheet_dict = footprint_shapes[sheet]
-                for i in range(0,len(layers)-1):
+                #sheet_dict_copy = copy.copy(sheet_dict)
+                sheet_dict_new = {}
+                for i, pcb_layer in enumerate(layers):
+                    #print len(layers)-i
+                    #print layers[len(layers)-i]
                     try:
-                        sheet_dict['temp'] = sheet_dict.pop(layers[i])
+                        sheet_dict_new[layers[len(layers)-i-1]] = copy.copy(sheet_dict[pcb_layer])
                     except:
                         continue
-                    try:
-                        sheet_dict[layers[i]] = sheet_dict.pop(layers[len(layers)-1-i])
-                    except:
-                        continue
-                    sheet_dict[layers[len(layers)-1-i]] = sheet_dict.pop('temp')
+
+                footprint_shapes[sheet] = copy.copy(sheet_dict_new)    
 
         self._footprint_shapes = footprint_shapes
 
