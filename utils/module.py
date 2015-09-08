@@ -413,29 +413,6 @@ class Module():
                                             original=False,
                                             mirror=invert)
 
-                    # Add pin labels 
-
-                    # There's a bit of a hack here that won't work in
-                    # all possible cases (where pads are placed on
-                    # bottom layer in a component that has pins placed
-                    # both on the top and on the bottom -- a rare
-                    # case). Good enough for now
-
-#                    labels = shapes_dict['pin-labels']['top']#[pcb_layer]
-#                    if labels != []:
-#                        style = utils.dictToStyleText(config.stl['layout']['board']['pad-labels'])
-#                        label_group = et.SubElement(group, 'g', 
-#                                                    transform="rotate(%s)" % (((1,-1)[invert])*component.getRotation()),
-#                                                    style=style)
-#                        for label in labels:
-#                            t = et.SubElement(label_group, 'text',
-#                                              x=str(((1,-1)[invert])*label['location'][0]),
-#                                              y=str(config.cfg['invert-y']*label['location'][1]))
-#                            t.text = label['text']
-
-
-
-
 
                 # Soldermask
                 shapes = shapes_dict['soldermask'].get(pcb_layer) or []
@@ -493,6 +470,7 @@ class Module():
                             placed_element = place.placeShape(shape, shape_group, invert)
 
 
+
                 # Assembly
                 shapes = shapes_dict['assembly'].get(pcb_layer) or []
                 try:
@@ -506,6 +484,23 @@ class Module():
                     group = et.SubElement(svg_layer, 'g', transform=transform)
                     for shape in shapes:
                         placed_element = place.placeShape(shape, group, invert)
+
+
+
+                # Add pin labels 
+                labels = shapes_dict['pin-labels'].get(pcb_layer) or []
+                if labels != []:
+                    svg_layer = self._layers[pcb_layer]['conductor']['pads']['layer']
+                    style = utils.dictToStyleText(config.stl['layout']['board']['pad-labels'])
+                    label_group = et.SubElement(svg_layer, 'g',
+                                                transform="rotate(%s)" % (((1,-1)[invert])*component.getRotation()),
+                                                style=style)
+                    for label in labels:
+                        t = et.SubElement(label_group, 'text')
+                                          x=str(((1,-1)[invert])*label['location'][0]),
+                                          y=str(config.cfg['invert-y']*label['location'][1]))
+                        t.text = label['text']
+
 
 
                 # Drills
@@ -791,12 +786,13 @@ class Module():
         rect_dict['height'] = rect_height
 
         # Create group for placing index
-        #for pcb_layer in utils.getSurfaceLayers():
         for pcb_layer in config.stk['layer-names']:
+
             if pcb_layer in config.stk['surface-layer-names']:
                 sheets = ['conductor', 'soldermask', 'silkscreen', 'assembly', 'solderpaste']
             else:
                 sheets = ['conductor']
+
             for sheet in sheets:
                 layer = self._layers[pcb_layer][sheet]['layer']
                 transform = "translate(%s,%s)" % (location.x, config.cfg['invert-y']*location.y)

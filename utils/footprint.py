@@ -208,17 +208,17 @@ class Footprint():
                                     self._shapes[stype][layer].append(shape)
 
      
-                # Add pin label
-                if pin_label != None:
-                    label = {}
-                    label['text'] = pin_label
-                    label['location'] = shape_dict['location']
-                    #self._shapes['pin-labels'][layer].append(label)
-                    try:
-                        self._shapes['pin-labels'][layer].append(shape)
-                    except:
-                        self._shapes['pin-labels'][layer] = []
-                        self._shapes['pin-labels'][layer].append(shape)
+                    # Add pin label
+                    if (pin_label != None):
+                        print layer, pin_label
+                        label = {}
+                        label['text'] = pin_label
+                        label['location'] = shape_dict['location']
+                        try:
+                            self._shapes['pin-labels'][layer].append(label)
+                        except:
+                            self._shapes['pin-labels'][layer] = []
+                            self._shapes['pin-labels'][layer].append(label)
 
 
 
@@ -233,7 +233,6 @@ class Footprint():
                 shape = Shape(drill_dict)
                 style = Style(drill_dict, 'drills')
                 shape.setStyle(style)
-                #self._shapes['drills']['top'].append(shape)                
                 try:
                     self._shapes['drills']['top'].append(shape)
                 except:
