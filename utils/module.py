@@ -524,11 +524,15 @@ class Module():
 
                 
             # Place origin marker
-            svg_layer = self._layers['placement']['layer']
+            svg_layer = self._layers[placement_layer]['placement']['layer']
             group = et.SubElement(svg_layer, 'g', transform=transform)
             path = svg.placementMarkerPath()
             transform = "translate(%s,%s)" % (location[0],
                                               config.cfg['invert-y']*location[1])
+
+            if placement_layer == 'bottom':
+                rotation *= -1
+
             marker_element = et.SubElement(group, 'path',
                                            d=path,
                                            transform="rotate(%s)" % rotation,

@@ -27,6 +27,9 @@ class Component():
         self._layer = component.get('layer') or 'top'
 
         self._rotate = component.get('rotate') or 0
+        if self._layer=='bottom':
+            self._rotate *= -1
+
         self._rotate_point = utils.toPoint(component.get('rotate-point') or [0, 0])
         self._scale = component.get('scale') or 1
         self._location = component.get('location') or [0, 0]
@@ -54,11 +57,11 @@ class Component():
                     # In order to apply the rotation we need to adust the location
                     shape.rotateLocation(self._rotate, self._rotate_point)
 
-                    shape.transformPath(self._scale,
-                                        self._rotate,
-                                        self._rotate_point,
-                                        False,
-                                        True)
+                    shape.transformPath(scale=self._scale,
+                                        rotate=self._rotate,
+                                        rotate_point=self._rotate_point,
+                                        mirror=False,
+                                        add=True)
 
         #-------------------------------------------------------------- 
         # Remove silkscreen and assembly shapes 

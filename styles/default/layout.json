@@ -368,12 +368,30 @@
   {
     "default":
     {
-      "stroke": "#444444",
-      "fill": "none",
-      "stroke-opacity": 0.6,
-      "stroke-width": 0.05,
-      "stroke-linejoin": "round",
-      "stroke-linecap": "round"
+      "top": {
+        "stroke": "#444444",
+        "fill": "none",
+        "stroke-opacity": 0.6,
+        "stroke-width": 0.05,
+        "stroke-linejoin": "round",
+        "stroke-linecap": "round"
+      },
+      "internal": {
+        "stroke": "#444444",
+        "fill": "none",
+        "stroke-opacity": 0.6,
+        "stroke-width": 0.05,
+        "stroke-linejoin": "round",
+        "stroke-linecap": "round"
+      },
+      "bottom": {
+        "stroke": "#444444",
+        "fill": "none",
+        "stroke-opacity": 0.6,
+        "stroke-width": 0.05,
+        "stroke-linejoin": "round",
+        "stroke-linecap": "round"
+      }
     },
     "text":
     {

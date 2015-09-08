@@ -1184,22 +1184,14 @@ def makeSvgLayers(top_layer, transform=None, refdef=None):
                                                              refdef)
         element.set('{'+config.cfg['ns']['pcbmode']+'}%s' % ('pcb-layer'), layer_name)
 
-#        # The 'sheets' to create depends on whether the layer is a
-#        # surface layer or an internal layer
-#        if layer_type == 'signal-layer-surface':
-#            sheets = ['copper', 'silkscreen', 'soldermask', 'solderpaste', 'assembly']
-# 
-#        elif layer_type == 'signal-layer-internal':
-#            sheets = ['copper']
-#        else:
-#            msg.error("Invalid layer type '%s' for layer '%s'" % (layer_type, layer_name)) 
-
-
         sheets = layer_dict['stack']
         if layer_type == 'signal-layer-surface':
+            placement_dict = [{"name": "placement", "type": "placement"}]
             assembly_dict = [{"name": "assembly", "type": "assembly"}]
             solderpaste_dict = [{"name": "solderpaste", "type": "solderpaste"}]
-            sheets = assembly_dict + solderpaste_dict + sheets  
+            
+            # Layer appear in Inkscape first/top to bottom/last
+            sheets = placement_dict + assembly_dict + solderpaste_dict + sheets  
 
         for sheet in reversed(sheets):
 
@@ -1264,7 +1256,7 @@ def makeSvgLayers(top_layer, transform=None, refdef=None):
 
 
 
-    for info_layer in ['origin', 'dimensions', 'outline', 'drills', 'placement', 'documentation']:
+    for info_layer in ['origin','dimensions','outline','drills','documentation']:
         style = utils.dict_to_style(config.stl['layout'][info_layer].get('default'))
         if combined_lc[info_layer]['hidden'] == True:
             style += 'display:none;'
