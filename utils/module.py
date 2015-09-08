@@ -756,9 +756,11 @@ class Module():
 
 
 
+
+
     def _placeLayerIndex(self):
         """
-        Adds a drill index
+        Adds a layer index
         """
 
         text_dict = config.stl['layout']['layer-index']['text']
@@ -790,8 +792,12 @@ class Module():
 
         # Create group for placing index
         #for pcb_layer in utils.getSurfaceLayers():
-        for pcb_layer in utils.getSurfaceLayers():
-            for sheet in ['conductor', 'soldermask', 'silkscreen', 'assembly', 'solderpaste']:
+        for pcb_layer in config.stk['layer-names']:
+            if pcb_layer in config.stk['surface-layer-names']:
+                sheets = ['conductor', 'soldermask', 'silkscreen', 'assembly', 'solderpaste']
+            else:
+                sheets = ['conductor']
+            for sheet in sheets:
                 layer = self._layers[pcb_layer][sheet]['layer']
                 transform = "translate(%s,%s)" % (location.x, config.cfg['invert-y']*location.y)
                 group = et.SubElement(layer, 'g',
@@ -804,7 +810,6 @@ class Module():
                 place.placeShape(rect_shape, group)
 
                 text_dict['value'] = "%s %s" % (pcb_layer, sheet)
-                #text_dict['location'] = [rect_width+rect_gap+text_width, 0]
                 text_shape = Shape(text_dict)
                 text_width = text_shape.getWidth()
                 style = Style(text_dict, sheet)
@@ -814,7 +819,7 @@ class Module():
 
                 location.y += config.cfg['invert-y']*(rect_height+rect_gap)
 
-            location.y += config.cfg['invert-y']*(rect_height+rect_gap*2)
+            location.y += config.cfg['invert-y']*(rect_height+rect_gap*1.5)
                 
 
 
