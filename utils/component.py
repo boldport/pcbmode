@@ -47,7 +47,6 @@ class Component():
         #------------------------------------------------        
         # Apply component-specific modifiers to footprint
         #------------------------------------------------
-        #for sheet in ['conductor', 'soldermask', 'solderpaste', 'silkscreen', 'assembly', 'drills']:
         for sheet in ['conductor', 'silkscreen', 'assembly', 'drills']:
             for layer in config.stk['layer-names']:
                 for shape in footprint_shapes[sheet].get(layer) or []:
@@ -61,9 +60,12 @@ class Component():
                                         False,
                                         True)
 
-        #--------------------------------------
-        # Remove silkscreen and assembly shapes
-        #--------------------------------------
+        #-------------------------------------------------------------- 
+        # Remove silkscreen and assembly shapes 
+        #-------------------------------------------------------------- 
+        # If the 'show' flag is 'false then remove these items from the
+        # shapes dictionary 
+        #--------------------------------------------------------------
         for sheet in ['silkscreen','assembly']:
             
             try:
