@@ -128,17 +128,20 @@ class Component():
         # Invert 'top' and 'bottom' if layer is on the 'bottom'
         #------------------------------------------------------
         if self._layer == 'bottom':
-            layers = utils.getSurfaceLayers()
-            layers_reversed = reversed(utils.getSurfaceLayers())
+            layers = config.stk['layer-names']
+            layers_reversed = reversed(config.stk['layer-names'])
            
             for sheet in ['conductor', 'soldermask', 'solderpaste', 'silkscreen', 'assembly']:
                 sheet_dict = footprint_shapes[sheet]
-                # TODO: this nasty hack won't work for more than two
-                # layers, so when 2+ are supported this needs to be
-                # revisited
                 for i in range(0,len(layers)-1):
-                    sheet_dict['temp'] = sheet_dict.pop(layers[i])
-                    sheet_dict[layers[i]] = sheet_dict.pop(layers[len(layers)-1-i])
+                    try:
+                        sheet_dict['temp'] = sheet_dict.pop(layers[i])
+                    except:
+                        continue
+                    try:
+                        sheet_dict[layers[i]] = sheet_dict.pop(layers[len(layers)-1-i])
+                    except:
+                        continue
                     sheet_dict[layers[len(layers)-1-i]] = sheet_dict.pop('temp')
 
         self._footprint_shapes = footprint_shapes
