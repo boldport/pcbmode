@@ -238,12 +238,15 @@ def extractRouting(svg_in):
     # The XPATH expression for extracting routes, but not vias
     xpath_expr = "//svg:g[@pcbmode:pcb-layer='%s']//svg:g[@pcbmode:sheet='routing']//svg:path[(@d) and not (@pcbmode:type='via')]"
 
-    routes_dict = {'top': {}, 'bottom': {}}
+    routes_dict = {}
 
-    for pcb_layer in utils.getSurfaceLayers():
+    for pcb_layer in config.stk['layer-names']:
         routes = svg_in.xpath(xpath_expr % pcb_layer, 
                               namespaces={'pcbmode':config.cfg['ns']['pcbmode'], 
                                           'svg':config.cfg['ns']['svg']})
+
+        print pcb_layer, routes
+
         for route in routes:
             route_dict = {}
             route_id = route.get('{'+config.cfg['ns']['pcbmode']+'}id')
@@ -258,7 +261,11 @@ def extractRouting(svg_in):
                                   #str(location.y)+
                                   style_text)
 
-            routes_dict[pcb_layer][digest] = {}
+            try:
+                routes_dict[pcb_layer][digest] = {}
+            except:
+                routes_dict[pcb_layer] = {}
+                routes_dict[pcb_layer][digest] = {}
             routes_dict[pcb_layer][digest]['type'] = 'path'
             routes_dict[pcb_layer][digest]['value'] = path
 
@@ -287,7 +294,7 @@ def extractRouting(svg_in):
     total_old = 0
     new = 0
     existing = 0
-    for pcb_layer in utils.getSurfaceLayers():
+    for pcb_layer in config.stk['layer-names']:
         try:
             total += len(routing_dict['routes'][pcb_layer])
         except:
@@ -306,7 +313,7 @@ def extractRouting(svg_in):
             else:
                 existing += 1
 
-    for pcb_layer in utils.getSurfaceLayers():
+    for pcb_layer in config.stk['layer-names']:
         total_old += len(old_dict)
 
     message = "Extracted %s routes; %s new (or modified), %s existing" % (total, new, existing)

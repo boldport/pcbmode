@@ -574,7 +574,7 @@ class Module():
         xpath_expr = "//g[@inkscape:label='%s']//g[@inkscape:label='%s']"
         extra_attributes = ['inkscape:connector-curvature', 'inkscape:original-d', 'inkscape:path-effect']
  
-        for pcb_layer in utils.getSurfaceLayers():
+        for pcb_layer in config.stk['layer-names']:
  
             # Are there pours in the layer? This makes a difference for whether to place
             # masks
