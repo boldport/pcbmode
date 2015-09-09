@@ -37,47 +37,47 @@ def extractComponents(svg_in):
     """
     
     # Get copper refdef shape groups from SVG data
+
+    xpath_expr_place = '//svg:g[@pcbmode:pcb-layer="%s"]//svg:g[@pcbmode:sheet="placement"]//svg:g[@pcbmode:type="component"]'
+
     xpath_expr_copper_pads = '//svg:g[@pcbmode:pcb-layer="%s"]//svg:g[@pcbmode:sheet="copper"]//svg:g[@pcbmode:sheet="pads"]//svg:g[@pcbmode:refdef]'
 
     xpath_expr_refdefs = '//svg:g[@pcbmode:pcb-layer="%s"]//svg:g[@pcbmode:sheet="silkscreen"]//svg:g[@pcbmode:type="refdef"][@pcbmode:refdef="%s"]'
 
-    for pcb_layer in utils.getSurfaceLayers():
-        shapes = svg_in.findall(xpath_expr_copper_pads % pcb_layer, 
-                                namespaces={'pcbmode':config.cfg['ns']['pcbmode'],
-                                            'svg':config.cfg['ns']['svg']})
+    for pcb_layer in config.stk['surface-layer-names']:
+        
+        # Find all markers
+        markers = svg_in.findall(xpath_expr_place % pcb_layer, 
+                                 namespaces={'pcbmode':config.cfg['ns']['pcbmode'],
+                                             'svg':config.cfg['ns']['svg']})
 
-        for shape in shapes:
-            transform_data = utils.parseTransform(shape.get('transform'))
-            refdef = shape.get('{'+config.cfg['ns']['pcbmode']+'}refdef')
+        for marker in markers:
+            transform_data = utils.parseTransform(marker.get('transform'))
+            refdef = marker.get('{'+config.cfg['ns']['pcbmode']+'}refdef')
             comp_dict = config.brd['components'][refdef]
 
-            # Check if the copper shapes are on the same layer as placement.
-            # Ignore if otherwise. While it is possible that a component is placed
-            # on one layer but all its components are on another, it is very
-            # unlikely, and doesn't make much sense.
-            on_layer = comp_dict.get('layer') or 'top'
-            if pcb_layer == on_layer:
-                new_location = transform_data['location']
-                old_location = utils.toPoint(comp_dict.get('location') or [0, 0])
-                # Invert 'y' coordinate
-                new_location.y *= config.cfg['invert-y']
+            new_location = transform_data['location']
+            old_location = utils.toPoint(comp_dict.get('location') or [0, 0])
 
-                # Change component location if needed
-                if new_location != old_location:
-                    msg.subInfo("Component %s moved from %s to %s" % (refdef, 
-                                                                      old_location, 
-                                                                      new_location))
-                    comp_dict['location'] = [new_location.x, 
-                                             new_location.y]
+            # Invert 'y' coordinate
+            new_location.y *= config.cfg['invert-y']
 
-                # Change component rotation if needed
-                if transform_data['type'] == 'matrix':
-                    old_rotate = comp_dict.get('rotate') or 0
-                    new_rotate = transform_data['rotate']
-                    comp_dict['rotate'] = round((old_rotate+new_rotate) % 360,4)
-                    msg.subInfo("Component %s rotated from %s to %s" % (refdef, 
-                                                                        old_rotate, 
-                                                                        comp_dict['rotate']))
+            # Change component location if needed
+            if new_location != old_location:
+                x = utils.niceFloat(new_location.x)
+                y = utils.niceFloat(new_location.y)
+                msg.subInfo("%s has moved from %s to %s" % (refdef,x,y))
+                comp_dict['location'] = [x,y]
+
+            # Change component rotation if needed
+            if transform_data['type'] == 'matrix':
+                old_rotate = comp_dict.get('rotate') or 0
+                new_rotate = transform_data['rotate']
+                comp_dict['rotate'] = utils.niceFloat((old_rotate+new_rotate) % 360)
+                msg.subInfo("Component %s rotated from %s to %s" % (refdef, 
+                                                                    old_rotate, 
+                                                                    comp_dict['rotate']))
+
 
             refdef_texts = svg_in.findall(xpath_expr_refdefs % (pcb_layer, refdef), 
                                           namespaces={'pcbmode':config.cfg['ns']['pcbmode'],

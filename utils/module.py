@@ -11,6 +11,7 @@ import messages as msg
 import svg
 import utils
 import place
+import HTMLParser
 
 from shape import Shape
 from style import Style
@@ -358,6 +359,9 @@ class Module():
     def _placeComponents(self, components, component_type, print_refdef=False):
         """
         """
+
+        htmlpar = HTMLParser.HTMLParser()
+
         for component in components:
             shapes_dict = component.getShapes()
             location = component.getLocation()
@@ -524,9 +528,11 @@ class Module():
 
 
                 
-            # Place origin marker
+            # Place component origin marker
             svg_layer = self._layers[placement_layer]['placement']['layer']
             group = et.SubElement(svg_layer, 'g', transform=transform)
+            group.set('{'+config.cfg['ns']['pcbmode']+'}type', 'component')
+            group.set('{'+config.cfg['ns']['pcbmode']+'}refdef', refdef)
             path = svg.placementMarkerPath()
             transform = "translate(%s,%s)" % (location[0],
                                               config.cfg['invert-y']*location[1])
@@ -536,16 +542,15 @@ class Module():
 
             marker_element = et.SubElement(group, 'path',
                                            d=path,
-                                           transform="rotate(%s)" % rotation,
-                                           id='component-marker')
- 
+                                           transform="rotate(%s)" % rotation)
+            
             style = utils.dictToStyleText(config.stl['layout']['placement']['text'])
  
             t = et.SubElement(group, 'text', x="0", y="-0.17", style=style)
             ts = et.SubElement(t, 'tspan', x="0", dy="0.1")
             ts.text = "%s" % (refdef)
             ts = et.SubElement(t, 'tspan', x="0", dy="0.1")
-            ts.text = "%s" % (rotation)
+            ts.text = htmlpar.unescape("%s&#176;" % (rotation))
             ts = et.SubElement(t, 'tspan', x="0", dy="0.1")
             ts.text = "[%.2f,%.2f]" % (location[0], location[1])
 

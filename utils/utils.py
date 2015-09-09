@@ -601,6 +601,14 @@ def getStyleAttrib(style, attrib):
 
 
 
+def niceFloat(f):
+    if f.is_integer():
+        return int(f)
+    else:
+        return round(f, 6)
+
+
+
 
 def parseTransform(transform):
     """
@@ -611,12 +619,14 @@ def parseTransform(transform):
         regex = r".*?translate\s?\(\s?(?P<x>-?[0-9]*\.?[0-9]+)\s?[\s,]\s?(?P<y>-?[0-9]*\.?[0-9]+\s?)\s?\).*"
         coord = re.match(regex, transform)
         data['type'] = 'translate'
-        data['location'] = Point(coord.group('x'),coord.group('y'))
+        x = coord.group('x')
+        y = coord.group('y')
+        data['location'] = Point(x,y)
     elif 'matrix' in transform.lower():
         data['type'] = 'matrix'
         data['location'], data['rotate'], data['scale'] = parseSvgMatrix(transform)
     else:
-        msg.error("Found a path transform that cannot be handled, %s. SVG stansforms shouls be in the form of 'translate(num,num)' or 'matric(num,num,num,num,num,num)" % transform)
+        msg.error("Found a path transform that cannot be handled, %s. SVG stansforms shouls be in the form of 'translate(num,num)' or 'matrix(num,num,num,num,num,num)" % transform)
 
     return data 
 
