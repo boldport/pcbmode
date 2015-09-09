@@ -34,8 +34,7 @@ class Footprint():
                         'silkscreen': {},
                         'assembly': {},
                         'solderpaste': {},
-                        'drills': {},
-                        'pin-labels': {}}
+                        'drills': {}}
 
         self._processPins()
         self._processSilkscreenShapes()
@@ -210,15 +209,7 @@ class Footprint():
      
                     # Add pin label
                     if (pin_label != None):
-                        print layer, pin_label
-                        label = {}
-                        label['text'] = pin_label
-                        label['location'] = shape_dict['location']
-                        try:
-                            self._shapes['pin-labels'][layer].append(label)
-                        except:
-                            self._shapes['pin-labels'][layer] = []
-                            self._shapes['pin-labels'][layer].append(label)
+                        shape.setLabel(pin_label)
 
 
 

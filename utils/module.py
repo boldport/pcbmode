@@ -391,19 +391,37 @@ class Module():
                     transform = "translate(%s,%s)" % (location[0],
                                                       config.cfg['invert-y']*location[1])
 
-                    group = et.SubElement(svg_layer, 'g', 
+                    shape_group = et.SubElement(svg_layer, 'g', 
                                           transform=transform)
 
                     if component_type == 'components':
-                        group.set('{'+config.cfg['ns']['pcbmode']+'}refdef', component.getRefdef())
+                        shape_group.set('{'+config.cfg['ns']['pcbmode']+'}refdef', component.getRefdef())
                     elif component_type == 'vias':
-                        group.set('{'+config.cfg['ns']['pcbmode']+'}type', 'via')
-                        group.set('{'+config.cfg['ns']['pcbmode']+'}via', component.getFootprintName())
+                        shape_group.set('{'+config.cfg['ns']['pcbmode']+'}type', 'via')
+                        shape_group.set('{'+config.cfg['ns']['pcbmode']+'}via', component.getFootprintName())
                     else:
                         pass
 
+                    style = utils.dictToStyleText(config.stl['layout']['conductor']['pads']['labels'])
+                    label_group = et.SubElement(shape_group, 'g', style=style)
+
                     for shape in shapes:
-                        place.placeShape(shape, group, invert)
+                        place.placeShape(shape, shape_group, invert)
+
+                        # Add pin labels
+                        # TODO: This isn't perfect, but good enough for now
+                        label = shape.getLabel()
+                        if label != None:
+                            label_location = shape.getLocation()
+                            label_rotation = shape.getRotation()
+                            label_transform = "rotate(%s)" % label_rotation
+                            t = et.SubElement(label_group, 'text',
+                                              x=str(((1,-1)[invert])*label_location.x),
+                                              y=str(config.cfg['invert-y']*label_location.y),
+                                              transform=label_transform)
+                            t.text = label
+
+
                         if there_are_pours == True:
                             mask_group = et.SubElement(self._masks[pcb_layer], 'g', 
                                                        transform=transform)
@@ -412,6 +430,8 @@ class Module():
                                             'pad',
                                             original=False,
                                             mirror=invert)
+
+
 
 
                 # Soldermask
@@ -486,20 +506,6 @@ class Module():
                         placed_element = place.placeShape(shape, group, invert)
 
 
-
-                # Add pin labels 
-                labels = shapes_dict['pin-labels'].get(pcb_layer) or []
-                if labels != []:
-                    svg_layer = self._layers[pcb_layer]['conductor']['pads']['layer']
-                    style = utils.dictToStyleText(config.stl['layout']['board']['pad-labels'])
-                    label_group = et.SubElement(svg_layer, 'g',
-                                                transform="rotate(%s)" % (((1,-1)[invert])*component.getRotation()),
-                                                style=style)
-                    for label in labels:
-                        t = et.SubElement(label_group, 'text')
-                                          x=str(((1,-1)[invert])*label['location'][0]),
-                                          y=str(config.cfg['invert-y']*label['location'][1]))
-                        t.text = label['text']
 
 
 

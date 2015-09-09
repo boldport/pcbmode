@@ -38,6 +38,10 @@ class Shape():
         self._scale = shape.get('scale') or 1
         self._pour_buffer = shape.get('buffer-to-pour')
 
+        # A general purpose label field; intended for use for pad
+        # labels
+        self._label = None
+
         try:
             self._type = shape.get('type')
         except:
@@ -246,3 +250,9 @@ class Shape():
     def getDiameter(self):
         return self._diameter
 
+
+    def setLabel(self, label):
+        self._label = label
+
+    def getLabel(self):
+        return self._label
