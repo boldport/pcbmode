@@ -77,14 +77,18 @@ class Module():
         self._placeOutlineDimensions()
 
         msg.subInfo('Placing components:', newline=False)
-        self._placeComponents(self._components, 'components', print_refdef=True)
+        self._placeComponents(components=self._components, 
+                              component_type='component',
+                              print_refdef=True)
         print
 
         msg.subInfo('Placing routes')
         self._placeRouting()
 
         msg.subInfo('Placing vias')
-        self._placeComponents(self._vias, 'vias')
+        self._placeComponents(components=self._vias, 
+                              component_type='via',
+                              print_refdef=False)
 
         msg.subInfo('Placing shapes')
         self._placeShapes()
@@ -396,13 +400,13 @@ class Module():
                                                       config.cfg['invert-y']*location[1])
 
                     shape_group = et.SubElement(svg_layer, 'g', 
-                                          transform=transform)
+                                                transform=transform)
 
-                    if component_type == 'components':
+                    if component_type == 'component':
+                        shape_group.set('{'+config.cfg['ns']['pcbmode']+'}type', 'component')
                         shape_group.set('{'+config.cfg['ns']['pcbmode']+'}refdef', component.getRefdef())
-                    elif component_type == 'vias':
+                    elif component_type == 'via':
                         shape_group.set('{'+config.cfg['ns']['pcbmode']+'}type', 'via')
-                        shape_group.set('{'+config.cfg['ns']['pcbmode']+'}via', component.getFootprintName())
                     else:
                         pass
 
@@ -531,8 +535,11 @@ class Module():
             # Place component origin marker
             svg_layer = self._layers[placement_layer]['placement']['layer']
             group = et.SubElement(svg_layer, 'g', transform=transform)
-            group.set('{'+config.cfg['ns']['pcbmode']+'}type', 'component')
-            group.set('{'+config.cfg['ns']['pcbmode']+'}refdef', refdef)
+            group.set('{'+config.cfg['ns']['pcbmode']+'}type', component_type)
+            group.set('{'+config.cfg['ns']['pcbmode']+'}footprint', component.getFootprintName())
+            if component_type == 'component':
+                group.set('{'+config.cfg['ns']['pcbmode']+'}refdef', refdef)
+
             path = svg.placementMarkerPath()
             transform = "translate(%s,%s)" % (location[0],
                                               config.cfg['invert-y']*location[1])
@@ -543,16 +550,17 @@ class Module():
             marker_element = et.SubElement(group, 'path',
                                            d=path,
                                            transform="rotate(%s)" % rotation)
-            
-            style = utils.dictToStyleText(config.stl['layout']['placement']['text'])
- 
-            t = et.SubElement(group, 'text', x="0", y="-0.17", style=style)
-            ts = et.SubElement(t, 'tspan', x="0", dy="0.1")
-            ts.text = "%s" % (refdef)
-            ts = et.SubElement(t, 'tspan', x="0", dy="0.1")
-            ts.text = htmlpar.unescape("%s&#176;" % (rotation))
-            ts = et.SubElement(t, 'tspan', x="0", dy="0.1")
-            ts.text = "[%.2f,%.2f]" % (location[0], location[1])
+
+            if component_type == 'component':
+                style = utils.dictToStyleText(config.stl['layout']['placement']['text'])
+     
+                t = et.SubElement(group, 'text', x="0", y="-0.17", style=style)
+                ts = et.SubElement(t, 'tspan', x="0", dy="0.1")
+                ts.text = "%s" % (refdef)
+                ts = et.SubElement(t, 'tspan', x="0", dy="0.1")
+                ts.text = htmlpar.unescape("%s&#176;" % (rotation))
+                ts = et.SubElement(t, 'tspan', x="0", dy="0.1")
+                ts.text = "[%.2f,%.2f]" % (location[0], location[1])
 
 
 
@@ -566,7 +574,6 @@ class Module():
 
         routing = config.rte
         routes = routing.get('routes') or {}
-        vias = routing.get('vias') 
 
         # Path effects are used for meandering paths, for example
         path_effects = routes.get('path_effects')

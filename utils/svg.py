@@ -1086,7 +1086,7 @@ def placementMarkerPath():
     """
     Returns a path for the placement marker
     """
-    diameter = 0.3
+    diameter = 0.2
  
     r = diameter/2.0
  

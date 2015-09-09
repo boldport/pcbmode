@@ -377,24 +377,24 @@
       "top": {
         "stroke": "#444444",
         "fill": "none",
-        "stroke-opacity": 0.6,
-        "stroke-width": 0.05,
+        "stroke-opacity": 0.5,
+        "stroke-width": 0.03,
         "stroke-linejoin": "round",
         "stroke-linecap": "round"
       },
       "internal": {
         "stroke": "#444444",
         "fill": "none",
-        "stroke-opacity": 0.6,
-        "stroke-width": 0.05,
+        "stroke-opacity": 0.5,
+        "stroke-width": 0.03,
         "stroke-linejoin": "round",
         "stroke-linecap": "round"
       },
       "bottom": {
         "stroke": "#444444",
         "fill": "none",
-        "stroke-opacity": 0.6,
-        "stroke-width": 0.05,
+        "stroke-opacity": 0.5,
+        "stroke-width": 0.03,
         "stroke-linejoin": "round",
         "stroke-linecap": "round"
       }

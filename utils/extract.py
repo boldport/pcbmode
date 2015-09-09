@@ -44,6 +44,7 @@ def extractComponents(svg_in):
 
     xpath_expr_refdefs = '//svg:g[@pcbmode:pcb-layer="%s"]//svg:g[@pcbmode:sheet="silkscreen"]//svg:g[@pcbmode:type="refdef"][@pcbmode:refdef="%s"]'
 
+
     for pcb_layer in config.stk['surface-layer-names']:
         
         # Find all markers
@@ -153,65 +154,6 @@ def extractComponents(svg_in):
 
 
 
-def extractDocs(svg_in):
-    """
-    Extracts the position of the documentation elements and updates
-    the board's json
-    """
-
-    # Get copper refdef shape groups from SVG data
-    xpath_expr = '//svg:g[@pcbmode:sheet="documentation"]//svg:g[@pcbmode:type="module-shapes"]'
-    docs = svg_in.findall(xpath_expr, 
-                          namespaces={'pcbmode':config.cfg['ns']['pcbmode'],
-                                      'svg':config.cfg['ns']['svg']})
-
-    
-    for doc in docs:
-        doc_key = doc.get('{'+config.cfg['ns']['pcbmode']+'}doc-key')
-        translate_data = utils.parseTransform(doc.get('transform'))
-        location = translate_data['location']
-        location.y *= config.cfg['invert-y']
-
-        current_location = utils.toPoint(config.brd['documentation'][doc_key]['location'])
-        if current_location != location:
-            config.brd['documentation'][doc_key]['location'] = [location.x, location.y] 
-            msg.subInfo("Found new location ([%s, %s]) for '%s'" % (location.x, location.y, doc_key))
-
-
-    # Extract drill index location
-    xpath_expr = '//svg:g[@pcbmode:sheet="drills"]//svg:g[@pcbmode:type="drill-index"]'
-    drill_index = svg_in.find(xpath_expr, 
-                              namespaces={'pcbmode':config.cfg['ns']['pcbmode'],
-                                          'svg':config.cfg['ns']['svg']})    
-    transform_dict = utils.parseTransform(drill_index.get('transform'))
-    location = transform_dict['location']
-    location.y *= config.cfg['invert-y']
-
-    # Modify the location in the board's config file. If a
-    # 'drill-index' field doesn't exist, create it
-    drill_index_dict = config.brd.get('drill-index') 
-    if drill_index_dict == None:
-        config.brd['drill-index'] = {}
-    config.brd['drill-index']['location'] = [location.x, location.y]
-
-        
-    # Save board config to file (everything is saved, not only the
-    # component data)
-    filename = os.path.join(config.cfg['locations']['boards'], 
-                            config.cfg['name'], 
-                            config.cfg['name'] + '.json')
-    try:
-        with open(filename, 'wb') as f:
-            f.write(json.dumps(config.brd, sort_keys=True, indent=2))
-    except:
-        msg.error("Cannot save file %s" % filename)
-
-
-
-
-
-
-
 def extractRouting(svg_in):
     """
     Extracts routing from the the 'routing' SVG layers of each PCB layer.
@@ -244,8 +186,6 @@ def extractRouting(svg_in):
         routes = svg_in.xpath(xpath_expr % pcb_layer, 
                               namespaces={'pcbmode':config.cfg['ns']['pcbmode'], 
                                           'svg':config.cfg['ns']['svg']})
-
-        print pcb_layer, routes
 
         for route in routes:
             route_dict = {}
@@ -321,93 +261,42 @@ def extractRouting(svg_in):
         message += ", %s removed" % (total_old - total)
     msg.subInfo(message)
 
-    #-------------
+
+    #-------------------------------
     # Extract vias
-    #-------------
+    #-------------------------------
 
-    # XPATH expression for extracting vias
-    xpath_expr = "//svg:g[@pcbmode:pcb-layer='%s']//svg:g[@pcbmode:sheet='routing']//svg:*[@pcbmode:type='via']"
-    # Get new vias; only search the top layer
-    new_vias = svg_in.xpath(xpath_expr % 'top', 
-                            namespaces={'pcbmode':config.cfg['ns']['pcbmode'], 
-                                        'svg':config.cfg['ns']['svg']})    
-
-    # XPATH expression for extracting vias
-    xpath_expr = "//svg:g[@pcbmode:pcb-layer='%s']//svg:g[@pcbmode:sheet='pads']//svg:g[@pcbmode:type='via']"
-    # Get nexisting vias; only search the top layer
-    vias = svg_in.xpath(xpath_expr % 'top', 
-                        namespaces={'pcbmode':config.cfg['ns']['pcbmode'], 
-                                    'svg':config.cfg['ns']['svg']})    
-
+    xpath_expr_place = '//svg:g[@pcbmode:pcb-layer="%s"]//svg:g[@pcbmode:sheet="placement"]//svg:g[@pcbmode:type="via"]'
 
     vias_dict = {}
 
-    for via in vias:
+    for pcb_layer in config.stk['surface-layer-names']:
+        
+        # Find all markers
+        markers = svg_in.findall(xpath_expr_place % pcb_layer, 
+                                 namespaces={'pcbmode':config.cfg['ns']['pcbmode'],
+                                             'svg':config.cfg['ns']['svg']})
 
-        transform = via.get('transform')
-        if transform != None:
-            transform_data = utils.parseTransform(transform)
+        for marker in markers:
+            transform_data = utils.parseTransform(marker.get('transform'))
             location = transform_data['location']
-        else:
-            location = Point()
+            # Invert 'y' coordinate
+            location.y *= config.cfg['invert-y']
 
-        # Invery 'y' axis if needed
-        location.y *= config.cfg['invert-y']
+            # Change component rotation if needed
+            if transform_data['type'] == 'matrix':
+                rotate = transform_data['rotate']
+                rotate = utils.niceFloat((rotate) % 360)
+                
+            digest = utils.digest("%s%s" % (location.x, location.y))
 
-        digest = utils.digest("%s%s" % (location.x, location.y))
-
-        # Define a via, just like any other component, but disable
-        # placement of refdef
-        vias_dict[digest] = {}
-        vias_dict[digest]['footprint'] = via.get('{'+config.cfg['ns']['pcbmode']+'}via')
-        vias_dict[digest]['location'] = [location.x, location.y]
-        vias_dict[digest]['silkscreen'] = {'refdef': {'show': False }}
-        vias_dict[digest]['assembly'] = {'refdef': {'show': False }}
-        vias_dict[digest]['layer'] = 'top'
-
-    
-
-    for via in new_vias:
-
-        # A newly-defined via will have a location set through the
-        # 'sodipodi' namespace and possible also through a transform
-        try:
-            # The commented lines below wored fro Inkscape prior to 0.91
-            #sodipodi_loc = Point(via.get('{'+config.cfg['ns']['sodipodi']+'}cx'), 
-            #                via.get('{'+config.cfg['ns']['sodipodi']+'}cy'))
-            sodipodi_loc = Point(via.get('cx'), 
-                            via.get('cy'))
-        except:
-            sodipodi_loc = Point()
-
-        print sodipodi_loc
-
-        transform = via.get('transform')
-        if transform != None:
-            transform_data = utils.parseTransform(transform)
-            location = transform_data['location']
-        else:
-            location = Point()
-
-        location += sodipodi_loc
-
-        # Invery 'y' axis if needed
-        location.y *= config.cfg['invert-y']
-
-        digest = utils.digest("%s%s" % (location.x, location.y))
-
-        # Define a via, just like any other component, but disable
-        # placement of refdef
-        vias_dict[digest] = {}
-        vias_dict[digest]['footprint'] = via.get('{'+config.cfg['ns']['pcbmode']+'}via')
-        vias_dict[digest]['location'] = [location.x, location.y]
-        vias_dict[digest]['silkscreen'] = {'refdef': {'show': False }}
-        vias_dict[digest]['assembly'] = {'refdef': {'show': False }}
-        vias_dict[digest]['layer'] = 'top'
-
-
-
-
+            # Define a via, just like any other component, but disable
+            # placement of refdef
+            vias_dict[digest] = {}
+            vias_dict[digest]['footprint'] = marker.get('{'+config.cfg['ns']['pcbmode']+'}footprint')
+            vias_dict[digest]['location'] = [utils.niceFloat(location.x),
+                                             utils.niceFloat(location.y)]
+            vias_dict[digest]['layer'] = 'top'
 
 
     routing_dict['vias'] = vias_dict
@@ -433,3 +322,57 @@ def extractRouting(svg_in):
 
 
 
+
+
+def extractDocs(svg_in):
+    """
+    Extracts the position of the documentation elements and updates
+    the board's json
+    """
+
+    # Get copper refdef shape groups from SVG data
+    xpath_expr = '//svg:g[@pcbmode:sheet="documentation"]//svg:g[@pcbmode:type="module-shapes"]'
+    docs = svg_in.findall(xpath_expr, 
+                          namespaces={'pcbmode':config.cfg['ns']['pcbmode'],
+                                      'svg':config.cfg['ns']['svg']})
+
+    
+    for doc in docs:
+        doc_key = doc.get('{'+config.cfg['ns']['pcbmode']+'}doc-key')
+        translate_data = utils.parseTransform(doc.get('transform'))
+        location = translate_data['location']
+        location.y *= config.cfg['invert-y']
+
+        current_location = utils.toPoint(config.brd['documentation'][doc_key]['location'])
+        if current_location != location:
+            config.brd['documentation'][doc_key]['location'] = [location.x, location.y] 
+            msg.subInfo("Found new location ([%s, %s]) for '%s'" % (location.x, location.y, doc_key))
+
+
+    # Extract drill index location
+    xpath_expr = '//svg:g[@pcbmode:sheet="drills"]//svg:g[@pcbmode:type="drill-index"]'
+    drill_index = svg_in.find(xpath_expr, 
+                              namespaces={'pcbmode':config.cfg['ns']['pcbmode'],
+                                          'svg':config.cfg['ns']['svg']})    
+    transform_dict = utils.parseTransform(drill_index.get('transform'))
+    location = transform_dict['location']
+    location.y *= config.cfg['invert-y']
+
+    # Modify the location in the board's config file. If a
+    # 'drill-index' field doesn't exist, create it
+    drill_index_dict = config.brd.get('drill-index') 
+    if drill_index_dict == None:
+        config.brd['drill-index'] = {}
+    config.brd['drill-index']['location'] = [location.x, location.y]
+
+        
+    # Save board config to file (everything is saved, not only the
+    # component data)
+    filename = os.path.join(config.cfg['locations']['boards'], 
+                            config.cfg['name'], 
+                            config.cfg['name'] + '.json')
+    try:
+        with open(filename, 'wb') as f:
+            f.write(json.dumps(config.brd, sort_keys=True, indent=2))
+    except:
+        msg.error("Cannot save file %s" % filename)

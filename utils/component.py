@@ -127,8 +127,10 @@ class Component():
                 # Add the refdef to the silkscreen/assembly list. It's
                 # important that this is added at the very end since the
                 # placement process assumes the refdef is last
-                footprint_shapes[sheet][layer].append(refdef_shape)
-
+                try:
+                    footprint_shapes[sheet][layer].append(refdef_shape)
+                except:
+                    continue
 
         #------------------------------------------------------
         # Invert 'top' and 'bottom' if layer is on the 'bottom'
