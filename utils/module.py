@@ -63,7 +63,6 @@ class Module():
         defs = et.SubElement(self._module, 'defs')
         self._masks = {}
 
-        #for pcb_layer in utils.getSurfaceLayers():
         for pcb_layer in config.stk['layer-names']:
              element = et.SubElement(defs, 'mask',
                                      id="mask-%s" % pcb_layer,
@@ -112,7 +111,6 @@ class Module():
         # This 'cover' "enables" the mask shapes defined in the mask are
         # shown. It *must* be the last element in the mask definition;
         # any mask element after it won't show
-        #for pcb_layer in utils.getSurfaceLayers():
         for pcb_layer in config.stk['layer-names']:
             if utils.checkForPoursInLayer(pcb_layer) is True:
                 mask_cover = et.SubElement(self._masks[pcb_layer], 'rect',
@@ -254,25 +252,21 @@ class Module():
             except:
                 msg.error("Cannot find a 'type' for a pour shape. Pours can be any 'shape', or simply 'type':'layer' to cover the entire layer.")
 
-            layers = pour_dict.get('layers') or ['top']
+            layers = utils.getExtendedLayerList(pour_dict.get('layers') or ['top'])
 
             if pour_type == 'layer':
                 # Get the outline shape dict
                 new_pour_dict = self._module_dict['outline'].get('shape').copy()
                 new_pour_dict['style'] = 'fill'
                 shape = Shape(new_pour_dict)
-                # Get the appropriate style from conductor->pours
-                style = Style(shape_dict=new_pour_dict,
-                              layer_name='conductor',
-                              sub_item='pours')
-                shape.setStyle(style)
             else:
                 shape = Shape(pour_dict)
-                # Get the appropriate style from conductor->pours
-                style = Style(shape_dict=pour_dict,
-                              layer_name='conductor',
-                              sub_item='pours')
-                shape.setStyle(style)
+
+            # Get the appropriate style from conductor->pours
+            style = Style(shape_dict=new_pour_dict,
+                          layer_name='conductor',
+                          sub_item='pours')
+            shape.setStyle(style)
 
             # Place on all specified layers
             for layer in layers:
@@ -303,7 +297,6 @@ class Module():
             there_are_pours = {}
             shape_groups = {}
 
-            #for pcb_layer in utils.getSurfaceLayers():
             for pcb_layer in config.stk['surface-layer-names']:
                 there_are_pours[pcb_layer] = utils.checkForPoursInLayer(pcb_layer)
                 shape_groups[pcb_layer] = et.SubElement(self._layers[pcb_layer][sheet]['layer'], 'g')
@@ -384,7 +377,6 @@ class Module():
             else:
                 invert = False
 
-            #for pcb_layer in utils.getSurfaceLayers():
             for pcb_layer in config.stk['layer-names']:
 
                 there_are_pours = utils.checkForPoursInLayer(pcb_layer)
@@ -723,7 +715,6 @@ class Module():
         except:
             pour_buffer = config.brd['distances']['from-pour-to']['outline']
 
-        #for pcb_layer in utils.getSurfaceLayers():
         for pcb_layer in config.stk['layer-names']:
             if utils.checkForPoursInLayer(pcb_layer) is True:
                 mask_element = place.placeShape(self._outline, self._masks[pcb_layer])
