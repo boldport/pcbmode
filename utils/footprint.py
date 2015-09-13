@@ -83,7 +83,7 @@ class Footprint():
                 shape_dict = shape_dict.copy()
 
                 # Which layer(s) to place the shape on
-                layers = shape_dict.get('layers') or ['top']
+                layers = utils.getExtendedLayerList(shape_dict.get('layers') or ['top'])
 
                 # Add the pin's location to the pad's location
                 shape_location = shape_dict.get('location') or [0, 0]
@@ -97,16 +97,6 @@ class Footprint():
                 show_name = pins[pin]['layout'].get('show-label') or True
                 if show_name == True:
                     pin_label = pins[pin]['layout'].get('label') or pin
-
-                # For the list of layers we may get a list of all
-                # internal layers ('internal-1', 'internal-2, etc.) or
-                # simply 'internal', meaning that that shape is meant
-                # to go into all internal layers, which is the most
-                # common case. The following 'expands' the layer list
-                if 'internal' in layers:
-                    layers.remove('internal')
-                    layers.extend(config.stk['internal-layer-names']) 
-                
 
                 for layer in layers:
                     
