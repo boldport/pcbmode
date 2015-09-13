@@ -329,7 +329,6 @@ def process_meander_type(type_string, meander_type):
 
 
 
-# there_are_pours_in_this_layer
 def checkForPoursInLayer(layer):
     """
     Returns True or False if there are pours in the specified layer
@@ -343,7 +342,7 @@ def checkForPoursInLayer(layer):
 
     if pours is not None:
         for pour_dict in pours:
-            layers = pour_dict.get('layers')
+            layers = getExtendedLayerList(pour_dict.get('layers'))
             if layer in layers:
                 return True
  
