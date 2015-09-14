@@ -86,14 +86,18 @@
         {
           "top":
           {
-            "copper": {"ext": "ger"},
+            "conductor": {"ext": "ger"},
             "soldermask": {"ext": "ger"},
             "silkscreen": {"ext": "ger"},
             "solderpaste": {"ext": "ger"}
           },
+          "internal":
+          {
+            "conductor": {"ext": "ger"}
+          },
           "bottom":
           {
-            "copper": {"ext": "ger"},
+            "conductor": {"ext": "ger"},
             "soldermask": {"ext": "ger"},
             "silkscreen": {"ext": "ger"},
             "solderpaste": {"ext": "ger"}
@@ -123,13 +127,13 @@
         {
           "top":
           {
-            "copper": {"ext": "gtl"},
+            "conductor": {"ext": "gtl"},
             "soldermask": {"ext": "gts"},
             "silkscreen": {"ext": "gto"}
           },
           "bottom":
           {
-            "copper": {"ext": "gbl"},
+            "conductor": {"ext": "gbl"},
             "soldermask": {"ext": "gbs"},
             "silkscreen": {"ext": "gbo"}  
           },
@@ -158,13 +162,13 @@
         {
           "top":
           {
-            "copper": {"ext": "GTL"},
+            "conductor": {"ext": "GTL"},
             "soldermask": {"ext": "GTS"},
             "silkscreen": {"ext": "GTO"}
           },
           "bottom":
           {
-            "copper": {"ext": "GBL"},
+            "conductor": {"ext": "GBL"},
             "soldermask": {"ext": "GBS"},
             "silkscreen": {"ext": "GBO"}  
           },

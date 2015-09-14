@@ -10,11 +10,7 @@
         },
         {
           "type": "soldermask",
-          "name": "soldermask-1"
-        },
-        {
-          "type": "soldermask",
-          "name": "soldermask-2"
+          "name": "soldermask"
         },
         {
           "type": "conductor",
