@@ -373,8 +373,8 @@ def checkForPoursInLayer(layer):
             if layer in layers:
                 return True
  
-    return False
-  
+    #return False
+    return True
 
 
 

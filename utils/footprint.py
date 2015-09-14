@@ -30,6 +30,7 @@ class Footprint():
         
 
         self._shapes = {'conductor': {},
+                        'pours': {},
                         'soldermask': {},
                         'silkscreen': {},
                         'assembly': {},
@@ -37,6 +38,7 @@ class Footprint():
                         'drills': {}}
 
         self._processPins()
+        self._processPours()
         self._processSilkscreenShapes()
         self._processAssemblyShapes()
 
@@ -53,11 +55,7 @@ class Footprint():
         Converts pins into 'shapes'
         """
 
-        try:
-            pins = self._footprint['pins']
-        except:
-            msg.error("Cannot find any 'pins' specified!")
-
+        pins = self._footprint.get('pins') or {}
 
         for pin in pins:
 
@@ -224,6 +222,30 @@ class Footprint():
 
 
 
+    def _processPours(self):
+        """
+        """
+
+        try:
+            shapes = self._footprint['layout']['pours']['shapes']
+        except:
+            return        
+
+        for shape_dict in shapes:
+            layers = utils.getExtendedLayerList(shape_dict.get('layers') or ['top'])
+            for layer in layers:
+                shape = Shape(shape_dict)
+                style = Style(shape_dict, 'conductor', 'pours')
+                shape.setStyle(style)
+
+                try:
+                    self._shapes['pours'][layer].append(shape)
+                except:
+                    self._shapes['pours'][layer] = []
+                    self._shapes['pours'][layer].append(shape)
+
+
+
 
 
     def _processSilkscreenShapes(self):
@@ -235,12 +257,11 @@ class Footprint():
             return
 
         for shape_dict in shapes:
-            layers = shape_dict.get('layers') or ['top']
+            layers = utils.getExtendedLayerList(shape_dict.get('layers') or ['top'])
             for layer in layers:
                 shape = Shape(shape_dict)
                 style = Style(shape_dict, 'silkscreen')
                 shape.setStyle(style)
-                #self._shapes['silkscreen'][layer].append(shape)
                 try:
                     self._shapes['silkscreen'][layer].append(shape)
                 except:
@@ -260,12 +281,11 @@ class Footprint():
             return
 
         for shape_dict in shapes:
-            layers = shape_dict.get('layer') or ['top']
+            layers = utils.getExtendedLayerList(shape_dict.get('layer') or ['top'])
             for layer in layers:
                 shape = Shape(shape_dict)
                 style = Style(shape_dict, 'assembly')
                 shape.setStyle(style)
-                #self._shapes['assembly'][layer].append(shape)
                 try:
                     self._shapes['assembly'][layer].append(shape)
                 except:

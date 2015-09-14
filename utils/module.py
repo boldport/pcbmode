@@ -46,6 +46,11 @@ class Module():
         vias_dict = self._routing_dict.get('vias') or {}
         self._vias = self._getComponents(vias_dict)
 
+        # Get dictionary of component definitions
+        shapes_dict = self._module_dict.get('shapes') or {}
+        self._shapes = self._getComponents(shapes_dict)
+
+
         sig_dig = config.cfg['significant-digits']
         self._transform = 'translate(%s %s)' % (round(self._width/2, sig_dig),
                                                 round(self._height/2, sig_dig))
@@ -89,11 +94,10 @@ class Module():
                               component_type='via',
                               print_refdef=False)
 
-        # Place additional shapes
-        shapes = copy.deepcopy(self._module_dict.get('shapes')) or []
-        if shapes != []:
-            msg.subInfo('Placing shapes')
-            self._placeShapes(shapes)
+        msg.subInfo('Placing shapes')
+        self._placeComponents(components=self._shapes, 
+                              component_type='shapes',
+                              print_refdef=False)
 
         if config.tmp['no-docs'] == False:
             msg.subInfo('Placing documentation')
@@ -230,288 +234,6 @@ class Module():
 
 
 
-    def _placeShapes(self, shapes):
-        """
-        """
-
-        for shape_dict in shapes:
-            placement_layers = utils.getExtendedLayerList(shape_dict.get('layers') or ['top'])
-            try:
-                sheets = shape_dict['sheets']
-            except:
-                msg.error("No 'sheets' are defined for shape")
-
-            # Verify the existance of the sheet in the layer
-            for placement_layer in placement_layers:
-                for defined_layer_dict in config.stk['layers-dict']:
-                    if defined_layer_dict['name'] == placement_layer:
-                        break
-
-                defined_sheets = defined_layer_dict['stack']
-                defined_sheet_names = []
-                for defined_sheet in defined_sheets:
-                    defined_sheet_names.append(defined_sheet['name'])
-
-                for sheet in sheets:
-                    new_sheet_list = utils.getExtendedSheetList(placement_layer, sheet)
-         
-#                if sheet not in new_sheet_list:
-#                    print sheet, new_sheet_list
-#                    msg.note("Sheet '%s' not defined in stackup" % sheet)
-
-                print new_sheet_list
-                        
-                for sheet in new_sheet_list:
-                    sheet_type = shape_dict.get('sheet-type') or None
-                    try:
-                        shape_type = shape_dict['type']
-                    except:
-                        msg.error("Every shape myst have a 'type' defined")
-
-                    # Create a shape that spans the entire layer
-                    if shape_type == 'layer':
-                        # Get the outline shape dict
-                        new_dict = self._module_dict['outline'].get('shape').copy()
-                        new_dict['style'] = 'fill'
-                        shape = Shape(new_dict)
-                    else:
-                        shape = Shape(shape_dict)
-                    
-                    if sheet_type != None:
-                        placement_svg_layer = self._layers[placement_layer][sheet][sheet_type]['layer']
-                    else:
-                        placement_svg_layer = self._layers[placement_layer][sheet]['layer']
-
-                    # Get the appropriate style from conductor->pours
-                    style = Style(shape_dict=shape_dict,
-                                  layer_name=sheet,
-                                  sub_item=sheet_type)
-                    shape.setStyle(style)
-
-
-                    # Shapes placed on the bottom layer are not mirrored
-                    # by default unless they are text
-                    if shape_dict['type'] == 'text':
-                        shape_mirror = True
-                    else:
-                        shape_mirror = False
-                    # Override default behaviour if instructed
-                    shape_mirror = shape_dict.get('mirror') or shape_mirror
-     
-                    if (placement_layer == 'bottom') and (shape_mirror == True):
-                        shape_dict['location'][0] *= -1
-                        mirror = True
-                    else:
-                        mirror = False
-
-                    # Place shape
-                    place.placeShape(shape, placement_svg_layer, mirror)
-
-
-                    # Place mask if there's a copper pour on the layer
-                    if (utils.checkForPoursInLayer(placement_layer) == True) and :
-                        location = shape.getLocation()
-                        transform = "translate(%s,%s)" % (location.x, location.y)
-                        mask_group = et.SubElement(self._masks[placement_layer], 'g')
-                        self._placeMask(svg_layer=mask_group, 
-                                        shape=shape,
-                                        kind='pad',
-                                        original=False,
-                                        mirror=mirror)
-
-
-
-
-#                        shape_group[pcb_layer] = et.SubElement(svg_layer, 'g',
-#                                                               mask='url(#mask-%s)' % pcb_layer)
-
-                    
-
-
-
-#    def _placeShape(shape, layer, sheet, sheet_type=None):
-#
-#
-#        shape_group = {}
-#
-# 
-#        for pcb_layer in config.stk['layer-names']:
-#            svg_layer = self._layers[pcb_layer]['conductor']['pours']['layer']
-#            shape_group[pcb_layer] = et.SubElement(svg_layer, 'g',
-#                                                   mask='url(#mask-%s)' % pcb_layer)
-# 
-#        for pour_dict in pours:
-#            try:
-#                pour_type = pour_dict['type']
-#            except:
-#                msg.error("Cannot find a 'type' for a pour shape. Pours can be any 'shape', or simply 'type':'layer' to cover the entire layer.")
-# 
-#            layers = utils.getExtendedLayerList(pour_dict.get('layers') or ['top'])
-# 
-#            if pour_type == 'layer':
-#                # Get the outline shape dict
-#                new_pour_dict = self._module_dict['outline'].get('shape').copy()
-#                new_pour_dict['style'] = 'fill'
-#                shape = Shape(new_pour_dict)
-#            else:
-#                shape = Shape(pour_dict)
-# 
-#            # Get the appropriate style from conductor->pours
-#            style = Style(shape_dict=new_pour_dict,
-#                          layer_name='conductor',
-#                          sub_item='pours')
-#            shape.setStyle(style)
-# 
-#            # Place on all specified layers
-#            for layer in layers:
-#                place.placeShape(shape, shape_group[layer])
-
-
-
-
-
-
-    def _placePourShapes(self, pours):
-        """
-        """
-
-        shape_group = {}
-
-        for pcb_layer in config.stk['layer-names']:
-            svg_layer = self._layers[pcb_layer]['conductor']['pours']['layer']
-            shape_group[pcb_layer] = et.SubElement(svg_layer, 'g',
-                                                   mask='url(#mask-%s)' % pcb_layer)
-
-        for pour_dict in pours:
-            try:
-                pour_type = pour_dict['type']
-            except:
-                msg.error("Cannot find a 'type' for a pour shape. Pours can be any 'shape', or simply 'type':'layer' to cover the entire layer.")
-
-            layers = utils.getExtendedLayerList(pour_dict.get('layers') or ['top'])
-
-            if pour_type == 'layer':
-                # Get the outline shape dict
-                new_pour_dict = self._module_dict['outline'].get('shape').copy()
-                new_pour_dict['style'] = 'fill'
-                shape = Shape(new_pour_dict)
-            else:
-                shape = Shape(pour_dict)
-
-            # Get the appropriate style from conductor->pours
-            style = Style(shape_dict=new_pour_dict,
-                          layer_name='conductor',
-                          sub_item='pours')
-            shape.setStyle(style)
-
-            # Place on all specified layers
-            for layer in layers:
-                place.placeShape(shape, shape_group[layer])
-
-
-
-
-
-    def _placeConductorShapes(self, shapes):
-        """
-        """
-
-        mirror = False
-
-        shape_groups = {}
-
-        for pcb_layer in config.stk['layer-names']:
-            shape_groups[pcb_layer] = et.SubElement(self._layers[pcb_layer]['conductor']['layer'], 'g')
-            shape_groups[pcb_layer].set('{'+config.cfg['ns']['pcbmode']+'}type', 'module-shapes')
-
-        for shape_dict in shapes:
-
-            pcb_layers = utils.getExtendedLayerList(shape_dict.get('layers') or ['top'])
-
-            for pcb_layer in pcb_layers:
-
-                # Shapes placed on the bottom layer are not mirrored
-                # by default unless they are text
-                if shape_dict['type'] == 'text':
-                    shape_mirror = True
-                else:
-                    shape_mirror = False
-                # Override default behaviour if instructed
-                shape_mirror = shape_dict.get('mirror') or shape_mirror
-
-                if (pcb_layer == 'bottom') and (shape_mirror == True):
-                    shape_dict['location'][0] *= -1
-                    mirror = True
-                else:
-                    mirror = False
-
-                shape = Shape(shape_dict)
-                style = Style(shape_dict, 'conductor')
-                shape.setStyle(style)
-                place.placeShape(shape, shape_groups[pcb_layer], mirror)
- 
-                # Place mask if there's a copper pour on the layer
-                if utils.checkForPoursInLayer(pcb_layer) == True:
-                    location = shape.getLocation()
-                    transform = "translate(%s,%s)" % (location.x, location.y)
-                    mask_group = et.SubElement(self._masks[pcb_layer], 'g')
-                    self._placeMask(svg_layer=mask_group, 
-                                    shape=shape,
-                                    kind='pad',
-                                    original=False,
-                                    mirror=mirror)
-
-
-
-
-
-    def _placeRestOfShapes(self, shapes_dict):
-        """
-        """
-
-        # Rmove empty lists
-        shapes_dict = dict( [(k,v) for k,v in shapes_dict.items() if len(v)>0])
-
-        for sheet,shapes_dict in shapes_dict.items():
-            
-            for shape_dict in shapes_dict:
-
-
-
-                shape_groups = {}
-     
-                for pcb_layer in config.stk['surface-layer-names']:
-                    shape_groups[pcb_layer] = et.SubElement(self._layers[pcb_layer][sheet]['layer'], 'g')
-                    shape_groups[pcb_layer].set('{'+config.cfg['ns']['pcbmode']+'}type', 'module-shapes')
-     
-                for pcb_layer in allowed_placement_layers:
- 
-                    # Shapes placed on the bottom layer are not mirrored
-                    # by default unless they are text
-                    if shape_dict['type'] == 'text':
-                        shape_mirror = True
-                    else:
-                        shape_mirror = False
-                    # Override default behaviour if instructed
-                    shape_mirror = shape_dict.get('mirror') or shape_mirror
-     
-                    if (pcb_layer == 'bottom') and (shape_mirror == True):
-                        shape_dict['location'][0] *= -1
-                        mirror = True
-                    else:
-                        mirror = False
- 
-                    shape = Shape(shape_dict)
-                    style = Style(shape_dict, sheet)
-                    shape.setStyle(style)
-                    place.placeShape(shape, shape_groups[pcb_layer], mirror)
- 
- 
-
-     
-     
-     
-     
     def _placeComponents(self, components, component_type, print_refdef=False):
         """
         """
@@ -589,6 +311,27 @@ class Module():
                                             'pad',
                                             original=False,
                                             mirror=invert)
+
+
+                # Pours
+                shapes = shapes_dict['pours'].get(pcb_layer) or []
+
+
+                try:
+                    svg_layer = self._layers[pcb_layer]['conductor']['pours']['layer']
+                    shape_group = et.SubElement(svg_layer, 'g',
+                                                mask='url(#mask-%s)' % pcb_layer)
+                except:
+                    svg_layer = None
+
+                if len(shapes) > 0 and svg_layer != None:
+                    print 'FFF'
+                    transform = "translate(%s,%s)" % (location[0],
+                                                      config.cfg['invert-y']*location[1])
+                    group = et.SubElement(shape_group, 'g', transform=transform)
+                    #group.set('{'+config.cfg['ns']['pcbmode']+'}type', 'component-shapes')
+                    for shape in shapes:
+                        placed_element = place.placeShape(shape, group, invert)
 
 
 
