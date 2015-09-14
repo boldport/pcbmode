@@ -6,7 +6,17 @@ def info(info, newline=True):
     if newline == True:
         print "-- %s" % info
     else:
-        print "-- %s" % info
+        print "-- %s" % info,
+
+
+def note(note, newline=True):
+    """
+    """
+    if newline == True:
+        print "-- NOTE: %s" % note
+    else:
+        print "-- NOTE: %s" % note,
+
 
 
 def subInfo(info, newline=True):
@@ -16,6 +26,7 @@ def subInfo(info, newline=True):
         print " * %s" % info
     else:
         print " * %s" % info,
+
 
 
 def error(info, error_type=None):
