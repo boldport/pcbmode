@@ -260,6 +260,33 @@ def getExtendedLayerList(layers):
 
 
 
+def getExtendedSheetList(layer, sheet):
+    """
+    We may want multiple sheets of the same type, such as two
+    soldermask layers on the same physical layer. This function
+    expands the list if such layers are defined in the stackup
+    """
+    
+    for layer_dict in config.stk['layers-dict']:
+        if layer_dict['name'] == layer:
+            break
+    stack_sheets = layer_dict['stack']
+
+    sheet_names = []
+    for stack_sheet in stack_sheets:
+        sheet_names.append(stack_sheet['name'])
+
+    new_list = []
+    for sheet_name in sheet_names:
+        if sheet_name.startswith(sheet):
+            new_list.append(sheet_name)
+
+    return new_list
+
+
+
+
+
 def create_dir(path):
     """
     Checks if a directory exists, and creates one if not
