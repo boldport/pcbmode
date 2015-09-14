@@ -89,11 +89,25 @@ class Module():
                               component_type='via',
                               print_refdef=False)
 
-        msg.subInfo('Placing shapes')
-        self._placeShapes()
+        # Place additional shapes
+        shapes_dict = copy.deepcopy(self._module_dict.get('shapes')) or {}
+        if shapes_dict != {}:
 
-        msg.subInfo('Placing pours')
-        self._placePours()
+            msg.subInfo('Placing pours')
+            shapes = shapes_dict.get('pours') or []
+            if shapes != []:
+                self._placePourShapes(shapes)
+            del shapes_dict['pours']
+
+            msg.subInfo('Placing shapes')
+            shapes = shapes_dict.get('conductor') or []
+            if shapes != []:
+                self._placeConductorShapes(shapes)
+            del shapes_dict['conductor']
+
+            # Place the rest of the shapes
+            if shapes_dict != {}:
+                self._placeRestOfShapes(shapes_dict)
 
         if config.tmp['no-docs'] == False:
             msg.subInfo('Placing documentation')
@@ -230,14 +244,9 @@ class Module():
 
 
 
-    def _placePours(self):
+    def _placePourShapes(self, pours):
         """
         """
-
-        try:
-            pours = self._module_dict['shapes']['pours']
-        except:
-            return
 
         shape_group = {}
 
@@ -276,78 +285,120 @@ class Module():
 
 
 
-    def _placeShapes(self):
+    def _placeConductorShapes(self, shapes):
         """
         """
 
         mirror = False
 
-        try:
-            shapes_dict = self._module_dict['shapes']
-        except:
-            return
+        shape_groups = {}
+
+        for pcb_layer in config.stk['layer-names']:
+            shape_groups[pcb_layer] = et.SubElement(self._layers[pcb_layer]['conductor']['layer'], 'g')
+            shape_groups[pcb_layer].set('{'+config.cfg['ns']['pcbmode']+'}type', 'module-shapes')
+
+        for shape_dict in shapes:
+
+            pcb_layers = utils.getExtendedLayerList(shape_dict.get('layers') or ['top'])
+
+            for pcb_layer in pcb_layers:
+
+                # Shapes placed on the bottom layer are not mirrored
+                # by default unless they are text
+                if shape_dict['type'] == 'text':
+                    shape_mirror = True
+                else:
+                    shape_mirror = False
+                # Override default behaviour if instructed
+                shape_mirror = shape_dict.get('mirror') or shape_mirror
+
+                if (pcb_layer == 'bottom') and (shape_mirror == True):
+                    shape_dict['location'][0] *= -1
+                    mirror = True
+                else:
+                    mirror = False
+
+                shape = Shape(shape_dict)
+                style = Style(shape_dict, 'conductor')
+                shape.setStyle(style)
+                place.placeShape(shape, shape_groups[pcb_layer], mirror)
+ 
+                # Place mask if there's a copper pour on the layer
+                if utils.checkForPoursInLayer(pcb_layer) == True:
+                    location = shape.getLocation()
+                    transform = "translate(%s,%s)" % (location.x, location.y)
+                    mask_group = et.SubElement(self._masks[pcb_layer], 'g')
+                    self._placeMask(svg_layer=mask_group, 
+                                    shape=shape,
+                                    kind='pad',
+                                    original=False,
+                                    mirror=mirror)
 
 
-        for sheet in ['conductor','soldermask','solderpaste','silkscreen']:
-            try:
-                shapes = shapes_dict[sheet]
-            except KeyError:
-                continue
-
-            there_are_pours = {}
-            shape_groups = {}
-
-            for pcb_layer in config.stk['surface-layer-names']:
-                there_are_pours[pcb_layer] = utils.checkForPoursInLayer(pcb_layer)
-                shape_groups[pcb_layer] = et.SubElement(self._layers[pcb_layer][sheet]['layer'], 'g')
-                shape_groups[pcb_layer].set('{'+config.cfg['ns']['pcbmode']+'}type', 'module-shapes')
-
-            for pcb_layer in config.stk['internal-layer-names']:
-                there_are_pours[pcb_layer] = utils.checkForPoursInLayer(pcb_layer)
-                shape_groups[pcb_layer] = et.SubElement(self._layers[pcb_layer]['conductor']['layer'], 'g')
-                shape_groups[pcb_layer].set('{'+config.cfg['ns']['pcbmode']+'}type', 'module-shapes')
 
 
-            for shape_dict in shapes:
 
-                pcb_layers = shape_dict.get('layers') or ['top']
+    def _placeRestOfShapes(self, shapes_dict):
+        """
+        """
 
-                for pcb_layer in pcb_layers:
+        # Rmove empty lists
+        shapes_dict = dict( [(k,v) for k,v in shapes_dict.items() if len(v)>0])
 
+        for sheet,shapes_dict in shapes_dict.items():
+            
+            for shape_dict in shapes_dict:
+
+                # Check if the placement layer has the sheet
+                for layer_dict in config.stk['surface-layers']:
+                    stack = layer_dict.get('stack') or []
+                    print stack
+                    if sheet not in stack:
+                        msg.note("Sheet '%s' not defined in stackup" % sheet)
+                        break
+
+                # Check if the placement layer specified is 'allowed',
+                # that is, if it's a surface layer. Any other layer will
+                # be copper only, and shapes for those have already been
+                # dealt with
+                placement_layers = utils.getExtendedLayerList(shape_dict.get('layers') or ['top'])
+                allowed_placement_layers = []
+                for pcb_layer in placement_layers:
+                    if pcb_layer in config.stk['surface-layer-names']:
+                        allowed_placement_layers.append(pcb_layer)
+                    else:
+                        msg.note("Ignoring layer '%s' for '%s'" % (pcb_layer, sheet))
+
+
+                shape_groups = {}
+     
+                for pcb_layer in config.stk['surface-layer-names']:
+                    shape_groups[pcb_layer] = et.SubElement(self._layers[pcb_layer][sheet]['layer'], 'g')
+                    shape_groups[pcb_layer].set('{'+config.cfg['ns']['pcbmode']+'}type', 'module-shapes')
+     
+                for pcb_layer in allowed_placement_layers:
+ 
                     # Shapes placed on the bottom layer are not mirrored
-                    # unless they are text, in which case, it's the
-                    # expected behaviour and so it is mirrored by default
-                    # unless otherwise instructed.
-                    try:
-                        shape_mirror = shape_dict.get['mirror']
-                    except:
-                        if shape_dict['type'] == 'text':
-                            shape_mirror = True
-                        else:
-                            shape_mirror = False
-                        
-                    if (pcb_layer == 'bottom') and (shape_mirror != False):
+                    # by default unless they are text
+                    if shape_dict['type'] == 'text':
+                        shape_mirror = True
+                    else:
+                        shape_mirror = False
+                    # Override default behaviour if instructed
+                    shape_mirror = shape_dict.get('mirror') or shape_mirror
+     
+                    if (pcb_layer == 'bottom') and (shape_mirror == True):
                         shape_dict['location'][0] *= -1
                         mirror = True
                     else:
                         mirror = False
-
+ 
                     shape = Shape(shape_dict)
                     style = Style(shape_dict, sheet)
                     shape.setStyle(style)
                     place.placeShape(shape, shape_groups[pcb_layer], mirror)
-     
-                    # Place mask for pour if copper shape
-                    if (sheet == 'conductor') and (there_are_pours[pcb_layer] == True):
-                        location = shape.getLocation()
-                        transform = "translate(%s,%s)" % (location.x, location.y)
-                        mask_group = et.SubElement(self._masks[pcb_layer], 'g')
-                        self._placeMask(svg_layer=mask_group, 
-                                        shape=shape,
-                                        kind='pad',
-                                        original=False,
-                                        mirror=mirror)
-
+ 
+ 
 
      
      
