@@ -40,10 +40,27 @@ class Component():
         except:
             msg.error("Cannot find a 'footprint' name for refdef %s." % refdef)
 
-        fname = os.path.join(config.cfg['base-dir'],
+        filename = self._footprint_name + '.json'
+
+        paths = [os.path.join(config.cfg['base-dir'],
+                             config.cfg['locations']['shapes'],
+                             filename),
+                   os.path.join(config.cfg['base-dir'],
                              config.cfg['locations']['components'],
-                             self._footprint_name + '.json')
-        footprint_dict = utils.dictFromJsonFile(fname)
+                             filename)]
+
+        footprint_dict = None
+        for path in paths:
+            if os.path.isfile(path):
+                footprint_dict = utils.dictFromJsonFile(path)
+                break
+
+        if footprint_dict == None:
+            fname_list = ""
+            for path in paths:
+                fname_list += " %s" % path
+            msg.error("Couldn't find shape file. Looked for it here:\n%s" % (fname_list))
+
         footprint = Footprint(footprint_dict)
         footprint_shapes = footprint.getShapes()
 

@@ -6,7 +6,8 @@
     "fonts": "fonts/",
     "build": "build/",
     "styles": "styles/",
-    "stackups": "stackups/"
+    "stackups": "stackups/",
+    "shapes": "shapes/"
   },
   "refdef-index":
   {
