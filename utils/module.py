@@ -95,7 +95,7 @@ class Module():
 
         msg.subInfo('Placing shapes')
         self._placeComponents(components=self._shapes, 
-                              component_type='shapes',
+                              component_type='shape',
                               print_refdef=False)
 
         if config.tmp['no-docs'] == False:
@@ -235,6 +235,11 @@ class Module():
 
     def _placeComponents(self, components, component_type, print_refdef=False):
         """
+        Places the component on the board.  
+
+        'component_type' is the content of the 'type' fiels of the
+        placed group. This is used by the extractor to identify the
+        type of component ('component', 'via', 'shape')
         """
 
         htmlpar = HTMLParser.HTMLParser()
@@ -274,13 +279,12 @@ class Module():
                     shape_group = et.SubElement(svg_layer, 'g', 
                                                 transform=transform)
 
+
+                    shape_group.set('{'+config.cfg['ns']['pcbmode']+'}type', component_type)
+                    # Add the reference designator as well if it's a
+                    # 'component'
                     if component_type == 'component':
-                        shape_group.set('{'+config.cfg['ns']['pcbmode']+'}type', 'component')
                         shape_group.set('{'+config.cfg['ns']['pcbmode']+'}refdef', component.getRefdef())
-                    elif component_type == 'via':
-                        shape_group.set('{'+config.cfg['ns']['pcbmode']+'}type', 'via')
-                    else:
-                        pass
 
                     style = utils.dictToStyleText(config.stl['layout']['conductor']['pads']['labels'])
                     label_group = et.SubElement(shape_group, 'g', style=style)
@@ -429,7 +433,7 @@ class Module():
             group = et.SubElement(svg_layer, 'g', transform=transform)
             group.set('{'+config.cfg['ns']['pcbmode']+'}type', component_type)
             group.set('{'+config.cfg['ns']['pcbmode']+'}footprint', component.getFootprintName())
-            if component_type == 'component':
+            if (component_type == 'component') or (component_type == 'shape'):
                 group.set('{'+config.cfg['ns']['pcbmode']+'}refdef', refdef)
 
             path = svg.placementMarkerPath()
@@ -443,7 +447,7 @@ class Module():
                                            d=path,
                                            transform="rotate(%s)" % rotation)
 
-            if component_type == 'component':
+            if (component_type == 'component'):
                 style = utils.dictToStyleText(config.stl['layout']['placement']['text'])
      
                 t = et.SubElement(group, 'text', x="0", y="-0.17", style=style)

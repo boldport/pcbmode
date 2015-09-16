@@ -38,7 +38,7 @@ def extractComponents(svg_in):
     
     # Get copper refdef shape groups from SVG data
 
-    xpath_expr_place = '//svg:g[@pcbmode:pcb-layer="%s"]//svg:g[@pcbmode:sheet="placement"]//svg:g[@pcbmode:type="component"]'
+    xpath_expr_place = '//svg:g[@pcbmode:pcb-layer="%s"]//svg:g[@pcbmode:sheet="placement"]//svg:g[@pcbmode:type="%s"]'
 
     xpath_expr_copper_pads = '//svg:g[@pcbmode:pcb-layer="%s"]//svg:g[@pcbmode:sheet="copper"]//svg:g[@pcbmode:sheet="pads"]//svg:g[@pcbmode:refdef]'
 
@@ -47,17 +47,25 @@ def extractComponents(svg_in):
 
     for pcb_layer in config.stk['surface-layer-names']:
         
-        # Find all markers
-        markers = svg_in.findall(xpath_expr_place % pcb_layer, 
+        # Find all 'component' markers
+        markers = svg_in.findall(xpath_expr_place % (pcb_layer, 'component'), 
                                  namespaces={'pcbmode':config.cfg['ns']['pcbmode'],
                                              'svg':config.cfg['ns']['svg']})
-
-        print len(markers)
+        # Find all 'shape' markers
+        markers += svg_in.findall(xpath_expr_place % (pcb_layer, 'shape'), 
+                                  namespaces={'pcbmode':config.cfg['ns']['pcbmode'],
+                                              'svg':config.cfg['ns']['svg']})
 
         for marker in markers:
+
             transform_data = utils.parseTransform(marker.get('transform'))
             refdef = marker.get('{'+config.cfg['ns']['pcbmode']+'}refdef')
-            comp_dict = config.brd['components'][refdef]
+            marker_type = marker.get('{'+config.cfg['ns']['pcbmode']+'}type')
+            
+            if marker_type == 'component':
+                comp_dict = config.brd['components'][refdef]
+            else:
+                comp_dict = config.brd['shapes'][refdef]
 
             new_location = transform_data['location']
             old_location = utils.toPoint(comp_dict.get('location') or [0, 0])
