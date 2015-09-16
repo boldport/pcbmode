@@ -52,6 +52,8 @@ def extractComponents(svg_in):
                                  namespaces={'pcbmode':config.cfg['ns']['pcbmode'],
                                              'svg':config.cfg['ns']['svg']})
 
+        print len(markers)
+
         for marker in markers:
             transform_data = utils.parseTransform(marker.get('transform'))
             refdef = marker.get('{'+config.cfg['ns']['pcbmode']+'}refdef')
@@ -65,10 +67,12 @@ def extractComponents(svg_in):
 
             # Change component location if needed
             if new_location != old_location:
-                x = utils.niceFloat(new_location.x)
-                y = utils.niceFloat(new_location.y)
-                msg.subInfo("%s has moved from %s to %s" % (refdef,x,y))
-                comp_dict['location'] = [x,y]
+                x1 = utils.niceFloat(old_location.x)
+                y1 = utils.niceFloat(old_location.y)
+                x2 = utils.niceFloat(new_location.x)
+                y2 = utils.niceFloat(new_location.y)
+                msg.subInfo("%s has moved from [%s,%s] to [%s,%s]" % (refdef,x1,y2,x2,y2))
+                comp_dict['location'] = [x2,y2]
 
             # Change component rotation if needed
             if transform_data['type'] == 'matrix':
