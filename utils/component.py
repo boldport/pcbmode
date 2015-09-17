@@ -156,13 +156,11 @@ class Component():
             layers = config.stk['layer-names']
             #layers_rev = copy.copy(reversed(config.stk['layer-names'])
            
-            for sheet in ['conductor', 'soldermask', 'solderpaste', 'silkscreen', 'assembly']:
+            for sheet in ['conductor', 'pours', 'soldermask', 'solderpaste', 'silkscreen', 'assembly']:
                 sheet_dict = footprint_shapes[sheet]
                 #sheet_dict_copy = copy.copy(sheet_dict)
                 sheet_dict_new = {}
                 for i, pcb_layer in enumerate(layers):
-                    #print len(layers)-i
-                    #print layers[len(layers)-i]
                     try:
                         sheet_dict_new[layers[len(layers)-i-1]] = copy.copy(sheet_dict[pcb_layer])
                     except:
