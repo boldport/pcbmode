@@ -456,7 +456,26 @@ class Module():
                 ts.text = htmlpar.unescape("%s&#176;" % (rotation))
                 ts = et.SubElement(t, 'tspan', x="0", dy="0.1")
                 ts.text = "[%.2f,%.2f]" % (location[0], location[1])
-
+            elif (component_type == 'shape'):
+                style = utils.dictToStyleText(config.stl['layout']['placement']['text'])
+     
+                t = et.SubElement(group, 'text', x="0", y="-0.17", style=style)
+                ts = et.SubElement(t, 'tspan', x="0", dy="0.1")
+                ts.text = "%s" % (refdef)
+                ts = et.SubElement(t, 'tspan', x="0", dy="0.1")
+                ts.text = htmlpar.unescape("%s&#176;" % (rotation))
+                ts = et.SubElement(t, 'tspan', x="0", dy="0.1")
+                ts.text = "[%.2f,%.2f]" % (location[0], location[1])
+            elif (component_type == 'via'):
+                style = utils.dictToStyleText(config.stl['layout']['placement']['text'])
+     
+                t = et.SubElement(group, 'text', x="0", y="-0.11", style=style)
+                ts = et.SubElement(t, 'tspan', x="0", dy="0.1")
+                ts.text = htmlpar.unescape("%s&#176;" % (rotation))
+                ts = et.SubElement(t, 'tspan', x="0", dy="0.1")
+                ts.text = "[%.2f,%.2f]" % (location[0], location[1])
+            else:
+                continue
 
 
 
