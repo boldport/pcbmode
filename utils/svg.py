@@ -1260,7 +1260,7 @@ def makeSvgLayers(top_layer, transform=None, refdef=None):
 
 
     for info_layer in ['origin','dimensions','outline','drills','documentation']:
-        style = utils.dict_to_style(config.stl['layout'][info_layer].get('default'))
+        style = utils.dictToStyleText(config.stl['layout'][info_layer].get('default'))
         if combined_lc[info_layer]['hidden'] == True:
             style += 'display:none;'
         layers[info_layer] = {}

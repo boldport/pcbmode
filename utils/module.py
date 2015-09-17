@@ -806,13 +806,13 @@ class Module():
         
 
         text_style_dict = config.stl['layout']['drill-index'].get('text')
-        text_style = utils.dict_to_style(text_style_dict)
+        text_style = utils.dictToStyleText(text_style_dict)
  
         count_style_dict = config.stl['layout']['drill-index'].get('count-text')
-        count_style = utils.dict_to_style(count_style_dict)        
+        count_style = utils.dictToStyleText(count_style_dict)        
 
         count_style_dict['font-size'] /= 2
-        drill_size_style = utils.dict_to_style(count_style_dict)
+        drill_size_style = utils.dictToStyleText(count_style_dict)
 
         if drill_count == 0:
             text = 'No drills'
