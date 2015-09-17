@@ -1099,8 +1099,9 @@ def placementMarkerPath():
     # extension
     b = r*1.8
 
-    return "m %s,%s c %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s m %s,%s %s,%s m %s,%s %s,%s z" % (0,r, k*r,0, r,-r*(1-k), r,-r, 0,-r*k, -r*(1-k),-r, -r,-r, -r*k,0, -r,r*(1-k), -r,r, 0,r*k, r*(1-k),r, r,r, 0,-(r-b), 0,-2*b, -b,b, 2*b,0)
+#    return "m %s,%s c %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s m %s,%s %s,%s m %s,%s %s,%s z" % (0,r, k*r,0, r,-r*(1-k), r,-r, 0,-r*k, -r*(1-k),-r, -r,-r, -r*k,0, -r,r*(1-k), -r,r, 0,r*k, r*(1-k),r, r,r, 0,-(r-b), 0,-2*b, -b,b, 2*b,0)
 
+    return "m %s,%s c %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s m %s,%s %s,%s z" % (0,r, k*r,0, r,-r*(1-k), r,-r, 0,-r*k, -r*(1-k),-r, -r,-r, -r*k,0, -r,r*(1-k), -r,r, 0,r*k, r*(1-k),r, r,r, -b,-r, 2*b,0)
 
 
 
