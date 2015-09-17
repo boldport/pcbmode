@@ -158,7 +158,6 @@ class Component():
 
         if self._layer == 'bottom':
             layers = config.stk['layer-names']
-            #layers_rev = copy.copy(reversed(config.stk['layer-names'])
            
             for sheet in ['conductor', 'pours', 'soldermask', 'solderpaste', 'silkscreen', 'assembly']:
                 sheet_dict = footprint_shapes[sheet]
