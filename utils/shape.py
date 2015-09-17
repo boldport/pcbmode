@@ -32,6 +32,17 @@ class Shape():
         # sense to me. This should be the only place to make the change.
         self._inv_rotate = -1
 
+        try:
+            self._type = shape.get('type')
+        except:
+            msg.error("Shapes must have a 'type' defined")
+
+        # A 'layer' type is a copy of the outline. Here we copy the
+        # outline shape and override the type
+        if self._type in ['layer']:
+            self._shape_dict = config.brd['outline'].get('shape').copy()
+            self._type = self._shape_dict.get('type')
+
         self._rotate = shape.get('rotate') or 0
         self._rotate *= self._inv_rotate
         self._rotate_point = shape.get('rotate-point') or Point(0,0)
@@ -42,26 +53,23 @@ class Shape():
         # labels
         self._label = None
 
-        try:
-            self._type = shape.get('type')
-        except:
-            msg.error("Shapes must have a 'type' defined")
-
         if self._type in ['rect', 'rectangle']:
-            path = svg.width_and_height_to_path(shape['width'], shape['height'], shape.get('radii'))
+            path = svg.width_and_height_to_path(self._shape_dict['width'],
+                                                self._shape_dict['height'],
+                                                self._shape_dict.get('radii'))
         elif self._type in ['circ', 'circle', 'round']:
-            path = svg.circle_diameter_to_path(shape['diameter'])
+            path = svg.circle_diameter_to_path(self._shape_dict['diameter'])
         elif self._type in ['drill']:
-            self._diameter = shape['diameter']
+            self._diameter = self._shape_dict['diameter']
             path = svg.drillPath(self._diameter)
         elif self._type in ['text', 'string']:
             try:
-                self._text = shape['value']
+                self._text = self._shape_dict['value']
             except KeyError:
                 msg.error("Could not find the text to display. The text to be displayed should be defined in the 'value' field, for example, 'value': 'DEADBEEF\\nhar\\nhar'")
 
             # Get the fon'ts name
-            font = shape.get('font-family') or config.stl['layout']['defaults']['font-family']
+            font = self._shape_dict.get('font-family') or config.stl['layout']['defaults']['font-family']
 
             # Search for the font SVG in these paths
             paths = [os.path.join(config.cfg['base-dir']),
@@ -83,12 +91,12 @@ class Shape():
                 msg.error("Couldn't find style file %s. Looked for it here:\n%s" % (font_filename, filenames))
 
             try:
-                fs = shape['font-size']
+                fs = self._shape_dict['font-size']
             except:
                 msg.error("A 'font-size' attribute must be specified for a 'text' type")
 
-            ls = shape.get('letter-spacing') or '0mm'
-            lh = shape.get('line-height') or fs
+            ls = self._shape_dict.get('letter-spacing') or '0mm'
+            lh = self._shape_dict.get('line-height') or fs
 
             font_size, letter_spacing, line_height = utils.getTextParams(fs,
                                                                          ls, 
@@ -110,13 +118,13 @@ class Shape():
            
             # In the case where the text is an outline/stroke instead
             # of a fill we get rid of the gerber_lp
-            if shape.get('style') == 'stroke':
+            if self._shape_dict.get('style') == 'stroke':
                 gerber_lp = None
 
             self._rotate += 180
 
         elif self._type in ['path']:
-            path = shape.get('value')
+            path = self._shape_dict.get('value')
         else:
             msg.error("'%s' is not a recongnised shape type" % self._type)
 
