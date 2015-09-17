@@ -318,8 +318,6 @@ class Module():
 
                 # Pours
                 shapes = shapes_dict['pours'].get(pcb_layer) or []
-
-
                 try:
                     svg_layer = self._layers[pcb_layer]['conductor']['pours']['layer']
                     shape_group = et.SubElement(svg_layer, 'g',

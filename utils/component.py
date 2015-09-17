@@ -150,15 +150,18 @@ class Component():
                     continue
 
         #------------------------------------------------------
-        # Invert 'top' and 'bottom' if layer is on the 'bottom'
+        # Invert layers
         #------------------------------------------------------
+        # If the placement is on the bottom of the baord then we need
+        # to invert the placement of all components. This affects the
+        # surface laters but also internal layers
+
         if self._layer == 'bottom':
             layers = config.stk['layer-names']
             #layers_rev = copy.copy(reversed(config.stk['layer-names'])
            
             for sheet in ['conductor', 'pours', 'soldermask', 'solderpaste', 'silkscreen', 'assembly']:
                 sheet_dict = footprint_shapes[sheet]
-                #sheet_dict_copy = copy.copy(sheet_dict)
                 sheet_dict_new = {}
                 for i, pcb_layer in enumerate(layers):
                     try:
