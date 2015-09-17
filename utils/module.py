@@ -364,6 +364,7 @@ class Module():
                         placed_element = place.placeShape(shape, group, invert)
 
 
+
                 # Silkscreen
                 shapes = shapes_dict['silkscreen'].get(pcb_layer) or []
                 try:
