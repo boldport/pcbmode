@@ -1,0 +1,51 @@
+{
+  "stackup": [
+    {
+      "name": "top",
+      "type": "signal-layer-surface",
+      "stack": [
+        {
+          "type": "silkscreen",
+          "name": "silkscreen"
+        },
+        {
+          "type": "soldermask",
+          "name": "soldermask"
+        },
+        {
+          "type": "conductor",
+          "name": "copper",
+          "material": "copper"
+        }
+      ]
+    },
+    {
+      "name": "insulator",
+      "type": "insulator",
+      "stack": [
+        {
+          "material": "FR4"
+        }
+      ]
+    },
+    {
+      "name": "bottom",
+      "type": "signal-layer-surface",
+      "stack": [
+        {
+          "type": "conductor",
+          "name": "copper",
+          "material": "copper"
+        },
+        {
+          "type": "soldermask",
+          "name": "soldermask"
+        },
+        {
+          "type": "silkscreen",
+          "name": "silkscreen"
+        }
+      ]
+    }
+  ] 
+}
