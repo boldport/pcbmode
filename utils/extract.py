@@ -64,8 +64,10 @@ def extractComponents(svg_in):
             
             if marker_type == 'component':
                 comp_dict = config.brd['components'][refdef]
-            else:
+            elif marker_type == 'shapes':
                 comp_dict = config.brd['shapes'][refdef]
+            else:
+                continue
 
             new_location = transform_data['location']
             old_location = utils.toPoint(comp_dict.get('location') or [0, 0])
@@ -127,8 +129,10 @@ def extractComponents(svg_in):
                 # a headache to tidy it up!
                 if pcb_layer == 'bottom':
                     current_refdef_loc.x = -current_refdef_loc.x
+
                 diff = group_loc-current_component_loc
                 new_refdef_loc = diff + current_refdef_loc
+
                 if pcb_layer == 'bottom':
                     new_refdef_loc.x = -new_refdef_loc.x
 

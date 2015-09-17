@@ -429,7 +429,15 @@ class Module():
                 
             # Place component origin marker
             svg_layer = self._layers[placement_layer]['placement']['layer']
-            group = et.SubElement(svg_layer, 'g', transform=transform)
+
+            # Here pcb_layer may not exist for components that define
+            # shapes for internal layers but only surface layers are
+            # defined in the stackup
+            try:
+                group = et.SubElement(svg_layer, 'g', transform=transform)
+            except:
+                return
+
             group.set('{'+config.cfg['ns']['pcbmode']+'}type', component_type)
             group.set('{'+config.cfg['ns']['pcbmode']+'}footprint', component.getFootprintName())
             if (component_type == 'component') or (component_type == 'shape'):
