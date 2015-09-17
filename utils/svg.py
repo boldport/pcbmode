@@ -1234,10 +1234,12 @@ def makeSvgLayers(top_layer, transform=None, refdef=None):
          
                 for cond_type in conductor_types:
                     try:
-                        style = utils.dict_to_style(config.stl['layout']['conductor'][cond_type].get(layer_name))
+                        style = utils.dictToStyle(config.stl['layout']['conductor'][cond_type].get(layer_name))
                     except:
                         # See comment above for rationalle
-                        style = utils.dictToStyleText(config.stl['layout'][sheet_type]['default'][layer_name.split('-')[0]])
+                        print layer_name, cond_type, layer_name.split('-')[0]
+                        #print config.stl['layout']['conductor'][cond_type]
+                        style = utils.dictToStyleText(config.stl['layout']['conductor'][cond_type][layer_name.split('-')[0]])
 
 
                     if combined_lc['conductor'][cond_type]['hidden'] == True:

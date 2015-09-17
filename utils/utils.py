@@ -19,36 +19,18 @@ import hashlib
 
 
 
-def dict_to_style(style_dict):
-    """
-    Convert a dictionary into an SVG/CSS style attribute
-    """
-
-    style = None
-
-    if style_dict is not None:
-        style = ''
-        for key in style_dict:
-            style += "%s:%s;" % (key, style_dict[key])
-
-    return style
-
-
-
 
 def dictToStyleText(style_dict):
     """
     Convert a dictionary into an SVG/CSS style attribute
     """
 
-    style = None
-
-    if style_dict is not None:
-        style = ''
-        for key in style_dict:
-            style += "%s:%s;" % (key, style_dict[key])
+    style = ''
+    for key in style_dict:
+        style += "%s:%s;" % (key, style_dict[key])
 
     return style
+
 
 
 
