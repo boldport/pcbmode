@@ -43,6 +43,8 @@ class Shape():
             self._shape_dict = config.brd['outline'].get('shape').copy()
             self._type = self._shape_dict.get('type')
 
+        self._place_mirrored = shape.get('mirror') or False
+
         self._rotate = shape.get('rotate') or 0
         self._rotate *= self._inv_rotate
         self._rotate_point = shape.get('rotate-point') or Point(0,0)
@@ -68,7 +70,7 @@ class Shape():
             except KeyError:
                 msg.error("Could not find the text to display. The text to be displayed should be defined in the 'value' field, for example, 'value': 'DEADBEEF\\nhar\\nhar'")
 
-            # Get the fon'ts name
+            # Get the font's name
             font = self._shape_dict.get('font-family') or config.stl['layout']['defaults']['font-family']
 
             # Search for the font SVG in these paths
@@ -130,7 +132,11 @@ class Shape():
 
 
         self._path = SvgPath(path, gerber_lp)
-        self._path.transform(self._scale, self._rotate, self._rotate_point, True)
+
+        self._path.transform(scale=self._scale, 
+                             rotate_angle=self._rotate, 
+                             rotate_point=self._rotate_point, 
+                             mirror=self._place_mirrored)
 
         self._gerber_lp = (shape.get('gerber-lp') or 
                            shape.get('gerber_lp') or 
@@ -262,5 +268,10 @@ class Shape():
     def setLabel(self, label):
         self._label = label
 
+
     def getLabel(self):
         return self._label
+
+
+    def getMirrorPlacement(self):
+        return self._place_mirrored

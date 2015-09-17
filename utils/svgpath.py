@@ -639,8 +639,6 @@ class SvgPath():
             self._height = record['height']
         else:
             width, height = self._getDimensions(path)
-            #width = self._width
-            #height = self._height
          
             # first point of path
             first_point = Point(path[0][1][0], path[0][1][1])
@@ -686,17 +684,26 @@ class SvgPath():
                         tmpp.mult(scale)
                         new_p += str(tmpp.x) + "," + str(tmpp.y) + " "
          
-            self._transformed = new_p
+            
             parsed = self._svgGrammar.parseString(new_p)
-            self._transformed_mirrored = self._mirrorHorizontally(parsed)
+            mirrored = self._mirrorHorizontally(parsed)
 
+            if mirror == False:
+                self._transformed_mirrored = mirrored
+                self._transformed = new_p
+            else:
+                self._transformed_mirrored = new_p
+                self._transformed = mirrored
+                
             width, height = self._getDimensions(parsed)
             self._width = width
             self._height = height
 
             self._record[digest] = {}
+
             self._record[digest]['path'] = self._transformed
             self._record[digest]['mirrored'] = self._transformed_mirrored
+                
             self._record[digest]['width'] = self._width
             self._record[digest]['height'] = self._height
 

@@ -77,7 +77,7 @@ class Component():
                     shape.transformPath(scale=self._scale,
                                         rotate=self._rotate,
                                         rotate_point=self._rotate_point,
-                                        mirror=False,
+                                        mirror=shape.getMirrorPlacement(),
                                         add=True)
 
         #-------------------------------------------------------------- 
