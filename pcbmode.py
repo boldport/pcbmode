@@ -167,7 +167,7 @@ def makeConfig(name, version, cmdline_args):
     try:
         stackup_filename = config.brd['stackup']['name'] + '.json'
     except:
-        stackup_filename = 'default.json'
+        stackup_filename = 'two-layer.json'
 
     paths = [os.path.join(config.cfg['base-dir']), # project dir
              os.path.join(os.path.dirname(os.path.realpath(__file__)))] # script dir
