@@ -1237,8 +1237,6 @@ def makeSvgLayers(top_layer, transform=None, refdef=None):
                         style = utils.dictToStyle(config.stl['layout']['conductor'][cond_type].get(layer_name))
                     except:
                         # See comment above for rationalle
-                        print layer_name, cond_type, layer_name.split('-')[0]
-                        #print config.stl['layout']['conductor'][cond_type]
                         style = utils.dictToStyleText(config.stl['layout']['conductor'][cond_type][layer_name.split('-')[0]])
 
 
