@@ -772,6 +772,7 @@ class Module():
         drills = drill_layer.findall(".//*[@pcbmode:diameter]", namespaces=ns)
 
         drills_dict = {}
+        longest_text = 0
         largest_drill = 0
         drill_count = 0
         for drill in drills:
@@ -784,6 +785,9 @@ class Module():
             if diameter > largest_drill:
                 largest_drill = diameter
             drill_count += 1
+
+            if len(str(diameter)) > longest_text:
+                longest_text = len(str(diameter))
 
 
         # Get location, or generate one
@@ -827,8 +831,14 @@ class Module():
         t.text = text
 
         # "new line"
-        location.y = -(largest_drill/2 + 0.5)
-        location.x = largest_drill/2
+        location.y = -(largest_drill/2 + 1.5)
+
+        # TODO: this hack'ish thing for aligning the text isn't going
+        # to work when the font is changed in the stylesheet
+        if float(longest_text*0.5) > largest_drill:
+            location.x = longest_text*0.3
+        else:
+            location.x = largest_drill/2
 
         gap = 2
 
