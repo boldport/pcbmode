@@ -123,12 +123,12 @@ class Footprint():
 
                             # Apply modifier based on shape type
                             if shape_type == 'path':
-                                sdict['scale'] = shape.getScale()*config.brd[stype]['path-scale']
+                                sdict['scale'] = shape.getScale()*config.brd['distances'][stype]['path-scale']
                             elif shape_type in ['rect', 'rectangle']:
-                                sdict['width'] += config.brd[stype]['rect-buffer']
-                                sdict['height'] += config.brd[stype]['rect-buffer']
+                                sdict['width'] += config.brd['distances'][stype]['rect-buffer']
+                                sdict['height'] += config.brd['distances'][stype]['rect-buffer']
                             elif shape_type in ['circ', 'circle']:
-                                sdict['diameter'] += config.brd[stype]['circle-buffer']
+                                sdict['diameter'] += config.brd['distances'][stype]['circle-buffer']
                             else:
                                 pass
      

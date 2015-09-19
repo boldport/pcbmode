@@ -9,6 +9,28 @@
     "stackups": "stackups/",
     "shapes": "shapes/"
   },
+  "distances":
+  {
+    "from-pour-to": 
+    {
+      "outline": 0.5,
+      "drill": 0.3, 
+      "pad": 0.2, 
+      "route": 0.25
+    },
+    "soldermask": 
+    {
+      "path-scale": 1.05,
+      "rect-buffer": 0.05,
+      "circle-buffer": 0.05
+    },
+    "solderpaste":
+    {
+      "path-scale": 0.9,
+      "rect-buffer": -0.1,
+      "circle-buffer": -0.1
+    }
+  },
   "refdef-index":
   {
     "common":
