@@ -131,23 +131,24 @@ class Footprint():
                                 sdict['diameter'] += config.brd['distances'][stype]['circle-buffer']
                             else:
                                 pass
-     
+
                             # Create shape based on new dictionary
                             sshape = Shape(sdict)
 
                             # Define style
                             sstyle = Style(sdict, stype)
 
-                            # Aplpy style
+                            # Apply style
                             sshape.setStyle(sstyle)
 
                             # Add shape to footprint's shape dictionary
                             #self._shapes[stype][layer].append(sshape)
                             try:
-                                self._shapes[stype][layer].append(shape)
+                                self._shapes[stype][layer].append(sshape)
                             except:
                                 self._shapes[stype][layer] = []
-                                self._shapes[stype][layer].append(shape)
+                                self._shapes[stype][layer].append(sshape)
+
 
 
                         # Do not place shape

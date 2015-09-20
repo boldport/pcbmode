@@ -350,10 +350,16 @@ class Module():
                     group.set('{'+config.cfg['ns']['pcbmode']+'}type', 'component-shapes')
                     for shape in shapes:
                         placed_element = place.placeShape(shape, group, invert)
+
      
-                    # Solderpaste
-                    shapes = shapes_dict['solderpaste'][pcb_layer]
+                # Solderpaste
+                shapes = shapes_dict['solderpaste'].get(pcb_layer) or []
+                try:
                     svg_layer = self._layers[pcb_layer]['solderpaste']['layer']
+                except:
+                    svg_layer = None
+
+                if len(shapes) > 0 and svg_layer != None:
                     transform = "translate(%s,%s)" % (location[0],
                                                       config.cfg['invert-y']*location[1])
                     group = et.SubElement(svg_layer, 'g', transform=transform)

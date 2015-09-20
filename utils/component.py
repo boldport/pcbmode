@@ -67,7 +67,7 @@ class Component():
         #------------------------------------------------        
         # Apply component-specific modifiers to footprint
         #------------------------------------------------
-        for sheet in ['conductor', 'pours', 'silkscreen', 'assembly', 'drills']:
+        for sheet in ['conductor', 'soldermask', 'solderpaste', 'pours', 'silkscreen', 'assembly', 'drills']:
             for layer in config.stk['layer-names']:
                 for shape in footprint_shapes[sheet].get(layer) or []:
 
