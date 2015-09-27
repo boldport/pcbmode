@@ -82,6 +82,7 @@ def extractComponents(svg_in):
                 x2 = utils.niceFloat(new_location.x)
                 y2 = utils.niceFloat(new_location.y)
                 msg.subInfo("%s has moved from [%s,%s] to [%s,%s]" % (refdef,x1,y2,x2,y2))
+                # Apply new location
                 comp_dict['location'] = [x2,y2]
 
             # Change component rotation if needed
@@ -98,58 +99,67 @@ def extractComponents(svg_in):
                                           namespaces={'pcbmode':config.cfg['ns']['pcbmode'],
                                                       'svg':config.cfg['ns']['svg']})
 
-            for refdef_text in refdef_texts:
+#            # Extract silkscreen refdef location 
+#            for refdef_text in refdef_texts:
+# 
+#                # Get refdef group location
+#                transform_data = utils.parseTransform(refdef_text.get('transform'))
+# 
+#                group_loc = transform_data['location']
+#                # Invert 'y' coordinate
+#                group_loc.y *= config.cfg['invert-y']
+# 
+# 
+#                # Get the refdef text path inside the refdef group
+#                refdef_path = refdef_text.find("svg:path", 
+#                                               namespaces={'svg':config.cfg['ns']['svg']})
+#                try:
+#                    transform_data = utils.parseTransform(refdef_path.get('transform'))
+#                except:
+#                    transform_data['location'] = Point(0,0)
+#                new_refdef_loc = transform_data['location']
+#                # Invert 'y' coordinate
+#                new_refdef_loc.y *= config.cfg['invert-y']
+# 
+#                # Rotate extracted location back to 0 degrees
+#                comp_rotate = comp_dict.get('rotate', 0)
+#                new_refdef_loc.rotate(-comp_rotate, Point())
+# 
+# 
+#                # Get location of the refdef from the component dict
+#                component_loc = utils.toPoint(comp_dict.get('location', [0, 0]))
+#                try:
+#                    old_refdef_loc = utils.toPoint(comp_dict['silkscreen']['refdef']['location'])
+#                except:
+#                    old_refdef_loc = Point()
+# 
+# 
+# 
+#                diff = group_loc-new_location
+# 
+#                new_refdef_loc = group_loc-new_location+new_refdef_loc
+# 
+#                if pcb_layer == 'bottom':
+#                    new_refdef_loc.x = -new_refdef_loc.x
+# 
+#                # Change the location in the dictionary
+#                if new_refdef_loc != old_refdef_loc:
+# 
+#                  
+#                    try:
+#                        tmp = comp_dict['silkscreen']
+#                    except:
+#                        comp_dict['silkscreen'] = {}
+# 
+#                    try:
+#                        tmp = comp_dict['silkscreen']['refdef']
+#                    except:
+#                        comp_dict['silkscreen']['refdef'] = {}
+# 
+#                    x = utils.niceFloat(new_refdef_loc.x)
+#                    y = utils.niceFloat(new_refdef_loc.y)
+#                    comp_dict['silkscreen']['refdef']['location'] = [x,y] 
 
-                # Get refdef group location
-                transform_data = utils.parseTransform(refdef_text.get('transform'))
-                group_loc = transform_data['location']
-                # Invert 'y' coordinate
-                group_loc.y *= config.cfg['invert-y']
-
-
-                # Get the refdef text path inside the refdef group
-                refdef_path = refdef_text.find("svg:path", 
-                                               namespaces={'svg':config.cfg['ns']['svg']})
-                try:
-                    transform_data = utils.parseTransform(refdef_path.get('transform'))
-                except:
-                    transform_data['location'] = Point(0,0)
-                refdef_loc = transform_data['location']
-                # Invert 'y' coordinate
-                refdef_loc.y *= config.cfg['invert-y']
-
-                # Current ('old') location of the component
-                current_component_loc = utils.toPoint(comp_dict.get('location', [0, 0]))
-                try:
-                    current_refdef_loc = utils.toPoint(comp_dict['silkscreen']['refdef']['location'])
-                except:
-                    current_refdef_loc = Point()
-
-                # TODO: this is an embarassing mess, but I have too much of
-                # a headache to tidy it up!
-                if pcb_layer == 'bottom':
-                    current_refdef_loc.x = -current_refdef_loc.x
-
-                diff = group_loc-current_component_loc
-                new_refdef_loc = diff + current_refdef_loc
-
-                if pcb_layer == 'bottom':
-                    new_refdef_loc.x = -new_refdef_loc.x
-
-                # Change the location in the dictionary
-                if new_refdef_loc != current_refdef_loc:
-                    try:
-                        tmp = comp_dict['silkscreen']
-                    except:
-                        comp_dict['silkscreen'] = {}
-
-                    try:
-                        tmp = comp_dict['silkscreen']['refdef']
-                    except:
-                        comp_dict['silkscreen']['refdef'] = {}
-
-                    comp_dict['silkscreen']['refdef']['location'] = [new_refdef_loc.x,
-                                                                     new_refdef_loc.y] 
 
 
     # Save board config to file (everything is saved, not only the
