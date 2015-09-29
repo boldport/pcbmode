@@ -12,20 +12,27 @@ from point import Point
 
 
 
-def extract():
+def extract(extract, extract_refdefs):
     """
     """
 
     svg_in = utils.openBoardSVG()
 
-    msg.info("Extracting routing and vias")
-    extractRouting(svg_in)
 
-    msg.info("Extracting components info")
-    extractComponents(svg_in)
+    if extract == True:
+        msg.info("Extracting routing and vias")
+        extractRouting(svg_in)
+     
+        msg.info("Extracting components info")
+        extractComponents(svg_in)
+     
+        msg.info("Extracting documentation and indicies locations")
+        extractDocs(svg_in)
+    
+    if extract_refdefs == True:
+        msg.info("Extracting refdefs info")
+        extractRefdefs(svg_in)
 
-    msg.info("Extracting documentation and indicies locations")
-    extractDocs(svg_in)
 
     return
 
@@ -36,14 +43,7 @@ def extractComponents(svg_in):
     """
     """
     
-    # Get copper refdef shape groups from SVG data
-
     xpath_expr_place = '//svg:g[@pcbmode:pcb-layer="%s"]//svg:g[@pcbmode:sheet="placement"]//svg:g[@pcbmode:type="%s"]'
-
-    xpath_expr_copper_pads = '//svg:g[@pcbmode:pcb-layer="%s"]//svg:g[@pcbmode:sheet="copper"]//svg:g[@pcbmode:sheet="pads"]//svg:g[@pcbmode:refdef]'
-
-    xpath_expr_refdefs = '//svg:g[@pcbmode:pcb-layer="%s"]//svg:g[@pcbmode:sheet="silkscreen"]//svg:g[@pcbmode:type="refdef"][@pcbmode:refdef="%s"]'
-
 
     for pcb_layer in config.stk['surface-layer-names']:
         
@@ -95,71 +95,85 @@ def extractComponents(svg_in):
                                                                     comp_dict['rotate']))
 
 
-            refdef_texts = svg_in.findall(xpath_expr_refdefs % (pcb_layer, refdef), 
-                                          namespaces={'pcbmode':config.cfg['ns']['pcbmode'],
-                                                      'svg':config.cfg['ns']['svg']})
+    # Save board config to file (everything is saved, not only the
+    # component data)
+    filename = os.path.join(config.cfg['locations']['boards'], 
+                            config.cfg['name'], 
+                            config.cfg['name'] + '.json')
+    try:
+        with open(filename, 'wb') as f:
+            f.write(json.dumps(config.brd, sort_keys=True, indent=2))
+    except:
+        msg.error("Cannot save file %s" % filename)
+ 
+    return
 
-#            # Extract silkscreen refdef location 
-#            for refdef_text in refdef_texts:
-# 
-#                # Get refdef group location
-#                transform_data = utils.parseTransform(refdef_text.get('transform'))
-# 
-#                group_loc = transform_data['location']
-#                # Invert 'y' coordinate
-#                group_loc.y *= config.cfg['invert-y']
-# 
-# 
-#                # Get the refdef text path inside the refdef group
-#                refdef_path = refdef_text.find("svg:path", 
-#                                               namespaces={'svg':config.cfg['ns']['svg']})
-#                try:
-#                    transform_data = utils.parseTransform(refdef_path.get('transform'))
-#                except:
-#                    transform_data['location'] = Point(0,0)
-#                new_refdef_loc = transform_data['location']
-#                # Invert 'y' coordinate
-#                new_refdef_loc.y *= config.cfg['invert-y']
-# 
-#                # Rotate extracted location back to 0 degrees
-#                comp_rotate = comp_dict.get('rotate', 0)
-#                new_refdef_loc.rotate(-comp_rotate, Point())
-# 
-# 
-#                # Get location of the refdef from the component dict
-#                component_loc = utils.toPoint(comp_dict.get('location', [0, 0]))
-#                try:
-#                    old_refdef_loc = utils.toPoint(comp_dict['silkscreen']['refdef']['location'])
-#                except:
-#                    old_refdef_loc = Point()
-# 
-# 
-# 
-#                diff = group_loc-new_location
-# 
-#                new_refdef_loc = group_loc-new_location+new_refdef_loc
-# 
-#                if pcb_layer == 'bottom':
-#                    new_refdef_loc.x = -new_refdef_loc.x
-# 
-#                # Change the location in the dictionary
-#                if new_refdef_loc != old_refdef_loc:
-# 
-#                  
-#                    try:
-#                        tmp = comp_dict['silkscreen']
-#                    except:
-#                        comp_dict['silkscreen'] = {}
-# 
-#                    try:
-#                        tmp = comp_dict['silkscreen']['refdef']
-#                    except:
-#                        comp_dict['silkscreen']['refdef'] = {}
-# 
-#                    x = utils.niceFloat(new_refdef_loc.x)
-#                    y = utils.niceFloat(new_refdef_loc.y)
-#                    comp_dict['silkscreen']['refdef']['location'] = [x,y] 
 
+
+
+
+
+def extractRefdefs(svg_in):
+    """
+    """
+
+    xpath_refdefs = '//svg:g[@pcbmode:sheet="silkscreen"]//svg:g[@pcbmode:type="refdef"]'
+    refdefs_elements = svg_in.findall(xpath_refdefs, 
+                             namespaces={'pcbmode':config.cfg['ns']['pcbmode'],
+                                         'svg':config.cfg['ns']['svg']})
+
+    for refdef_element in refdefs_elements:
+ 
+        # Get refdef group location
+        group_trans_data = utils.parseTransform(refdef_element.get('transform'))
+        group_loc = group_trans_data['location']
+        # Invert 'y' coordinate because Inkscape
+        group_loc.y *= config.cfg['invert-y']
+
+        # Get reference designator
+        refdef = refdef_element.get('{'+config.cfg['ns']['pcbmode']+'}refdef')
+
+        # Get component dictionary
+        refdef_dict = config.brd['components'].get(refdef)
+
+        # Get component placement layer
+        comp_loc = utils.toPoint(refdef_dict.get('location', [0,0]))
+
+        if comp_loc != group_loc:
+
+            # Get location of the refdef from the component dict
+            try:
+                loc_old = utils.toPoint(refdef_dict['silkscreen']['refdef']['location'])
+            except:
+                loc_old = Point()
+
+            # Get component placement layer
+            comp_layer = refdef_dict.get('layer', 'top')
+     
+            # Get component rotation
+            comp_rotation = refdef_dict.get('rotate', 0)
+
+            difference = group_loc-comp_loc
+            difference.rotate(-comp_rotation, Point())
+
+            if comp_layer == 'bottom':
+                difference.x *= -1
+
+            loc_new = loc_old+difference
+
+            try:
+                tmp = refdef_dict['silkscreen']
+            except:
+                comp_dict['silkscreen'] = {}
+ 
+            try:
+                tmp = refdef_dict['silkscreen']['refdef']
+            except:
+                refdef_dict['silkscreen']['refdef'] = {}
+ 
+            x = utils.niceFloat(loc_new.x)
+            y = utils.niceFloat(loc_new.y)
+            refdef_dict['silkscreen']['refdef']['location'] = [x,y] 
 
 
     # Save board config to file (everything is saved, not only the
@@ -174,7 +188,6 @@ def extractComponents(svg_in):
         msg.error("Cannot save file %s" % filename)
  
     return
-
 
 
 

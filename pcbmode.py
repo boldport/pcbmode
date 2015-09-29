@@ -51,7 +51,11 @@ def cmdArgSetup(pcbmode_version):
      
     argp.add_argument('-e', '--extract',
                       action='store_true', dest='extract', default=False,
-                      help="Extract data from the generated SVG")
+                      help="Extract routing and component placement from board's SVG")
+
+    argp.add_argument('--extract-refdefs',
+                      action='store_true', dest='extract_refdefs', default=False,
+                      help="Extract components' reference designator location and rotation from board's SVG")
      
     argp.add_argument('--fab', nargs='?',
                       dest='fab', default=False,
@@ -343,9 +347,10 @@ def main():
 
         utils.renumberRefdefs(order)
 
-    # Extract routing from input SVG file
-    elif cmdline_args.extract is True:
-        extract.extract()
+    # Extract information from SVG file
+    elif cmdline_args.extract is True or cmdline_args.extract_refdefs is True:
+        extract.extract(extract=cmdline_args.extract,
+                        extract_refdefs=cmdline_args.extract_refdefs)
 
     # Create a BoM
     elif cmdline_args.make_bom is not False:
