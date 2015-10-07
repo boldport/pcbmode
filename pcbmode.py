@@ -11,6 +11,7 @@ import utils.gerber as gerber
 import utils.extract as extract
 import utils.excellon as excellon
 import utils.messages as msg
+import utils.bom as bom
 from utils.board import Board
 
 
@@ -79,6 +80,10 @@ def cmdArgSetup(pcbmode_version):
     argp.add_argument('--renumber-refdefs', nargs='?',
                       dest='renumber', default=False,
                       help="Renumber refdefs (valid options are 'top-to-bottom' (default), 'bottom-to-top', 'left-to-right', 'right-to-left'")
+
+    argp.add_argument('--make-bom', nargs='?',
+                      dest='make_bom', default=False, 
+                      help='Create a bill of materials')
 
     return argp
 
@@ -321,10 +326,13 @@ def main():
 
         utils.renumberRefdefs(order)
 
-    # extract routing from input SVG file
+    # Extract routing from input SVG file
     elif cmdline_args.extract is True:
-        #msg.info("Extracting")
         extract.extract()
+
+    # Create a BoM
+    elif cmdline_args.make_bom is not False:
+        bom.make_bom(cmdline_args.make_bom)
 
     else:
         # make the board

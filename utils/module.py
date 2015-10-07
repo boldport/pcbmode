@@ -242,7 +242,7 @@ class Module():
             try:
                 pour_type = pour_dict['type']
             except:
-                msg.error("Can't find a 'type' for a pour shape. Pours can be any 'shape', or simply 'type':'layer' to cover the entire layer.")
+                msg.error("Cannot find a 'type' for a pour shape. Pours can be any 'shape', or simply 'type':'layer' to cover the entire layer.")
 
             layers = pour_dict.get('layers') or ['top']
 
@@ -251,11 +251,13 @@ class Module():
                 new_pour_dict = self._module_dict['outline'].get('shape').copy()
                 new_pour_dict['style'] = 'fill'
                 shape = Shape(new_pour_dict)
-                style = Style(new_pour_dict, 'outline')
+                # Get the appropriate style from copper->pours
+                style = Style(new_pour_dict, layer_name='copper', sub_item='pours')
                 shape.setStyle(style)
             else:
                 shape = Shape(pour_dict)
-                style = Style(pour_dict, 'outline')
+                # Get the appropriate style from copper->pours
+                style = Style(pour_dict, layer_name='copper', sub_item='pours')
                 shape.setStyle(style)
 
             # Place on all specified layers
@@ -311,6 +313,7 @@ class Module():
                             shape_mirror = False
                         
                     if (pcb_layer == 'bottom') and (shape_mirror != False):
+                        shape_dict['location'][0] *= -1
                         mirror = True
                     else:
                         mirror = False
@@ -325,13 +328,11 @@ class Module():
                         location = shape.getLocation()
                         transform = "translate(%s,%s)" % (location.x, location.y)
                         mask_group = et.SubElement(self._masks[pcb_layer], 'g')
-                                                   #id="routing_masks") 
-                                                   #transform=transform)
                         self._placeMask(svg_layer=mask_group, 
                                         shape=shape,
                                         kind='pad',
                                         original=False,
-                                        mirror=False)
+                                        mirror=mirror)
 
 
      
@@ -486,7 +487,7 @@ class Module():
                     group = et.SubElement(svg_layer, 'g', transform=transform)
                     group.set('{'+config.cfg['ns']['pcbmode']+'}type', 'component-shapes')
                     for shape in shapes:
-                        placed_element = place.placeShape(shape, group)
+                        placed_element = place.placeShape(shape, group, invert)
                         placed_element.set('{'+config.cfg['ns']['pcbmode']+'}diameter',
                                            str(shape.getDiameter()))
 
@@ -929,8 +930,16 @@ and is maintained by Boldport
         # Get shapes for each component definition
         for refdef in components_dict:
             component_dict = components_dict[refdef]
+            
+            # Show or hide the component.
+            # This will still account the component for the BoM
             show = component_dict.get('show', True)
-            if show == True:
+
+            # Place or do not place the component
+            # Also ignored for BoM
+            place = component_dict.get('place', True)
+
+            if (show == True) and (place == True):
                 component = Component(refdef, component_dict)
                 components.append(component)
         

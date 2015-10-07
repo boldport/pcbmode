@@ -80,7 +80,7 @@ def parseDimension(string):
     if specified, from the value
     """
     if string != None:
-        result = re.match('(-?\d+\.?\d?)\s?(\w+)', string)
+        result = re.match('(-?\d*\.?\d+)\s?(\w+)?', string)
         value = float(result.group(1))
         unit = result.group(2)
     else:
@@ -599,7 +599,10 @@ def parseTransform(transform):
         regex = r".*?translate\s?\(\s?(?P<x>-?[0-9]*\.?[0-9]+)\s?[\s,]\s?(?P<y>-?[0-9]*\.?[0-9]+\s?)\s?\).*"
         coord = re.match(regex, transform)
         data['type'] = 'translate'
-        data['location'] = Point(coord.group('x'),coord.group('y'))
+        try:
+            data['location'] = Point(coord.group('x'),coord.group('y'))
+        except:
+            data['location'] = Point()
     elif 'matrix' in transform.lower():
         data['type'] = 'matrix'
         data['location'], data['rotate'], data['scale'] = parseSvgMatrix(transform)

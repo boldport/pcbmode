@@ -103,11 +103,13 @@ class Component():
      
                 refdef_dict['location'] = refdef_dict.get('location') or [0, 0]
                 refdef_dict['type'] = 'text'
-                refdef_dict['value'] = refdef
-                refdef_dict['font-family'] = (config.stl['layout'][sheet]['refdef'].get('font-family') or 
+                refdef_dict['value'] = refdef_dict.get('value') or refdef
+                refdef_dict['font-family'] = (refdef_dict.get('font-family') or
+                                              config.stl['layout'][sheet]['refdef'].get('font-family') or 
                                               config.stl['defaults']['font-family'])
-                refdef_dict['font-size'] = (config.stl['layout'][sheet]['refdef'].get('font-size') or 
-                                              "2mm")
+                refdef_dict['font-size'] = (refdef_dict.get('font-size') or 
+                                            config.stl['layout'][sheet]['refdef'].get('font-size') or 
+                                            "2mm")
                 refdef_shape = Shape(refdef_dict)
 
                 refdef_shape.is_refdef = True
