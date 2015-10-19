@@ -638,7 +638,10 @@ def parseTransform(transform):
     Returns a Point() for the input transform
     """
     data = {}
-    if 'translate' in transform.lower():
+    if transform == None:
+        data['type'] = 'translate'
+        data['location'] = Point()
+    elif 'translate' in transform.lower():
         regex = r".*?translate\s?\(\s?(?P<x>-?[0-9]*\.?[0-9]+)\s?[\s,]\s?(?P<y>-?[0-9]*\.?[0-9]+\s?)\s?\).*"
         coord = re.match(regex, transform)
         data['type'] = 'translate'
