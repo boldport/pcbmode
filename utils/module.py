@@ -391,10 +391,13 @@ class Module():
                             is_refdef = False
 
                         if is_refdef == True:
-                            refdef_group = et.SubElement(svg_layer, 'g', transform=transform)
-                            refdef_group.set('{'+config.cfg['ns']['pcbmode']+'}type', 'refdef')
-                            refdef_group.set('{'+config.cfg['ns']['pcbmode']+'}refdef', refdef)
-                            placed_element = place.placeShape(shape, refdef_group, invert)
+                            # Shapes don't need to have silkscreen
+                            # reference designators
+                            if component_type != 'shape':
+                                refdef_group = et.SubElement(svg_layer, 'g', transform=transform)
+                                refdef_group.set('{'+config.cfg['ns']['pcbmode']+'}type', 'refdef')
+                                refdef_group.set('{'+config.cfg['ns']['pcbmode']+'}refdef', refdef)
+                                placed_element = place.placeShape(shape, refdef_group, invert)
                         else:
                             placed_element = place.placeShape(shape, shape_group, invert)
 
