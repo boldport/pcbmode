@@ -260,6 +260,11 @@ class Footprint():
         for shape_dict in shapes:
             layers = utils.getExtendedLayerList(shape_dict.get('layers') or ['top'])
             for layer in layers:
+                # Mirror the shape if it's text and on bottom later,
+                # but let explicit shape setting override
+                if layer == 'bottom':
+                    if shape_dict['type'] == 'text':
+                        shape_dict['mirror'] = shape_dict.get('mirror') or 'True'
                 shape = Shape(shape_dict)
                 style = Style(shape_dict, 'silkscreen')
                 shape.setStyle(style)
