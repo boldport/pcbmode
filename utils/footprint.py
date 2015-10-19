@@ -107,12 +107,12 @@ class Footprint():
                         self._shapes['conductor'][layer] = []
                         self._shapes['conductor'][layer].append(shape)
                         
-                    for stype in ['soldermask', 'solderpaste']:
+                    for stype in ['soldermask','solderpaste']:
 
                         # Get a custom shape specification if it exists
                         sdict_list = shape_dict.get(stype) 
 
-                        # No defined; default
+                        # Not defined; default
                         if sdict_list == None:
                             # Use default settings for shape based on
                             # the pad shape
@@ -165,8 +165,8 @@ class Footprint():
                                 sdict_list = [sdict_list]
 
                             # Process list of shapes
-                            for sdict in sdict_list:
-                                sdict = sdict.copy()
+                            for sdict_ in sdict_list:
+                                sdict = sdict_.copy()
                                 shape_loc = utils.toPoint(sdict.get('location') or [0, 0])
 
                                 # Apply rotation
@@ -190,10 +190,10 @@ class Footprint():
                                 # Add shape to footprint's shape dictionary
                                 #self._shapes[stype][layer].append(sshape)
                                 try:
-                                    self._shapes[stype][layer].append(shape)
+                                    self._shapes[stype][layer].append(sshape)
                                 except:
                                     self._shapes[stype][layer] = []
-                                    self._shapes[stype][layer].append(shape)
+                                    self._shapes[stype][layer].append(sshape)
 
      
                     # Add pin label
