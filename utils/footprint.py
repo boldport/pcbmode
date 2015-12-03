@@ -39,7 +39,7 @@ class Footprint():
 
         self._processPins()
         self._processPours()
-        self._processSilkscreenShapes()
+        self._processShapes()
         self._processAssemblyShapes()
 
 
@@ -249,30 +249,36 @@ class Footprint():
 
 
 
-    def _processSilkscreenShapes(self):
+    def _processShapes(self):
         """
         """
-        try:
-            shapes = self._footprint['layout']['silkscreen']['shapes']
-        except:
-            return
 
-        for shape_dict in shapes:
-            layers = utils.getExtendedLayerList(shape_dict.get('layers') or ['top'])
-            for layer in layers:
-                # Mirror the shape if it's text and on bottom later,
-                # but let explicit shape setting override
-                if layer == 'bottom':
-                    if shape_dict['type'] == 'text':
-                        shape_dict['mirror'] = shape_dict.get('mirror') or 'True'
-                shape = Shape(shape_dict)
-                style = Style(shape_dict, 'silkscreen')
-                shape.setStyle(style)
-                try:
-                    self._shapes['silkscreen'][layer].append(shape)
-                except:
-                    self._shapes['silkscreen'][layer] = []
-                    self._shapes['silkscreen'][layer].append(shape)
+        sheets = ['silkscreen', 'soldermask']
+
+        for sheet in sheets:
+
+            try:
+                shapes = self._footprint['layout'][sheet]['shapes']
+            except:
+                shapes = []
+     
+            for shape_dict in shapes:
+                layers = utils.getExtendedLayerList(shape_dict.get('layers') or ['top'])
+                for layer in layers:
+                    # Mirror the shape if it's text and on bottom later,
+                    # but let explicit shape setting override
+                    if layer == 'bottom':
+                        if shape_dict['type'] == 'text':
+                            shape_dict['mirror'] = shape_dict.get('mirror') or 'True'
+                    shape = Shape(shape_dict)
+                    style = Style(shape_dict, sheet)
+                    shape.setStyle(style)
+                    try:
+                        self._shapes[sheet][layer].append(shape)
+                    except:
+                        self._shapes[sheet][layer] = []
+                        self._shapes[sheet][layer].append(shape)
+
 
 
 
