@@ -64,7 +64,7 @@ def extractComponents(svg_in):
             
             if marker_type == 'component':
                 comp_dict = config.brd['components'][refdef]
-            elif marker_type == 'shapes':
+            elif marker_type == 'shape':
                 comp_dict = config.brd['shapes'][refdef]
             else:
                 continue
