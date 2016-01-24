@@ -2,7 +2,7 @@
 Components
 ##########
 
-Components are an essential part of every design. Here you'll find how to define a component, and how to place it on the board.
+Components are the building blocks of the board. In fact, they are used for placing any element on board, except for routes. A via is a 'component', and a copper pour is defined within a 'component' and then instantiated into the board's JSON file.
 
 Defining components
 ===================
@@ -29,12 +29,12 @@ Components are defined in their own JSON file. The skeleton of this file is the 
       }
     }
 
-In ``pins`` the pins of the components are "declared" by instantiating one of the pads defined in ``pads``. In ``layout`` shapes for assembly and silkscreen are added.
+``pins`` is where the pins of a components are 'instantiated'. ``pads`` contain what pads or pins are in terms of their shapes and drills. Each 'pin' instantiates a 'pad' from ``pads''. ``layout`` contain silkscreen and assembly shapes.
 
 pins
 ----
 
-The ``pins`` block is where pins are instantiated. Here's what a 2-pin footprint would look like
+ Here's what a component with two pins looks like
 
 .. code-block:: json
 
@@ -63,9 +63,9 @@ The ``pins`` block is where pins are instantiated. Here's what a 2-pin footprint
       }
     }
 
-Each pin has a unique key -- ``1`` and ``2-TH`` above -- which do not necessarily need to be numbers. ``pad`` instantiates the type of landing pad to use, which is defined later. ``location`` is the position of the pin relative to the *centre of the component*.
+Each pin has a unique key -- ``1`` and ``2-TH`` above -- that does not necessarily need to be a number. ``pad`` instantiates the type of landing pad to use, which is defined in the ``pads'' section. ``location`` is the position of the pin relative to the *centre of the component*.
 
-*PCBmodE* can discreetly place a label at the centre of the pin (this is viewable when zooming in on the pin). The label can be defined using ``label``, or if ``label`` is missing, the key will be used instead. Labels will be shown by default, and ``"show-label": false`` will disable this functionality. 
+*PCBmodE* can discreetly place a label at the centre of the pin (this is viewable when zooming in on the pin). The label can be defined using ``label``, or if ``label`` is missing, the key will be used instead. To not place the label use ``"show-label": false``. 
 
 
 pads
@@ -265,54 +265,54 @@ layout shapes
 
 
 
-Placing components
-==================
+Placing components and shapes
+=============================
+
+Footprints for components and shapes are stored in their own directories within the project path (those can be changed in the configuration file).
+
+This is an example of instantiating a component within the board's JSON file
 
 .. code-block:: json
 
     {
-      "locations":
+      "components":
       {
-        "boards": "boards/",
-        "components": "components/",
-        "fonts": "fonts/",
-        "build": "build/",
-        "styles": "styles/"
-      }
-    }
-
-
-.. code-block:: json
-
-    {
-      "J2": 
-      {
-        "footprint": "my-part", 
-        "layer": "top", 
-        "location": [
-          36.7, 
-          0
-        ], 
-        "rotate": -90, 
-        "show": true, 
-        "silkscreen": {
-        "refdef": {
+        "J2": 
+        {
+          "footprint": "my-part", 
+          "layer": "top", 
           "location": [
-            -7.2, 
-            2.16
+            36.7, 
+            0
           ], 
-          "rotate": 0, 
-          "rotate-with-component": false, 
-          "show": true
-        }, 
-        "shapes": {
-          "show": true
+          "rotate": -90, 
+          "show": true, 
+          "silkscreen": {
+            "refdef": {
+              "location": [
+                -7.2, 
+                2.16
+              ], 
+              "rotate": 0, 
+              "rotate-with-component": false, 
+              "show": true
+            }, 
+          "shapes": {
+            "show": true
+            }
           }
         }
-      }
-    } 
+      } 
+    }
+
+The key of each component -- ``J2`` above -- record is the component's reference designator, or in *PCBmodE*-speak, 'refdef'. Note that as opposed to ``shape`` types, here ``layer`` can only accept one layer.
+
+``silkscreen`` is optional, but allows control over the placement of the reference designator, and whether shapes are placed or not.
 
 
+.. note::
+
+   The sharp-minded amongst you will notice that 'refdef' is not exactly short form of 'reference designator'. I noticed that fact only in version 3.0 of *PCBmodE*, way too far to change it. So I embraced this folly and it will forever be.
 
 
 

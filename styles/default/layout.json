@@ -5,15 +5,17 @@
     "style":
     {
       "outline": "stroke",
-      "copper": "fill",
+      "conductor": "fill",
       "silkscreen": "stroke",
       "documentation": "fill",
       "assembly": "stroke",
       "soldermask": "fill",
       "solderpaste": "fill",
       "drills": "fill",
+      "placement": "stroke",
       "refdef": "fill",
-      "dimensions": "stroke"
+      "dimensions": "stroke",
+      "origin": "stroke"
     }
   },
   "board":
@@ -23,24 +25,6 @@
       "fill-opacity": 1,
       "fill": "#000000",
       "stroke": "none"
-    },
-    "pad-labels":
-    {
-      "font-size": "0.1px",
-      "font-style": "normal",
-      "font-variant": "normal",
-      "font-weight": "bold",
-      "font-stretch": "normal",
-      "text-align": "center",
-      "line-height":" 100%",
-      "letter-spacing": "0",
-      "word-spacing": "0",
-      "writing-mode": "lr-tb",
-      "text-anchor": "middle",
-      "fill": "#f3ff00",
-      "fill-opacity": 0.8,
-      "stroke": "none",
-      "font-family": "Courier 10 Pitch"
     }
   },
   "dimensions":
@@ -89,7 +73,7 @@
     {
     }
   },
-  "copper": 
+  "conductor": 
   {
     "default":
     {
@@ -97,6 +81,13 @@
       {
         "stroke": "#008500",
         "fill": "#008500",
+        "stroke-opacity": 0.6,
+        "fill-opacity": 0.6   
+      },
+      "internal":
+      {
+        "stroke": "#F2B705",
+        "fill": "#F2B705",
         "stroke-opacity": 0.6,
         "fill-opacity": 0.6   
       },
@@ -114,9 +105,31 @@
       {
         "stroke": "none"
       },
+      "internal":
+      {
+        "stroke": "none"
+      },
       "bottom":
       {
         "stroke": "none"
+      },
+      "labels":
+      {
+        "font-size": "0.1px",
+        "font-style": "normal",
+        "font-variant": "normal",
+        "font-weight": "bold",
+        "font-stretch": "normal",
+        "text-align": "center",
+        "line-height":" 100%",
+        "letter-spacing": "0",
+        "word-spacing": "0",
+        "writing-mode": "lr-tb",
+        "text-anchor": "middle",
+        "fill": "#f3ff00",
+        "fill-opacity": 1,
+        "stroke": "none",
+        "font-family": "Sans serif"
       }
     },
     "routing":
@@ -125,6 +138,12 @@
       {
         "stroke": "#269926",
         "fill": "#269926",
+        "fill-opacity": 0.6
+      },
+      "internal":
+      {
+        "stroke": "#F2B705",
+        "fill": "#F2B705",
         "fill-opacity": 0.6
       },
       "bottom":
@@ -137,6 +156,13 @@
     "pours":
     {
       "top":
+      {
+        "fill-opacity": 0.2,
+        "stroke-opacity": 0.2,
+        "stroke-linejoin": "round",
+        "stroke-linecap": "round"
+      },
+      "internal":
       {
         "fill-opacity": 0.2,
         "stroke-opacity": 0.2,
@@ -346,6 +372,54 @@
       "fill-opacity": 0.6,
       "stroke": "none",
       "fill-rule": "evenodd"
+    }
+  },
+  "placement":
+  {
+    "default":
+    {
+      "top": {
+        "stroke": "#444444",
+        "fill": "none",
+        "stroke-opacity": 0.5,
+        "stroke-width": 0.03,
+        "stroke-linejoin": "round",
+        "stroke-linecap": "round"
+      },
+      "internal": {
+        "stroke": "#444444",
+        "fill": "none",
+        "stroke-opacity": 0.5,
+        "stroke-width": 0.03,
+        "stroke-linejoin": "round",
+        "stroke-linecap": "round"
+      },
+      "bottom": {
+        "stroke": "#444444",
+        "fill": "none",
+        "stroke-opacity": 0.5,
+        "stroke-width": 0.03,
+        "stroke-linejoin": "round",
+        "stroke-linecap": "round"
+      }
+    },
+    "text":
+    {
+      "font-size": "0.1px",
+      "font-style": "normal",
+      "font-variant": "normal",
+      "font-weight": "bold",
+      "font-stretch": "normal",
+      "text-align": "center",
+      "line-height":" 100%",
+      "letter-spacing": "0",
+      "word-spacing": "0",
+      "writing-mode": "lr-tb",
+      "text-anchor": "middle",
+      "fill": "#222222",
+      "fill-opacity": 0.8,
+      "stroke": "none",
+      "font-family": "Sans serif"
     }
   },
   "drill-index":

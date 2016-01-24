@@ -27,17 +27,19 @@ class Footprint():
 
         self._footprint = footprint
 
-        self._shapes = {'copper': {'top': [], 'bottom': [], 'internal': []},
-                        'soldermask': {'top': [], 'bottom': []},
-                        'silkscreen': {'top': [], 'bottom': []},
-                        'assembly': {'top': [], 'bottom': []},
-                        'solderpaste': {'top': [], 'bottom': []},
-                        'drills': {'top': [], 'bottom': [], 'internal': []},
-                        'pin-labels': {'top': [], 'bottom': [], 'internal': []}}
+        
 
+        self._shapes = {'conductor': {},
+                        'pours': {},
+                        'soldermask': {},
+                        'silkscreen': {},
+                        'assembly': {},
+                        'solderpaste': {},
+                        'drills': {}}
 
         self._processPins()
-        self._processSilkscreenShapes()
+        self._processPours()
+        self._processShapes()
         self._processAssemblyShapes()
 
 
@@ -53,11 +55,7 @@ class Footprint():
         Converts pins into 'shapes'
         """
 
-        try:
-            pins = self._footprint['pins']
-        except:
-            msg.error("Cannot find any 'pins' specified!")
-
+        pins = self._footprint.get('pins') or {}
 
         for pin in pins:
 
@@ -83,7 +81,7 @@ class Footprint():
                 shape_dict = shape_dict.copy()
 
                 # Which layer(s) to place the shape on
-                layers = shape_dict.get('layers') or ['top']
+                layers = utils.getExtendedLayerList(shape_dict.get('layers') or ['top'])
 
                 # Add the pin's location to the pad's location
                 shape_location = shape_dict.get('location') or [0, 0]
@@ -98,28 +96,23 @@ class Footprint():
                 if show_name == True:
                     pin_label = pins[pin]['layout'].get('label') or pin
 
-                # The same shape can go on multiple layers
                 for layer in layers:
                     
                     shape = Shape(shape_dict)
-                    style = Style(shape_dict, 'copper')
+                    style = Style(shape_dict, 'conductor')
                     shape.setStyle(style)
                     try:
-                        # This will pass if 'layer' is defined as a
-                        # list rather than a string.
-                        # TODO: There's bound to be a better way of 
-                        # doing this
-                        self._shapes['copper'][layer].append(shape)
+                        self._shapes['conductor'][layer].append(shape)
                     except:
-                        msg.error("The same pad shape can be placed on multiple layers. Even if it is only placed on a single layer, the layer needs to be defined as a list, for example, 'layer':['top']")
-
-
-                    for stype in ['soldermask', 'solderpaste']:
+                        self._shapes['conductor'][layer] = []
+                        self._shapes['conductor'][layer].append(shape)
+                        
+                    for stype in ['soldermask','solderpaste']:
 
                         # Get a custom shape specification if it exists
                         sdict_list = shape_dict.get(stype) 
 
-                        # No defined; default
+                        # Not defined; default
                         if sdict_list == None:
                             # Use default settings for shape based on
                             # the pad shape
@@ -130,26 +123,33 @@ class Footprint():
 
                             # Apply modifier based on shape type
                             if shape_type == 'path':
-                                sdict['scale'] = shape.getScale()*config.brd[stype]['path-scale']
+                                sdict['scale'] = shape.getScale()*config.brd['distances'][stype]['path-scale']
                             elif shape_type in ['rect', 'rectangle']:
-                                sdict['width'] += config.brd[stype]['rect-buffer']
-                                sdict['height'] += config.brd[stype]['rect-buffer']
+                                sdict['width'] += config.brd['distances'][stype]['rect-buffer']
+                                sdict['height'] += config.brd['distances'][stype]['rect-buffer']
                             elif shape_type in ['circ', 'circle']:
-                                sdict['diameter'] += config.brd[stype]['circle-buffer']
+                                sdict['diameter'] += config.brd['distances'][stype]['circle-buffer']
                             else:
                                 pass
-     
+
                             # Create shape based on new dictionary
                             sshape = Shape(sdict)
 
                             # Define style
                             sstyle = Style(sdict, stype)
 
-                            # Aplpy style
+                            # Apply style
                             sshape.setStyle(sstyle)
 
                             # Add shape to footprint's shape dictionary
-                            self._shapes[stype][layer].append(sshape)
+                            #self._shapes[stype][layer].append(sshape)
+                            try:
+                                self._shapes[stype][layer].append(sshape)
+                            except:
+                                self._shapes[stype][layer] = []
+                                self._shapes[stype][layer].append(sshape)
+
+
 
                         # Do not place shape
                         elif (sdict_list == {}) or (sdict_list == []):
@@ -165,8 +165,8 @@ class Footprint():
                                 sdict_list = [sdict_list]
 
                             # Process list of shapes
-                            for sdict in sdict_list:
-                                sdict = sdict.copy()
+                            for sdict_ in sdict_list:
+                                sdict = sdict_.copy()
                                 shape_loc = utils.toPoint(sdict.get('location') or [0, 0])
 
                                 # Apply rotation
@@ -188,15 +188,17 @@ class Footprint():
                                 sshape.setStyle(sstyle)
      
                                 # Add shape to footprint's shape dictionary
-                                self._shapes[stype][layer].append(sshape)
+                                #self._shapes[stype][layer].append(sshape)
+                                try:
+                                    self._shapes[stype][layer].append(sshape)
+                                except:
+                                    self._shapes[stype][layer] = []
+                                    self._shapes[stype][layer].append(sshape)
 
      
-                        # Add pin label
-                        if pin_label != None:
-                            label = {}
-                            label['text'] = pin_label
-                            label['location'] = shape_dict['location']
-                            self._shapes['pin-labels'][layer].append(label)
+                    # Add pin label
+                    if (pin_label != None):
+                        shape.setLabel(pin_label)
 
 
 
@@ -211,29 +213,72 @@ class Footprint():
                 shape = Shape(drill_dict)
                 style = Style(drill_dict, 'drills')
                 shape.setStyle(style)
-                self._shapes['drills']['top'].append(shape)                
+                try:
+                    self._shapes['drills']['top'].append(shape)
+                except:
+                    self._shapes['drills']['top'] = []
+                    self._shapes['drills']['top'].append(shape)
                         
 
 
 
 
-
-
-    def _processSilkscreenShapes(self):
+    def _processPours(self):
         """
         """
+
         try:
-            shapes = self._footprint['layout']['silkscreen']['shapes']
+            shapes = self._footprint['layout']['pours']['shapes']
         except:
-            return
+            return        
 
         for shape_dict in shapes:
-            layers = shape_dict.get('layers') or ['top']
+            layers = utils.getExtendedLayerList(shape_dict.get('layers') or ['top'])
             for layer in layers:
                 shape = Shape(shape_dict)
-                style = Style(shape_dict, 'silkscreen')
+                style = Style(shape_dict, 'conductor', 'pours')
                 shape.setStyle(style)
-                self._shapes['silkscreen'][layer].append(shape)
+
+                try:
+                    self._shapes['pours'][layer].append(shape)
+                except:
+                    self._shapes['pours'][layer] = []
+                    self._shapes['pours'][layer].append(shape)
+
+
+
+
+
+    def _processShapes(self):
+        """
+        """
+
+        sheets = ['conductor', 'silkscreen', 'soldermask']
+
+        for sheet in sheets:
+
+            try:
+                shapes = self._footprint['layout'][sheet]['shapes']
+            except:
+                shapes = []
+     
+            for shape_dict in shapes:
+                layers = utils.getExtendedLayerList(shape_dict.get('layers') or ['top'])
+                for layer in layers:
+                    # Mirror the shape if it's text and on bottom later,
+                    # but let explicit shape setting override
+                    if layer == 'bottom':
+                        if shape_dict['type'] == 'text':
+                            shape_dict['mirror'] = shape_dict.get('mirror') or 'True'
+                    shape = Shape(shape_dict)
+                    style = Style(shape_dict, sheet)
+                    shape.setStyle(style)
+                    try:
+                        self._shapes[sheet][layer].append(shape)
+                    except:
+                        self._shapes[sheet][layer] = []
+                        self._shapes[sheet][layer].append(shape)
+
 
 
 
@@ -248,12 +293,16 @@ class Footprint():
             return
 
         for shape_dict in shapes:
-            layers = shape_dict.get('layer') or ['top']
+            layers = utils.getExtendedLayerList(shape_dict.get('layer') or ['top'])
             for layer in layers:
                 shape = Shape(shape_dict)
                 style = Style(shape_dict, 'assembly')
                 shape.setStyle(style)
-                self._shapes['assembly'][layer].append(shape)
+                try:
+                    self._shapes['assembly'][layer].append(shape)
+                except:
+                    self._shapes['assembly'][layer] = []
+                    self._shapes['assembly'][layer].append(shape)
 
 
 

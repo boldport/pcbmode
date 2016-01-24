@@ -51,7 +51,11 @@ def cmdArgSetup(pcbmode_version):
      
     argp.add_argument('-e', '--extract',
                       action='store_true', dest='extract', default=False,
-                      help="Extract data from the generated SVG")
+                      help="Extract routing and component placement from board's SVG")
+
+    argp.add_argument('--extract-refdefs',
+                      action='store_true', dest='extract_refdefs', default=False,
+                      help="Extract components' reference designator location and rotation from board's SVG")
      
     argp.add_argument('--fab', nargs='?',
                       dest='fab', default=False,
@@ -136,6 +140,11 @@ def makeConfig(name, version, cmdline_args):
         config.brd['config']['units'] = 'mm'
         config.brd['config']['style-layout'] = 'default'
 
+
+    #=================================
+    # Style
+    #=================================
+
     # Get style file; search for it in the project directory and 
     # where the script it
     layout_style = config.brd['config']['style-layout']
@@ -156,9 +165,38 @@ def makeConfig(name, version, cmdline_args):
     if config.stl['layout'] == {}:
         msg.error("Couldn't find style file %s. Looked for it here:\n%s" % (layout_style_filename, filenames))
 
-    #=================================
+    #-------------------------------------------------------------
+    # Stackup
+    #-------------------------------------------------------------
+    try:
+        stackup_filename = config.brd['stackup']['name'] + '.json'
+    except:
+        stackup_filename = 'two-layer.json'
+
+    paths = [os.path.join(config.cfg['base-dir']), # project dir
+             os.path.join(os.path.dirname(os.path.realpath(__file__)))] # script dir
+
+    filenames = ''
+    for path in paths:
+        filename = os.path.join(path, config.cfg['locations']['stackups'],
+                                stackup_filename)
+        filenames += "  %s \n" % filename
+        if os.path.isfile(filename):
+            config.stk = utils.dictFromJsonFile(filename)
+            break
+
+    if config.stk == {}:
+        msg.error("Couldn't find stackup file %s. Looked for it here:\n%s" % (stackup_filename, filenames))
+
+    config.stk['layers-dict'], config.stk['layer-names'] = utils.getLayerList()
+    config.stk['surface-layers'] = [config.stk['layers-dict'][0], config.stk['layers-dict'][-1]]
+    config.stk['internal-layers'] = config.stk['layers-dict'][1:-1]
+    config.stk['surface-layer-names'] = [config.stk['layer-names'][0], config.stk['layer-names'][-1]]
+    config.stk['internal-layer-names'] = config.stk['layer-names'][1:-1]
+
+    #---------------------------------------------------------------
     # Path database
-    #=================================
+    #---------------------------------------------------------------
     filename = os.path.join(config.cfg['locations']['boards'], 
                             config.cfg['name'],
                             config.cfg['locations']['build'],
@@ -170,9 +208,9 @@ def makeConfig(name, version, cmdline_args):
         config.pth = utils.dictFromJsonFile(filename)
 
 
-    #=================================
+    #----------------------------------------------------------------
     # Routing
-    #=================================
+    #----------------------------------------------------------------
     filename = os.path.join(config.cfg['base-dir'], 
                             config.brd['files'].get('routing-json') or config.cfg['name'] + '_routing.json')
 
@@ -209,27 +247,39 @@ def makeConfig(name, version, cmdline_args):
     # the style for masks used for copper pours
     config.cfg['mask-style'] = "fill:#000;stroke:#000;stroke-linejoin:round;stroke-width:%s;"
 
-    # Sort out distances
-    distances = {
-      "from-pour-to": {
-        "outline": 0.5,
-        "drill": 0.3, 
-        "pad": 0.2, 
-        "route": 0.25
-       }
-    }
 
-    config.brd['distances'] = (config.brd.get('distances') or 
-                               distances)
-    config.brd['distances']['from-pour-to'] = (config.brd['distances'].get('from-pour-to') or
-                                               distances['from-pour-to'])
-    dcfg = config.brd['distances']['from-pour-to']
-    for key in distances['from-pour-to'].keys():
-        dcfg[key] = (dcfg[key] or distances[key])
+    #------------------------------------------------------------------
+    # Distances
+    #------------------------------------------------------------------
+    # If any of the distance definitions are missing from the board's
+    # configuration file, use PCBmodE's defaults
+    #------------------------------------------------------------------
+    config_distances_dict = config.cfg['distances']
+    try:
+        board_distances_dict = config.brd.get('distances')
+    except:
+        board_distances_dict = {}
 
-    # Commandline overrides. These are stored in a temporary dictionary
-    # so that they are not written to the config file when the board's
-    # configuration is dumped, with extraction, for example
+    distance_keys = ['from-pour-to', 'soldermask', 'solderpaste']
+
+    for dk in distance_keys:
+        config_dict = config_distances_dict[dk]
+        try:
+            board_dict = board_distances_dict[dk]
+        except:
+            board_distances_dict[dk] = {}
+            board_dict = board_distances_dict[dk]
+        
+        for k in config_dict.keys():
+            board_dict[k] = (board_dict.get(k) or config_dict[k])
+
+    #-----------------------------------------------------------------
+    # Commandline overrides
+    #-----------------------------------------------------------------
+    # These are stored in a temporary dictionary so that they are not
+    # written to the config file when the board's configuration is
+    # dumped, with extraction, for example
+    #-----------------------------------------------------------------
     config.tmp = {}
     config.tmp['no-layer-index'] = (cmdline_args.no_layer_index or
                                     config.brd['config'].get('no-layer-index') or
@@ -261,35 +311,6 @@ def makeConfig(name, version, cmdline_args):
     # be the only place this inversion happens so it's easy to
     # control if things change.
     config.cfg['invert-y'] = -1
-
-    # Applying a scale factor to a rectanle can look bad if the height
-    # and width are different. For paths, since they are typically
-    # irregular, we apply a scale, but for rectangles and circles we
-    # apply a buffer
-
-    # Soldemask scales and buffers
-    soldermask_dict = {
-      "path-scale": 1.05,
-      "rect-buffer": 0.05,
-      "circle-buffer": 0.05
-    }
-    config.brd['soldermask'] = config.brd.get('soldermask') or {}
-    for key in soldermask_dict:
-        value = config.brd['soldermask'].get(key)
-        if value == None:
-            config.brd['soldermask'][key] = soldermask_dict[key]
-
-    # Solderpaste scale
-    solderpaste_dict = {
-      "path-scale": 0.9,
-      "rect-buffer": -0.1,
-      "circle-buffer": -0.1
-    }
-    config.brd['solderpaste'] = config.brd.get('solderpaste') or {}
-    for key in solderpaste_dict:
-        value = config.brd['solderpaste'].get(key)
-        if value == None:
-            config.brd['solderpaste'][key] = solderpaste_dict[key]
 
 
     return
@@ -326,9 +347,10 @@ def main():
 
         utils.renumberRefdefs(order)
 
-    # Extract routing from input SVG file
-    elif cmdline_args.extract is True:
-        extract.extract()
+    # Extract information from SVG file
+    elif cmdline_args.extract is True or cmdline_args.extract_refdefs is True:
+        extract.extract(extract=cmdline_args.extract,
+                        extract_refdefs=cmdline_args.extract_refdefs)
 
     # Create a BoM
     elif cmdline_args.make_bom is not False:

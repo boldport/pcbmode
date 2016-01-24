@@ -49,7 +49,8 @@ def gerberise(manufacturer='default'):
     filename_info = config.cfg['manufacturers'][manufacturer]['filenames']['gerbers']
 
     # Process Gerbers for PCB layers and sheets
-    for pcb_layer in utils.getSurfaceLayers():
+    #for pcb_layer in utils.getSurfaceLayers():
+    for pcb_layer in config.stk['layer-names']:
 
         # Get the SVG layer corresponding to the PCB layer
         svg_layer = svg_in.find("//svg:g[@pcbmode:pcb-layer='%s']" % (pcb_layer),
@@ -59,32 +60,34 @@ def gerberise(manufacturer='default'):
         mask_paths = svg_in.findall(".//svg:defs//svg:mask[@pcbmode:pcb-layer='%s']//svg:path" % pcb_layer,
                                        namespaces=ns)
 
-        sheets = ['copper', 'soldermask', 'solderpaste', 'silkscreen']
+        sheets = ['conductor', 'soldermask', 'solderpaste', 'silkscreen']
+#        sheets = ['conductor']
         for sheet in sheets:
             # Get the SVG layer corresponding to the 'sheet'
             sheet_layer = svg_layer.find(".//svg:g[@pcbmode:sheet='%s']" % (sheet),
                                          namespaces=ns)
 
-            if sheet == 'copper':
+            if sheet == 'conductor':
                 mask_paths_to_pass = mask_paths
             else:
                 mask_paths_to_pass = []
 
-            # Create a Gerber object
-            gerber = Gerber(sheet_layer,
-                            mask_paths_to_pass,
-                            decimals,
-                            digits,
-                            steps,
-                            length)
-
-            add = '_%s_%s.%s' % (pcb_layer, sheet,
-                                 filename_info[pcb_layer][sheet].get('ext') or 'ger')
-            filename = os.path.join(base_dir, base_name + add)
-
-            with open(filename, "wb") as f:
-                for line in gerber.getGerber():
-                    f.write(line)
+            if sheet_layer != None:
+                # Create a Gerber object
+                gerber = Gerber(sheet_layer,
+                                mask_paths_to_pass,
+                                decimals,
+                                digits,
+                                steps,
+                                length)
+     
+                add = '_%s_%s.%s' % (pcb_layer, sheet,
+                                     filename_info[pcb_layer.split('-')[0]][sheet].get('ext') or 'ger')
+                filename = os.path.join(base_dir, base_name + add)
+     
+                with open(filename, "wb") as f:
+                    for line in gerber.getGerber():
+                        f.write(line)
 
 
     # Process module sheets
@@ -921,8 +924,9 @@ def gerbers_to_svg(manufacturer='default'):
         print foil
 
         
-    for pcb_layer in utils.getSurfaceLayers():
-        for foil in ['copper', 'silkscreen', 'soldermask']:
+    #for pcb_layer in utils.getSurfaceLayers():
+    for pcb_layer in config.stk['layer-names']:
+        for foil in ['conductor', 'silkscreen', 'soldermask']:
             gerber_file = os.path.join(production_path, 
                                        base_name + '_%s_%s.ger'% (pcb_layer, foil))
             gerber_data = open(gerber_file, 'r').read()

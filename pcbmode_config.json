@@ -5,7 +5,31 @@
     "components": "components/",
     "fonts": "fonts/",
     "build": "build/",
-    "styles": "styles/"
+    "styles": "styles/",
+    "stackups": "stackups/",
+    "shapes": "shapes/"
+  },
+  "distances":
+  {
+    "from-pour-to": 
+    {
+      "outline": 0.5,
+      "drill": 0.3, 
+      "pad": 0.2, 
+      "route": 0.25
+    },
+    "soldermask": 
+    {
+      "path-scale": 1.05,
+      "rect-buffer": 0.05,
+      "circle-buffer": 0.05
+    },
+    "solderpaste":
+    {
+      "path-scale": 0.9,
+      "rect-buffer": -0.1,
+      "circle-buffer": -0.1
+    }
   },
   "refdef-index":
   {
@@ -85,14 +109,18 @@
         {
           "top":
           {
-            "copper": {"ext": "ger"},
+            "conductor": {"ext": "ger"},
             "soldermask": {"ext": "ger"},
             "silkscreen": {"ext": "ger"},
             "solderpaste": {"ext": "ger"}
           },
+          "internal":
+          {
+            "conductor": {"ext": "ger"}
+          },
           "bottom":
           {
-            "copper": {"ext": "ger"},
+            "conductor": {"ext": "ger"},
             "soldermask": {"ext": "ger"},
             "silkscreen": {"ext": "ger"},
             "solderpaste": {"ext": "ger"}
@@ -122,13 +150,13 @@
         {
           "top":
           {
-            "copper": {"ext": "gtl"},
+            "conductor": {"ext": "gtl"},
             "soldermask": {"ext": "gts"},
             "silkscreen": {"ext": "gto"}
           },
           "bottom":
           {
-            "copper": {"ext": "gbl"},
+            "conductor": {"ext": "gbl"},
             "soldermask": {"ext": "gbs"},
             "silkscreen": {"ext": "gbo"}  
           },
@@ -157,13 +185,13 @@
         {
           "top":
           {
-            "copper": {"ext": "GTL"},
+            "conductor": {"ext": "GTL"},
             "soldermask": {"ext": "GTS"},
             "silkscreen": {"ext": "GTO"}
           },
           "bottom":
           {
-            "copper": {"ext": "GBL"},
+            "conductor": {"ext": "GBL"},
             "soldermask": {"ext": "GBS"},
             "silkscreen": {"ext": "GBO"}  
           },
