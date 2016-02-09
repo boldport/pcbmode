@@ -187,13 +187,15 @@
           {
             "conductor": {"ext": "GTL"},
             "soldermask": {"ext": "GTS"},
-            "silkscreen": {"ext": "GTO"}
+            "silkscreen": {"ext": "GTO"},
+            "solderpaste": {"ext": "ger"}
           },
           "bottom":
           {
             "conductor": {"ext": "GBL"},
             "soldermask": {"ext": "GBS"},
-            "silkscreen": {"ext": "GBO"}  
+            "silkscreen": {"ext": "GBO"},
+            "solderpaste": {"ext": "ger"}  
           },
           "other":
    	  {
