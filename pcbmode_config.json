@@ -190,6 +190,10 @@
             "silkscreen": {"ext": "GTO"},
             "solderpaste": {"ext": "ger"}
           },
+          "internal":
+          {
+            "conductor": {"ext": "ger"}
+          },
           "bottom":
           {
             "conductor": {"ext": "GBL"},
