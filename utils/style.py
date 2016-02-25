@@ -66,7 +66,7 @@ class Style():
 
 
     def getStyleString(self):
-        return utils.dict_to_style(self._style_dict)
+        return utils.dictToStyleText(self._style_dict)
 
 
     def getStrokeWidth(self):

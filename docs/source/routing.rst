@@ -6,7 +6,6 @@ Routing, of course, is an essential part of a circuit board. *PCBmodE* does not 
 
 .. important:: Make sure that you place the routes and vias on the routing SVG layer of the desired PCB layer. To choose that layer either click on an element in the layer or open the layer pane by pressing ``CTRL+SHIFT+L``.
 
-
 .. important:: In order to place routes, make sure that Inkscape is set to 'optimise' paths by going to ``File->Inkscape Preferences->Transforms`` and choosing ``optimised`` under ``Store transformation``.
 
 
@@ -39,19 +38,24 @@ If the route is placed where there is a copper pour, it will automatically have 
 Adding vias
 -----------
 
-Vias are defined just like any other component, but are placed differently.
+Vias are components just like any other. There are placed just like other components, but in the routing file ``<design_name>_routing.json", not the main board's JSON.
 
-1) Choose the routing layer
-2) Choose the ``Draw`` tool (``F6``)
-3) Press ``CTRL`` and click with the left button where you'd like the via (size and color doesn't matter)
-4) Open Inkscape's XML editor (``SHIFT+CTRL+X``)
-5) Next to ``set`` enter ``pcbmode:type`` and below enter ``via``
-6) Press ``set`` or ``CTRL+ENTER``
-7) Next to ``set`` enter ``pcbmode:via`` and below enter the component to be placed as a via. So if your via definition is in ``via.json`` (in the component directory) then enter ``via`` (without the ``.json``)
-8) Press ``set`` or ``CTRL+ENTER``
+.. code-block:: json
+    {  
+      "vias": {
+        "362835dd0": {
+          "footprint": "via", 
+          "layer": "top", 
+          "location": [
+            -8, 
+            -0.883744
+          ]
+        }
+      }
+    }
+
+You can assign a unique key to the via, but that will be over-written by a hash when extracted.
 
 .. note:: Since vias are components, anything could be a via, so if it makes sense to place a 2x2 0.1" header as a "via", that's possible.
-
-.. note:: This somewhat cumbersome procedure is a compromise between usability and the need to modify Inkscape or adding vias manually.
 
 .. important:: Don't forget to extract the changes!

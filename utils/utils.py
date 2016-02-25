@@ -19,36 +19,18 @@ import hashlib
 
 
 
-def dict_to_style(style_dict):
-    """
-    Convert a dictionary into an SVG/CSS style attribute
-    """
-
-    style = None
-
-    if style_dict is not None:
-        style = ''
-        for key in style_dict:
-            style += "%s:%s;" % (key, style_dict[key])
-
-    return style
-
-
-
 
 def dictToStyleText(style_dict):
     """
     Convert a dictionary into an SVG/CSS style attribute
     """
 
-    style = None
-
-    if style_dict is not None:
-        style = ''
-        for key in style_dict:
-            style += "%s:%s;" % (key, style_dict[key])
+    style = ''
+    for key in style_dict:
+        style += "%s:%s;" % (key, style_dict[key])
 
     return style
+
 
 
 
@@ -206,28 +188,82 @@ def dictFromJsonFile(filename, error=True):
 
 
 
+def getLayerList():
+    """
+    """
+    layer_list = []
+    for record in config.stk['stackup']:
+        if record['type'] == 'signal-layer-surface' or record['type'] == 'signal-layer-internal':
+            layer_list.append(record)
+
+    layer_names = []
+    for record in layer_list:
+        layer_names.append(record['name'])
+
+    return layer_list, layer_names
+
+
 
 def getSurfaceLayers():
     """
-    Returns a list of sorface layer names
+    Returns a list of surface layer names
+    Only here until this function is purged from the
+    codebase
     """    
+    return config.stk['surface-layer-names']
 
-    board_stackup = config.brd['physical'].get('stackup')
-    if board_stackup is not None:
-        if len(board_stackup) == 1:
-            surface_layers = ['top']
-        elif len(board_stackup) == 2:
-            surface_layers = ['top', 'bottom']
-        else:
-            msg.error("PCBmodE currently only supports two layers, found %s." % len(board_stackup))
-            
-    return surface_layers
+
 
 
 def getInternalLayers():
     """
+    Returns a list of internal layer names
+    Only here until this function is purged from the
+    codebase
+    """    
+    return config.stk['internal-layer-names']
+
+
+
+
+def getExtendedLayerList(layers):
     """
-    return []
+    For the list of layers we may get a list of all
+    internal layers ('internal-1', 'internal-2, etc.) or
+    simply 'internal', meaning that that shape is meant
+    to go into all internal layers, which is the most
+    common case. The following 'expands' the layer list
+    """
+    if 'internal' in layers:
+        layers.remove('internal')
+        layers.extend(config.stk['internal-layer-names']) 
+    return layers
+
+
+
+
+def getExtendedSheetList(layer, sheet):
+    """
+    We may want multiple sheets of the same type, such as two
+    soldermask layers on the same physical layer. This function
+    expands the list if such layers are defined in the stackup
+    """
+    
+    for layer_dict in config.stk['layers-dict']:
+        if layer_dict['name'] == layer:
+            break
+    stack_sheets = layer_dict['stack']
+
+    sheet_names = []
+    for stack_sheet in stack_sheets:
+        sheet_names.append(stack_sheet['name'])
+
+    new_list = []
+    for sheet_name in sheet_names:
+        if sheet_name.startswith(sheet):
+            new_list.append(sheet_name)
+
+    return new_list
 
 
 
@@ -302,7 +338,6 @@ def process_meander_type(type_string, meander_type):
 
 
 
-# there_are_pours_in_this_layer
 def checkForPoursInLayer(layer):
     """
     Returns True or False if there are pours in the specified layer
@@ -316,12 +351,12 @@ def checkForPoursInLayer(layer):
 
     if pours is not None:
         for pour_dict in pours:
-            layers = pour_dict.get('layers')
+            layers = getExtendedLayerList(pour_dict.get('layers'))
             if layer in layers:
                 return True
  
-    return False
-  
+    #return False
+    return True
 
 
 
@@ -589,25 +624,35 @@ def getStyleAttrib(style, attrib):
 
 
 
+def niceFloat(f):
+    if f.is_integer():
+        return int(f)
+    else:
+        return round(f, 6)
+
+
+
 
 def parseTransform(transform):
     """
     Returns a Point() for the input transform
     """
     data = {}
-    if 'translate' in transform.lower():
+    if transform == None:
+        data['type'] = 'translate'
+        data['location'] = Point()
+    elif 'translate' in transform.lower():
         regex = r".*?translate\s?\(\s?(?P<x>-?[0-9]*\.?[0-9]+)\s?[\s,]\s?(?P<y>-?[0-9]*\.?[0-9]+\s?)\s?\).*"
         coord = re.match(regex, transform)
         data['type'] = 'translate'
-        try:
-            data['location'] = Point(coord.group('x'),coord.group('y'))
-        except:
-            data['location'] = Point()
+        x = coord.group('x')
+        y = coord.group('y')
+        data['location'] = Point(x,y)
     elif 'matrix' in transform.lower():
         data['type'] = 'matrix'
         data['location'], data['rotate'], data['scale'] = parseSvgMatrix(transform)
     else:
-        msg.error("Found a path transform that cannot be handled, %s. SVG stansforms shouls be in the form of 'translate(num,num)' or 'matric(num,num,num,num,num,num)" % transform)
+        msg.error("Found a path transform that cannot be handled, %s. SVG stansforms shouls be in the form of 'translate(num,num)' or 'matrix(num,num,num,num,num,num)" % transform)
 
     return data 
 

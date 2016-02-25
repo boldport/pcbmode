@@ -1060,7 +1060,6 @@ def circle_diameter_to_path(d, offset=Point()):
 
 
 
-# drill_diameter_to_path
 def drillPath(diameter):
     """
     Returns an SVG path for a drill symbol of diameter 'diameter'
@@ -1078,6 +1077,31 @@ def drillPath(diameter):
     b = r*0.9
 
     return "m %s,%s c %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s z m %s,%s %s,%s c %s,%s %s,%s %s,%s l %s,%s %s,%s c %s,%s %s,%s %s,%s z" % (0,r, k*r,0, r,-r*(1-k), r,-r, 0,-r*k, -r*(1-k),-r, -r,-r, -r*k,0, -r,r*(1-k), -r,r, 0,r*k, r*(1-k),r, r,r, 0,-(r-b), 0,-2*b, -b*k,0, -b,b*(1-k), -b,b, b,0, b,0, 0,k*b, -b*(1-k),b, -b,b)
+
+
+
+
+
+def placementMarkerPath():
+    """
+    Returns a path for the placement marker
+    """
+    diameter = 0.2
+ 
+    r = diameter/2.0
+ 
+    # The calculation to obtain the 'k' coefficient can be found here:
+    # http://itc.ktu.lt/itc354/Riskus354.pdf
+    # "APPROXIMATION OF A CUBIC BEZIER CURVE BY CIRCULAR ARCS AND VICE VERSA"
+    # by Aleksas Riskus
+    k = 0.5522847498
+ 
+    # extension
+    b = r*1.8
+
+#    return "m %s,%s c %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s m %s,%s %s,%s m %s,%s %s,%s z" % (0,r, k*r,0, r,-r*(1-k), r,-r, 0,-r*k, -r*(1-k),-r, -r,-r, -r*k,0, -r,r*(1-k), -r,r, 0,r*k, r*(1-k),r, r,r, 0,-(r-b), 0,-2*b, -b,b, 2*b,0)
+
+    return "m %s,%s c %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s m %s,%s %s,%s z" % (0,r, k*r,0, r,-r*(1-k), r,-r, 0,-r*k, -r*(1-k),-r, -r,-r, -r*k,0, -r,r*(1-k), -r,r, 0,r*k, r*(1-k),r, r,r, -b,-r, 2*b,0)
 
 
 
@@ -1117,7 +1141,7 @@ def makeSvgLayers(top_layer, transform=None, refdef=None):
     # default. This is the "master" control; settings in the board's
     # config file will override these settings
     layer_control = {
-      "copper": { 
+      "conductor": { 
         "hidden": False, "locked": False, 
         "pours": { "hidden": False, "locked": True },
         "pads": { "hidden": False, "locked": False },
@@ -1131,6 +1155,7 @@ def makeSvgLayers(top_layer, transform=None, refdef=None):
       "dimensions": { "hidden": False, "locked": True },
       "origin": { "hidden": False, "locked": True },
       "drills": { "hidden": False, "locked": False },
+      "placement": { "hidden": False, "locked": False },
       "outline": { "hidden": False, "locked": True }
     }
 
@@ -1146,67 +1171,104 @@ def makeSvgLayers(top_layer, transform=None, refdef=None):
     layers = {}
 
     # Create layers for top and bottom PCB layers
-    for pcb_layer_name in reversed(utils.getSurfaceLayers()):
+    for layer_dict in reversed(config.stk['layers-dict']):
+
+        layer_type = layer_dict['type']
+        layer_name = layer_dict['name']
 
         # create SVG layer for PCB layer
-        layers[pcb_layer_name] = {}
-        element = layers[pcb_layer_name]['layer'] = makeSvgLayer(top_layer, 
-                                                                 pcb_layer_name,
-                                                                 transform,
-                                                                 None,
-                                                                 refdef)
-        element.set('{'+config.cfg['ns']['pcbmode']+'}%s' % ('pcb-layer'), pcb_layer_name)
-
-        # create the following PCB sheets for the PCB layer
-        pcb_sheets = ['copper', 'silkscreen', 'soldermask', 'solderpaste', 'assembly']
-        for pcb_sheet in pcb_sheets:
-
-            # Set default style for this sheet
-            style = utils.dictToStyleText(config.stl['layout'][pcb_sheet]['default'].get(pcb_layer_name))
-            if combined_lc[pcb_sheet]['hidden'] == True:
-                style += 'display:none;'
-            tmp = layers[pcb_layer_name] 
-            tmp[pcb_sheet] = {}
-            element = tmp[pcb_sheet]['layer'] = makeSvgLayer(tmp['layer'], 
-                                                             pcb_sheet,
-                                                             None, 
-                                                             style,
-                                                             refdef)
-            element.set('{'+config.cfg['ns']['pcbmode']+'}%s' % ('sheet'), pcb_sheet)
-            if combined_lc[pcb_sheet]['locked'] == True:
-                element.set('{'+config.cfg['ns']['sodipodi']+'}insensitive', 'true')
-
-
-        # instantiate sub-layers for 'copper' PCB layer
-        tmp = layers[pcb_layer_name]['copper']
-        layer_names = ['routing', 'pads', 'pours']
-
-        for layer_name in layer_names:
-            style = utils.dict_to_style(config.stl['layout']['copper'][layer_name].get(pcb_layer_name))
-            if combined_lc[pcb_sheet]['hidden'] == True:
-                style += 'display:none;'
-            tmp[layer_name] = {}
-            element = tmp[layer_name]['layer'] = makeSvgLayer(tmp['layer'], 
-                                                              layer_name,
-                                                              None, 
-                                                              style,
-                                                              refdef)
-            element.set('{'+config.cfg['ns']['pcbmode']+'}%s' % ('sheet'), layer_name)
-            if combined_lc['copper'][layer_name]['locked'] == True:
-                element.set('{'+config.cfg['ns']['sodipodi']+'}insensitive', 'true')
-
-    for layer_name in ['origin', 'dimensions', 'outline', 'drills', 'documentation']:
-        style = utils.dict_to_style(config.stl['layout'][layer_name].get('default'))
-        if combined_lc[layer_name]['hidden'] == True:
-            style += 'display:none;'
         layers[layer_name] = {}
         element = layers[layer_name]['layer'] = makeSvgLayer(top_layer, 
                                                              layer_name,
+                                                             transform,
+                                                             None,
+                                                             refdef)
+        element.set('{'+config.cfg['ns']['pcbmode']+'}%s' % ('pcb-layer'), layer_name)
+
+        sheets = layer_dict['stack']
+        if layer_type == 'signal-layer-surface':
+            placement_dict = [{"name": "placement", "type": "placement"}]
+            assembly_dict = [{"name": "assembly", "type": "assembly"}]
+            solderpaste_dict = [{"name": "solderpaste", "type": "solderpaste"}]
+            
+            # Layer appear in Inkscape first/top to bottom/last
+            sheets = placement_dict + assembly_dict + solderpaste_dict + sheets  
+
+        for sheet in reversed(sheets):
+
+            sheet_type = sheet['type']
+            sheet_name = sheet['name']
+
+            # Set default style for this sheet
+            try:
+                style = utils.dictToStyleText(config.stl['layout'][sheet_type]['default'][layer_name])
+            except:
+                # A stylesheet may define one style for any sheet type
+                # or a specific style for multiple layers of the same
+                # type. If, for example, a specific style for
+                # 'internal-2' cannot be found, PCBmodE will default
+                # to the general definition for this type of sheet
+                style = utils.dictToStyleText(config.stl['layout'][sheet_type]['default'][layer_name.split('-')[0]])
+
+            if combined_lc[sheet_type]['hidden'] == True:
+                style += 'display:none;'
+ 
+            tmp = layers[layer_name] 
+            tmp[sheet_type] = {}
+            element = tmp[sheet_type]['layer'] = makeSvgLayer(parent_layer=tmp['layer'], 
+                                                              layer_name=sheet_name,
+                                                              transform=None, 
+                                                              style=style,
+                                                              refdef=refdef)
+
+            element.set('{'+config.cfg['ns']['pcbmode']+'}%s' % ('sheet'), sheet_type)
+            if combined_lc[sheet_type]['locked'] == True:
+                element.set('{'+config.cfg['ns']['sodipodi']+'}insensitive', 'true')
+
+            # A PCB layer of type 'conductor' is best presented in
+            # seperate sub-layers of 'pours', 'pads', and
+            # 'routing'. The following generates those sub-layers
+            if sheet_type == 'conductor':
+                tmp2 = layers[layer_name]['conductor']
+                conductor_types = ['routing', 'pads', 'pours']
+         
+                for cond_type in conductor_types:
+                    try:
+                        style = utils.dictToStyle(config.stl['layout']['conductor'][cond_type].get(layer_name))
+                    except:
+                        # See comment above for rationalle
+                        style = utils.dictToStyleText(config.stl['layout']['conductor'][cond_type][layer_name.split('-')[0]])
+
+
+                    if combined_lc['conductor'][cond_type]['hidden'] == True:
+                        style += 'display:none;'
+
+                    tmp2[cond_type] = {}
+                    element = tmp2[cond_type]['layer'] = makeSvgLayer(parent_layer=tmp2['layer'], 
+                                                                      layer_name=cond_type,
+                                                                      transform=None, 
+                                                                      style=style,
+                                                                      refdef=refdef)
+
+                    element.set('{'+config.cfg['ns']['pcbmode']+'}%s' % ('sheet'), cond_type)
+
+                    if combined_lc['conductor'][cond_type]['locked'] == True:
+                        element.set('{'+config.cfg['ns']['sodipodi']+'}insensitive', 'true')
+
+
+
+    for info_layer in ['origin','dimensions','outline','drills','documentation']:
+        style = utils.dictToStyleText(config.stl['layout'][info_layer].get('default'))
+        if combined_lc[info_layer]['hidden'] == True:
+            style += 'display:none;'
+        layers[info_layer] = {}
+        element = layers[info_layer]['layer'] = makeSvgLayer(top_layer, 
+                                                             info_layer,
                                                              transform, 
                                                              style,
                                                              refdef)
-        element.set('{'+config.cfg['ns']['pcbmode']+'}%s' % ('sheet'), layer_name)
-        if combined_lc[layer_name]['locked'] == True:
+        element.set('{'+config.cfg['ns']['pcbmode']+'}%s' % ('sheet'), info_layer)
+        if combined_lc[info_layer]['locked'] == True:
             element.set('{'+config.cfg['ns']['sodipodi']+'}insensitive', 'true')
 
     return layers

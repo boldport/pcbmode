@@ -3,6 +3,7 @@
 import os
 
 import config
+import copy
 import messages as msg
 
 # pcbmode modules
@@ -26,6 +27,9 @@ class Component():
         self._layer = component.get('layer') or 'top'
 
         self._rotate = component.get('rotate') or 0
+        if self._layer=='bottom':
+            self._rotate *= -1
+
         self._rotate_point = utils.toPoint(component.get('rotate-point') or [0, 0])
         self._scale = component.get('scale') or 1
         self._location = component.get('location') or [0, 0]
@@ -36,32 +40,52 @@ class Component():
         except:
             msg.error("Cannot find a 'footprint' name for refdef %s." % refdef)
 
-        fname = os.path.join(config.cfg['base-dir'],
+        filename = self._footprint_name + '.json'
+
+        paths = [os.path.join(config.cfg['base-dir'],
+                             config.cfg['locations']['shapes'],
+                             filename),
+                   os.path.join(config.cfg['base-dir'],
                              config.cfg['locations']['components'],
-                             self._footprint_name + '.json')
-        footprint_dict = utils.dictFromJsonFile(fname)
+                             filename)]
+
+        footprint_dict = None
+        for path in paths:
+            if os.path.isfile(path):
+                footprint_dict = utils.dictFromJsonFile(path)
+                break
+
+        if footprint_dict == None:
+            fname_list = ""
+            for path in paths:
+                fname_list += " %s" % path
+            msg.error("Couldn't find shape file. Looked for it here:\n%s" % (fname_list))
+
         footprint = Footprint(footprint_dict)
         footprint_shapes = footprint.getShapes()
 
         #------------------------------------------------        
         # Apply component-specific modifiers to footprint
         #------------------------------------------------
-        for sheet in ['copper', 'soldermask', 'solderpaste', 'silkscreen', 'assembly', 'drills']:
-            for layer in utils.getSurfaceLayers() + utils.getInternalLayers():
-                for shape in footprint_shapes[sheet][layer]:
+        for sheet in ['conductor', 'soldermask', 'solderpaste', 'pours', 'silkscreen', 'assembly', 'drills']:
+            for layer in config.stk['layer-names']:
+                for shape in footprint_shapes[sheet].get(layer) or []:
+
                     # In order to apply the rotation we need to adust the location
-                    # of each element
                     shape.rotateLocation(self._rotate, self._rotate_point)
 
-                    shape.transformPath(self._scale,
-                                        self._rotate,
-                                        self._rotate_point,
-                                        False,
-                                        True)
+                    shape.transformPath(scale=self._scale,
+                                        rotate=self._rotate,
+                                        rotate_point=self._rotate_point,
+                                        mirror=shape.getMirrorPlacement(),
+                                        add=True)
 
-        #--------------------------------------
-        # Remove silkscreen and assembly shapes
-        #--------------------------------------
+        #-------------------------------------------------------------- 
+        # Remove silkscreen and assembly shapes if instructed 
+        #-------------------------------------------------------------- 
+        # If the 'show' flag is 'false then remove these items from the
+        # shapes dictionary 
+        #--------------------------------------------------------------
         for sheet in ['silkscreen','assembly']:
             
             try:
@@ -120,25 +144,31 @@ class Component():
                 # Add the refdef to the silkscreen/assembly list. It's
                 # important that this is added at the very end since the
                 # placement process assumes the refdef is last
-                footprint_shapes[sheet][layer].append(refdef_shape)
-
+                try:
+                    footprint_shapes[sheet][layer].append(refdef_shape)
+                except:
+                    continue
 
         #------------------------------------------------------
-        # Invert 'top' and 'bottom' if layer is on the 'bottom'
+        # Invert layers
         #------------------------------------------------------
+        # If the placement is on the bottom of the baord then we need
+        # to invert the placement of all components. This affects the
+        # surface laters but also internal layers
+
         if self._layer == 'bottom':
-            layers = utils.getSurfaceLayers()
-            layers_reversed = reversed(utils.getSurfaceLayers())
+            layers = config.stk['layer-names']
            
-            for sheet in ['copper', 'soldermask', 'solderpaste', 'silkscreen', 'assembly']:
+            for sheet in ['conductor', 'pours', 'soldermask', 'solderpaste', 'silkscreen', 'assembly']:
                 sheet_dict = footprint_shapes[sheet]
-                # TODO: this nasty hack won't work for more than two
-                # layers, so when 2+ are supported this needs to be
-                # revisited
-                for i in range(0,len(layers)-1):
-                    sheet_dict['temp'] = sheet_dict.pop(layers[i])
-                    sheet_dict[layers[i]] = sheet_dict.pop(layers[len(layers)-1-i])
-                    sheet_dict[layers[len(layers)-1-i]] = sheet_dict.pop('temp')
+                sheet_dict_new = {}
+                for i, pcb_layer in enumerate(layers):
+                    try:
+                        sheet_dict_new[layers[len(layers)-i-1]] = copy.copy(sheet_dict[pcb_layer])
+                    except:
+                        continue
+
+                footprint_shapes[sheet] = copy.copy(sheet_dict_new)    
 
         self._footprint_shapes = footprint_shapes
 
