@@ -145,9 +145,12 @@ class Component():
                 # important that this is added at the very end since the
                 # placement process assumes the refdef is last
                 try:
-                    footprint_shapes[sheet][layer].append(refdef_shape)
+                    footprint_shapes[sheet][layer]
                 except:
-                    continue
+                    footprint_shapes[sheet][layer] = []
+
+                footprint_shapes[sheet][layer].append(refdef_shape)
+                    
 
         #------------------------------------------------------
         # Invert layers
