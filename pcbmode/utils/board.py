@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import config
+import pcbmode.config as config
 import messages as msg
 from module import Module
 

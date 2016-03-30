@@ -3,7 +3,7 @@
 import os
 import json
 
-import config
+import pcbmode.config as config
 import messages as msg
 
 # pcbmode modules

@@ -4,7 +4,7 @@ import os
 import copy
 from lxml import etree as et
 
-import config
+import pcbmode.config as config
 import messages as msg
 
 # import pcbmode modules

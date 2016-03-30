@@ -9,7 +9,7 @@ from operator import itemgetter # for sorting lists by dict value
 import HTMLParser # required for HTML to unicode translation
 from lxml import etree as et
 
-import config
+import pcbmode.config as config
 
 # pcbmode modules
 from point import Point
