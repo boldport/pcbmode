@@ -9,12 +9,12 @@ import re
 #import HTMLParser # required for HTML to unicode translation
 #from lxml import etree as et
 
-import config
+import pcbmode.config as config
 
 # pcbmode modules
 #from point import Point
 #from svgpath import SvgPath
-import utils as utils
+from . import utils
 from . import messages as msg
 #import hashlib
 

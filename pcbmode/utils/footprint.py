@@ -5,8 +5,9 @@ import re
 import json
 from lxml import etree as et
 
-import config
+import pcbmode.config as config
 from . import messages as msg
+
 
 # pcbmode modules
 from . import svg 

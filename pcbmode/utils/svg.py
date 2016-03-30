@@ -5,7 +5,7 @@ import pyparsing as PYP
 import re
 from lxml import etree as et
 
-import config
+import pcbmode.config as config
 
 # import pcbmode modules
 from . import utils

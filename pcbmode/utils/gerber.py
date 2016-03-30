@@ -5,12 +5,12 @@ import re
 from lxml import etree as et
 import pyparsing as pyp
 
-import config
+import pcbmode.config as config
 from . import messages as msg
 
 # pcbmode modules
 from . import svg
-import utils
+from . import utils
 from .svgpath import SvgPath
 from .point import Point
 

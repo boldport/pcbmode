@@ -4,7 +4,7 @@ from math import sqrt, ceil
 import pyparsing as PYP
 import re
 
-import config
+import pcbmode.config as config
 from . import messages as msg
 
 # import pcbmode modules

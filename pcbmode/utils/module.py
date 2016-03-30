@@ -6,7 +6,7 @@ import copy
 import sys
 from lxml import etree as et
 
-import config
+import pcbmode.config as config
 from . import messages as msg
 
 from . import svg

@@ -2,7 +2,7 @@
 
 import os
 
-import config
+import pcbmode.config as config
 import copy
 
 # pcbmode modules
