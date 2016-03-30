@@ -24,5 +24,6 @@ setup(
     entry_points={
         'console_scripts': ['pcbmode = pcbmode.pcbmode:main']
     },
+    zip_safe = True
 )
 
