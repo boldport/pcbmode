@@ -8,8 +8,8 @@ from lxml import etree as et
 import config
 
 # import pcbmode modules
-import utils
-from point import Point
+from . import utils
+from .point import Point
 
 
 
@@ -263,7 +263,7 @@ def absolute_to_relative_path(path):
             abspos = abspos + (patho - abspos)
 
         else:
-            print "ERROR: found an unsupported SVG path command " + str(pd[i][0])
+            print("ERROR: found an unsupported SVG path command " + str(pd[i][0]))
 
 
     # return the relative path
@@ -503,7 +503,7 @@ def relative_svg_path_to_absolute_coord_list(path, bezier_steps=100, segment_len
 
 
         else:
-            print "ERROR: found an unsupported SVG path command "+ str(cmd)
+            print("ERROR: found an unsupported SVG path command "+ str(cmd))
 
 
     points.append(p)
@@ -822,7 +822,7 @@ def calculate_bounding_box_of_path(path):
             pass
 
         else:
-            print "ERROR: found an unsupported SVG path command " + str(pd[i][0])
+            print("ERROR: found an unsupported SVG path command " + str(pd[i][0]))
 
     return bbox_top_left, bbox_bot_right
 

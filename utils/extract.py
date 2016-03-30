@@ -4,11 +4,11 @@ import os
 import json
 
 import config
-import messages as msg
+from . import messages as msg
 
 # pcbmode modules
 import utils
-from point import Point
+from .point import Point
 
 
 

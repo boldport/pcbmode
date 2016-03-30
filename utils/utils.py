@@ -6,15 +6,20 @@ import re
 import subprocess as subp # for shell commands
 import math
 from operator import itemgetter # for sorting lists by dict value
-import HTMLParser # required for HTML to unicode translation
 from lxml import etree as et
+
+try:
+    # Python 3
+    import html.parser as HTMLParser
+except:
+    # Python 2
+    import HTMLParser
 
 import config
 
 # pcbmode modules
-from point import Point
-from svgpath import SvgPath
-import messages as msg
+from .point import Point
+from . import messages as msg
 import hashlib
 
 
@@ -175,9 +180,9 @@ def dictFromJsonFile(filename, error=True):
         return result
 
     try:
-        with open(filename, 'rb') as f:
+        with open(filename, 'r') as f:
             json_data = json.load(f, object_pairs_hook=checking_for_unique_keys)
-    except IOError, OSError:
+    except (IOError, OSError):
         if error == True:
             msg.error("Couldn't open JSON file: %s" % filename, IOError)
         else:
@@ -282,7 +287,7 @@ def create_dir(path):
         if os.path.isdir(path):
             pass
         else:
-            print "ERROR: couldn't create build path %s" % path
+            print("ERROR: couldn't create build path %s" % path)
             raise
 
     return
@@ -315,7 +320,7 @@ def process_meander_type(type_string, meander_type):
     elif (meander_type == 'meander-sawtooth'):
         look_for = ['base-length', 'amplitude', 'bus-width', 'pitch']
     else:
-        print "ERROR: unrecognised meander type"
+        print("ERROR: unrecognised meander type")
         reaise
 
     meander = {}
@@ -526,6 +531,7 @@ def getTextParams(font_size, letter_spacing, line_height):
 
 
 def textToPath(font_data, text, letter_spacing, line_height, scale_factor):
+    from .svgpath import SvgPath
     """
     Convert a text string (unicode and newlines allowed) to a path.
     The 'scale_factor' is needed in order to scale rp 'letter_spacing' and 'line_height'
@@ -603,7 +609,7 @@ def textToPath(font_data, text, letter_spacing, line_height, scale_factor):
 
 def digest(string):
     digits = config.cfg['digest-digits']
-    return hashlib.md5(string).hexdigest()[:digits-1]
+    return hashlib.md5(string.encode()).hexdigest()[:digits-1]
 
 
 

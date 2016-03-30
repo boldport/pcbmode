@@ -5,13 +5,13 @@ import copy
 from lxml import etree as et
 
 import config
-import messages as msg
+from . import messages as msg
 
 # import pcbmode modules
-import utils as utils
-import svg
-from point import Point
-from svgpath import SvgPath
+from . import utils
+from . import svg
+from .point import Point
+from .svgpath import SvgPath
 
 
 

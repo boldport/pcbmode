@@ -15,7 +15,7 @@ import config
 #from point import Point
 #from svgpath import SvgPath
 import utils as utils
-import messages as msg
+from . import messages as msg
 #import hashlib
 
 

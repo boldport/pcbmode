@@ -3,12 +3,12 @@
 from lxml import etree as et
 
 import config
-import messages as msg
+from . import messages as msg
 
 # pcbmode modules
 import utils
-import svg
-from point import Point
+from . import svg
+from .point import Point
 
 
 
@@ -165,7 +165,7 @@ def placeDrill(drill,
                                           style=style,
                                           d=path_bottom)
         else:
-            print "ERROR: unrecognised drills soldermask option"
+            print("ERROR: unrecognised drills soldermask option")
 
     return
 

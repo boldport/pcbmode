@@ -4,9 +4,14 @@ import os
 import json
 import argparse
 
+try:
+    from os import getcwdu as getcwd
+except:
+    from os import getcwd as getcwd
+
 # PCBmodE modules
 import config
-import utils.utils as utils
+from utils import utils
 import utils.gerber as gerber
 import utils.extract as extract
 import utils.excellon as excellon
@@ -27,7 +32,7 @@ def cmdArgSetup(pcbmode_version):
     
     # commandline argument settings and parsing
     argp = argparse.ArgumentParser(description=description, 
-                      add_help=True, version=pcbmode_version, epilog=epilog)
+                      add_help=True, epilog=epilog)
      
     argp.add_argument('-b', '--board-name',
                       dest='boards', required=True, nargs=1,
@@ -103,7 +108,7 @@ def makeConfig(name, version, cmdline_args):
     # Read in PCBmodE's configuration file. Look for it in the
     # calling directory, and then where the script is
     msg.info("Processing PCBmodE's configuration file")
-    paths = [os.path.join(os.getcwdu()), # project dir
+    paths = [os.path.join(getcwd()), # project dir
              os.path.join(os.path.dirname(os.path.realpath(__file__)))] # script dir
 
     filenames = ''
@@ -386,11 +391,11 @@ def main():
                             'paths_db.json')
 
     try:
-        f = open(filename, 'wb')
+        f = open(filename, 'w')
     except IOError as e:
-        print "I/O error({0}): {1}".format(e.errno, e.strerror)
+        print("I/O error({0}): {1}".format(e.errno, e.strerror))
  
-    f.write(json.dumps(config.pth, sort_keys=True, indent=2))
+    json.dump(config.pth, f, sort_keys=True, indent=2)
     f.close()
 
     msg.info("Done!")

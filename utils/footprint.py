@@ -6,16 +6,16 @@ import json
 from lxml import etree as et
 
 import config
-import messages as msg
+from . import messages as msg
 
 # pcbmode modules
-import svg 
-import utils
-import place
+from . import svg 
+from . import utils
+from . import place
 import copy
-from style import Style
-from point import Point
-from shape import Shape
+from .style import Style
+from .point import Point
+from .shape import Shape
 
 
 

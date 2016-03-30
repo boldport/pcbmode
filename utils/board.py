@@ -1,8 +1,8 @@
 #!/usr/bin/python
 
 import config
-import messages as msg
-from module import Module
+from . import messages as msg
+from .module import Module
 
 
 
