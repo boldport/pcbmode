@@ -24,7 +24,8 @@ The folder in which *PCBmodE* looks for a font is defined in the the configurati
       }
     }
 
-When looking for a font file, *PCBmodE* will first look at the local project folder and then where ``pcbmode.py`` is. 
+When looking for a font file, *PCBmodE* will first look at the local
+project folder and then the *PCBmodE*'s installation directory (``<PYTHONPATH>/lib/site-packages/pcbmode/``).
 
 .. tip:: When you find a font that you'd like to use, search for an SVG version of it. Many fonts at http://www.fontsquirrel.com have an SVG version for download.
 

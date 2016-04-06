@@ -7,15 +7,71 @@ Setup
 What you'll need
 ================
 
-* Linux
-* Python 2.7 + PyParsing package
+* Python 2.7
 * Inkscape
 * Text editor
+
+Installation with ``pip``
+=========================
+
+System packages for `python-parsing` and `python-lxml` are
+required. If they aren't already installed, pip will attempt to build
+them. See `Installation with virtualenv` for information on the
+required development packages.
+
+.. tip:: You'll need root permissions to install pcbmode
+	 system-wide. Be sure to use sudo/su as needed.
+
+.. code-block:: bash
+
+		pip install pcbmode
+
+`or`
+
+.. code-block:: bash
+
+		easy_install pcbmode
+
+Often it's helpful to segregate applications to their own virtual
+environments. As a bonus, root permissions are not required.
+
+.. tip:: To use virtualenv you will need to build the python-lxml
+	 package. For this to succeed, you'll need to install the
+	 development packages for several programs and libraries. On
+	 Ubuntu, this looks like: ``apt-get install libxml2-dev
+	 libxslt1-dev python-dev``
+
+.. code-block:: bash
+
+		virtualenv pcbmode-env
+		. pcbmode-env/bin/activate
+		pip install pcbmode
+
+Installation from Source
+========================
+
+Fetch the *PCBModE* source. Stable snapshots are available at `https://github.com/boldport/pcbmode/releases
+<https://github.com/boldport/pcbmode/releases>`_. The latest
+development sources are available via git:
+
+``git clone https://github.com/boldport/pcbmode.git``
+
+.. code-block:: bash
+
+		cd pcbmode
+		virtualenv env          # Virtualenv is
+		. env/bin/activate      # Optional
+		python setup.py install # Use sudo/su if needed (e.g. not using virtualenv)
+
+After installation, PCBmodE will be available in your path as
+``pcbmode``. If you are using `virtualenv`, the ``pcbmode`` command
+will only be available in your path after ``. env/bin/activate`` and
+will no longer be in your path after running ``deactivate``.
 
 Setup
 =====
 
-.. tip:: To see all the options that *PCBmodE* supports, use ``python pcbmode.py --help``
+.. tip:: To see all the options that *PCBmodE* supports, use ``pcbmode --help``
 
 By default *PCBmodE* expects to find the board files under
 
@@ -41,7 +97,7 @@ Here's one way to organise the build environment
 
 To make the ``hello-solder`` board, run *PCBmodE* within ``cool-pcbs``
 
-    python PCBmodeE/pcbmode.py -b hello-solder -m
+    pcbmode -b hello-solder -m
 
 Then open the SVG with Inkscape
 
