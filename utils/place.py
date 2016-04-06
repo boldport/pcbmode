@@ -2,7 +2,7 @@
 
 from lxml import etree as et
 
-import pcbmode.config as config
+import config
 import messages as msg
 
 # pcbmode modules

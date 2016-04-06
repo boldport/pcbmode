@@ -2,7 +2,7 @@
 
 import os
 
-import pcbmode.config as config
+import config
 import copy
 import messages as msg
 

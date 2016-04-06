@@ -9,7 +9,7 @@ import re
 #import HTMLParser # required for HTML to unicode translation
 #from lxml import etree as et
 
-import pcbmode.config as config
+import config
 
 # pcbmode modules
 #from point import Point
