@@ -9,8 +9,6 @@ from operator import itemgetter # for sorting lists by dict value
 import HTMLParser # required for HTML to unicode translation
 from lxml import etree as et
 
-from pkg_resources import get_distribution
-
 import pcbmode.config as config
 
 # pcbmode modules
@@ -101,7 +99,15 @@ def toPoint(coord=[0, 0]):
 
 def get_git_revision():
 
-    return get_distribution('pcbmode').version
+    path = os.path.dirname(os.path.realpath(__file__))
+    command = [path, 'git', 'describe', '--tags', '--long']
+
+    try:
+        rev = subp.check_output(command)
+    except:
+        rev = 'unknown'
+
+    return rev
 
 
 

@@ -4,8 +4,6 @@ import os
 import json
 import argparse
 
-from pkg_resources import resource_filename, resource_exists
-
 # PCBmodE modules
 import config
 import utils.utils as utils
@@ -105,15 +103,12 @@ def makeConfig(name, version, cmdline_args):
     # Read in PCBmodE's configuration file. Look for it in the
     # calling directory, and then where the script is
     msg.info("Processing PCBmodE's configuration file")
-    paths = [os.path.join(os.getcwdu(), cmdline_args.config_file)]
-
-    config_resource = (__name__, 'pcbmode_config.json')
-    if resource_exists(*config_resource):
-        paths.append(resource_filename(*config_resource))
+    paths = [os.path.join(os.getcwdu()), # project dir
+             os.path.join(os.path.dirname(os.path.realpath(__file__)))] # script dir
 
     filenames = ''
     for path in paths:
-        filename = path
+        filename = os.path.join(path, cmdline_args.config_file)
         filenames += "  %s \n" % filename
         if os.path.isfile(filename):
             config.cfg = utils.dictFromJsonFile(filename)
@@ -154,23 +149,20 @@ def makeConfig(name, version, cmdline_args):
     # where the script it
     layout_style = config.brd['config']['style-layout']
     layout_style_filename = 'layout.json'
-    paths = [os.path.join(config.cfg['base-dir'],
-                          config.cfg['locations']['styles'],
-                          layout_style, layout_style_filename)] # project dir
-
-    style_resource = (__name__, '/'.join(['styles', layout_style, layout_style_filename]))
-    if resource_exists(*style_resource):
-        paths.append(resource_filename(*style_resource))
+    paths = [os.path.join(config.cfg['base-dir']), # project dir
+             os.path.join(os.path.dirname(os.path.realpath(__file__)))] # script dir
 
     filenames = ''
     for path in paths:
-        filename = path
+        filename = os.path.join(path, config.cfg['locations']['styles'],
+                                layout_style, 
+                                layout_style_filename)
         filenames += "  %s \n" % filename
         if os.path.isfile(filename):
             config.stl['layout'] = utils.dictFromJsonFile(filename)
             break
 
-    if not 'layout' in config.stl or config.stl['layout'] == {}:
+    if config.stl['layout'] == {}:
         msg.error("Couldn't find style file %s. Looked for it here:\n%s" % (layout_style_filename, filenames))
 
     #-------------------------------------------------------------
@@ -181,15 +173,13 @@ def makeConfig(name, version, cmdline_args):
     except:
         stackup_filename = 'two-layer.json'
 
-    paths = [os.path.join(config.cfg['base-dir'], config.cfg['locations']['stackups'], stackup_filename)] # project dir
-
-    stackup_resource = (__name__, '/'.join(['stackups', stackup_filename]))
-    if resource_exists(*stackup_resource):
-        paths.append(resource_filename(*stackup_resource))
+    paths = [os.path.join(config.cfg['base-dir']), # project dir
+             os.path.join(os.path.dirname(os.path.realpath(__file__)))] # script dir
 
     filenames = ''
     for path in paths:
-        filename = path
+        filename = os.path.join(path, config.cfg['locations']['stackups'],
+                                stackup_filename)
         filenames += "  %s \n" % filename
         if os.path.isfile(filename):
             config.stk = utils.dictFromJsonFile(filename)
