@@ -15,7 +15,7 @@ setup(
 
     # metadata for upload to PyPI
     author = "Saar Drimer",
-    author_email = "saar@gmail.com",
+    author_email = "saardrimer@gmail.com",
     description = "A printed circuit board design tool with a twist",
     license = "MIT",
     keywords = "pcb svg eda pcbmode",
