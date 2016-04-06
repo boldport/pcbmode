@@ -4,12 +4,12 @@ import os
 import re
 from lxml import etree as et
 
-import config
-import messages as msg
+import pcbmode.config as config
+from . import messages as msg
 
 # pcbmode modules
-import utils
-from point import Point
+from . import utils
+from .point import Point
 
 
 

@@ -4,15 +4,22 @@ import os
 import json
 import argparse
 
+try:
+    from os import getcwdu as getcwd
+except:
+    from os import getcwd as getcwd
+
+from pkg_resources import resource_filename, resource_exists
+
 # PCBmodE modules
-import config
-import utils.utils as utils
-import utils.gerber as gerber
-import utils.extract as extract
-import utils.excellon as excellon
-import utils.messages as msg
-import utils.bom as bom
-from utils.board import Board
+from . import config
+from .utils import utils
+from .utils import gerber
+from .utils import extract
+from .utils import excellon
+from .utils import messages as msg
+from .utils import bom
+from .utils.board import Board
 
 
 def cmdArgSetup(pcbmode_version):
@@ -27,7 +34,7 @@ def cmdArgSetup(pcbmode_version):
     
     # commandline argument settings and parsing
     argp = argparse.ArgumentParser(description=description, 
-                      add_help=True, version=pcbmode_version, epilog=epilog)
+                      add_help=True, epilog=epilog)
      
     argp.add_argument('-b', '--board-name',
                       dest='boards', required=True, nargs=1,
@@ -103,12 +110,16 @@ def makeConfig(name, version, cmdline_args):
     # Read in PCBmodE's configuration file. Look for it in the
     # calling directory, and then where the script is
     msg.info("Processing PCBmodE's configuration file")
-    paths = [os.path.join(os.getcwdu()), # project dir
-             os.path.join(os.path.dirname(os.path.realpath(__file__)))] # script dir
+
+    paths = [os.path.join(os.getcwd(), cmdline_args.config_file)]
+
+    config_resource = (__name__, 'pcbmode_config.json')
+    if resource_exists(*config_resource):
+        paths.append(resource_filename(*config_resource))
 
     filenames = ''
     for path in paths:
-        filename = os.path.join(path, cmdline_args.config_file)
+        filename = path
         filenames += "  %s \n" % filename
         if os.path.isfile(filename):
             config.cfg = utils.dictFromJsonFile(filename)
@@ -149,20 +160,23 @@ def makeConfig(name, version, cmdline_args):
     # where the script it
     layout_style = config.brd['config']['style-layout']
     layout_style_filename = 'layout.json'
-    paths = [os.path.join(config.cfg['base-dir']), # project dir
-             os.path.join(os.path.dirname(os.path.realpath(__file__)))] # script dir
+    paths = [os.path.join(config.cfg['base-dir'],
+                          config.cfg['locations']['styles'],
+                          layout_style, layout_style_filename)] # project dir
+
+    style_resource = (__name__, '/'.join(['styles', layout_style, layout_style_filename]))
+    if resource_exists(*style_resource):
+        paths.append(resource_filename(*style_resource))
 
     filenames = ''
     for path in paths:
-        filename = os.path.join(path, config.cfg['locations']['styles'],
-                                layout_style, 
-                                layout_style_filename)
+        filename = path
         filenames += "  %s \n" % filename
         if os.path.isfile(filename):
             config.stl['layout'] = utils.dictFromJsonFile(filename)
             break
 
-    if config.stl['layout'] == {}:
+    if not 'layout' in config.stl or config.stl['layout'] == {}:
         msg.error("Couldn't find style file %s. Looked for it here:\n%s" % (layout_style_filename, filenames))
 
     #-------------------------------------------------------------
@@ -173,13 +187,15 @@ def makeConfig(name, version, cmdline_args):
     except:
         stackup_filename = 'two-layer.json'
 
-    paths = [os.path.join(config.cfg['base-dir']), # project dir
-             os.path.join(os.path.dirname(os.path.realpath(__file__)))] # script dir
+    paths = [os.path.join(config.cfg['base-dir'], config.cfg['locations']['stackups'], stackup_filename)] # project dir
+
+    stackup_resource = (__name__, '/'.join(['stackups', stackup_filename]))
+    if resource_exists(*stackup_resource):
+        paths.append(resource_filename(*stackup_resource))
 
     filenames = ''
     for path in paths:
-        filename = os.path.join(path, config.cfg['locations']['stackups'],
-                                stackup_filename)
+        filename = path
         filenames += "  %s \n" % filename
         if os.path.isfile(filename):
             config.stk = utils.dictFromJsonFile(filename)
@@ -386,11 +402,11 @@ def main():
                             'paths_db.json')
 
     try:
-        f = open(filename, 'wb')
+        f = open(filename, 'w')
     except IOError as e:
-        print "I/O error({0}): {1}".format(e.errno, e.strerror)
+        print("I/O error({0}): {1}".format(e.errno, e.strerror))
  
-    f.write(json.dumps(config.pth, sort_keys=True, indent=2))
+    json.dump(config.pth, f, sort_keys=True, indent=2)
     f.close()
 
     msg.info("Done!")

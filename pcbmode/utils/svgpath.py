@@ -4,13 +4,13 @@ from math import sqrt, ceil
 import pyparsing as PYP
 import re
 
-import config
-import messages as msg
+import pcbmode.config as config
+from . import messages as msg
 
 # import pcbmode modules
-import utils
-import svg 
-from point import Point
+from . import utils
+from . import svg
+from .point import Point
 
 
 
@@ -609,7 +609,7 @@ class SvgPath():
                 pass
      
             else:
-                print "ERROR: found an unsupported SVG path command " + str(path[i][0])
+                print("ERROR: found an unsupported SVG path command " + str(path[i][0]))
 
         self._bbox_top_left = bbox_top_left
         self._bbox_bot_right = bbox_bot_right        

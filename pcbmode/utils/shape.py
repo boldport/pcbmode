@@ -4,14 +4,16 @@ import os
 import copy
 from lxml import etree as et
 
-import config
-import messages as msg
+from pkg_resources import resource_exists, resource_filename
+
+import pcbmode.config as config
+from . import messages as msg
 
 # import pcbmode modules
-import utils as utils
-import svg
-from point import Point
-from svgpath import SvgPath
+from . import utils
+from . import svg
+from .point import Point
+from .svgpath import SvgPath
 
 
 
@@ -72,18 +74,21 @@ class Shape():
 
             # Get the font's name
             font = self._shape_dict.get('font-family') or config.stl['layout']['defaults']['font-family']
+            font_filename = "%s.svg" % font
 
             # Search for the font SVG in these paths
-            paths = [os.path.join(config.cfg['base-dir']),
-                     os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')]
+            paths = [os.path.join(config.cfg['base-dir'],
+                                  config.cfg['locations']['fonts'],
+                                  font_filename)]
 
-            font_filename = "%s.svg" % font
+            font_resource = ('pcbmode', '/'.join(['fonts',font_filename]))
+            if resource_exists(*font_resource):
+                paths.append(resource_filename(*font_resource))
+
             filenames = ''
             font_data = None
             for path in paths:
-                filename = os.path.join(path,
-                                        config.cfg['locations']['fonts'],
-                                        font_filename)
+                filename = path
                 filenames += "  %s \n" % filename
                 if os.path.isfile(filename):
                     font_data = et.ElementTree(file=filename)

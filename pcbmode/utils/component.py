@@ -2,16 +2,15 @@
 
 import os
 
-import config
+import pcbmode.config as config
 import copy
-import messages as msg
 
 # pcbmode modules
-import utils
-import messages as msg
-from shape import Shape
-from style import Style
-from footprint import Footprint
+from . import utils
+from . import messages as msg
+from .shape import Shape
+from .style import Style
+from .footprint import Footprint
 
 
 
