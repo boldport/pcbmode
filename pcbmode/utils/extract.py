@@ -164,7 +164,7 @@ def extractRefdefs(svg_in):
             try:
                 tmp = refdef_dict['silkscreen']
             except:
-                comp_dict['silkscreen'] = {}
+                refdef_dict['silkscreen'] = {}
  
             try:
                 tmp = refdef_dict['silkscreen']['refdef']
