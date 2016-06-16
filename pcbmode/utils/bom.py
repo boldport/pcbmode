@@ -98,8 +98,6 @@ def make_bom(quantity=None):
                 bom_dict[description] = fp_bom_dict
                 bom_dict[description]['refdefs'] = []
             bom_dict[description]['refdefs'].append(refdef)
-            
-            bom_dict[description]['placement'] = components_dict[refdef]['layer']
     
 
     try:
@@ -155,11 +153,7 @@ def make_bom(quantity=None):
                   "search-url": "https://octopart.com/search?q="
                 }
               ]
-            }, 
-            {
-              "field": "placement",
-              "text": "Layer"
-            }, 
+            },
             {
               "field": "notes",
               "text": "Notes"
@@ -216,7 +210,6 @@ def make_bom(quantity=None):
         html.append('    <th class="tg-header">%s</th>' % item)
     html.append('  </tr>')
     
-
     uncateg_content = []
     dnp_content = []
     index = 1
