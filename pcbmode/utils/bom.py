@@ -256,6 +256,12 @@ def make_bom(quantity=None):
                 content.append("%s " % refdefs)
             elif item['field'] == 'description':
                 content.append("%s " % desc)
+            elif item['field'] == 'part-number':
+                try:
+                    number = bom_dict[desc][item['field']]
+                except:
+                    number = ""
+                content.append('<span style="white-space:nowrap">%s</span>' % number)
             else:
                 try:
                     content.append(bom_dict[desc][item['field']])
