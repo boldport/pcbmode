@@ -207,14 +207,17 @@ def make_bom(quantity=None):
     html.append('  </tr>') 
     html.append('  <tr>')
     for item in header:
-        html.append('    <th class="tg-header">%s</th>' % item)
+        if item == 'Designators':
+            html.append('    <th class="tg-header-des">%s</th>' % item)
+        else:
+            html.append('    <th class="tg-header">%s</th>' % item)
     html.append('  </tr>')
     
     uncateg_content = []
     dnp_content = []
     index = 1
 
-    for desc in bom_dict:
+    for desc in sorted(bom_dict):
         content = []
         for item in bom_content:
             if item['field'] == 'line-item':
