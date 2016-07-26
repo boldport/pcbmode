@@ -3,12 +3,12 @@
 import os
 import json
 
-import config
-import messages as msg
+import pcbmode.config as config
+from . import messages as msg
 
 # pcbmode modules
-import utils
-from point import Point
+from . import utils
+from .point import Point
 
 
 
@@ -164,7 +164,7 @@ def extractRefdefs(svg_in):
             try:
                 tmp = refdef_dict['silkscreen']
             except:
-                comp_dict['silkscreen'] = {}
+                refdef_dict['silkscreen'] = {}
  
             try:
                 tmp = refdef_dict['silkscreen']['refdef']
@@ -336,6 +336,8 @@ def extractRouting(svg_in):
             vias_dict[digest]['location'] = [utils.niceFloat(location.x),
                                              utils.niceFloat(location.y)]
             vias_dict[digest]['layer'] = 'top'
+            vias_dict[digest]['silkscreen'] = {'refdef':{'show':False}}
+            vias_dict[digest]['assembly'] = {'refdef':{'show':False}}
 
 
     routing_dict['vias'] = vias_dict

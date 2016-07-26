@@ -3,20 +3,27 @@
 import os
 import datetime
 import copy
+import sys
 from lxml import etree as et
 
-import config
-import messages as msg
+import pcbmode.config as config
+from . import messages as msg
 
-import svg
-import utils
-import place
-import HTMLParser
+from . import svg
+from . import utils
+from . import place
 
-from shape import Shape
-from style import Style
-from component import Component
-from point import Point
+try:
+    # Python 3
+    import html.parser as HTMLParser
+except:
+    # Python 2
+    import HTMLParser
+
+from .shape import Shape
+from .style import Style
+from .component import Component
+from .point import Point
 
 
 
@@ -83,7 +90,7 @@ class Module():
         self._placeComponents(components=self._components, 
                               component_type='component',
                               print_refdef=True)
-        print
+        sys.stdout.write("\n")
 
         msg.subInfo('Placing routes')
         self._placeRouting()
@@ -132,7 +139,7 @@ class Module():
         try:
             f = open(output_file, 'wb')
         except IOError as e:
-            print "I/O error({0}): {1}".format(e.errno, e.strerror)
+            print("I/O error({0}): {1}".format(e.errno, e.strerror))
      
         f.write(et.tostring(svg_doc, pretty_print=True))
         f.close()
@@ -251,7 +258,7 @@ class Module():
             refdef = component.getRefdef()
 
             if print_refdef == True:
-                print refdef,
+                sys.stdout.write("%s " % refdef)
 
             # If the component is placed on the bottom layer we need
             # to invert the shapes AND their 'x' coordinate.  This is
@@ -314,7 +321,6 @@ class Module():
                                             'pad',
                                             original=False,
                                             mirror=invert)
-
 
                 # Pours
                 shapes = shapes_dict['pours'].get(pcb_layer) or []
@@ -435,7 +441,6 @@ class Module():
                                            str(shape.getDiameter()))
 
 
-                
             # Place component origin marker
             svg_layer = self._layers[placement_layer]['placement']['layer']
 

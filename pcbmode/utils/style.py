@@ -1,10 +1,12 @@
 #!/usr/bin/python
 
-import config
-import messages as msg
+import pcbmode.config as config
+from . import messages as msg
+
+
 
 # import pcbmode modules
-import utils
+from . import utils
 
 
 

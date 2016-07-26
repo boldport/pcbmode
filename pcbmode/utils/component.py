@@ -2,16 +2,15 @@
 
 import os
 
-import config
+import pcbmode.config as config
 import copy
-import messages as msg
 
 # pcbmode modules
-import utils
-import messages as msg
-from shape import Shape
-from style import Style
-from footprint import Footprint
+from . import utils
+from . import messages as msg
+from .shape import Shape
+from .style import Style
+from .footprint import Footprint
 
 
 
@@ -145,9 +144,12 @@ class Component():
                 # important that this is added at the very end since the
                 # placement process assumes the refdef is last
                 try:
-                    footprint_shapes[sheet][layer].append(refdef_shape)
+                    footprint_shapes[sheet][layer]
                 except:
-                    continue
+                    footprint_shapes[sheet][layer] = []
+
+                footprint_shapes[sheet][layer].append(refdef_shape)
+                    
 
         #------------------------------------------------------
         # Invert layers

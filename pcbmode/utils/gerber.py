@@ -5,14 +5,14 @@ import re
 from lxml import etree as et
 import pyparsing as pyp
 
-import config
-import messages as msg
+import pcbmode.config as config
+from . import messages as msg
 
 # pcbmode modules
-import svg
-import utils
-from svgpath import SvgPath
-from point import Point
+from . import svg
+from . import utils
+from .svgpath import SvgPath
+from .point import Point
 
 
 
@@ -770,7 +770,7 @@ def gerbers_to_svg(manufacturer='default'):
                         tmp['height'] = line['aperture_definition']['height']
                         tmp['number'] = line['aperture_definition']['number']
                     else:
-                        print "ERROR: cannot recognise aperture definition type"
+                        print("ERROR: cannot recognise aperture definition type")
                     
                     if gerber_dict.get('aperture-definitions') is None:
                         gerber_dict['aperture-definitions'] = []
@@ -861,10 +861,10 @@ def gerbers_to_svg(manufacturer='default'):
         board_shape_path = shape.get('value')
         board_shape_gerber_lp = shape.get('gerber_lp')
         if board_shape_path is None:
-            print "ERROR: couldn't find a path under key 'value' for board outline"
+            print("ERROR: couldn't find a path under key 'value' for board outline")
 
     else:
-        print "ERROR: unrecognised board shape type: %s. Possible options are 'rect' or 'path'" % board_shape_type
+        print("ERROR: unrecognised board shape type: %s. Possible options are 'rect' or 'path'" % board_shape_type)
 
     # convert path to relative
     board_shape_path_relative = svg.absolute_to_relative_path(board_shape_path)
@@ -921,7 +921,7 @@ def gerbers_to_svg(manufacturer='default'):
         gerber_svg = create_gerber_svg_data(gerber_data)
         gerber_svg_layer = gerber_layers[foil]['layer']
         gerber_svg_layer.append(gerber_svg)
-        print foil
+        print(foil)
 
         
     #for pcb_layer in utils.getSurfaceLayers():
@@ -933,7 +933,7 @@ def gerbers_to_svg(manufacturer='default'):
             gerber_svg = create_gerber_svg_data(gerber_data)
             gerber_svg_layer = gerber_layers[pcb_layer][foil]['layer']
             gerber_svg_layer.append(gerber_svg)
-            print foil
+            print(foil)
 
 
     output_file = os.path.join(config.cfg['base-dir'], config.cfg['locations']['build'], cfg['board_name'] + '_gerber.svg')
@@ -941,7 +941,7 @@ def gerbers_to_svg(manufacturer='default'):
     try:
         f = open(output_file, 'wb')
     except IOError as e:
-        print "I/O error({0}): {1}".format(e.errno, e.strerror)
+        print("I/O error({0}): {1}".format(e.errno, e.strerror))
 
     f.write(et.tostring(doc, pretty_print=True))
     f.close()

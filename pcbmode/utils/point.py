@@ -6,7 +6,7 @@ import decimal
 DEG2RAD = 2 * pi / 360
 
 
-class Point():
+class Point:
   
     def __init__(self, x=0, y=0):
         self.x = float(x)
