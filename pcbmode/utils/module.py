@@ -326,12 +326,12 @@ class Module():
                 shapes = shapes_dict['pours'].get(pcb_layer) or []
                 try:
                     svg_layer = self._layers[pcb_layer]['conductor']['pours']['layer']
-                    shape_group = et.SubElement(svg_layer, 'g',
-                                                mask='url(#mask-%s)' % pcb_layer)
                 except:
                     svg_layer = None
 
                 if len(shapes) > 0 and svg_layer != None:
+                    shape_group = et.SubElement(svg_layer, 'g',
+                                                mask='url(#mask-%s)' % pcb_layer)
                     transform = "translate(%s,%s)" % (location[0],
                                                       config.cfg['invert-y']*location[1])
                     group = et.SubElement(shape_group, 'g', transform=transform)
