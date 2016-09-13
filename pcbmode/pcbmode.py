@@ -19,6 +19,7 @@ from .utils import extract
 from .utils import excellon
 from .utils import messages as msg
 from .utils import bom
+from .utils import coord_file
 from .utils.board import Board
 
 
@@ -91,6 +92,10 @@ def cmdArgSetup(pcbmode_version):
     argp.add_argument('--renumber-refdefs', nargs='?',
                       dest='renumber', default=False,
                       help="Renumber refdefs (valid options are 'top-to-bottom' (default), 'bottom-to-top', 'left-to-right', 'right-to-left'")
+
+    argp.add_argument('--make-coord-file', nargs='?',
+                      dest='coord_file', default=False,
+                      help="Create a simple placement coordinate CSV file")
 
     argp.add_argument('--make-bom', nargs='?',
                       dest='make_bom', default=False, 
@@ -371,6 +376,9 @@ def main():
     # Create a BoM
     elif cmdline_args.make_bom is not False:
         bom.make_bom(cmdline_args.make_bom)
+
+    elif cmdline_args.coord_file is not False:
+        coord_file.makeCoordFile(cmdline_args.coord_file)
 
     else:
         # make the board
