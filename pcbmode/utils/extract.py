@@ -335,7 +335,7 @@ def extractRouting(svg_in):
             vias_dict[digest]['footprint'] = marker.get('{'+config.cfg['ns']['pcbmode']+'}footprint')
             vias_dict[digest]['location'] = [utils.niceFloat(location.x),
                                              utils.niceFloat(location.y)]
-            vias_dict[digest]['layer'] = 'top'
+            vias_dict[digest]['layer'] = pcb_layer
             vias_dict[digest]['silkscreen'] = {'refdef':{'show':False}}
             vias_dict[digest]['assembly'] = {'refdef':{'show':False}}
 
