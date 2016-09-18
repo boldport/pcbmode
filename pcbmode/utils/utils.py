@@ -642,7 +642,8 @@ def parseTransform(transform):
         data['type'] = 'translate'
         data['location'] = Point()
     elif 'translate' in transform.lower():
-        regex = r".*?translate\s?\(\s?(?P<x>-?[0-9]*\.?[0-9]+)\s?[\s,]\s?(?P<y>-?[0-9]*\.?[0-9]+\s?)\s?\).*"
+        regex = r".*?translate\s?\(\s?(?P<x>[+-]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)\s?[\s,]\s?(?P<y>[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)\s?\).*"
+#       regex = r".*?translate\s?\(\s?(?P<x>-?[0-9]*\.?[0-9]+)\s?[\s,]\s?(?P<y>-?[0-9]*\.?[0-9]+\s?)\s?\).*"
         coord = re.match(regex, transform)
         data['type'] = 'translate'
         x = coord.group('x')
@@ -652,7 +653,7 @@ def parseTransform(transform):
         data['type'] = 'matrix'
         data['location'], data['rotate'], data['scale'] = parseSvgMatrix(transform)
     else:
-        msg.error("Found a path transform that cannot be handled, %s. SVG stansforms shouls be in the form of 'translate(num,num)' or 'matrix(num,num,num,num,num,num)" % transform)
+        msg.error("Found a path transform that cannot be handled, %s. SVG stansforms should be in the form of 'translate(num,num)' or 'matrix(num,num,num,num,num,num)" % transform)
 
     return data 
 
