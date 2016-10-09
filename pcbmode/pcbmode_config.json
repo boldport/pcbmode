@@ -142,41 +142,6 @@
         }
       }
     },
-    "hackvana":
-    {
-      "filenames":
-      {
-        "gerbers":
-        {
-          "top":
-          {
-            "conductor": {"ext": "gtl"},
-            "soldermask": {"ext": "gts"},
-            "silkscreen": {"ext": "gto"}
-          },
-          "bottom":
-          {
-            "conductor": {"ext": "gbl"},
-            "soldermask": {"ext": "gbs"},
-            "silkscreen": {"ext": "gbo"}  
-          },
-          "other":
-   	  {
-            "documentation": {"ext": "gbr"},
-            "outline": {"ext": "gbr"}
-          }
-        },
-        "drills":
-        {
-          "plated": {"ext": "drl"},
-          "non-plated": {"end": "_NPTH", "ext": "drl"}
-        },
-        "text":
-	{
-          "readme": {"ext": "txt"}
-        }
-      }
-    },
     "oshpark":
     {
       "filenames":
