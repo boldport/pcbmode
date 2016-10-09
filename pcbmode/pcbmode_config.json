@@ -153,7 +153,7 @@
             "conductor": {"ext": "GTL"},
             "soldermask": {"ext": "GTS"},
             "silkscreen": {"ext": "GTO"},
-            "solderpaste": {"ext": "ger"}
+            "solderpaste": {"ext": "GTP"}
           },
           "internal":
           {
@@ -164,7 +164,7 @@
             "conductor": {"ext": "GBL"},
             "soldermask": {"ext": "GBS"},
             "silkscreen": {"ext": "GBO"},
-            "solderpaste": {"ext": "ger"}  
+            "solderpaste": {"ext": "GBP"}  
           },
           "other":
    	  {
