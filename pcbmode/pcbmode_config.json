@@ -182,6 +182,47 @@
           "readme": {"ext": "txt"}
         }
       }
+    },
+    "dirtypcb":
+    {
+      "filenames":
+      {
+	"gerbers":
+	{
+	  "top":
+	  {
+	    "copper": {"ext": "gtl"},
+	    "soldermask": {"ext": "gts"},
+	    "silkscreen": {"ext": "gto"},
+	    "solderpaste": {"ext": "gtp"}
+	  },
+          "internal":
+          {
+            "conductor": {"ext": "ger"}
+          },
+	  "bottom":
+	  {
+	    "copper": {"ext": "gbl"},
+	    "soldermask": {"ext": "gbs"},
+	    "silkscreen": {"ext": "gbo"},
+	    "solderpaste": {"ext": "gbp"}
+	  },
+	  "other":
+	  {
+	    "documentation": {"ext": "ger"},
+	    "outline": {"ext": "gbr"}
+	  }
+	},
+	"drills":
+	{
+	  "plated": {"ext": "txt"},
+	  "non-plated": {"ext": "txt"}
+	},
+	"text":
+	{
+	  "readme": {"ext": "txt"}
+	}
+      }
     }
   }
 }
