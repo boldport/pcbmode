@@ -29,7 +29,7 @@ packages. On Debian based systems these are installed like this:
 
 .. code-block:: bash
 
-                sudo apt-get install libxml2-dev libxslt1-dev python-dev
+		sudo apt-get install libxml2-dev libxslt1-dev python-dev libpq-dev libldap2-dev libsasl2-dev libffi-dev 
 
 Fetch the *PCBModE* source. Stable snapshots are available at
 `https://github.com/boldport/pcbmode/releases
