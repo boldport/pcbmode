@@ -9,7 +9,7 @@ The 'hello-solder' is a fun design for learn how *PCBmodE* by example.
 Setup
 =====
 
-Get the boards repository from `here <https://github.com/boldport/boards>`_ and follow the instructions :doc:`setup` to 'compile' the board. This command should do it
+Get the 'hello-solder' repository from `here <https://github.com/boldport/hello-solder>`_ and follow the instructions :doc:`setup` to 'compile' the board. This command should do it
 
     ``pcbmode -b hello-solder -m``
 
