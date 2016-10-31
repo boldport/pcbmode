@@ -452,10 +452,15 @@ class Module():
             except:
                 return
 
+            # Add PCBmodE information, useful for when extracting
             group.set('{'+config.cfg['ns']['pcbmode']+'}type', component_type)
             group.set('{'+config.cfg['ns']['pcbmode']+'}footprint', component.getFootprintName())
             if (component_type == 'component') or (component_type == 'shape'):
                 group.set('{'+config.cfg['ns']['pcbmode']+'}refdef', refdef)
+            elif (component_type == 'via'):
+                group.set('{'+config.cfg['ns']['pcbmode']+'}id', refdef)
+            else:
+                pass
 
             path = svg.placementMarkerPath()
             transform = "translate(%s,%s)" % (location[0],
