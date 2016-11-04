@@ -67,6 +67,50 @@ Nothing is installed globally, so to start from scratch you can just follow thes
                 cd pcbmode
                 git clean -dfX     # erases any untracked files (build files etc). save your work!
 
+
+Installation on Windows
+========================================
+
+Only Linux is officially supported, so consider this experimental,
+and prone to breaking at any time.
+
+Start with the dependencies:
+
+Make sure you have Python 2.7.9 or later, this is the first Windows
+version with pip bundled. It's also assumed that Python has been
+added to the system path.
+
+Install Lxml:
+Download an appropriate binary `here <http://www.lfd.uci.edu/~gohlke/pythonlibs/#lxml>`_.
+
+Confusingly enough, the default Python install is a 32-bit version,
+even when installed on a 64-bit version, so you probably want
+*lxml-3.6.4-cp27-cp27m-win32.whl*
+
+Then upgrade pip and install the Lxml wheel:
+
+.. code-block:: bash
+
+                cd path\to\downloads
+                python -m pip install --upgrade pip
+                python -m pip install lxml-3.6.4-cp27-cp27m-win32.whl
+
+
+Fetch the *PCBModE* source. Stable snapshots are available at
+`https://github.com/boldport/pcbmode/releases
+<https://github.com/boldport/pcbmode/releases>`_. The latest
+development sources are available via git:
+
+.. code-block:: bash
+
+                git clone https://github.com/boldport/pcbmode.git
+                cd pcbmode
+                python setup.py install
+
+                
+There will now be a ``pcbmode.exe`` in your ``C:\Python27\Scripts`` directory.
+Add this to the system path, or use the whole path whenever you call PCBmodE.
+                
 Running PCBmodE
 ===============
 
