@@ -207,7 +207,7 @@ def extractRouting(svg_in):
     try:
         routing_dict_old = utils.dictFromJsonFile(output_file, False)
     except:
-        routing_dict_old = {'routes': {}} 
+        routing_dict_old = {'routes': {}, 'vias': {}} 
 
     #---------------
     # Extract routes
@@ -326,6 +326,8 @@ def extractRouting(svg_in):
             if transform_data['type'] == 'matrix':
                 rotate = transform_data['rotate']
                 rotate = utils.niceFloat((rotate) % 360)
+            else:
+                rotate = 0
                 
             digest = utils.digest("%s%s" % (location.x, location.y))
 
@@ -338,6 +340,24 @@ def extractRouting(svg_in):
             vias_dict[digest]['layer'] = pcb_layer
             vias_dict[digest]['silkscreen'] = {'refdef':{'show':False}}
             vias_dict[digest]['assembly'] = {'refdef':{'show':False}}
+
+
+            # Get the vis's ID
+            try:
+                via_id = marker.get('{'+config.cfg['ns']['pcbmode']+'}id')
+            except:
+                via_id = None
+
+            # Apply existing rotation
+            if via_id != None:
+                try:
+                    old_via_rotate = routing_dict_old['vias'][via_id]['rotate']
+                except:
+                    old_via_rotate = 0
+
+                vias_dict[digest]['rotate'] = old_via_rotate + rotate
+            
+
 
 
     routing_dict['vias'] = vias_dict
