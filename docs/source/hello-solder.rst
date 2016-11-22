@@ -11,7 +11,7 @@ Setup
 
 Get the boards repository from `here <https://github.com/boldport/boards>`_ and follow the instructions :doc:`setup` to 'compile' the board. This command should do it
 
-    ``python pcbmode/pcbmode.py -b hello-solder -m``
+    ``pcbmode -b hello-solder -m``
 
 
 .. info:: *PCBmodE* caches some of the heavy computations in a file in the ``build`` directory, so subsequent invocations will run much faster.
