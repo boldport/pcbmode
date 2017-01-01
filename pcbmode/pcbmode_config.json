@@ -142,41 +142,6 @@
         }
       }
     },
-    "hackvana":
-    {
-      "filenames":
-      {
-        "gerbers":
-        {
-          "top":
-          {
-            "conductor": {"ext": "gtl"},
-            "soldermask": {"ext": "gts"},
-            "silkscreen": {"ext": "gto"}
-          },
-          "bottom":
-          {
-            "conductor": {"ext": "gbl"},
-            "soldermask": {"ext": "gbs"},
-            "silkscreen": {"ext": "gbo"}  
-          },
-          "other":
-   	  {
-            "documentation": {"ext": "gbr"},
-            "outline": {"ext": "gbr"}
-          }
-        },
-        "drills":
-        {
-          "plated": {"ext": "drl"},
-          "non-plated": {"end": "_NPTH", "ext": "drl"}
-        },
-        "text":
-	{
-          "readme": {"ext": "txt"}
-        }
-      }
-    },
     "oshpark":
     {
       "filenames":
@@ -188,7 +153,7 @@
             "conductor": {"ext": "GTL"},
             "soldermask": {"ext": "GTS"},
             "silkscreen": {"ext": "GTO"},
-            "solderpaste": {"ext": "ger"}
+            "solderpaste": {"ext": "GTP"}
           },
           "internal":
           {
@@ -199,7 +164,7 @@
             "conductor": {"ext": "GBL"},
             "soldermask": {"ext": "GBS"},
             "silkscreen": {"ext": "GBO"},
-            "solderpaste": {"ext": "ger"}  
+            "solderpaste": {"ext": "GBP"}  
           },
           "other":
    	  {
@@ -216,6 +181,47 @@
 	{
           "readme": {"ext": "txt"}
         }
+      }
+    },
+    "dirtypcb":
+    {
+      "filenames":
+      {
+	"gerbers":
+	{
+	  "top":
+	  {
+	    "copper": {"ext": "gtl"},
+	    "soldermask": {"ext": "gts"},
+	    "silkscreen": {"ext": "gto"},
+	    "solderpaste": {"ext": "gtp"}
+	  },
+          "internal":
+          {
+            "conductor": {"ext": "ger"}
+          },
+	  "bottom":
+	  {
+	    "copper": {"ext": "gbl"},
+	    "soldermask": {"ext": "gbs"},
+	    "silkscreen": {"ext": "gbo"},
+	    "solderpaste": {"ext": "gbp"}
+	  },
+	  "other":
+	  {
+	    "documentation": {"ext": "ger"},
+	    "outline": {"ext": "gbr"}
+	  }
+	},
+	"drills":
+	{
+	  "plated": {"ext": "txt"},
+	  "non-plated": {"ext": "txt"}
+	},
+	"text":
+	{
+	  "readme": {"ext": "txt"}
+	}
       }
     }
   }

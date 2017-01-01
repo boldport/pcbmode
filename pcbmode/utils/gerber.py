@@ -61,7 +61,6 @@ def gerberise(manufacturer='default'):
                                        namespaces=ns)
 
         sheets = ['conductor', 'soldermask', 'solderpaste', 'silkscreen']
-#        sheets = ['conductor']
         for sheet in sheets:
             # Get the SVG layer corresponding to the 'sheet'
             sheet_layer = svg_layer.find(".//svg:g[@pcbmode:sheet='%s']" % (sheet),
@@ -80,9 +79,15 @@ def gerberise(manufacturer='default'):
                                 digits,
                                 steps,
                                 length)
-     
-                add = '_%s_%s.%s' % (pcb_layer, sheet,
-                                     filename_info[pcb_layer.split('-')[0]][sheet].get('ext') or 'ger')
+
+                # Default to .ger extension if undefined
+                try:
+                    ext = filename_info[pcb_layer.split('-')[0]][sheet].get('ext')
+                except KeyError:
+                    ext = 'ger'
+
+                add = '_%s_%s.%s' % (pcb_layer, sheet, ext)
+
                 filename = os.path.join(base_dir, base_name + add)
      
                 with open(filename, "wb") as f:

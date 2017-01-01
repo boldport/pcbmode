@@ -326,12 +326,12 @@ class Module():
                 shapes = shapes_dict['pours'].get(pcb_layer) or []
                 try:
                     svg_layer = self._layers[pcb_layer]['conductor']['pours']['layer']
-                    shape_group = et.SubElement(svg_layer, 'g',
-                                                mask='url(#mask-%s)' % pcb_layer)
                 except:
                     svg_layer = None
 
                 if len(shapes) > 0 and svg_layer != None:
+                    shape_group = et.SubElement(svg_layer, 'g',
+                                                mask='url(#mask-%s)' % pcb_layer)
                     transform = "translate(%s,%s)" % (location[0],
                                                       config.cfg['invert-y']*location[1])
                     group = et.SubElement(shape_group, 'g', transform=transform)
@@ -452,10 +452,15 @@ class Module():
             except:
                 return
 
+            # Add PCBmodE information, useful for when extracting
             group.set('{'+config.cfg['ns']['pcbmode']+'}type', component_type)
             group.set('{'+config.cfg['ns']['pcbmode']+'}footprint', component.getFootprintName())
             if (component_type == 'component') or (component_type == 'shape'):
                 group.set('{'+config.cfg['ns']['pcbmode']+'}refdef', refdef)
+            elif (component_type == 'via'):
+                group.set('{'+config.cfg['ns']['pcbmode']+'}id', refdef)
+            else:
+                pass
 
             path = svg.placementMarkerPath()
             transform = "translate(%s,%s)" % (location[0],

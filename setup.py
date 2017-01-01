@@ -10,7 +10,8 @@ setup(
     package_data = {
         'pcbmode': ['stackups/*.json',
                     'styles/*/*.json',
-                    'fonts/*.svg'],
+                    'fonts/*.svg',
+                    'pcbmode_config.json'],
     },
 
     # metadata for upload to PyPI
