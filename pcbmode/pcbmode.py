@@ -101,6 +101,11 @@ def cmdArgSetup(pcbmode_version):
                       dest='make_bom', default=False, 
                       help='Create a bill of materials')
 
+    argp.add_argument('--sig-dig', nargs=1,
+                      dest='sig_dig', default=False,
+                      help="Number of significant digits to use when generating the board's SVG. Valid values are between 2 and 8.")
+
+
     return argp
 
 
@@ -259,8 +264,15 @@ def makeConfig(name, version, cmdline_args):
 
     config.cfg['namespace'] = config.cfg['ns']
 
-    # significant digits to use for floats
+    # Get amount of significant digits to use for floats
     config.cfg['significant-digits'] = config.cfg.get('significant-digits', 8)
+
+    if cmdline_args.sig_dig != False:
+        sig_dig = int(cmdline_args.sig_dig[0])
+        if (2 <= sig_dig <= 8):
+            config.cfg['significant-digits'] = sig_dig
+        else:
+            msg.info("Commandline significant digit specification not in range, setting to %d" % config.cfg['significant-digits'])
 
     # buffer from board outline to display block edge 
     config.cfg['display-frame-buffer'] = config.cfg.get('display_frame_buffer', 1.0)

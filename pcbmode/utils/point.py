@@ -3,14 +3,20 @@
 from math import pi, sin, cos
 import decimal
 
+import pcbmode.config as config
+
 DEG2RAD = 2 * pi / 360
 
 
 class Point:
   
     def __init__(self, x=0, y=0):
-        self.x = float(x)
-        self.y = float(y)
+        try:
+            self.sig_dig = config.cfg['significant-digits']
+        except:
+            self.sig_dig = 8
+        self.x = round(float(x), self.sig_dig)
+        self.y = round(float(y), self.sig_dig)
        
     def __add__(self, p):
         """ add point 'p' of type Point to current point""" 
@@ -36,8 +42,8 @@ class Point:
         return not((self.x == p.x) and (self.y == p.y))
 
     def assign(self, x=0, y=0):
-        self.x = float(x)
-        self.y = float(y)
+        self.x = round(float(x), self.sig_dig) 
+        self.y = round(float(y), self.sig_dig) 
         return
 
     def rotate(self, deg, p):
