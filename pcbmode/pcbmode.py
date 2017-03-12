@@ -389,10 +389,10 @@ def makeConfig(name, version, cmdline_args):
 
 def main():
 
-    # get PCBmodE version
+    # Get PCBmodE version
     version = utils.get_git_revision()
 
-    # setup and parse commandline arguments
+    # Setup and parse commandline arguments
     argp = cmdArgSetup(version)
     cmdline_args = argp.parse_args()
 
@@ -401,11 +401,11 @@ def main():
     board_name = cmdline_args.boards[0]
     makeConfig(board_name, version, cmdline_args)
 
-    # check if build directory exists; if not, create
+    # Check if build directory exists; if not, create
     build_dir = os.path.join(config.cfg['base-dir'], config.cfg['locations']['build'])
     utils.create_dir(build_dir)
 
-    # renumber refdefs and dump board config file
+    # Renumber refdefs and dump board config file
     if cmdline_args.renumber is not False:
         msg.info("Renumbering refdefs")
         if cmdline_args.renumber is None:
