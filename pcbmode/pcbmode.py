@@ -346,6 +346,41 @@ def makeConfig(name, version, cmdline_args):
     config.cfg['invert-y'] = -1
 
 
+    #-----------------------------------------------------------------
+    # Commandline overrides
+    #-----------------------------------------------------------------
+    # Controls the visibility of layers and whether they are locked by
+    # default. This is the "master" control; settings in the board's
+    # config file will override these settings
+    #-----------------------------------------------------------------
+    layer_control_default = {
+      "conductor": { 
+        "place": True, "hide": False, "lock": False, 
+        "pours": { "place": True, "hide": False, "lock": True },
+        "pads": { "place": True, "hide": False, "lock": False },
+        "routing": { "place": True, "hide": False, "lock": False }
+      },
+      "soldermask": { "place": True, "hide": False, "lock": False },
+      "solderpaste": { "place": True, "hide": True, "lock": True },
+      "silkscreen": { "place": True, "hide": False, "lock": False },
+      "assembly": { "place": True, "hide": False, "lock": False },
+      "documentation": { "place": True, "hide": False, "lock": False },
+      "dimensions": { "place": True, "hide": False, "lock": True },
+      "origin": { "place": True, "hide": False, "lock": True },
+      "drills": { "place": True, "hide": False, "lock": False },
+      "placement": { "place": True, "hide": False, "lock": False },
+      "outline": { "place": True, "hide": False, "lock": True }
+    }
+
+    # Get overrides
+    layer_control_config = config.brd.get('layer-control')
+    if layer_control_config != None:
+        config.brd['layer-control'] = dict(layer_control_default.items() +
+                                           layer_control_config.items())
+    else:
+        config.brd['layer-control'] = layer_control_default
+
+
     return
 
 
