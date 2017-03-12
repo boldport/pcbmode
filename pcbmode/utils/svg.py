@@ -1137,35 +1137,7 @@ def makeSvgLayers(top_layer, transform=None, refdef=None):
     Returns a dictionary of layer instantiations.
     """
 
-    # Controls the visibility of layers and whether they are locked by
-    # default. This is the "master" control; settings in the board's
-    # config file will override these settings
-    layer_control = {
-      "conductor": { 
-        "hidden": False, "locked": False, 
-        "pours": { "hidden": False, "locked": True },
-        "pads": { "hidden": False, "locked": False },
-        "routing": { "hidden": False, "locked": False }
-      },
-      "soldermask": { "hidden": False, "locked": False },
-      "solderpaste": { "hidden": True, "locked": True },
-      "silkscreen": { "hidden": False, "locked": False },
-      "assembly": { "hidden": False, "locked": False },
-      "documentation": { "hidden": False, "locked": False },
-      "dimensions": { "hidden": False, "locked": True },
-      "origin": { "hidden": False, "locked": True },
-      "drills": { "hidden": False, "locked": False },
-      "placement": { "hidden": False, "locked": False },
-      "outline": { "hidden": False, "locked": True }
-    }
-
-    # Get overrides
-    layer_control_config = config.brd.get('layer-control')
-    if layer_control_config != None:
-        combined_lc = dict(layer_control.items() +
-                           layer_control_config.items())
-    else:
-        combined_lc = layer_control
+    layer_control = config.brd['layer-control']
 
     # Holds SVG layers 
     layers = {}
@@ -1210,7 +1182,7 @@ def makeSvgLayers(top_layer, transform=None, refdef=None):
                 # to the general definition for this type of sheet
                 style = utils.dictToStyleText(config.stl['layout'][sheet_type]['default'][layer_name.split('-')[0]])
 
-            if combined_lc[sheet_type]['hidden'] == True:
+            if layer_control[sheet_type]['hidden'] == True:
                 style += 'display:none;'
  
             tmp = layers[layer_name] 
@@ -1222,7 +1194,7 @@ def makeSvgLayers(top_layer, transform=None, refdef=None):
                                                               refdef=refdef)
 
             element.set('{'+config.cfg['ns']['pcbmode']+'}%s' % ('sheet'), sheet_type)
-            if combined_lc[sheet_type]['locked'] == True:
+            if layer_control[sheet_type]['locked'] == True:
                 element.set('{'+config.cfg['ns']['sodipodi']+'}insensitive', 'true')
 
             # A PCB layer of type 'conductor' is best presented in
@@ -1240,7 +1212,7 @@ def makeSvgLayers(top_layer, transform=None, refdef=None):
                         style = utils.dictToStyleText(config.stl['layout']['conductor'][cond_type][layer_name.split('-')[0]])
 
 
-                    if combined_lc['conductor'][cond_type]['hidden'] == True:
+                    if layer_control['conductor'][cond_type]['hidden'] == True:
                         style += 'display:none;'
 
                     tmp2[cond_type] = {}
@@ -1252,14 +1224,14 @@ def makeSvgLayers(top_layer, transform=None, refdef=None):
 
                     element.set('{'+config.cfg['ns']['pcbmode']+'}%s' % ('sheet'), cond_type)
 
-                    if combined_lc['conductor'][cond_type]['locked'] == True:
+                    if layer_control['conductor'][cond_type]['locked'] == True:
                         element.set('{'+config.cfg['ns']['sodipodi']+'}insensitive', 'true')
 
 
 
     for info_layer in ['origin','dimensions','outline','drills','documentation']:
         style = utils.dictToStyleText(config.stl['layout'][info_layer].get('default'))
-        if combined_lc[info_layer]['hidden'] == True:
+        if layer_control[info_layer]['hidden'] == True:
             style += 'display:none;'
         layers[info_layer] = {}
         element = layers[info_layer]['layer'] = makeSvgLayer(top_layer, 
@@ -1268,7 +1240,7 @@ def makeSvgLayers(top_layer, transform=None, refdef=None):
                                                              style,
                                                              refdef)
         element.set('{'+config.cfg['ns']['pcbmode']+'}%s' % ('sheet'), info_layer)
-        if combined_lc[info_layer]['locked'] == True:
+        if layer_control[info_layer]['locked'] == True:
             element.set('{'+config.cfg['ns']['sodipodi']+'}insensitive', 'true')
 
     return layers
