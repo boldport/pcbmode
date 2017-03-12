@@ -38,6 +38,9 @@ class Module():
         """
         """
 
+        ns = {'pcbmode':config.cfg['ns']['pcbmode'],
+              'svg':config.cfg['ns']['svg']} 
+
         self._module_dict = module_dict
         self._routing_dict = routing_dict
 
@@ -132,6 +135,16 @@ class Module():
                 # This tells the Gerber conversion to ignore this shape
                 mask_cover.set('{'+config.cfg['ns']['pcbmode']+'}type', 'mask-cover')
 
+
+        # Remove layers that were not made to be 'placed'. This
+        # is a bit of a cheat, but it works for now.
+        # TODO ;)
+
+
+        # Output SVG
+        # TODO: this will eventually need to be done in main()
+        # when PCBmodE supports multiple 'modules' combined into
+        # a single 'board'
         output_file = os.path.join(config.cfg['base-dir'],
                                    config.cfg['locations']['build'],
                                    config.cfg['name'] + '.svg')
