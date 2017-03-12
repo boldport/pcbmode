@@ -1182,7 +1182,7 @@ def makeSvgLayers(top_layer, transform=None, refdef=None):
                 # to the general definition for this type of sheet
                 style = utils.dictToStyleText(config.stl['layout'][sheet_type]['default'][layer_name.split('-')[0]])
 
-            if layer_control[sheet_type]['hidden'] == True:
+            if layer_control[sheet_type]['hide'] == True:
                 style += 'display:none;'
  
             tmp = layers[layer_name] 
@@ -1194,7 +1194,7 @@ def makeSvgLayers(top_layer, transform=None, refdef=None):
                                                               refdef=refdef)
 
             element.set('{'+config.cfg['ns']['pcbmode']+'}%s' % ('sheet'), sheet_type)
-            if layer_control[sheet_type]['locked'] == True:
+            if layer_control[sheet_type]['lock'] == True:
                 element.set('{'+config.cfg['ns']['sodipodi']+'}insensitive', 'true')
 
             # A PCB layer of type 'conductor' is best presented in
@@ -1212,7 +1212,7 @@ def makeSvgLayers(top_layer, transform=None, refdef=None):
                         style = utils.dictToStyleText(config.stl['layout']['conductor'][cond_type][layer_name.split('-')[0]])
 
 
-                    if layer_control['conductor'][cond_type]['hidden'] == True:
+                    if layer_control['conductor'][cond_type]['hide'] == True:
                         style += 'display:none;'
 
                     tmp2[cond_type] = {}
@@ -1224,14 +1224,14 @@ def makeSvgLayers(top_layer, transform=None, refdef=None):
 
                     element.set('{'+config.cfg['ns']['pcbmode']+'}%s' % ('sheet'), cond_type)
 
-                    if layer_control['conductor'][cond_type]['locked'] == True:
+                    if layer_control['conductor'][cond_type]['lock'] == True:
                         element.set('{'+config.cfg['ns']['sodipodi']+'}insensitive', 'true')
 
 
 
     for info_layer in ['origin','dimensions','outline','drills','documentation']:
         style = utils.dictToStyleText(config.stl['layout'][info_layer].get('default'))
-        if layer_control[info_layer]['hidden'] == True:
+        if layer_control[info_layer]['hide'] == True:
             style += 'display:none;'
         layers[info_layer] = {}
         element = layers[info_layer]['layer'] = makeSvgLayer(top_layer, 
@@ -1240,7 +1240,7 @@ def makeSvgLayers(top_layer, transform=None, refdef=None):
                                                              style,
                                                              refdef)
         element.set('{'+config.cfg['ns']['pcbmode']+'}%s' % ('sheet'), info_layer)
-        if layer_control[info_layer]['locked'] == True:
+        if layer_control[info_layer]['lock'] == True:
             element.set('{'+config.cfg['ns']['sodipodi']+'}insensitive', 'true')
 
     return layers
