@@ -428,7 +428,7 @@ def main():
         coord_file.makeCoordFile(cmdline_args.coord_file)
 
     else:
-        # make the board
+        # Make the board
         if cmdline_args.make is True:
             msg.info("Creating board")
             board = Board()
