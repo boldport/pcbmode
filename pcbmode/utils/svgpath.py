@@ -314,7 +314,7 @@ class SvgPath():
      
                 if path[i][0] == 'H':
                     for coord_tmp in path[i][1:]:
-                        coord.assign(coord_tmp[0], coord_tmp[1])
+                        coord.assign(coord_tmp[0], 0)
                         p += str(coord.x - abspos.x) + ' '
                         abspos.x = coord.x
      
