@@ -244,10 +244,11 @@ class SvgPath():
                         abspos += coord 
      
                 if path[i][0] == 'Q':
-                    for coord_tmp in path[i][1:]:
-                        coord.assign(coord_tmp[0], coord_tmp[1])
-                        p += str(coord.x - abspos.x) + ',' + str(coord.y - abspos.y) + ' '
-                    abspos.assign(coord.x, coord.y)
+                    for j in range(1,len(path[i])+1, 2):
+                        for coord_tmp in path[i][j:j+2]:
+                            coord.assign(coord_tmp[0], coord_tmp[1])
+                            p += str(coord.x - abspos.x) + ',' + str(coord.y - abspos.y) + ' '
+                        abspos.assign(coord.x, coord.y)
      
      
             # simple cubic Bezier curve command 
