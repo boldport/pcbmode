@@ -390,9 +390,9 @@ class SvgPath():
         """
         """
 
-        last_point = Point()
         abs_point = Point()
-     
+        patho = Point()
+
         bbox_top_left = Point()
         bbox_bot_right = Point()
      
@@ -424,7 +424,9 @@ class SvgPath():
                     bbox_top_left, bbox_bot_right = svg.boundary_box_check(bbox_top_left, 
                                                                        bbox_bot_right, 
                                                                        abs_point)
-      
+                #store path origin for the time the (sub)path is closed ('z')
+                patho = abs_point
+
             # cubic Bezier curve command 
             elif re.match('c', path[i][0]):
      
@@ -607,7 +609,7 @@ class SvgPath():
      
             # 'close shape' command
             elif re.match('Z', path[i][0], re.I):
-                pass
+                abs_point = patho
      
             else:
                 print("ERROR: found an unsupported SVG path command " + str(path[i][0]))
