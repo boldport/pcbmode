@@ -98,7 +98,7 @@ class Excellon():
             # diameters are wrong!
             # Drill index must be greater than 0
             drills[diameter]['index'] = i+1
-            ex.append("T%dC%s\n" % (i+1, diameter)) 
+            ex.append("T%dC%s\n" % (i+1, float(diameter))) 
 
         ex.append('M95\n') # End of a part program header
 
