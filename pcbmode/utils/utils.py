@@ -638,16 +638,22 @@ def parseTransform(transform):
     Returns a Point() for the input transform
     """
     data = {}
+
     if transform == None:
         data['type'] = 'translate'
         data['location'] = Point()
     elif 'translate' in transform.lower():
-        regex = r".*?translate\s?\(\s?(?P<x>[+-]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)\s?[\s,]\s?(?P<y>[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)\s?\).*"
+        regex = r".*?translate\s?\(\s?(?P<x>[+-]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)(\s?[\s,]\s?)?(?P<y>[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)?\s?\).*"
+#        regex = r".*?translate\s?\(\s?(?P<x>[+-]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)\s?[\s,]\s?(?P<y>[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)\s?\).*"
 #       regex = r".*?translate\s?\(\s?(?P<x>-?[0-9]*\.?[0-9]+)\s?[\s,]\s?(?P<y>-?[0-9]*\.?[0-9]+\s?)\s?\).*"
         coord = re.match(regex, transform)
         data['type'] = 'translate'
         x = coord.group('x')
         y = coord.group('y')
+        if coord.group('y') != None:
+            y = coord.group('y')
+        else:
+            y = 0
         data['location'] = Point(x,y)
     elif 'matrix' in transform.lower():
         data['type'] = 'matrix'
