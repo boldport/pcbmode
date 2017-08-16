@@ -1,8 +1,10 @@
 #!/usr/bin/python
+# coding=utf-8
 
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
 import sys
+
 
 def info(info, newline=True):
     """
@@ -22,7 +24,6 @@ def note(note, newline=True):
         sys.stdout.write("-- NOTE: %s" % note)
 
 
-
 def subInfo(info, newline=True):
     """
     """
@@ -30,7 +31,6 @@ def subInfo(info, newline=True):
         print(" * %s" % info)
     else:
         sys.stdout.write(" * %s" % info)
-
 
 
 def error(info, error_type=None):
@@ -44,7 +44,3 @@ def error(info, error_type=None):
     if error_type != None:
         raise error_type
     raise Exception
-
-
-
-

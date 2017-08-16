@@ -1,15 +1,15 @@
 #!/usr/bin/python
+# coding=utf-8
+from __future__ import absolute_import
 
-from math import pi, sin, cos
-import decimal
+from math import cos, pi, sin
 
 import pcbmode.config as config
 
 DEG2RAD = 2 * pi / 360
 
 
-class Point:
-  
+class Point(object):
     def __init__(self, x=0, y=0):
         try:
             self.sig_dig = config.cfg['significant-digits']
@@ -17,13 +17,13 @@ class Point:
             self.sig_dig = 8
         self.x = round(float(x), self.sig_dig)
         self.y = round(float(y), self.sig_dig)
-       
+
     def __add__(self, p):
-        """ add point 'p' of type Point to current point""" 
+        """ add point 'p' of type Point to current point"""
         return Point(self.x + p.x, self.y + p.y)
 
     def __sub__(self, p):
-        """ subtract point 'p' of type Point to current point""" 
+        """ subtract point 'p' of type Point to current point"""
         return Point(self.x - p.x, self.y - p.y)
 
     def __repr__(self, d=2):
@@ -39,11 +39,11 @@ class Point:
 
     def __ne__(self, p):
         """ not equal attribute """
-        return not((self.x == p.x) and (self.y == p.y))
+        return not ((self.x == p.x) and (self.y == p.y))
 
     def assign(self, x=0, y=0):
-        self.x = round(float(x), self.sig_dig) 
-        self.y = round(float(y), self.sig_dig) 
+        self.x = round(float(x), self.sig_dig)
+        self.y = round(float(y), self.sig_dig)
         return
 
     def rotate(self, deg, p):
