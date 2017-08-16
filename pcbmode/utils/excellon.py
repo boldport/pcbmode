@@ -1,24 +1,20 @@
 #!/usr/bin/python
+# coding=utf-8
+from __future__ import absolute_import
 
 import os
-import re
-from lxml import etree as et
 
 import pcbmode.config as config
-from . import messages as msg
-
-# pcbmode modules
-from . import utils
-from .point import Point
-
+from pcbmode.utils import utils
+from pcbmode.utils.point import Point
 
 
 def makeExcellon(manufacturer='default'):
     """
     """
 
-    ns = {'pcbmode':config.cfg['ns']['pcbmode'],
-          'svg':config.cfg['ns']['svg']} 
+    ns = {'pcbmode': config.cfg['ns']['pcbmode'],
+          'svg': config.cfg['ns']['svg']}
 
     # Open the board's SVG
     svg_in = utils.openBoardSVG()
@@ -28,8 +24,8 @@ def makeExcellon(manufacturer='default'):
     excellon = Excellon(drills_layer)
 
     # Save to file
-    base_dir = os.path.join(config.cfg['base-dir'], 
-                            config.cfg['locations']['build'], 
+    base_dir = os.path.join(config.cfg['base-dir'],
+                            config.cfg['locations']['build'],
                             'production')
     base_name = "%s_rev_%s" % (config.brd['config']['name'],
                                config.brd['config']['rev'])
@@ -45,10 +41,7 @@ def makeExcellon(manufacturer='default'):
             f.write(line)
 
 
-
-
-
-class Excellon():
+class Excellon(object):
     """
     """
 
@@ -58,17 +51,17 @@ class Excellon():
 
         self._svg = svg
 
-        self._ns = {'pcbmode':config.cfg['ns']['pcbmode'],
-                    'svg':config.cfg['ns']['svg']} 
+        self._ns = {'pcbmode': config.cfg['ns']['pcbmode'],
+                    'svg': config.cfg['ns']['svg']}
 
         # Get all drill paths except for the ones used in the
         # drill-index
         drill_paths = self._svg.findall(".//svg:g[@pcbmode:type='component-shapes']//svg:path",
-                                     namespaces=self._ns)
+                                        namespaces=self._ns)
 
         drills_dict = {}
         for drill_path in drill_paths:
-            diameter = drill_path.get('{'+config.cfg['ns']['pcbmode']+'}diameter')
+            diameter = drill_path.get('{' + config.cfg['ns']['pcbmode'] + '}diameter')
             location = self._getLocation(drill_path)
             if diameter not in drills_dict:
                 drills_dict[diameter] = {}
@@ -79,13 +72,10 @@ class Excellon():
         self._content = self._createContent(drills_dict)
         self._postamble = self._createPostamble()
 
-
     def getExcellon(self):
-        return (self._preamble+
-                self._content+
+        return (self._preamble +
+                self._content +
                 self._postamble)
-
-
 
     def _createContent(self, drills):
         """
@@ -97,10 +87,10 @@ class Excellon():
             # the result can be quite devastating where drill
             # diameters are wrong!
             # Drill index must be greater than 0
-            drills[diameter]['index'] = i+1
-            ex.append("T%dC%s\n" % (i+1, float(diameter))) 
+            drills[diameter]['index'] = i + 1
+            ex.append("T%dC%s\n" % (i + 1, float(diameter)))
 
-        ex.append('M95\n') # End of a part program header
+        ex.append('M95\n')  # End of a part program header
 
         for diameter in drills:
             ex.append("T%s\n" % drills[diameter]['index'])
@@ -109,28 +99,22 @@ class Excellon():
 
         return ex
 
-
-
     def _createPreamble(self):
         """
         """
         ex = []
-        ex.append('M48\n') # Beginning of a part program header
-        ex.append('METRIC,TZ\n') # Metric, trailing zeros
-        ex.append('G90\n') # Absolute mode
-        ex.append('M71\n') # Metric measuring mode        
+        ex.append('M48\n')  # Beginning of a part program header
+        ex.append('METRIC,TZ\n')  # Metric, trailing zeros
+        ex.append('G90\n')  # Absolute mode
+        ex.append('M71\n')  # Metric measuring mode
         return ex
-
-
 
     def _createPostamble(self):
         """
         """
         ex = []
-        ex.append('M30\n') # End of Program, rewind
+        ex.append('M30\n')  # End of Program, rewind
         return ex
-
-
 
     def _getLocation(self, path):
         """
@@ -153,18 +137,12 @@ class Excellon():
         transform = path.get('transform')
         if transform != None:
             transform_data = utils.parseTransform(transform)
-            location += transform_data['location']        
+            location += transform_data['location']
 
         return location
-
-
-
 
     def _getPoint(self, point):
         """
         Converts a Point type into an Excellon coordinate
         """
         return "X%.6fY%.6f\n" % (point.x, -point.y)
-
-
-

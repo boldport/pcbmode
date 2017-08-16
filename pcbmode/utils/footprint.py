@@ -1,34 +1,21 @@
 #!/usr/bin/python
-
-import os
-import re
-import json
-from lxml import etree as et
+# coding=utf-8
+from __future__ import absolute_import
 
 import pcbmode.config as config
-from . import messages as msg
+from pcbmode.utils import messages as msg, utils
+from pcbmode.utils.point import Point
+from pcbmode.utils.shape import Shape
+from pcbmode.utils.style import Style
 
 
-# pcbmode modules
-from . import svg 
-from . import utils
-from . import place
-import copy
-from .style import Style
-from .point import Point
-from .shape import Shape
-
-
-
-class Footprint():
+class Footprint(object):
     """
     """
 
     def __init__(self, footprint):
 
         self._footprint = footprint
-
-        
 
         self._shapes = {'conductor': {},
                         'pours': {},
@@ -43,13 +30,8 @@ class Footprint():
         self._processShapes()
         self._processAssemblyShapes()
 
-
-
-
     def getShapes(self):
         return self._shapes
-
-
 
     def _processPins(self):
         """
@@ -98,7 +80,7 @@ class Footprint():
                     pin_label = pins[pin]['layout'].get('label') or pin
 
                 for layer in layers:
-                    
+
                     shape = Shape(shape_dict)
                     style = Style(shape_dict, 'conductor')
                     shape.setStyle(style)
@@ -107,11 +89,11 @@ class Footprint():
                     except:
                         self._shapes['conductor'][layer] = []
                         self._shapes['conductor'][layer].append(shape)
-                        
-                    for stype in ['soldermask','solderpaste']:
+
+                    for stype in ['soldermask', 'solderpaste']:
 
                         # Get a custom shape specification if it exists
-                        sdict_list = shape_dict.get(stype) 
+                        sdict_list = shape_dict.get(stype)
 
                         # Not defined; default
                         if sdict_list == None:
@@ -124,7 +106,7 @@ class Footprint():
 
                             # Apply modifier based on shape type
                             if shape_type == 'path':
-                                sdict['scale'] = shape.getScale()*config.brd['distances'][stype]['path-scale']
+                                sdict['scale'] = shape.getScale() * config.brd['distances'][stype]['path-scale']
                             elif shape_type in ['rect', 'rectangle']:
                                 sdict['width'] += config.brd['distances'][stype]['rect-buffer']
                                 sdict['height'] += config.brd['distances'][stype]['rect-buffer']
@@ -143,7 +125,7 @@ class Footprint():
                             sshape.setStyle(sstyle)
 
                             # Add shape to footprint's shape dictionary
-                            #self._shapes[stype][layer].append(sshape)
+                            # self._shapes[stype][layer].append(sshape)
                             try:
                                 self._shapes[stype][layer].append(sshape)
                             except:
@@ -181,28 +163,24 @@ class Footprint():
 
                                 # Create new shape
                                 sshape = Shape(sdict)
-     
+
                                 # Create new style
                                 sstyle = Style(sdict, stype)
-                                
+
                                 # Apply style
                                 sshape.setStyle(sstyle)
-     
+
                                 # Add shape to footprint's shape dictionary
-                                #self._shapes[stype][layer].append(sshape)
+                                # self._shapes[stype][layer].append(sshape)
                                 try:
                                     self._shapes[stype][layer].append(sshape)
                                 except:
                                     self._shapes[stype][layer] = []
                                     self._shapes[stype][layer].append(sshape)
 
-     
                     # Add pin label
                     if (pin_label != None):
                         shape.setLabel(pin_label)
-
-
-
 
             drills = pad_dict.get('drills') or []
             for drill_dict in drills:
@@ -219,10 +197,6 @@ class Footprint():
                 except:
                     self._shapes['drills']['top'] = []
                     self._shapes['drills']['top'].append(shape)
-                        
-
-
-
 
     def _processPours(self):
         """
@@ -231,7 +205,7 @@ class Footprint():
         try:
             shapes = self._footprint['layout']['pours']['shapes']
         except:
-            return        
+            return
 
         for shape_dict in shapes:
             layers = utils.getExtendedLayerList(shape_dict.get('layers') or ['top'])
@@ -246,10 +220,6 @@ class Footprint():
                     self._shapes['pours'][layer] = []
                     self._shapes['pours'][layer].append(shape)
 
-
-
-
-
     def _processShapes(self):
         """
         """
@@ -262,7 +232,7 @@ class Footprint():
                 shapes = self._footprint['layout'][sheet]['shapes']
             except:
                 shapes = []
-     
+
             for shape_dict in shapes:
                 layers = utils.getExtendedLayerList(shape_dict.get('layers') or ['top'])
                 for layer in layers:
@@ -279,11 +249,6 @@ class Footprint():
                     except:
                         self._shapes[sheet][layer] = []
                         self._shapes[sheet][layer].append(shape)
-
-
-
-
-
 
     def _processAssemblyShapes(self):
         """
@@ -304,6 +269,3 @@ class Footprint():
                 except:
                     self._shapes['assembly'][layer] = []
                     self._shapes['assembly'][layer].append(shape)
-
-
-

@@ -1,17 +1,12 @@
 #!/usr/bin/python
+# coding=utf-8
+from __future__ import absolute_import
 
 import pcbmode.config as config
-from . import messages as msg
+from pcbmode.utils import messages as msg, utils
 
 
-
-# import pcbmode modules
-from . import utils
-
-
-
-
-class Style():
+class Style(object):
     """
     Manages the logic for determining the style of an object
     based on its shape definition, 'shape_dict'. In the layout
@@ -23,6 +18,7 @@ class Style():
     Originally it was added for 'refdef' within silkscreen and
     soldermask, but could be used with other types.
     """
+
     def __init__(self, shape_dict, layer_name, sub_item=None):
 
         default_style = config.stl['layout']['defaults']['style'][layer_name]
@@ -45,7 +41,7 @@ class Style():
             self._style_dict = layer_style.get(self._style).copy()
         except:
             self._style_dict = None
-            
+
         # Apply defaults if style dict wasn't found
         if self._style_dict == None:
             if self._style == 'fill':
@@ -62,14 +58,11 @@ class Style():
                                                 layer_style[self._style].get('stroke-width'))
             self._style_dict['fill'] = "none"
 
-
     def getStyleType(self):
         return self._style
 
-
     def getStyleString(self):
         return utils.dictToStyleText(self._style_dict)
-
 
     def getStrokeWidth(self):
         return self._style_dict['stroke-width']

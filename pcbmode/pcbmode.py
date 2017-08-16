@@ -1,26 +1,22 @@
 #!/usr/bin/python
+# coding=utf-8
+from __future__ import absolute_import
 
-import os
-import json
 import argparse
+import json
+import os
+
+from pkg_resources import resource_exists, resource_filename
+
+# PCBmodE modules
+from pcbmode import config
+from pcbmode.utils import bom, coord_file, excellon, extract, gerber, messages as msg, utils
+from pcbmode.utils.board import Board
 
 try:
     from os import getcwdu as getcwd
 except:
     from os import getcwd as getcwd
-
-from pkg_resources import resource_filename, resource_exists
-
-# PCBmodE modules
-from . import config
-from .utils import utils
-from .utils import gerber
-from .utils import extract
-from .utils import excellon
-from .utils import messages as msg
-from .utils import bom
-from .utils import coord_file
-from .utils.board import Board
 
 
 def cmdArgSetup(pcbmode_version):
@@ -32,31 +28,31 @@ def cmdArgSetup(pcbmode_version):
 
     epilog = """
     """
-    
+
     # commandline argument settings and parsing
-    argp = argparse.ArgumentParser(description=description, 
-                      add_help=True, epilog=epilog)
-     
+    argp = argparse.ArgumentParser(description=description,
+                                   add_help=True, epilog=epilog)
+
     argp.add_argument('-b', '--board-name',
                       dest='boards', required=True, nargs=1,
                       help='The name of the board. The location of the files should be specified in the configuration file, otherwise defaults are used')
-     
+
     argp.add_argument('-f', '--filein', required=False,
                       dest='filein',
                       help='Input file name')
-     
+
     argp.add_argument('-o', '--fileout',
                       dest='fileout',
                       help='Output file name')
-     
+
     argp.add_argument('-c', '--config-file', default='pcbmode_config.json',
                       dest='config_file',
                       help='Configuration file name (default=pcbmode_config.json)')
-     
+
     argp.add_argument('-m', '--make-board',
                       action='store_true', dest='make', default=False,
                       help="Create SVG for the board specified with the '-b'/'--board_name' switch. The output's location can be specified in the configuration file")
-     
+
     argp.add_argument('-e', '--extract',
                       action='store_true', dest='extract', default=False,
                       help="Extract routing and component placement from board's SVG")
@@ -64,7 +60,7 @@ def cmdArgSetup(pcbmode_version):
     argp.add_argument('--extract-refdefs',
                       action='store_true', dest='extract_refdefs', default=False,
                       help="Extract components' reference designator location and rotation from board's SVG")
-     
+
     argp.add_argument('--fab', nargs='?',
                       dest='fab', default=False,
                       help='Generate manufacturing files (Gerbers, Excellon, etc.) An optional argument specifies the fab for custom filenames')
@@ -98,19 +94,14 @@ def cmdArgSetup(pcbmode_version):
                       help="Create a simple placement coordinate CSV file")
 
     argp.add_argument('--make-bom', nargs='?',
-                      dest='make_bom', default=False, 
+                      dest='make_bom', default=False,
                       help='Create a bill of materials')
 
     argp.add_argument('--sig-dig', nargs=1,
                       dest='sig_dig', default=False,
                       help="Number of significant digits to use when generating the board's SVG. Valid values are between 2 and 8.")
 
-
     return argp
-
-
-
-
 
 
 def makeConfig(name, version, cmdline_args):
@@ -147,8 +138,8 @@ def makeConfig(name, version, cmdline_args):
 
     # Read in the board's configuration data
     msg.info("Processing board's configuration file")
-    filename = os.path.join(config.cfg['locations']['boards'], 
-                            config.cfg['name'], 
+    filename = os.path.join(config.cfg['locations']['boards'],
+                            config.cfg['name'],
                             config.cfg['name'] + '.json')
     config.brd = utils.dictFromJsonFile(filename)
 
@@ -161,10 +152,9 @@ def makeConfig(name, version, cmdline_args):
         config.brd['config']['units'] = 'mm'
         config.brd['config']['style-layout'] = 'default'
 
-
-    #=================================
+    # =================================
     # Style
-    #=================================
+    # =================================
 
     # Get style file; search for it in the project directory and 
     # where the script it
@@ -172,7 +162,7 @@ def makeConfig(name, version, cmdline_args):
     layout_style_filename = 'layout.json'
     paths = [os.path.join(config.cfg['base-dir'],
                           config.cfg['locations']['styles'],
-                          layout_style, layout_style_filename)] # project dir
+                          layout_style, layout_style_filename)]  # project dir
 
     style_resource = (__name__, '/'.join(['styles', layout_style, layout_style_filename]))
     if resource_exists(*style_resource):
@@ -189,15 +179,15 @@ def makeConfig(name, version, cmdline_args):
     if not 'layout' in config.stl or config.stl['layout'] == {}:
         msg.error("Couldn't find style file %s. Looked for it here:\n%s" % (layout_style_filename, filenames))
 
-    #-------------------------------------------------------------
+    # -------------------------------------------------------------
     # Stackup
-    #-------------------------------------------------------------
+    # -------------------------------------------------------------
     try:
         stackup_filename = config.brd['stackup']['name'] + '.json'
     except:
         stackup_filename = 'two-layer.json'
 
-    paths = [os.path.join(config.cfg['base-dir'], config.cfg['locations']['stackups'], stackup_filename)] # project dir
+    paths = [os.path.join(config.cfg['base-dir'], config.cfg['locations']['stackups'], stackup_filename)]  # project dir
 
     stackup_resource = (__name__, '/'.join(['stackups', stackup_filename]))
     if resource_exists(*stackup_resource):
@@ -220,10 +210,10 @@ def makeConfig(name, version, cmdline_args):
     config.stk['surface-layer-names'] = [config.stk['layer-names'][0], config.stk['layer-names'][-1]]
     config.stk['internal-layer-names'] = config.stk['layer-names'][1:-1]
 
-    #---------------------------------------------------------------
+    # ---------------------------------------------------------------
     # Path database
-    #---------------------------------------------------------------
-    filename = os.path.join(config.cfg['locations']['boards'], 
+    # ---------------------------------------------------------------
+    filename = os.path.join(config.cfg['locations']['boards'],
                             config.cfg['name'],
                             config.cfg['locations']['build'],
                             'paths_db.json')
@@ -233,11 +223,10 @@ def makeConfig(name, version, cmdline_args):
     if os.path.isfile(filename):
         config.pth = utils.dictFromJsonFile(filename)
 
-
-    #----------------------------------------------------------------
+    # ----------------------------------------------------------------
     # Routing
-    #----------------------------------------------------------------
-    filename = os.path.join(config.cfg['base-dir'], 
+    # ----------------------------------------------------------------
+    filename = os.path.join(config.cfg['base-dir'],
                             config.brd['files'].get('routing-json') or config.cfg['name'] + '_routing.json')
 
     # Open database file. If it doesn't exist, leave the database in
@@ -247,19 +236,18 @@ def makeConfig(name, version, cmdline_args):
     else:
         config.rte = {}
 
-
     # namespace URLs
     config.cfg['ns'] = {
-        None       : "http://www.w3.org/2000/svg",
-        "dc"       : "http://purl.org/dc/elements/1.1/",
-        "cc"       : "http://creativecommons.org/ns#",
-        "rdf"      : "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-        "svg"      : "http://www.w3.org/2000/svg",
-        "sodipodi" : "http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd",
-        "inkscape" : "http://www.inkscape.org/namespaces/inkscape",
+        None: "http://www.w3.org/2000/svg",
+        "dc": "http://purl.org/dc/elements/1.1/",
+        "cc": "http://creativecommons.org/ns#",
+        "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+        "svg": "http://www.w3.org/2000/svg",
+        "sodipodi": "http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd",
+        "inkscape": "http://www.inkscape.org/namespaces/inkscape",
         # Namespace URI are strings; they don't need to be URLs. See:
         #  http://en.wikipedia.org/wiki/XML_namespace
-        "pcbmode"  : "pcbmode"
+        "pcbmode": "pcbmode"
     }
 
     config.cfg['namespace'] = config.cfg['ns']
@@ -280,13 +268,12 @@ def makeConfig(name, version, cmdline_args):
     # the style for masks used for copper pours
     config.cfg['mask-style'] = "fill:#000;stroke:#000;stroke-linejoin:round;stroke-width:%s;"
 
-
-    #------------------------------------------------------------------
+    # ------------------------------------------------------------------
     # Distances
-    #------------------------------------------------------------------
+    # ------------------------------------------------------------------
     # If any of the distance definitions are missing from the board's
     # configuration file, use PCBmodE's defaults
-    #------------------------------------------------------------------
+    # ------------------------------------------------------------------
     config_distances_dict = config.cfg['distances']
     try:
         board_distances_dict = config.brd.get('distances')
@@ -302,17 +289,17 @@ def makeConfig(name, version, cmdline_args):
         except:
             board_distances_dict[dk] = {}
             board_dict = board_distances_dict[dk]
-        
+
         for k in config_dict.keys():
             board_dict[k] = (board_dict.get(k) or config_dict[k])
 
-    #-----------------------------------------------------------------
+    # -----------------------------------------------------------------
     # Commandline overrides
-    #-----------------------------------------------------------------
+    # -----------------------------------------------------------------
     # These are stored in a temporary dictionary so that they are not
     # written to the config file when the board's configuration is
     # dumped, with extraction, for example
-    #-----------------------------------------------------------------
+    # -----------------------------------------------------------------
     config.tmp = {}
     config.tmp['no-layer-index'] = (cmdline_args.no_layer_index or
                                     config.brd['config'].get('no-layer-index') or
@@ -327,13 +314,12 @@ def makeConfig(name, version, cmdline_args):
                                     config.brd['config'].get('no-drill-index') or
                                     False)
 
-
     # Define Gerber setting from board's config or defaults
     try:
         tmp = config.brd['gerber']
     except:
         config.brd['gerber'] = {}
-    gd = config.brd['gerber']    
+    gd = config.brd['gerber']
     gd['decimals'] = config.brd['gerber'].get('decimals') or 6
     gd['digits'] = config.brd['gerber'].get('digits') or 6
     gd['steps-per-segment'] = config.brd['gerber'].get('steps-per-segment') or 100
@@ -345,31 +331,30 @@ def makeConfig(name, version, cmdline_args):
     # control if things change.
     config.cfg['invert-y'] = -1
 
-
-    #-----------------------------------------------------------------
+    # -----------------------------------------------------------------
     # Commandline overrides
-    #-----------------------------------------------------------------
+    # -----------------------------------------------------------------
     # Controls the visibility of layers and whether they are locked by
     # default. This is the "master" control; settings in the board's
     # config file will override these settings
-    #-----------------------------------------------------------------
+    # -----------------------------------------------------------------
     layer_control_default = {
-      "conductor": { 
-        "place": True, "hide": False, "lock": False, 
-        "pours": { "place": True, "hide": False, "lock": True },
-        "pads": { "place": True, "hide": False, "lock": False },
-        "routing": { "place": True, "hide": False, "lock": False }
-      },
-      "soldermask": { "place": True, "hide": False, "lock": False },
-      "solderpaste": { "place": True, "hide": True, "lock": True },
-      "silkscreen": { "place": True, "hide": False, "lock": False },
-      "assembly": { "place": True, "hide": False, "lock": False },
-      "documentation": { "place": True, "hide": False, "lock": False },
-      "dimensions": { "place": True, "hide": False, "lock": True },
-      "origin": { "place": True, "hide": False, "lock": True },
-      "drills": { "place": True, "hide": False, "lock": False },
-      "placement": { "place": True, "hide": False, "lock": False },
-      "outline": { "place": True, "hide": False, "lock": True }
+        "conductor": {
+            "place": True, "hide": False, "lock": False,
+            "pours": {"place": True, "hide": False, "lock": True},
+            "pads": {"place": True, "hide": False, "lock": False},
+            "routing": {"place": True, "hide": False, "lock": False}
+        },
+        "soldermask": {"place": True, "hide": False, "lock": False},
+        "solderpaste": {"place": True, "hide": True, "lock": True},
+        "silkscreen": {"place": True, "hide": False, "lock": False},
+        "assembly": {"place": True, "hide": False, "lock": False},
+        "documentation": {"place": True, "hide": False, "lock": False},
+        "dimensions": {"place": True, "hide": False, "lock": True},
+        "origin": {"place": True, "hide": False, "lock": True},
+        "drills": {"place": True, "hide": False, "lock": False},
+        "placement": {"place": True, "hide": False, "lock": False},
+        "outline": {"place": True, "hide": False, "lock": True}
     }
 
     # Get overrides
@@ -380,15 +365,10 @@ def makeConfig(name, version, cmdline_args):
     else:
         config.brd['layer-control'] = layer_control_default
 
-
     return
 
 
-
-
-
 def main():
-
     # Get PCBmodE version
     version = utils.get_git_revision()
 
@@ -411,7 +391,7 @@ def main():
         if cmdline_args.renumber is None:
             order = 'top-to-bottom'
         else:
-            order = cmdline_args.renumber.lower()    
+            order = cmdline_args.renumber.lower()
 
         utils.renumberRefdefs(order)
 
@@ -439,19 +419,18 @@ def main():
                 manufacturer = 'default'
             else:
                 manufacturer = cmdline_args.fab.lower()
-     
+
             msg.info("Creating Gerbers")
             gerber.gerberise(manufacturer)
 
             msg.info("Creating excellon drill file")
             excellon.makeExcellon(manufacturer)
-     
+
         if cmdline_args.pngs is True:
             msg.info("Creating PNGs")
             utils.makePngs()
-   
-    
-    filename = os.path.join(config.cfg['locations']['boards'], 
+
+    filename = os.path.join(config.cfg['locations']['boards'],
                             config.cfg['name'],
                             config.cfg['locations']['build'],
                             'paths_db.json')
@@ -460,12 +439,11 @@ def main():
         f = open(filename, 'w')
     except IOError as e:
         print("I/O error({0}): {1}".format(e.errno, e.strerror))
- 
+
     json.dump(config.pth, f, sort_keys=True, indent=2)
     f.close()
 
     msg.info("Done!")
-
 
 
 if __name__ == "__main__":

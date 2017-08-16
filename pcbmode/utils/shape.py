@@ -1,24 +1,19 @@
 #!/usr/bin/python
+# coding=utf-8
+from __future__ import absolute_import
 
 import os
-import copy
-from lxml import etree as et
 
+from lxml import etree as et
 from pkg_resources import resource_exists, resource_filename
 
 import pcbmode.config as config
-from . import messages as msg
-
-# import pcbmode modules
-from . import utils
-from . import svg
-from .point import Point
-from .svgpath import SvgPath
+from pcbmode.utils import messages as msg, svg, utils
+from pcbmode.utils.point import Point
+from pcbmode.utils.svgpath import SvgPath
 
 
-
-
-class Shape():
+class Shape(object):
     """
     """
 
@@ -49,7 +44,7 @@ class Shape():
 
         self._rotate = shape.get('rotate') or 0
         self._rotate *= self._inv_rotate
-        self._rotate_point = shape.get('rotate-point') or Point(0,0)
+        self._rotate_point = shape.get('rotate-point') or Point(0, 0)
         self._scale = shape.get('scale') or 1
         self._pour_buffer = shape.get('buffer-to-pour')
 
@@ -81,7 +76,7 @@ class Shape():
                                   config.cfg['locations']['fonts'],
                                   font_filename)]
 
-            font_resource = ('pcbmode', '/'.join(['fonts',font_filename]))
+            font_resource = ('pcbmode', '/'.join(['fonts', font_filename]))
             if resource_exists(*font_resource):
                 paths.append(resource_filename(*font_resource))
 
@@ -106,13 +101,13 @@ class Shape():
             lh = self._shape_dict.get('line-height') or fs
 
             font_size, letter_spacing, line_height = utils.getTextParams(fs,
-                                                                         ls, 
+                                                                         ls,
                                                                          lh)
 
             # With the units-per-em we can figure out the scale factor
             # to use for the desired font size
             units_per_em = float(font_data.find("//n:font-face", namespaces={'n': config.cfg['namespace']['svg']}).get('units-per-em')) or 1000
-            self._scale = font_size/units_per_em
+            self._scale = font_size / units_per_em
 
             # Get the path to use. This returns the path without
             # scaling, which will be applied later, in the same manner
@@ -122,7 +117,7 @@ class Shape():
                                                letter_spacing,
                                                line_height,
                                                self._scale)
-           
+
             # In the case where the text is an outline/stroke instead
             # of a fill we get rid of the gerber_lp
             if self._shape_dict.get('style') == 'stroke':
@@ -135,53 +130,42 @@ class Shape():
         else:
             msg.error("'%s' is not a recongnised shape type" % self._type)
 
-
         self._path = SvgPath(path, gerber_lp)
 
-        self._path.transform(scale=self._scale, 
-                             rotate_angle=self._rotate, 
-                             rotate_point=self._rotate_point, 
+        self._path.transform(scale=self._scale,
+                             rotate_angle=self._rotate,
+                             rotate_point=self._rotate_point,
                              mirror=self._place_mirrored)
 
-        self._gerber_lp = (shape.get('gerber-lp') or 
-                           shape.get('gerber_lp') or 
-                           gerber_lp or 
+        self._gerber_lp = (shape.get('gerber-lp') or
+                           shape.get('gerber_lp') or
+                           gerber_lp or
                            None)
 
         self._location = utils.toPoint(shape.get('location', [0, 0]))
 
-
-
-
     def transformPath(self, scale=1, rotate=0, rotate_point=Point(), mirror=False, add=False):
         if add == False:
             self._path.transform(scale,
-                                 rotate*self._inv_rotate,
+                                 rotate * self._inv_rotate,
                                  rotate_point,
                                  mirror)
         else:
-            self._path.transform(scale*self._scale,
-                                 rotate*self._inv_rotate+self._rotate,
-                                 rotate_point+self._rotate_point,
+            self._path.transform(scale * self._scale,
+                                 rotate * self._inv_rotate + self._rotate,
+                                 rotate_point + self._rotate_point,
                                  mirror)
-
-
 
     def rotateLocation(self, angle, point=Point()):
         """
         """
         self._location.rotate(angle, point)
 
-
     def getRotation(self):
         return self._rotate
 
-
-
     def setRotation(self, rotate):
         self._rotate = rotate
-
-
 
     def getOriginalPath(self):
         """
@@ -189,30 +173,20 @@ class Shape():
         """
         return self._path.getOriginal()
 
-
-
     def getTransformedPath(self, mirrored=False):
         if mirrored == True:
             return self._path.getTransformedMirrored()
         else:
             return self._path.getTransformed()
 
-
-
     def getWidth(self):
         return self._path.getWidth()
-
-
 
     def getHeight(self):
         return self._path.getHeight()
 
-
-
     def getGerberLP(self):
         return self._gerber_lp
-
-
 
     def setStyle(self, style):
         """
@@ -220,63 +194,49 @@ class Shape():
         """
         self._style = style
 
-
     def getStyle(self):
         """
         Return the shape's style Style object
         """
         return self._style
 
-
     def getStyleString(self):
         style = self._style.getStyleString()
         return style
-
 
     def getStyleType(self):
         style = self._style.getStyleType()
         return style
 
-
     def getScale(self):
         return self._scale
-
 
     def getLocation(self):
         return self._location
 
-  
     def setLocation(self, location):
         self._location = location
-
 
     def getParsedPath(self):
         return self._parsed
 
-
     def getPourBuffer(self):
         return self._pour_buffer
 
-     
     def getType(self):
         return self._type
-
 
     def getText(self):
         return self._text
 
-
     def getDiameter(self):
         return self._diameter
-
 
     def setLabel(self, label):
         self._label = label
 
-
     def getLabel(self):
         return self._label
-
 
     def getMirrorPlacement(self):
         return self._place_mirrored

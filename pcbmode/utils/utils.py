@@ -1,12 +1,21 @@
 #!/usr/bin/python
+# coding=utf-8
+from __future__ import absolute_import
 
+import hashlib
 import json
+import math
 import os
 import re
-import subprocess as subp # for shell commands
-import math
-from operator import itemgetter # for sorting lists by dict value
+import subprocess as subp  # for shell commands
+from operator import itemgetter  # for sorting lists by dict value
+
 from lxml import etree as et
+from pkg_resources import get_distribution
+
+import pcbmode.config as config
+from pcbmode.utils import messages as msg
+from pcbmode.utils.point import Point
 
 try:
     # Python 3
@@ -14,17 +23,6 @@ try:
 except:
     # Python 2
     import HTMLParser
-
-from pkg_resources import get_distribution
-
-import pcbmode.config as config
-
-# pcbmode modules
-from .point import Point
-from . import messages as msg
-import hashlib
-
-
 
 
 def dictToStyleText(style_dict):
@@ -39,9 +37,6 @@ def dictToStyleText(style_dict):
     return style
 
 
-
-
-
 def openBoardSVG():
     """
     Opens the built PCBmodE board SVG.
@@ -52,15 +47,11 @@ def openBoardSVG():
                             config.cfg['locations']['build'],
                             config.cfg['name'] + '.svg')
     try:
-        data = et.ElementTree(file=filename) 
+        data = et.ElementTree(file=filename)
     except IOError as e:
         msg.error("Cannot open %s; has the board been made using the '-m' option yet?" % filename)
 
     return data
-
-
-
-
 
 
 def parseDimension(string):
@@ -78,16 +69,12 @@ def parseDimension(string):
     return value, unit
 
 
-
-
 def to_Point(coord=[0, 0]):
     """
     Takes a coordinate in the form of [x,y] and
     returns a Point type
     """
     return Point(coord[0], coord[1])
-
-
 
 
 def toPoint(coord=[0, 0]):
@@ -101,16 +88,8 @@ def toPoint(coord=[0, 0]):
         return Point(coord[0], coord[1])
 
 
-
-
-
 def get_git_revision():
-
     return get_distribution('pcbmode').version
-
-
-
-
 
 
 def makePngs():
@@ -119,8 +98,8 @@ def makePngs():
     """
 
     # Directory for storing the Gerbers within the build path
-    images_path = os.path.join(config.cfg['base-dir'], 
-                               config.cfg['locations']['build'], 
+    images_path = os.path.join(config.cfg['base-dir'],
+                               config.cfg['locations']['build'],
                                'images')
     # Create it if it doesn't exist
     create_dir(images_path)
@@ -129,27 +108,24 @@ def makePngs():
     png_dpi = 600
     msg.subInfo("Generating PNGs for each layer of the board")
 
-    command = ['inkscape', 
-               '--without-gui', 
-               '--file=%s' % os.path.join(config.cfg['base-dir'], 
-                                          config.cfg['locations']['build'], 
-                                          config.cfg['name'] + '.svg'), 
-               '--export-png=%s' % os.path.join(images_path, config.cfg['name'] + '_rev_' + 
+    command = ['inkscape',
+               '--without-gui',
+               '--file=%s' % os.path.join(config.cfg['base-dir'],
+                                          config.cfg['locations']['build'],
+                                          config.cfg['name'] + '.svg'),
+               '--export-png=%s' % os.path.join(images_path, config.cfg['name'] + '_rev_' +
                                                 config.brd['config']['rev'] +
                                                 '.png'),
                '--export-dpi=%s' % str(png_dpi),
                '--export-area-drawing',
                '--export-background=#FFFFFF']
-    
+
     try:
         subp.call(command)
     except OSError as e:
         msg.error("Cannot find, or run, Inkscape in commandline mode")
 
     return
-
-
-
 
 
 # get_json_data_from_file
@@ -167,7 +143,7 @@ def dictFromJsonFile(filename, error=True):
           http://stackoverflow.com/questions/16172011/json-in-python-receive-check-duplicate-key-error
         """
         result = dict()
-        for key,value in pairs:
+        for key, value in pairs:
             if key in result:
                 msg.error("duplicate key ('%s') specified in %s" % (key, filename), KeyError)
             result[key] = value
@@ -185,8 +161,6 @@ def dictFromJsonFile(filename, error=True):
     return json_data
 
 
-
-
 def getLayerList():
     """
     """
@@ -202,16 +176,13 @@ def getLayerList():
     return layer_list, layer_names
 
 
-
 def getSurfaceLayers():
     """
     Returns a list of surface layer names
     Only here until this function is purged from the
     codebase
-    """    
+    """
     return config.stk['surface-layer-names']
-
-
 
 
 def getInternalLayers():
@@ -219,10 +190,8 @@ def getInternalLayers():
     Returns a list of internal layer names
     Only here until this function is purged from the
     codebase
-    """    
+    """
     return config.stk['internal-layer-names']
-
-
 
 
 def getExtendedLayerList(layers):
@@ -235,10 +204,8 @@ def getExtendedLayerList(layers):
     """
     if 'internal' in layers:
         layers.remove('internal')
-        layers.extend(config.stk['internal-layer-names']) 
+        layers.extend(config.stk['internal-layer-names'])
     return layers
-
-
 
 
 def getExtendedSheetList(layer, sheet):
@@ -247,7 +214,7 @@ def getExtendedSheetList(layer, sheet):
     soldermask layers on the same physical layer. This function
     expands the list if such layers are defined in the stackup
     """
-    
+
     for layer_dict in config.stk['layers-dict']:
         if layer_dict['name'] == layer:
             break
@@ -265,14 +232,11 @@ def getExtendedSheetList(layer, sheet):
     return new_list
 
 
-
-
-
 def create_dir(path):
     """
     Checks if a directory exists, and creates one if not
     """
-    
+
     try:
         # try to create directory first; this prevents TOCTTOU-type race condition
         os.makedirs(path)
@@ -287,9 +251,6 @@ def create_dir(path):
     return
 
 
-
-
-
 def add_dict_values(d1, d2):
     """
     Add the values of two dicts
@@ -297,11 +258,7 @@ def add_dict_values(d1, d2):
       http://stackoverflow.com/questions/1031199/adding-dictionaries-in-python
     """
 
-    return dict((n, d1.get(n, 0)+d2.get(n, 0)) for n in set(d1)|set(d2) )
-
-
-
-
+    return dict((n, d1.get(n, 0) + d2.get(n, 0)) for n in set(d1) | set(d2))
 
 
 def process_meander_type(type_string, meander_type):
@@ -327,14 +284,11 @@ def process_meander_type(type_string, meander_type):
             meander[param] = float(tmp.group('v'))
 
     # add optional fields as 'None'
-    for param in look_for:    
+    for param in look_for:
         if meander.get(param) is None:
             meander[param] = None
 
     return meander
-
-
-
 
 
 def checkForPoursInLayer(layer):
@@ -353,11 +307,9 @@ def checkForPoursInLayer(layer):
             layers = getExtendedLayerList(pour_dict.get('layers'))
             if layer in layers:
                 return True
- 
-    #return False
+
+    # return False
     return True
-
-
 
 
 def interpret_svg_matrix(matrix_data):
@@ -370,15 +322,15 @@ def interpret_svg_matrix(matrix_data):
     """
 
     # apply float() to all elements, just in case
-    matrix_data = [ float(x) for x in matrix_data ]
+    matrix_data = [float(x) for x in matrix_data]
 
     coord = Point(matrix_data[4], -matrix_data[5])
     if matrix_data[0] == 0:
         angle = math.degrees(0)
     else:
         angle = math.atan(matrix_data[2] / matrix_data[0])
-    
-    scale = Point(math.fabs(matrix_data[0] / math.cos(angle)), 
+
+    scale = Point(math.fabs(matrix_data[0] / math.cos(angle)),
                   math.fabs(matrix_data[3] / math.cos(angle)))
 
     # convert angle to degrees
@@ -390,10 +342,6 @@ def interpret_svg_matrix(matrix_data):
     angle = -angle
 
     return coord, angle, scale
-
-
-
-
 
 
 def parse_refdef(refdef):
@@ -413,13 +361,9 @@ def parse_refdef(refdef):
         n = int(parse.group('n'))
         e = parse.group('e')
         return t, n, e
-    
 
 
-
-
-
-#def renumber_refdefs(cfg, order):
+# def renumber_refdefs(cfg, order):
 def renumberRefdefs(order):
     """
     Renumber the refdefs in the specified order
@@ -447,51 +391,45 @@ def renumberRefdefs(order):
 
         # Sort list according to 'order'
         for comp_type in comp_dict:
-           if order == 'left-to-right':
-               reverse = False
-               itemget_param = 'coord_x'
-           elif order == 'right-to-left':
-               reverse = True
-               itemget_param = 'coord_x'
-           elif order == 'top-to-bottom':
-               reverse = True
-               itemget_param = 'coord-y'
-           elif order == 'bottom-to-top':
-               reverse = False
-               itemget_param = 'coord-y'
-           else:
-               msg.error('Unrecognised renumbering order %s' % (order)) 
- 
-           sorted_list = sorted(comp_dict[comp_type], 
-                                key=itemgetter(itemget_param), 
-                                reverse=reverse)
+            if order == 'left-to-right':
+                reverse = False
+                itemget_param = 'coord_x'
+            elif order == 'right-to-left':
+                reverse = True
+                itemget_param = 'coord_x'
+            elif order == 'top-to-bottom':
+                reverse = True
+                itemget_param = 'coord-y'
+            elif order == 'bottom-to-top':
+                reverse = False
+                itemget_param = 'coord-y'
+            else:
+                msg.error('Unrecognised renumbering order %s' % (order))
 
+            sorted_list = sorted(comp_dict[comp_type],
+                                 key=itemgetter(itemget_param),
+                                 reverse=reverse)
 
-           for i, record in enumerate(sorted_list):
-               new_refdef = "%s%s" % (record['type'], i+1)
-               if record['extra'] is not None:
-                   new_refdef += "%s" % (record['extra'])
-               new_dict[new_refdef] = record['record']
- 
+            for i, record in enumerate(sorted_list):
+                new_refdef = "%s%s" % (record['type'], i + 1)
+                if record['extra'] is not None:
+                    new_refdef += "%s" % (record['extra'])
+                new_dict[new_refdef] = record['record']
+
     config.brd['components'] = new_dict
 
     # Save board config to file (everything is saved, not only the
     # component data)
-    filename = os.path.join(config.cfg['locations']['boards'], 
-                            config.cfg['name'], 
+    filename = os.path.join(config.cfg['locations']['boards'],
+                            config.cfg['name'],
                             config.cfg['name'] + '.json')
     try:
         with open(filename, 'wb') as f:
             f.write(json.dumps(config.brd, sort_keys=True, indent=2))
     except:
         msg.error("Cannot save file %s" % filename)
- 
- 
+
     return
-
-
-
-
 
 
 def getTextParams(font_size, letter_spacing, line_height):
@@ -510,7 +448,7 @@ def getTextParams(font_size, letter_spacing, line_height):
 
     if line_height_unit == None:
         line_height_unit = 'mm'
-    
+
     try:
         font_size, font_size_unit = parseDimension(font_size)
     except:
@@ -520,8 +458,6 @@ def getTextParams(font_size, letter_spacing, line_height):
         font_size_unit = 'mm'
 
     return float(font_size), float(letter_spacing), float(line_height)
-
-
 
 
 def textToPath(font_data, text, letter_spacing, line_height, scale_factor):
@@ -535,14 +471,14 @@ def textToPath(font_data, text, letter_spacing, line_height, scale_factor):
     # This the horizontal advance that applied to all glyphs unless there's a specification for
     # for the glyph itself
     font_horiz_adv_x = float(font_data.find("//n:font", namespaces={'n': config.cfg['namespace']['svg']}).get('horiz-adv-x'))
-    
+
     # This is the number if 'units' per 'em'. The default, in the absence of a definition is 1000
     # according to the SVG spec
     units_per_em = float(font_data.find("//n:font-face", namespaces={'n': config.cfg['namespace']['svg']}).get('units-per-em')) or 1000
 
     glyph_ascent = float(font_data.find("//n:font-face", namespaces={'n': config.cfg['namespace']['svg']}).get('ascent'))
     glyph_decent = float(font_data.find("//n:font-face", namespaces={'n': config.cfg['namespace']['svg']}).get('descent'))
- 
+
     text_width = 0
     text_path = ''
 
@@ -551,7 +487,6 @@ def textToPath(font_data, text, letter_spacing, line_height, scale_factor):
         text = re.findall(r'(\&#x[0-9abcdef]*;|.|\n)', text)
     except:
         throw("There's a problem parsing the text '%s'. Unicode and \\n newline should be fine, by the way." % text)
- 
 
     # instantiate HTML parser
     htmlpar = HTMLParser.HTMLParser()
@@ -567,7 +502,7 @@ def textToPath(font_data, text, letter_spacing, line_height, scale_factor):
         # get the glyph definition from the file
         if symbol == '\n':
             text_width = 0
-            text_height += units_per_em + (line_height/scale_factor-units_per_em)
+            text_height += units_per_em + (line_height / scale_factor - units_per_em)
         else:
             glyph = font_data.find(u'//n:glyph[@unicode="%s"]' % symbol, namespaces={'n': config.cfg['namespace']['svg']})
             if glyph == None:
@@ -581,16 +516,15 @@ def textToPath(font_data, text, letter_spacing, line_height, scale_factor):
                     offset_x = float(first_point[0])
                     offset_y = float(first_point[1])
                     path = glyph_path.getRelative()
-                    path = re.sub('^(m\s?[-\d\.]+\s?,\s?[-\d\.]+)', 'M %s,%s' % (str(text_width+offset_x), str(offset_y-text_height)), path)
-                    gerber_lp += (glyph.get('gerber-lp') or 
-                                  glyph.get('gerber_lp') or 
-                                  "%s" % 'd'*glyph_path.getNumberOfSegments())
+                    path = re.sub('^(m\s?[-\d\.]+\s?,\s?[-\d\.]+)', 'M %s,%s' % (str(text_width + offset_x), str(offset_y - text_height)), path)
+                    gerber_lp += (glyph.get('gerber-lp') or
+                                  glyph.get('gerber_lp') or
+                                  "%s" % 'd' * glyph_path.getNumberOfSegments())
                     text_path += "%s " % (path)
 
-            text_width += glyph_width+letter_spacing/scale_factor
+            text_width += glyph_width + letter_spacing / scale_factor
 
-
-    # Mirror text 
+    # Mirror text
     text_path = SvgPath(text_path)
     text_path.transform()
     text_path = text_path.getTransformedMirrored()
@@ -598,17 +532,9 @@ def textToPath(font_data, text, letter_spacing, line_height, scale_factor):
     return text_path, gerber_lp
 
 
-
-
-
 def digest(string):
     digits = config.cfg['digest-digits']
-    return hashlib.md5(string.encode()).hexdigest()[:digits-1]
-
-
-
-
-
+    return hashlib.md5(string.encode()).hexdigest()[:digits - 1]
 
 
 def getStyleAttrib(style, attrib):
@@ -622,15 +548,11 @@ def getStyleAttrib(style, attrib):
         return match.group('s')
 
 
-
-
 def niceFloat(f):
     if f.is_integer():
         return int(f)
     else:
         return round(f, 6)
-
-
 
 
 def parseTransform(transform):
@@ -644,8 +566,8 @@ def parseTransform(transform):
         data['location'] = Point()
     elif 'translate' in transform.lower():
         regex = r".*?translate\s?\(\s?(?P<x>[+-]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)(\s?[\s,]\s?)?(?P<y>[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)?\s?\).*"
-#        regex = r".*?translate\s?\(\s?(?P<x>[+-]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)\s?[\s,]\s?(?P<y>[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)\s?\).*"
-#       regex = r".*?translate\s?\(\s?(?P<x>-?[0-9]*\.?[0-9]+)\s?[\s,]\s?(?P<y>-?[0-9]*\.?[0-9]+\s?)\s?\).*"
+        #        regex = r".*?translate\s?\(\s?(?P<x>[+-]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)\s?[\s,]\s?(?P<y>[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)\s?\).*"
+        #       regex = r".*?translate\s?\(\s?(?P<x>-?[0-9]*\.?[0-9]+)\s?[\s,]\s?(?P<y>-?[0-9]*\.?[0-9]+\s?)\s?\).*"
         coord = re.match(regex, transform)
         data['type'] = 'translate'
         x = coord.group('x')
@@ -654,17 +576,14 @@ def parseTransform(transform):
             y = coord.group('y')
         else:
             y = 0
-        data['location'] = Point(x,y)
+        data['location'] = Point(x, y)
     elif 'matrix' in transform.lower():
         data['type'] = 'matrix'
         data['location'], data['rotate'], data['scale'] = parseSvgMatrix(transform)
     else:
         msg.error("Found a path transform that cannot be handled, %s. SVG stansforms should be in the form of 'translate(num,num)' or 'matrix(num,num,num,num,num,num)" % transform)
 
-    return data 
-
-
-
+    return data
 
 
 def parseSvgMatrix(matrix):
@@ -681,18 +600,18 @@ def parseSvgMatrix(matrix):
     matrix = matrix.split(',')
 
     # Apply float() to all elements
-    matrix = [ float(x) for x in matrix ]
+    matrix = [float(x) for x in matrix]
 
     coord = Point(matrix[4], matrix[5])
     if matrix[0] == 0:
         angle = math.degrees(0)
     else:
         angle = math.atan(matrix[2] / matrix[0])
-    
-    #scale = Point(math.fabs(matrix[0] / math.cos(angle)), 
+
+    # scale = Point(math.fabs(matrix[0] / math.cos(angle)),
     #              math.fabs(matrix[3] / math.cos(angle)))
-    scale_x = math.sqrt(matrix[0]*matrix[0] + matrix[1]*matrix[1]),
-    scale_y = math.sqrt(matrix[2]*matrix[2] + matrix[3]*matrix[3]),    
+    scale_x = math.sqrt(matrix[0] * matrix[0] + matrix[1] * matrix[1]),
+    scale_y = math.sqrt(matrix[2] * matrix[2] + matrix[3] * matrix[3]),
 
     scale = max(scale_x, scale_y)[0]
 
@@ -705,9 +624,3 @@ def parseSvgMatrix(matrix):
     angle = -angle
 
     return coord, angle, scale
-
-
-
-
-
-
