@@ -349,6 +349,7 @@ def checkForPoursInLayer(layer):
         pours = {}
 
     if pours is not None:
+        print pours
         for pour_dict in pours:
             layers = getExtendedLayerList(pour_dict.get('layers'))
             if layer in layers:
@@ -658,11 +659,32 @@ def parseTransform(transform):
     elif 'matrix' in transform.lower():
         data['type'] = 'matrix'
         data['location'], data['rotate'], data['scale'] = parseSvgMatrix(transform)
+    elif 'rotate' in transform.lower():
+        data['type'] = 'rotate'
+        data['location'], data['rotate'] = parseSvgRotate(transform)
     else:
         msg.error("Found a path transform that cannot be handled, %s. SVG stansforms should be in the form of 'translate(num,num)' or 'matrix(num,num,num,num,num,num)" % transform)
 
     return data 
 
+
+
+def parseSvgRotate(rotate):
+    """
+    """
+    regex = r".*?rotate\((?P<m>.*?)\).*"
+    rotate = re.match(regex, rotate)
+    rotate = rotate.group('m')
+    rotate = rotate.split(',')
+
+    # Apply float() to all elements
+    rotate = [ float(x) for x in rotate ]
+
+    location = Point(rotate[1], rotate[2])
+
+    angle = rotate[0]
+
+    return location, angle
 
 
 

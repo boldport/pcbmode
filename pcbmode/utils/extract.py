@@ -69,24 +69,26 @@ def extractComponents(svg_in):
             else:
                 continue
 
-            new_location = transform_data['location']
-            old_location = utils.toPoint(comp_dict.get('location') or [0, 0])
-
-            # Invert 'y' coordinate
-            new_location.y *= config.cfg['invert-y']
-
-            # Change component location if needed
-            if new_location != old_location:
-                x1 = utils.niceFloat(old_location.x)
-                y1 = utils.niceFloat(old_location.y)
-                x2 = utils.niceFloat(new_location.x)
-                y2 = utils.niceFloat(new_location.y)
-                msg.subInfo("%s has moved from [%s,%s] to [%s,%s]" % (refdef,x1,y2,x2,y2))
-                # Apply new location
-                comp_dict['location'] = [x2,y2]
-
+            # Ignore location extraction when parsing 'rotate'
+            if transform_data['type'] != 'rotate':
+                new_location = transform_data['location']
+                old_location = utils.toPoint(comp_dict.get('location') or [0, 0])
+     
+                # Invert 'y' coordinate
+                new_location.y *= config.cfg['invert-y']
+     
+                # Change component location if needed
+                if new_location != old_location:
+                    x1 = utils.niceFloat(old_location.x)
+                    y1 = utils.niceFloat(old_location.y)
+                    x2 = utils.niceFloat(new_location.x)
+                    y2 = utils.niceFloat(new_location.y)
+                    msg.subInfo("%s has moved from [%s,%s] to [%s,%s]" % (refdef,x1,y2,x2,y2))
+                    # Apply new location
+                    comp_dict['location'] = [x2,y2]
+     
             # Change component rotation if needed
-            if transform_data['type'] == 'matrix':
+            if transform_data['type'] in ['rotate','matrix']:
                 old_rotate = comp_dict.get('rotate') or 0
                 new_rotate = transform_data['rotate']
                 comp_dict['rotate'] = utils.niceFloat((old_rotate+new_rotate) % 360)
