@@ -12,6 +12,9 @@ What you'll need
 
 * Python 2.7
 * Inkscape
+  On OSX you can find Inkscape in MacPorts, or HomeBrew, or via direct download. 
+  https://inkscape.org/en/download/mac-os/
+* Python modules: pyparsing, lxml (install via pip)
 * Text editor
 
 Installation from Source with Virtualenv
@@ -85,22 +88,27 @@ Here's one way to organise the build environment
     cool-pcbs/
       PCBmodE/
       boards/
-        hello-solder/
-          hello-solder.json
-          hello-solder_routing.json
+        thelady/
+          thelady.json
+          thelady_routing.json
           components/
             ...
-        cordwood/
-          ...
 
+Download The Lady Example
+   mkdir boards
+   cd boards
+   git clone https://github.com/boldport/thelady
 
-To make the ``hello-solder`` board, run *PCBmodE* within ``cool-pcbs``
+To make the ``thelady`` board, run *PCBmodE* within ``cool-pcbs``
 
-    pcbmode -b hello-solder -m
+    pcbmode -b thelady -m
 
 Then open the SVG with Inkscape
 
     inkscape cool-pcbs/boards/hello-solder/build/hello-solder.svg
+
+On OSX the command syntax is a bit different. 
+    /Applications/Inkscape.app/Contents/Resources/bin/inkscape ./boards/thelady/build/thelady.svg
 
 If the SVG opens you're good to go!
 
