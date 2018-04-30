@@ -315,7 +315,7 @@ def process_meander_type(type_string, meander_type):
         look_for = ['base-length', 'amplitude', 'bus-width', 'pitch']
     else:
         print("ERROR: unrecognised meander type")
-        reaise
+        raise
 
     meander = {}
 
@@ -349,7 +349,7 @@ def checkForPoursInLayer(layer):
         pours = {}
 
     if pours is not None:
-        print pours
+        print(pours)
         for pour_dict in pours:
             layers = getExtendedLayerList(pour_dict.get('layers'))
             if layer in layers:
