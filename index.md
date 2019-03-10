@@ -1,5 +1,3 @@
-![PCBmodE logo](/images/pcbmode-logo.png)
-
 # A circuit board design software with a twist
 
 PCBmodE is a circuit board design software written in Python. Its main advantage is allowing the design to create and use arbitrary shapes for any element of the board. Using stock [Inkscape](http://inkscape.org) as the GUI provides all the features of a drawing tool. This, in contrast to traditional PCB design tools that restrict visual freedom and don't have the full feature set of a vector editing software.
