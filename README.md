@@ -44,7 +44,7 @@ That said, the next version of PCBmodE, 'cinco', we'll focus on the following:
 
 ## Contributing
 
-For contributing code, see the CONTRIBUTE file included in this repository.
+For contributing code, see the CONTRIBUTE.md included in this repository.
 
 If you'd like to contribute _towards_ development in the form of hard cold electronic money, see the end of [this](https://boldport.com/pcbmode) page.
 
