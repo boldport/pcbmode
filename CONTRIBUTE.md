@@ -8,6 +8,6 @@ If you'd like to contribute to PCBmodE's codebase please agree that
 
 If you agree add your full name and email address that you'd use for your contributions. Then issue a pull request with this modified file before issuing a contribution pull request.
 
-##Those who agreed:
+## Those who agreed:
 full name, email address
 
