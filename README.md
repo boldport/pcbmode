@@ -1,22 +1,23 @@
+![PCBmodE logo](/images/pcbmode-logo.png)
+
 # PCBmodE — a circuit board design software with a twist
 
 PCBmodE is a circuit board design software written in Python. Its main advantage is allowing the design to create and use arbitrary shapes for any element of the board. Using stock [Inkscape](http://inkscape.org) as the GUI provides all the features of a drawing tool. This, in contrast to traditional PCB design tools that restrict visual freedom and don't have the full feature set of a vector editing software.
 
 ## Workflow
 
-PCBmodE is a layout-driven design; there's no schematic functionality. Also, there's no DRC other than the designer's eyes.
+PCBmodE folows a layout-driven design flow. There's no schematic functionality or DRC other than the designer's eyes. It's essentiallya script that runs from commandline generating files depending on the stage of the design.
 
-PCBmodE is a script that runs from commandline generating files depending on the stage of the design.
-
-Text editor: edit input [JSON](http://en.wikipedia.org/wiki/JSON) files
-PCBmodE: convert JSON to SVG
-Inkscape: edit SVG (component movement, routing, etc.)
-PCBmodE: extract changes and apply them back to input JSON files
+1. Text editor: edit input [JSON](http://en.wikipedia.org/wiki/JSON) files
+2. PCBmodE: convert JSON files to Inkscape SVG
+3. Inkscape: edit SVG (component movement, routing, etc.)
+4. PCBmodE: extract changes and apply them back to input JSON files
 
 Iterate the above until the design is ready, and then
 
-PCBmodE: create [Gerber](http://en.wikipedia.org/wiki/Gerber_format) files from SVG
-Send to fab ;)
+1. PCBmodE: create [Gerber](http://en.wikipedia.org/wiki/Gerber_format) files from SVG
+2. Send to fab
+3. Get lovely boards back and impress people on Twitter
 
 ## Requirements
 
