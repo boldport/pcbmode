@@ -372,13 +372,13 @@ def makeConfig(name, version, cmdline_args):
       "outline": { "place": True, "hide": False, "lock": True }
     }
 
-    # Get overrides
+    # Assign Layer Control Defaults
+    config.brd['layer-control'] = layer_control_default
+
+    # Then get overrides
     layer_control_config = config.brd.get('layer-control')
     if layer_control_config != None:
-        config.brd['layer-control'] = dict(layer_control_default.items() +
-                                           layer_control_config.items())
-    else:
-        config.brd['layer-control'] = layer_control_default
+        config.brd['layer-control'].update(layer_control_config)
 
 
     return
