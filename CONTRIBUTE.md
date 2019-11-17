@@ -10,4 +10,4 @@ If you agree add your full name and email address that you'd use for your contri
 
 ## Those who agreed:
 full name, email address
-
+Edward Shin, contact@edwardsh.in
