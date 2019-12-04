@@ -42,9 +42,16 @@ The next version of PCBmodE is v5, codename 'cinco'. For this release I'd like t
 * Migrate to Python3 (drop support for Python2)
 * Work with Inkscape 1.x (drop support for previous versions)
 * Improve performance and do better than the current simple caching method
+* Implement the latest Gerber X2 standard
 * Automatic 'gerber-lp' generation from SVG shapes
 * Support any font form Google Fonts
 * Fully support SVG paths (currently 'l' is buggy and 'a' isn't supported)
+
+New desired extensions:
+* Footprint creation wizard
+* New project wizard
+* Browser viewer of PCBmodE SVGs
+* Inkscape add-on to invoke PCBmodE functions from within Inkscape
 
 ## Contributing
 
