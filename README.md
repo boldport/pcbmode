@@ -36,12 +36,15 @@ PCBmodE is developed and tested under Linux, so it might or might not work under
 
 PCBmodE was written and is maintained by Saar Drimer of [Boldport](https://boldport.com). It has been used to design all of Boldport's [products](https://boldport.com/shop) since 2013. It is, therefore, very functional but sadly not that well documented and development happens in bursts.
 
-That said, the next version of PCBmodE, 'cinco', we'll focus on the following:
-* Ease of installation and getting started
-* Complete migration to Python3
-* Update and refresh documentation
-* Resolve known usability and functional bugs
-* Enhance performance
+The next version of PCBmodE is v5, codename 'cinco'. For this release I'd like to get the following done:
+* Package PCBmodE so it's easy to install
+* Update and maintain the documentation
+* Migrate to Python3 (drop support for Python2)
+* Work with Inkscape 1.x (drop support for previous versions)
+* Improve performance and do better than the current simple caching method
+* Automatic 'gerber-lp' generation from SVG shapes
+* Support any font form Google Fonts
+* Fully support SVG paths (currently 'l' is buggy and 'a' isn't supported)
 
 ## Contributing
 
