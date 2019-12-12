@@ -1,3 +1,7 @@
+Important! This is a development branch of the 5th version of PCBmodE ('cinco-master'). Don't use for PCBs that you don't want to break with the next commit ;)
+--
+
+
 ![PCBmodE logo](/images/pcbmode-logo.png)
 
 # A circuit board design software with a twist
