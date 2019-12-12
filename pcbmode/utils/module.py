@@ -972,7 +972,7 @@ and is maintained by Boldport
         # Get shapes for each component definition
         for refdef in components_dict:
             component_dict = components_dict[refdef]
-            
+    
             # Show or hide the component.
             # This will still account the component for the BoM
             show = component_dict.get('show', True)
