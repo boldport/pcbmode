@@ -28,7 +28,7 @@ def cmdArgSetup(pcbmode_version):
     Sets up the commandline arguments form and variables
     """
 
-    description = "PCBmodE is a script-based PCB design tool that generates SVG files from JSON inpus files. It can then convert the SVG into Gerbers. Viewing and (some) editing is done with Inkscape. "
+    description = "PCBmodE is a script-based PCB design tool that generates SVG files from JSON inpus files. It can then convert the SVG into Gerbers. Viewing and (some) editing is done with Inkscape. You can support this project here: https://github.com/sponsors/saardrimer "
 
     epilog = """
     """
@@ -116,6 +116,12 @@ def cmdArgSetup(pcbmode_version):
 def makeConfig(name, version, cmdline_args):
     """
     """
+
+    # Infor while in development
+    msg.info("Important!")
+    msg.info("You are using a version of PCBmodE ('cinco') that's actively under development.")
+    msg.info("Please support this project at https://github.com/sponsors/saardrimer.\n")
+
 
     # Read in PCBmodE's configuration file. Look for it in the
     # calling directory, and then where the script is
