@@ -35,15 +35,23 @@ def subInfo(info, newline=True):
 
 def error(info, error_type=None):
     """
+    Print a message and then raise
     """
+
+    print('')
     print('-----------------------------')
     print('Yikes, ERROR!')
+    print('')
     print('* %s' % info)
+    print('')
     print('Solder on!')
     print('-----------------------------')
+    print('')
+
     if error_type != None:
         raise error_type
-    raise Exception
+    else:
+        raise Exception
 
 
 
