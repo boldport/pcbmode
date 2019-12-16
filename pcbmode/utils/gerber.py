@@ -90,7 +90,7 @@ def gerberise(manufacturer='default'):
 
                 filename = os.path.join(base_dir, base_name + add)
      
-                with open(filename, "wb") as f:
+                with open(filename, "w") as f:
                     for line in gerber.getGerber():
                         f.write(line)
 
@@ -114,7 +114,7 @@ def gerberise(manufacturer='default'):
                           filename_info['other'][sheet].get('ext') or 'ger')
         filename = os.path.join(base_dir, base_name + add)
 
-        with open(filename, "wb") as f:
+        with open(filename, "w") as f:
             for line in gerber.getGerber(False):
                 f.write(line)
 

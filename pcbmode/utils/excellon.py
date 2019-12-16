@@ -40,7 +40,7 @@ def makeExcellon(manufacturer='default'):
                       filename_info['plated'].get('ext') or 'txt')
     filename = os.path.join(base_dir, base_name + add)
 
-    with open(filename, "wb") as f:
+    with open(filename, "w") as f:
         for line in excellon.getExcellon():
             f.write(line)
 
