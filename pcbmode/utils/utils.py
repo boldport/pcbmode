@@ -7,13 +7,7 @@ import subprocess as subp # for shell commands
 import math
 from operator import itemgetter # for sorting lists by dict value
 from lxml import etree as et
-
-try:
-    # Python 3
-    import html.parser as HTMLParser
-except:
-    # Python 2
-    import HTMLParser
+import html.parser as HTMLParser
 
 from pkg_resources import get_distribution
 
@@ -176,6 +170,8 @@ def dictFromJsonFile(filename, error=True):
     try:
         with open(filename, 'r') as f:
             json_data = json.load(f, object_pairs_hook=checking_for_unique_keys)
+    except ValueError as e:
+        msg.error("Couldn't parse JSON file %s:\n-- %s" % (filename, e), ValueError)
     except (IOError, OSError):
         if error == True:
             msg.error("Couldn't open JSON file: %s" % filename, IOError)
