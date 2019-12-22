@@ -19,7 +19,6 @@ Contents:
    extraction
    layer-polarity
    layer-control
-   hello-solder
 
 
 Indices and tables
