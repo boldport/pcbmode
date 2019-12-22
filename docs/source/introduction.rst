@@ -11,16 +11,14 @@ What is PCBmodE?
 How is PCBmodE different?
 -------------------------
 
-*PCBmodE* was conceived as a circuit design tool that allows the designer to put any arbitrary shape on any layer of the board; it is natively vector-based. *PCBmodE* uses open and widely used formats (SVG, JSON) together with open source tools (Python, Inkscape) without proprietary elements (Gerber is an exception). It also provides a fresh take on circuit design and opens new uses for the circuit board manufacturing medium.
+*PCBmodE* was conceived as a circuit design tool that allows the designer freedom to put any arbitrary shape on any layer of the board. While it is possible to add graphical elements to other PCB design tools by additional scripts and general arm-twisting, *PCBmodE* is purposefully designed and architected for that purpose.
 
-*PCBmodE* uses stylesheets with CSS-like syntax. This seperates 'style' from 'content', similarly to the relationship of HTML and CSS.
+*PCBmodE* uses open and widely used formats (SVG, JSON) together with open source tools (Python, Inkscape) without proprietary elements (Gerber is an exception, although the standard is public). It also provides a fresh take on circuit design and opens new uses for the circuit board manufacturing medium.
 
-*PCBmodE* is free and open source (MIT license).
+*PCBmodE* is free and open source under the GPL 3 license.
 
 
 What PCBmodE isn't
 ------------------
 
-*PCBmodE* is not a complete circuit design tool. It does not (currently) have a notion of schematics, have design rule checks, or support more than two layers.
-
-*PCBmodE* is 'alpha' software and isn't as user friendly as we'd like it to be, yet.
+*PCBmodE* isn't a general-purpose replacement for other PCB design tools like KiCad, EAGLE, Altium, etc. For example, it does not currently have a notion of a netlist or schematics, have design rule checks.

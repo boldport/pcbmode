@@ -2,108 +2,143 @@
 Setup
 #####
 
-*PCBmodE* is written and tested with Python 2.7 under Linux. It may or may not work on other operating systems or later versions of Python. With time 'official' support for Windows/MAC will be added.
+We test *PCBmodE* with Python 3.7 under Linux, but it may or may not
+work on other operating systems.
 
-It comes in the form of a installable tool called `pcbmode` which is
+It comes in the form of a installable tool called ``pcbmode`` which is
 run from the command line.
 
 What you'll need
 ================
 
-* Python 2.7
-* Inkscape
+* Python 3.7+
+* Inkscape 1.0+
 * Text editor
 
-Installation from Source with Virtualenv
-========================================
+Installation in a virtual environment 
+=====================================
 
-Virualenv is a Python tool that makes it easy to keep applications in
-their own isolated environments. As a bonus, root permissions are not
-required. This can come useful when running experimental versions of
-PCBmodE.
+Use a virtual environment to keep *PCBmodE* in its own isolated
+environments, for example Python3's ``venv``. If you don't have
+``venv``, get it like this:
 
-These instructions describe how to build PCBmodE for use in a
-virtualenv. To be able to build python-lxml (one of PCBmodE's
-dependencies) you need to install some system-level development
-packages. On Debian based systems these are installed like this:
+.. code-block:: bash
+
+                sudo apt-get install python3-venv
+
+These instructions describe how to build *PCBmodE* for use in a
+virtual environment. To be able to build python-lxml (one of
+*PCBmodE*'s dependencies) you need to install some system-level
+development packages. On Debian based systems these are installed like
+this:
 
 .. code-block:: bash
 
                 sudo apt-get install libxml2-dev libxslt1-dev python-dev
 
-Fetch the *PCBModE* source. Stable snapshots are available at
-`https://github.com/boldport/pcbmode/releases
-<https://github.com/boldport/pcbmode/releases>`_. The latest
-development sources are available via git:
+.. note:: You're reading the documentation for version 5 of *PCBmodE*,
+          'Cinco'. The link below will get you that branch while we're
+          working on it, and before its release.
+
+Get the *PCBModE* source from GitHub. 
 
 .. code-block:: bash
 
-                git clone https://github.com/boldport/pcbmode.git
+                git clone https://github.com/boldport/pcbmode/tree/cinco-master
 
-After putting PCBmodE in a directory called `pcbmode`, run these
-commands to create a virtualenv in the directory `pcbmode-env/` next
-to it, and install PCBmodE in the virtualenv.
+Now run these commands to create a virtual environment, for example in
+the directory ``pcbmode-env/`` next to ``pcbmode/``. Then create the
+virtual environment like this:
 
 .. code-block:: bash
 
-                virtualenv pcbmode-env
+                python3 venv -m pcbmode-env
                 source pcbmode-env/bin/activate
 		cd pcbmode
-		python setup.py install
 
-After installation, PCBmodE will be available in your path as
-``pcbmode``. But since it was installed in a virtualenv, the
-``pcbmode`` command will only be available in your path after running
-``pcbmode-env/bin/activate`` and will no longer be in your path after
-running ``deactivate``. You will need to activate the virtualenv each
-time you want to run `pcbmode` from a new terminal window.
-
-Nothing is installed globally, so to start from scratch you can just follow these steps:
+If you want to just run *PCBmodE*, run
 
 .. code-block:: bash
 
-                deactivate         # skip if pcbmode-env is not active
-                rm -r pcbmode-env
-                cd pcbmode
-                git clean -dfX     # erases any untracked files (build files etc). save your work!
+		python3 setup.py install
+
+but if you want to develop it, run
+
+.. code-block:: bash
+
+		python3 setup.py develop
+
+After installation, *PCBmodE* will be available in your path as an
+executable ``pcbmode``. But since it was installed in a virtualenv,
+the ``pcbmode`` command will only be available in your path after
+running ``source pcbmode-env/bin/activate`` and will no longer be in
+your path after running ``deactivate``, which gets you out of the
+virtual environment. You will need to activate the virtualenv each
+time you want to run ``pcbmode`` from a new terminal window.
+
+Nothing is installed globally, so to start from scratch you can just
+follow these steps:
+
+.. code-block:: bash
+
+  deactivate	     # skip if pcbmode-env is not active
+  rm -r pcbmode-env
+  cd pcbmode
+  git clean -dfX     # erases any untracked files (build files etc). Save your work!
+
 
 Running PCBmodE
 ===============
 
-.. tip:: To see all the options that *PCBmodE* supports, use ``pcbmode --help``
+.. tip:: To see all the options that *PCBmodE* supports, use ``pcbmode
+         --help``
 
 By default *PCBmodE* expects to find the board files under
 
-    boards/<board-name>
+.. code-block:: bash
 
-relative to the place where it is invoked. 
+                boards/<board-name>
 
-.. tip:: Paths where *PCBmodE* looks for thing can be changed in the config file ``pcbmode_config.json``
+*relative to the place where it is invoked*. 
+
+.. tip:: Paths where *PCBmodE* looks for things can be changed in the
+         config file ``pcbmode_config.json``.
 
 Here's one way to organise the build environment
 
-    cool-pcbs/
-      PCBmodE/
-      boards/
-        hello-solder/
-          hello-solder.json
-          hello-solder_routing.json
-          components/
-            ...
-        cordwood/
-          ...
+.. code-block:: bash
+
+                beautiful-pcbs/
+                  pcbmode-env/
+                  pcbmode/
+                  boards/
+                    my-board/                # a PCB project
+                      my-board.json
+                      my-board_routing.json
+                      components/
+                      shapes/
+                      docs/
+                        ...
+                    cordwood/                # another PCB project
+                      ...
 
 
-To make the ``hello-solder`` board, run *PCBmodE* within ``cool-pcbs``
+To make the ``my-board`` board, run *PCBmodE* within ``beautiful-pcbs``
 
-    pcbmode -b hello-solder -m
+.. code-block:: bash
+
+                pcbmode -b my-board -m
 
 Then open the SVG with Inkscape
 
-    inkscape cool-pcbs/boards/hello-solder/build/hello-solder.svg
+.. code-block:: bash
+
+                inkscape beautiful-pcbs/boards/my-board/build/my-board.svg
 
 If the SVG opens you're good to go!
 
-.. note:: *PCBmodE* processes a lot of shapes on the first time it is run, so it will take a noticeable time. This time will be dramatically reduced on subsequent invocations since *PCBmodE* caches the shapes in a datafile within the project's build directory.
-
-
+.. note:: *PCBmodE* processes a lot of shapes on the first time it is
+          run, so it will take a noticeable amount. This time will be
+          dramatically reduced on subsequent invocations since
+          *PCBmodE* caches the shapes in a datafile within the
+          project's build directory.
