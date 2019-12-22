@@ -1,11 +1,10 @@
-People who kindly support PCBmodE with cash
---
+# People who kindly support PCBmodE
 
-(You too can support this project via GitHub Sponsors.)
+Contribute to the development of PCBmodE by [supporting Saar Drimer](https://github.com/sponsors/saardrimer) through GitHub Sponsors.
 
-**Active**
+## Active supporters
 
-* Rufus Cable, (@threebytesfull)[https://github.com/threebytesfull]
-* (@eedoc)[https://github.com/eedoc]
+* Rufus Cable, [@threebytesfull](https://github.com/threebytesfull)
+* [@eedoc](https://github.com/eedoc)
 
-**Past**
+## Past supporters
