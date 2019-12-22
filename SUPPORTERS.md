@@ -5,6 +5,7 @@ People who kindly support PCBmodE with cash
 
 **Active**
 
-* Rufus Cable, @threebytesfull
+* Rufus Cable, (@threebytesfull)[https://github.com/threebytesfull]
+* (@eedoc)[https://github.com/eedoc]
 
 **Past**
