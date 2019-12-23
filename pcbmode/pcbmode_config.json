@@ -109,26 +109,26 @@
         {
           "top":
           {
-            "conductor": {"ext": "ger"},
-            "soldermask": {"ext": "ger"},
-            "silkscreen": {"ext": "ger"},
-            "solderpaste": {"ext": "ger"}
+            "conductor": {"ext": "gbr"},
+            "soldermask": {"ext": "gbr"},
+            "silkscreen": {"ext": "gbrr"},
+            "solderpaste": {"ext": "gbrr"}
           },
           "internal":
           {
-            "conductor": {"ext": "ger"}
+            "conductor": {"ext": "gbrr"}
           },
           "bottom":
           {
-            "conductor": {"ext": "ger"},
-            "soldermask": {"ext": "ger"},
-            "silkscreen": {"ext": "ger"},
-            "solderpaste": {"ext": "ger"}
+            "conductor": {"ext": "gbrr"},
+            "soldermask": {"ext": "gbr"},
+            "silkscreen": {"ext": "gbrr"},
+            "solderpaste": {"ext": "gbr"}
           },
           "other":
    	  {
-            "documentation": {"ext": "ger"},
-            "outline": {"ext": "ger"}
+            "documentation": {"ext": "gbr"},
+            "outline": {"ext": "gbrr"}
           }
         },
         "drills":
