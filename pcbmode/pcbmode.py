@@ -4,23 +4,20 @@ import os
 import json
 import argparse
 
-try:
-    from os import getcwdu as getcwd
-except:
-    from os import getcwd as getcwd
+from os import getcwd as getcwd
 
 from pkg_resources import resource_filename, resource_exists
 
 # PCBmodE modules
-from . import config
-from .utils import utils
-from .utils import gerber
-from .utils import extract
-from .utils import excellon
-from .utils import messages as msg
-from .utils import bom
-from .utils import coord_file
-from .utils.board import Board
+from pcbmode import config
+from pcbmode.utils import utils
+from pcbmode.utils import gerber
+from pcbmode.utils import extract
+from pcbmode.utils import excellon
+from pcbmode.utils import messages as msg
+from pcbmode.utils import bom
+from pcbmode.utils import coord_file
+from pcbmode.utils.board import Board
 
 
 def cmdArgSetup(pcbmode_version):
