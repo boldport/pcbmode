@@ -98,11 +98,6 @@ def cmdArgSetup(pcbmode_version):
                       dest='make_bom', default=False, 
                       help='Create a bill of materials')
 
-    argp.add_argument('--sig-dig', nargs=1,
-                      dest='sig_dig', default=False,
-                      help="Number of significant digits to use when generating the board's SVG. Valid values are between 2 and 8.")
-
-
     return argp
 
 
@@ -144,17 +139,10 @@ def load_board_config():
 
 
 
-
-def make_config(name, version, cmdline_args):
+def load_style():
     """
     """
 
-    #=================================
-    # Style
-    #=================================
-
-    # Get style file; search for it in the project directory and 
-    # where the script it
     layout_style = config.brd['config']['style-layout']
     layout_style_filename = 'layout.json'
     paths = [os.path.join(config.cfg['base-dir'],
@@ -176,9 +164,12 @@ def make_config(name, version, cmdline_args):
     if not 'layout' in config.stl or config.stl['layout'] == {}:
         msg.error("Couldn't find style file %s. Looked for it here:\n%s" % (layout_style_filename, filenames))
 
-    #-------------------------------------------------------------
-    # Stackup
-    #-------------------------------------------------------------
+
+
+def load_stackup():
+    """
+    """
+
     try:
         stackup_filename = config.brd['stackup']['name'] + '.json'
     except:
@@ -207,33 +198,38 @@ def make_config(name, version, cmdline_args):
     config.stk['surface-layer-names'] = [config.stk['layer-names'][0], config.stk['layer-names'][-1]]
     config.stk['internal-layer-names'] = config.stk['layer-names'][1:-1]
 
-    #---------------------------------------------------------------
-    # Path database
-    #---------------------------------------------------------------
+
+
+def load_cache():
+    """
+    """
+
     filename = os.path.join(config.cfg['locations']['boards'], 
                             config.cfg['name'],
                             config.cfg['locations']['build'],
                             'paths_db.json')
 
-    # Open database file. If it doesn't exist, leave the database in
-    # ots initial state of {}
     if os.path.isfile(filename):
         config.pth = utils.dictFromJsonFile(filename)
 
 
-    #----------------------------------------------------------------
-    # Routing
-    #----------------------------------------------------------------
+
+def load_routing():
+    """
+    """
+
     filename = os.path.join(config.cfg['base-dir'], 
                             config.brd['files'].get('routing-json') or config.cfg['name'] + '_routing.json')
 
-    # Open database file. If it doesn't exist, leave the database in
-    # ots initial state of {}
     if os.path.isfile(filename):
         config.rte = utils.dictFromJsonFile(filename)
-    else:
-        config.rte = {}
 
+
+
+
+def make_config(name, version, cmdline_args):
+    """
+    """
 
     # namespace URLs
     config.cfg['ns'] = {
@@ -248,20 +244,10 @@ def make_config(name, version, cmdline_args):
         #  http://en.wikipedia.org/wiki/XML_namespace
         "pcbmode"  : "pcbmode"
     }
-
     config.cfg['namespace'] = config.cfg['ns']
 
-    # Get amount of significant digits to use for floats
-    config.cfg['significant-digits'] = config.cfg.get('significant-digits', 8)
 
-    if cmdline_args.sig_dig != False:
-        sig_dig = int(cmdline_args.sig_dig[0])
-        if (2 <= sig_dig <= 8):
-            config.cfg['significant-digits'] = sig_dig
-        else:
-            msg.info("Commandline significant digit specification not in range, setting to %d" % config.cfg['significant-digits'])
-
-    # buffer from board outline to display block edge 
+    # Buffer from board outline to display block edge 
     config.cfg['display-frame-buffer'] = config.cfg.get('display_frame_buffer', 1.0)
 
     # the style for masks used for copper pours
@@ -410,6 +396,11 @@ def main():
 
     msg.info("Loading board's configuration data")
     load_board_config()
+
+    load_style()
+    load_stackup()
+    load_cache()
+    load_routing()
 
     make_config(board_name, version, cmdline_args)
 
