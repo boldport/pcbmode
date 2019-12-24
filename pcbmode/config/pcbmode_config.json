@@ -9,6 +9,10 @@
     "stackups": "stackups/",
     "shapes": "shapes/"
   },
+  "parameters":
+  {
+    "significant-digits": 8
+  },
   "distances":
   {
     "from-pour-to": 
