@@ -108,50 +108,35 @@ def cmdArgSetup(pcbmode_version):
 
 
 
-
-
-def makeConfig(name, version, cmdline_args):
+def load_config():
     """
+    Load the default ans local configuration files into memory
     """
-
-    # Infor while in development
-    msg.info("Important!")
-    msg.info("You are using a version of PCBmodE ('cinco') that's actively under development.")
-    msg.info("Please support this project at https://github.com/sponsors/saardrimer.\n")
-
 
     # Read in PCBmodE's configuration file. Look for it in the
     # calling directory, and then where the script is
     msg.info("Processing PCBmodE's configuration file")
 
-    #paths = [os.path.join(os.getcwd(), cmdline_args.config_file)]
-
-    #config_resource = (__name__, 'pcbmode_config.json')
-
-    pcbmode_file = os.path.realpath(__file__)
-    pcbmode_path = os.path.dirname(pcbmode_file)
-
-    print(pcbmode_path)
-
-#    if resource_exists(*config_resource):
-#        paths.append(resource_filename(*config_resource))
-
+    pcbmode_file = os.path.realpath(__file__)    # Get location of pcbmode.py
+    pcbmode_path = os.path.dirname(pcbmode_file) # Get only the path
     config_path = 'config'
     config_filename = 'pcbmode_config.json'
     config.cfg = utils.dictFromJsonFile(os.path.join(pcbmode_path,
                                                      config_path,
                                                      config_filename))
 
-#    filenames = ''
-#    for path in paths:
-#        filename = path
-#        filenames += "  %s \n" % filename
-#        if os.path.isfile(filename):
-#            config.cfg = utils.dictFromJsonFile(filename)
-#            break
 
-    if config.cfg == {}:
-        msg.error("Couldn't open PCBmodE's configuration file %s. Looked for it here:\n%s" % (cmdline_args.config_file, filenames))
+
+def make_config(name, version, cmdline_args):
+    """
+    """
+
+    # Info while in development
+    msg.info("Important!")
+    msg.info("You are using a version of PCBmodE ('cinco') that's actively under development.")
+    msg.info("Please support this project at https://github.com/sponsors/saardrimer.\n")
+
+
 
     # add stuff
     config.cfg['name'] = name
@@ -410,6 +395,9 @@ def makeConfig(name, version, cmdline_args):
 
 def main():
 
+    # Load PCBmodE configuration 
+    load_config()
+
     # Get PCBmodE version
     version = utils.get_git_revision()
 
@@ -420,7 +408,9 @@ def main():
     # Might support running multiple boards in the future,
     # for now get the first onw
     board_name = cmdline_args.boards[0]
-    makeConfig(board_name, version, cmdline_args)
+
+
+    make_config(board_name, version, cmdline_args)
 
     # Check if build directory exists; if not, create
     build_dir = os.path.join(config.cfg['base-dir'], config.cfg['locations']['build'])
