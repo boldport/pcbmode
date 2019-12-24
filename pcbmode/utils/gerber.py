@@ -885,7 +885,7 @@ def gerbers_to_svg(manufacturer='default'):
     #                                  round(board_height/2, sig_dig))
 
     # extra buffer for display frame
-    display_frame_buffer = config.cfg.get('display-frame-buffer') or 1.0
+    display_frame_buffer = config.cfg['parameters']['display-frame-buffer']
 
     gerber = et.Element('svg',
         width=str(display_width) + config.brd['config']['units'],

@@ -246,14 +246,6 @@ def make_config(name, version, cmdline_args):
     }
     config.cfg['namespace'] = config.cfg['ns']
 
-
-    # Buffer from board outline to display block edge 
-    config.cfg['display-frame-buffer'] = config.cfg.get('display_frame_buffer', 1.0)
-
-    # the style for masks used for copper pours
-    config.cfg['mask-style'] = "fill:#000;stroke:#000;stroke-linejoin:round;stroke-width:%s;"
-
-
     #------------------------------------------------------------------
     # Distances
     #------------------------------------------------------------------
