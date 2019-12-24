@@ -9,7 +9,7 @@ from os import getcwd as getcwd
 from pkg_resources import resource_filename, resource_exists
 
 # PCBmodE modules
-from pcbmode import config
+from pcbmode.config import config
 from pcbmode.utils import utils
 from pcbmode.utils import gerber
 from pcbmode.utils import extract
@@ -124,19 +124,31 @@ def makeConfig(name, version, cmdline_args):
     # calling directory, and then where the script is
     msg.info("Processing PCBmodE's configuration file")
 
-    paths = [os.path.join(os.getcwd(), cmdline_args.config_file)]
+    #paths = [os.path.join(os.getcwd(), cmdline_args.config_file)]
 
-    config_resource = (__name__, 'pcbmode_config.json')
-    if resource_exists(*config_resource):
-        paths.append(resource_filename(*config_resource))
+    #config_resource = (__name__, 'pcbmode_config.json')
 
-    filenames = ''
-    for path in paths:
-        filename = path
-        filenames += "  %s \n" % filename
-        if os.path.isfile(filename):
-            config.cfg = utils.dictFromJsonFile(filename)
-            break
+    pcbmode_file = os.path.realpath(__file__)
+    pcbmode_path = os.path.dirname(pcbmode_file)
+
+    print(pcbmode_path)
+
+#    if resource_exists(*config_resource):
+#        paths.append(resource_filename(*config_resource))
+
+    config_path = 'config'
+    config_filename = 'pcbmode_config.json'
+    config.cfg = utils.dictFromJsonFile(os.path.join(pcbmode_path,
+                                                     config_path,
+                                                     config_filename))
+
+#    filenames = ''
+#    for path in paths:
+#        filename = path
+#        filenames += "  %s \n" % filename
+#        if os.path.isfile(filename):
+#            config.cfg = utils.dictFromJsonFile(filename)
+#            break
 
     if config.cfg == {}:
         msg.error("Couldn't open PCBmodE's configuration file %s. Looked for it here:\n%s" % (cmdline_args.config_file, filenames))
