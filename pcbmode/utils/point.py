@@ -13,7 +13,7 @@ class Point:
   
     def __init__(self, x=0, y=0):
         try:
-            self.sig_dig = config.cfg['significant-digits']
+            self.sig_dig = config.cfg['parameters']['significant-digits']
         except:
             self.sig_dig = 8
         self.x = round(float(x), self.sig_dig)

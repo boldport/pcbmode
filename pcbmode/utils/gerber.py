@@ -880,7 +880,7 @@ def gerbers_to_svg(manufacturer='default'):
     display_height = board_height
 
     #transform = 'translate(' + str(round((board_width)/2, SD)) + ' ' + str(round((board_height)/2, SD)) + ')'
-    sig_dig = config.cfg['significant-digits']
+    sig_dig = config.cfg['parameters']['significant-digits']
     #transform = 'translate(%s %s)' % (round(board_width/2, sig_dig),
     #                                  round(board_height/2, sig_dig))
 

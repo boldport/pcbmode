@@ -52,7 +52,7 @@ class Module():
         shapes_dict = self._module_dict.get('shapes') or {}
         self._shapes = self._getComponents(shapes_dict)
 
-        sig_dig = config.cfg['significant-digits']
+        sig_dig = config.cfg['parameters']['significant-digits']
         self._transform = 'translate(%s %s)' % (round(self._width/2, sig_dig),
                                                 round(self._height/2, sig_dig))
 

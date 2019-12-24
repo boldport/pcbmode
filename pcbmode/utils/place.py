@@ -19,7 +19,7 @@ def placeShape(shape, svg_layer, invert=False, original=False):
     'original': use the original path, not the transformed one
     """
 
-    sig_dig = config.cfg['significant-digits']
+    sig_dig = config.cfg['parameters']['significant-digits']
 
     style_string = shape.getStyleString()
     style_type = shape.getStyleType()
@@ -82,7 +82,7 @@ def placeDrill(drill,
     path = svg.drill_diameter_to_path(diameter)
     mask_path = svg.circle_diameter_to_path(diameter)
 
-    sig_dig = config.cfg['significant-digits']
+    sig_dig = config.cfg['parameters']['significant-digits']
     transform = 'translate(%s %s)' % (round((location.x + offset.x)*scale, sig_dig),
                                       round((-location.y - offset.y)*scale, sig_dig))
 
