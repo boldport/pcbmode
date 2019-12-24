@@ -3,7 +3,8 @@
 from math import pi, sin, cos
 import decimal
 
-import pcbmode.config as config
+from pcbmode.config import config
+
 
 DEG2RAD = 2 * pi / 360
 

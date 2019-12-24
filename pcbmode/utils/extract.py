@@ -3,12 +3,10 @@
 import os
 import json
 
-import pcbmode.config as config
-from . import messages as msg
-
-# pcbmode modules
-from . import utils
-from .point import Point
+from pcbmode.config import config
+from pcbmode.utils import messages as msg
+from pcbmode.utils import utils
+from pcbmode.utils.point import Point
 
 
 

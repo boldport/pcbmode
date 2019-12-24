@@ -5,11 +5,9 @@ import pyparsing as PYP
 import re
 from lxml import etree as et
 
-import pcbmode.config as config
-
-# import pcbmode modules
-from . import utils
-from .point import Point
+from pcbmode.config import config
+from pcbmode.utils import utils
+from pcbmode.utils.point import Point
 
 
 

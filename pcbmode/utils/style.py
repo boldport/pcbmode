@@ -1,14 +1,8 @@
 #!/usr/bin/python
 
-import pcbmode.config as config
-from . import messages as msg
-
-
-
-# import pcbmode modules
-from . import utils
-
-
+from pcbmode.config import config
+from pcbmode.utils import messages as msg
+from pcbmode.utils import utils
 
 
 class Style():

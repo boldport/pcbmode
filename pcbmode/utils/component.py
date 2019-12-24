@@ -1,16 +1,14 @@
 #!/usr/bin/python
 
 import os
-
-import pcbmode.config as config
 import copy
 
-# pcbmode modules
-from . import utils
-from . import messages as msg
-from .shape import Shape
-from .style import Style
-from .footprint import Footprint
+from pcbmode.config import config
+from pcbmode.utils import utils
+from pcbmode.utils import messages as msg
+from pcbmode.utils.shape import Shape
+from pcbmode.utils.style import Style
+from pcbmode.utils.footprint import Footprint
 
 
 

@@ -3,20 +3,17 @@
 import os
 import re
 import json
+import copy
 from lxml import etree as et
 
-import pcbmode.config as config
-from . import messages as msg
-
-
-# pcbmode modules
-from . import svg 
-from . import utils
-from . import place
-import copy
-from .style import Style
-from .point import Point
-from .shape import Shape
+from pcbmode.config import config
+from pcbmode.utils import messages as msg
+from pcbmode.utils import svg 
+from pcbmode.utils import utils
+from pcbmode.utils import place
+from pcbmode.utils.style import Style
+from pcbmode.utils.point import Point
+from pcbmode.utils.shape import Shape
 
 
 

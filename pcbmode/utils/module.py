@@ -5,25 +5,17 @@ import datetime
 import copy
 import sys
 from lxml import etree as et
+import html.parser as HTMLParser
 
-import pcbmode.config as config
-from . import messages as msg
-
-from . import svg
-from . import utils
-from . import place
-
-try:
-    # Python 3
-    import html.parser as HTMLParser
-except:
-    # Python 2
-    import HTMLParser
-
-from .shape import Shape
-from .style import Style
-from .component import Component
-from .point import Point
+from pcbmode.config import config
+from pcbmode.utils import messages as msg
+from pcbmode.utils import svg
+from pcbmode.utils import utils
+from pcbmode.utils import place
+from pcbmode.utils.shape import Shape
+from pcbmode.utils.style import Style
+from pcbmode.utils.component import Component
+from pcbmode.utils.point import Point
 
 
 

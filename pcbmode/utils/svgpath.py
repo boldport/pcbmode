@@ -4,13 +4,11 @@ from math import sqrt, ceil
 import pyparsing as PYP
 import re
 
-import pcbmode.config as config
-from . import messages as msg
-
-# import pcbmode modules
-from . import utils
-from . import svg
-from .point import Point
+from pcbmode.config import config
+from pcbmode.utils import messages as msg
+from pcbmode.utils import utils
+from pcbmode.utils import svg
+from pcbmode.utils.point import Point
 
 
 

@@ -3,17 +3,14 @@
 import os
 import copy
 from lxml import etree as et
-
 from pkg_resources import resource_exists, resource_filename
 
-import pcbmode.config as config
-from . import messages as msg
-
-# import pcbmode modules
-from . import utils
-from . import svg
-from .point import Point
-from .svgpath import SvgPath
+from pcbmode.config import config
+from pcbmode.utils import messages as msg
+from pcbmode.utils import utils
+from pcbmode.utils import svg
+from pcbmode.utils.point import Point
+from pcbmode.utils.svgpath import SvgPath
 
 
 

@@ -3,12 +3,13 @@
 #import json
 import os
 import re
-import pcbmode.config as config
 
-from . import utils
-from . import messages as msg
-from .shape import Shape
-from .style import Style
+from pcbmode.config import config
+from pcbmode.utils import utils
+from pcbmode.utils import messages as msg
+from pcbmode.utils.shape import Shape
+from pcbmode.utils.style import Style
+
 
 
 def makeCoordFile(arg=False):
