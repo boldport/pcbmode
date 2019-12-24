@@ -108,14 +108,10 @@ def cmdArgSetup(pcbmode_version):
 
 
 
-def load_config():
+def load_pcbmode_config():
     """
-    Load the default ans local configuration files into memory
+    Load the default and local configuration files into memory
     """
-
-    # Read in PCBmodE's configuration file. Look for it in the
-    # calling directory, and then where the script is
-    msg.info("Processing PCBmodE's configuration file")
 
     pcbmode_file = os.path.realpath(__file__)    # Get location of pcbmode.py
     pcbmode_path = os.path.dirname(pcbmode_file) # Get only the path
@@ -126,33 +122,18 @@ def load_config():
                                                      config_filename))
 
 
-
-def make_config(name, version, cmdline_args):
+def load_board_config():
     """
+    Load the board's configuration data
     """
 
-    # Info while in development
-    msg.info("Important!")
-    msg.info("You are using a version of PCBmodE ('cinco') that's actively under development.")
-    msg.info("Please support this project at https://github.com/sponsors/saardrimer.\n")
-
-
-
-    # add stuff
-    config.cfg['name'] = name
-    config.cfg['version'] = version
-    config.cfg['base-dir'] = os.path.join(config.cfg['locations']['boards'], name)
-
-    config.cfg['digest-digits'] = 10
-
-    # Read in the board's configuration data
-    msg.info("Processing board's configuration file")
     filename = os.path.join(config.cfg['locations']['boards'], 
                             config.cfg['name'], 
                             config.cfg['name'] + '.json')
     config.brd = utils.dictFromJsonFile(filename)
 
     tmp_dict = config.brd.get('config')
+
     if tmp_dict != None:
         config.brd['config']['units'] = tmp_dict.get('units', 'mm') or 'mm'
         config.brd['config']['style-layout'] = tmp_dict.get('style-layout', 'default') or 'default'
@@ -161,6 +142,12 @@ def make_config(name, version, cmdline_args):
         config.brd['config']['units'] = 'mm'
         config.brd['config']['style-layout'] = 'default'
 
+
+
+
+def make_config(name, version, cmdline_args):
+    """
+    """
 
     #=================================
     # Style
@@ -395,8 +382,10 @@ def make_config(name, version, cmdline_args):
 
 def main():
 
-    # Load PCBmodE configuration 
-    load_config()
+    # Info while in development
+    msg.info("Important!")
+    msg.info("You are using a version of PCBmodE ('cinco') that's actively under development.")
+    msg.info("Please support this project at https://github.com/sponsors/saardrimer.\n")
 
     # Get PCBmodE version
     version = utils.get_git_revision()
@@ -409,6 +398,18 @@ def main():
     # for now get the first onw
     board_name = cmdline_args.boards[0]
 
+    msg.info("Loading PCBmodE's configuration data")
+    load_pcbmode_config()
+
+    # Add more config
+    config.cfg['name'] = board_name
+    config.cfg['version'] = version
+    config.cfg['base-dir'] = os.path.join(config.cfg['locations']['boards'], board_name)
+
+    config.cfg['digest-digits'] = 10
+
+    msg.info("Loading board's configuration data")
+    load_board_config()
 
     make_config(board_name, version, cmdline_args)
 
