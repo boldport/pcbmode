@@ -880,12 +880,12 @@ def gerbers_to_svg(manufacturer='default'):
     display_height = board_height
 
     #transform = 'translate(' + str(round((board_width)/2, SD)) + ' ' + str(round((board_height)/2, SD)) + ')'
-    sig_dig = config.cfg['parameters']['significant-digits']
+    sig_dig = config.cfg['params']['significant-digits']
     #transform = 'translate(%s %s)' % (round(board_width/2, sig_dig),
     #                                  round(board_height/2, sig_dig))
 
     # extra buffer for display frame
-    display_frame_buffer = config.cfg['parameters']['display-frame-buffer']
+    display_frame_buffer = config.cfg['params']['display-frame-buffer']
 
     gerber = et.Element('svg',
         width=str(display_width) + config.brd['config']['units'],
