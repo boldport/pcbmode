@@ -13,7 +13,7 @@
   {
     "significant-digits": 8,
     "display-frame-buffer": 1.0,
-    "mask-style": "fill:#000;stroke:#000;stroke-linejoin:round;stroke-width:%s;"
+    "mask-style": "fill:#000;stroke:#000;stroke-linejoin:round;stroke-width:%s;",
     "distances":
     {
       "from-pour-to": 
