@@ -593,13 +593,11 @@ def textToPath(font_data, text, letter_spacing, line_height, scale_factor):
 
 
 
-
 def digest(string):
-    digits = config.cfg['digest-digits']
+    """
+    """
+    digits = config.cfg['params']['num-of-digest-digits']
     return hashlib.md5(string.encode()).hexdigest()[:digits-1]
-
-
-
 
 
 
