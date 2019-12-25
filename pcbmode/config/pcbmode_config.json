@@ -9,33 +9,68 @@
     "stackups": "stackups/",
     "shapes": "shapes/"
   },
+  "create-and-display":
+  {
+    "docs": true, 
+    "drill-index": true, 
+    "flashes": true, 
+    "layer-index": true  
+  },
   "params":
   {
+    "units": "mm",
     "significant-digits": 8,
-    "display-frame-buffer": 1.0,
-    "mask-style": "fill:#000;stroke:#000;stroke-linejoin:round;stroke-width:%s;",
-    "distances":
+    "display-frame-buffer": 1.0
+    "num-of-digest-digits": 12
+  },
+  "distances":
+  {
+    "from-pour-to": 
     {
-      "from-pour-to": 
-      {
-        "outline": 0.5,
-        "drill": 1.0, 
-        "pad": 0.2, 
-        "route": 0.25
-      },
-      "soldermask": 
-      {
-        "path-scale": 1.05,
-        "rect-buffer": 0.05,
-        "circle-buffer": 0.05
-      },
-      "solderpaste":
-      {
-        "path-scale": 0.9,
-        "rect-buffer": -0.1,
-        "circle-buffer": -0.1
-      }
+      "outline": 0.5,
+      "drill": 1.0, 
+      "pad": 0.2, 
+      "route": 0.25
+    },
+    "soldermask": 
+    {
+      "path-scale": 1.05,
+      "rect-buffer": 0.05,
+      "circle-buffer": 0.05
+    },
+    "solderpaste":
+    {
+      "path-scale": 0.9,
+      "rect-buffer": -0.1,
+      "circle-buffer": -0.1
     }
+  },
+  "gerber-params":
+  {
+    "decimals": 6, 
+    "digits": 6, 
+    "min-segment-length": 0.05, 
+    "steps-per-segment": 100
+  },
+  "layer-control":
+  {
+    "conductor":
+    { 
+      "place": true, "hide": false, "lock": false, 
+      "pours": { "place": true, "hide": false, "lock": true },
+      "pads": { "place": true, "hide": false, "lock": false },
+      "routing": { "place": true, "hide": false, "lock": false }
+    },
+    "soldermask": { "place": true, "hide": false, "lock": false },
+    "solderpaste": { "place": true, "hide": true, "lock": true },
+    "silkscreen": { "place": true, "hide": false, "lock": false },
+    "assembly": { "place": true, "hide": false, "lock": false },
+    "documentation": { "place": true, "hide": false, "lock": false },
+    "dimensions": { "place": true, "hide": false, "lock": true },
+    "origin": { "place": true, "hide": false, "lock": true },
+    "drills": { "place": true, "hide": false, "lock": false },
+    "placement": { "place": true, "hide": false, "lock": false },
+    "outline": { "place": true, "hide": false, "lock": true }
   },
   "refdef-index":
   {
