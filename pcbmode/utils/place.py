@@ -92,11 +92,7 @@ def placeDrill(drill,
                                   id='pad_drill',
                                   diameter=str(diameter))
 
-    pour_buffer = 1.0
-    try:
-        pour_buffer = board_cfg['distances']['buffer_from_pour_to'].get('drill') or 1.0
-    except:
-        pass
+    pour_buffer = board_cfg['params']['distances']['from_pour_to']['drill']
 
     # add a mask buffer between pour and board outline
     if mask_groups != {}:

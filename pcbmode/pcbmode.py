@@ -246,15 +246,16 @@ def make_config(name, version, cmdline_args):
     }
     config.cfg['namespace'] = config.cfg['ns']
 
+
     #------------------------------------------------------------------
     # Distances
     #------------------------------------------------------------------
     # If any of the distance definitions are missing from the board's
     # configuration file, use PCBmodE's defaults
     #------------------------------------------------------------------
-    config_distances_dict = config.cfg['distances']
+    config_distances_dict = config.cfg['params']['distances']
     try:
-        board_distances_dict = config.brd.get('distances')
+        board_distances_dict = config.brd['params']['distances']
     except:
         board_distances_dict = {}
 
@@ -270,6 +271,7 @@ def make_config(name, version, cmdline_args):
         
         for k in config_dict.keys():
             board_dict[k] = (board_dict.get(k) or config_dict[k])
+
 
     #-----------------------------------------------------------------
     # Commandline overrides

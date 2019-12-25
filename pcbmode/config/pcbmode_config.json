@@ -19,7 +19,7 @@
       "from-pour-to": 
       {
         "outline": 0.5,
-        "drill": 0.3, 
+        "drill": 1.0, 
         "pad": 0.2, 
         "route": 0.25
       },

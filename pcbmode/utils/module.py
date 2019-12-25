@@ -628,10 +628,7 @@ class Module():
         # 'pad', 'route' unless 'pour_buffer' is specified
         pour_buffer = shape.getPourBuffer()
         if pour_buffer == None:
-            try:
-                pour_buffer = self._module_dict['distances']['from-pour-to'][kind]
-            except:
-                pour_buffer = config.brd['distances']['from-pour-to'][kind]
+            pour_buffer = config.cfg['params']['distances']['from-pour-to'][kind]
 
         style_template = "fill:%s;stroke:#000;stroke-linejoin:round;stroke-width:%s;stroke-linecap:round;"
 
@@ -662,12 +659,7 @@ class Module():
         shape_group.set('{'+config.cfg['ns']['pcbmode']+'}type', 'module-shapes')
         place.placeShape(self._outline, shape_group)
 
-        # Place a mask for the board's outline. This creates a buffer between 
-        # the board's edge and pours
-        try:
-            pour_buffer = self._module['distances']['from-pour-to']['outline']
-        except:
-            pour_buffer = config.brd['distances']['from-pour-to']['outline']
+        pour_buffer = config.cfg['params']['distances']['from-pour-to']['outline']
 
         for pcb_layer in config.stk['layer-names']:
             if utils.checkForPoursInLayer(pcb_layer) is True:
