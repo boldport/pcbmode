@@ -45,7 +45,7 @@ class Component():
 
         footprint_dict = None
         for path in paths:
-            if (path / filename).exists:
+            if (path / filename).exists():
                 footprint_dict = utils.dictFromJsonFile(path / filename)
                 break
 

@@ -892,8 +892,8 @@ class Module():
         Returns the skelaton of an Inkscape SVG element
         """
         module = et.Element('svg',
-                            width="%s%s" % (self._width, config.brd['config']['units']),
-                            height="%s%s" % (self._height, config.brd['config']['units']),
+                            width="%s%s" % (self._width, config.cfg['params']['units']),
+                            height="%s%s" % (self._height, config.cfg['params']['units']),
                             viewBox='%s, %s, %s, %s' % (0, 0, self._width, self._height),
                             version='1.1',
                             nsmap=config.cfg['ns'],
@@ -907,7 +907,7 @@ class Module():
        
         # Add units definition (only 'mm' is supported)
         inkscape_opt.set('{'+config.cfg['ns']['inkscape']+'}%s' % 'document-units',
-                         config.brd['config']['units'])
+                         config.cfg['params']['units'])
        
         # Open window maximised
         inkscape_opt.set('{'+config.cfg['ns']['inkscape']+'}%s' % 'window-maximized',
@@ -926,7 +926,7 @@ class Module():
        
         # Add a welcome message as a comment in the SVG
         welcome_message = """
-Hello! This SVG file was generated using PCBmodE version %s on %s GMT. 
+Hello! This SVG file was generated using PCBmodE on %s GMT. 
 PCBmodE is open source software
 
   http://pcbmode.com
@@ -935,7 +935,7 @@ and is maintained by Boldport
 
   http://boldport.com
 
-""" % (config.cfg['version'], datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")) 
+""" % (datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")) 
         module.append(et.Comment(welcome_message))
 
         return module
