@@ -58,7 +58,7 @@
       "circle-buffer": -0.1
     }
   },
-  "gerber-params":
+  "gerber":
   {
     "decimals": 6, 
     "digits": 6, 

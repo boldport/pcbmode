@@ -246,27 +246,6 @@ def apply_overrides(cli_args):
         config.cfg['create']['flashes'] = cli_args.show_layer_index
 
 
-
-
-def make_config(name, version, cmdline_args):
-    """
-    """
-
-
-    # Define Gerber setting from board's config or defaults
-    try:
-        tmp = config.brd['gerber']
-    except:
-        config.brd['gerber'] = {}
-    gd = config.brd['gerber']    
-    gd['decimals'] = config.brd['gerber'].get('decimals') or 6
-    gd['digits'] = config.brd['gerber'].get('digits') or 6
-    gd['steps-per-segment'] = config.brd['gerber'].get('steps-per-segment') or 100
-    gd['min-segment-length'] = config.brd['gerber'].get('min-segment-length') or 0.05
-
-
-
-
 def main():
 
     # Info while in development
@@ -298,8 +277,6 @@ def main():
     set_y_axis_invert()
 
     apply_overrides(cmdline_args)
-
-    make_config(board_name, version, cmdline_args)
 
     # Check if build directory exists; if not, create
     build_dir = os.path.join(config.cfg['base-dir'], config.cfg['locations']['build'])
