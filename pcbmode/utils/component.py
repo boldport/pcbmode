@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
-import os
 import copy
+from pathlib import Path
 
 from pcbmode.config import config
 from pcbmode.utils import utils
@@ -39,17 +39,14 @@ class Component():
 
         filename = self._footprint_name + '.json'
 
-        paths = [os.path.join(config.cfg['base-dir'],
-                             config.cfg['locations']['shapes'],
-                             filename),
-                   os.path.join(config.cfg['base-dir'],
-                             config.cfg['locations']['components'],
-                             filename)]
+        # Look for the files in both components and shapes paths.
+        paths = [Path(config.tmp['project-path'] / config.cfg['components']['path']),
+                 Path(config.tmp['project-path'] / config.cfg['shapes']['path'])]
 
         footprint_dict = None
         for path in paths:
-            if os.path.isfile(path):
-                footprint_dict = utils.dictFromJsonFile(path)
+            if (path / filename).exists:
+                footprint_dict = utils.dictFromJsonFile(path / filename)
                 break
 
         if footprint_dict == None:
