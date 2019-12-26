@@ -14,7 +14,7 @@ def extract(extract, extract_refdefs):
     """
     """
 
-    svg_in = utils.openBoardSVG()
+    svg_in = utils.open_board_svg()
 
 
     if extract == True:
