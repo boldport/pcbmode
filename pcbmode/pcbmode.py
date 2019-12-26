@@ -139,8 +139,7 @@ def load_pcbmode_config():
     config_path = 'config'
     config_filename = 'pcbmode_config.json'
 
-    pcbmode_path = Path(__file__).parent
-    config_file = pcbmode_path / config_path / config_filename
+    config_file = config.tmp['pcbmode-path'] / config_path / config_filename
     config.cfg = utils.dictFromJsonFile(config_file)
 
     # Override with local settings, if any
@@ -201,7 +200,7 @@ def load_cache():
     """
 
     filename = config.tmp['project-path'] / config.cfg['cache']['file'] 
-    if filename.exists():
+    if filename.is_file():
         config.pth = utils.dictFromJsonFile(filename)
 
 
@@ -257,6 +256,8 @@ def main():
     argp = cl_arg_setup()
     cmdline_args = argp.parse_args()
 
+    config.tmp['pcbmode-path'] = Path(__file__).parent
+
     # Might support running multiple boards in the future,
     # for now get the first one
     project_path = cmdline_args.boards[0] 
@@ -265,22 +266,14 @@ def main():
 
     msg.info("Loading PCBmodE's configuration data")
     load_pcbmode_config()
-
     msg.info("Loading board's configuration data")
     load_board_file()
-
     load_style()
     load_stackup()
     load_cache()
     load_routing()
-
     set_y_axis_invert()
-
     apply_overrides(cmdline_args)
-
-    # Check if build directory exists; if not, create
-    build_dir = os.path.join(config.cfg['base-dir'], config.cfg['locations']['build'])
-    utils.create_dir(build_dir)
 
     # Renumber refdefs and dump board config file
     if cmdline_args.renumber is not False:
@@ -328,18 +321,9 @@ def main():
             utils.makePngs()
    
     
-    filename = os.path.join(config.cfg['locations']['boards'], 
-                            config.cfg['name'],
-                            config.cfg['locations']['build'],
-                            'paths_db.json')
-
-    try:
-        f = open(filename, 'w')
-    except IOError as e:
-        print("I/O error({0}): {1}".format(e.errno, e.strerror))
- 
-    json.dump(config.pth, f, sort_keys=True, indent=2)
-    f.close()
+    filename = config.tmp['project-path'] / config.cfg['cache']['file']
+    filename.parent.mkdir(parents=True, exist_ok=True)
+    filename.write_text(json.dumps(config.pth, sort_keys=True, indent=2))
 
     msg.info("Done!")
 

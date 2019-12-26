@@ -2,12 +2,10 @@
   "locations":
   {
     "boards": "boards/",
-    "components": "components/",
     "fonts": "fonts/",
     "build": "build/",
     "styles": "styles/",
-    "stackups": "stackups/",
-    "shapes": "shapes/"
+    "stackups": "stackups/"
   },
   "styles":
   {
@@ -20,6 +18,18 @@
   "cache":
   {
     "file": "build/cache/temp.json"
+  },
+  "shapes":
+  {
+    "path": "shapes"
+  },
+  "fonts":
+  {
+    "path": "fonts"
+  },
+  "components":
+  {
+    "path": "components"
   },
   "create":
   {
