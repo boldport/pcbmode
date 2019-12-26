@@ -286,7 +286,7 @@ class Module():
                     svg_layer = self._layers[pcb_layer]['conductor']['pads']['layer']
      
                     transform = "translate(%s,%s)" % (location[0],
-                                                      config.cfg['invert-y']*location[1])
+                                                      config.cfg['iya']*location[1])
 
                     shape_group = et.SubElement(svg_layer, 'g', 
                                                 transform=transform)
@@ -313,7 +313,7 @@ class Module():
                             label_transform = "rotate(%s)" % label_rotation
                             t = et.SubElement(label_group, 'text',
                                               x=str(((1,-1)[invert])*label_location.x),
-                                              y=str(config.cfg['invert-y']*label_location.y),
+                                              y=str(config.cfg['iya']*label_location.y),
                                               transform=label_transform)
                             t.text = label
 
@@ -338,7 +338,7 @@ class Module():
                     shape_group = et.SubElement(svg_layer, 'g',
                                                 mask='url(#mask-%s)' % pcb_layer)
                     transform = "translate(%s,%s)" % (location[0],
-                                                      config.cfg['invert-y']*location[1])
+                                                      config.cfg['iya']*location[1])
                     group = et.SubElement(shape_group, 'g', transform=transform)
                     group.set('{'+config.cfg['ns']['pcbmode']+'}type', 'pours')
                     for shape in shapes:
@@ -356,7 +356,7 @@ class Module():
 
                 if len(shapes) > 0 and svg_layer != None:
                     transform = "translate(%s,%s)" % (location[0],
-                                                      config.cfg['invert-y']*location[1])
+                                                      config.cfg['iya']*location[1])
                     group = et.SubElement(svg_layer, 'g', transform=transform)
                     group.set('{'+config.cfg['ns']['pcbmode']+'}type', 'component-shapes')
                     for shape in shapes:
@@ -372,7 +372,7 @@ class Module():
 
                 if len(shapes) > 0 and svg_layer != None:
                     transform = "translate(%s,%s)" % (location[0],
-                                                      config.cfg['invert-y']*location[1])
+                                                      config.cfg['iya']*location[1])
                     group = et.SubElement(svg_layer, 'g', transform=transform)
                     group.set('{'+config.cfg['ns']['pcbmode']+'}type', 'component-shapes')
                     for shape in shapes:
@@ -389,7 +389,7 @@ class Module():
 
                 if len(shapes) > 0 and svg_layer != None:
                     transform = "translate(%s,%s)" % (location[0],
-                                                      config.cfg['invert-y']*location[1])
+                                                      config.cfg['iya']*location[1])
                     shape_group = et.SubElement(svg_layer, 'g', transform=transform)
                     shape_group.set('{'+config.cfg['ns']['pcbmode']+'}type', 'component-shapes')
      
@@ -423,7 +423,7 @@ class Module():
 
                 if len(shapes) > 0 and svg_layer != None: 
                     transform = "translate(%s,%s)" % (location[0],
-                                                      config.cfg['invert-y']*location[1])
+                                                      config.cfg['iya']*location[1])
                     group = et.SubElement(svg_layer, 'g', transform=transform)
                     for shape in shapes:
                         placed_element = place.placeShape(shape, group, invert)
@@ -437,7 +437,7 @@ class Module():
                 if len(shapes) > 0:
                     svg_layer = self._layers['drills']['layer']
                     transform = "translate(%s,%s)" % (location[0],
-                                                      config.cfg['invert-y']*location[1])
+                                                      config.cfg['iya']*location[1])
                     group = et.SubElement(svg_layer, 'g', transform=transform)
                     group.set('{'+config.cfg['ns']['pcbmode']+'}type', 'component-shapes')
                     for shape in shapes:
@@ -469,7 +469,7 @@ class Module():
 
             path = svg.placementMarkerPath()
             transform = "translate(%s,%s)" % (location[0],
-                                              config.cfg['invert-y']*location[1])
+                                              config.cfg['iya']*location[1])
 
             if placement_layer == 'bottom':
                 rotation *= -1
@@ -694,7 +694,7 @@ class Module():
             shape_group = et.SubElement(self._layers['documentation']['layer'], 'g')
             shape_group.set('{'+config.cfg['ns']['pcbmode']+'}type', 'module-shapes')            
             shape_group.set('{'+config.cfg['ns']['pcbmode']+'}doc-key', key)
-            shape_group.set('transform', "translate(%s,%s)" % (location.x, config.cfg['invert-y']*location.y))
+            shape_group.set('transform', "translate(%s,%s)" % (location.x, config.cfg['iya']*location.y))
 
             location = docs_dict[key]['location']
             docs_dict[key]['location'] = [0, 0]
@@ -750,7 +750,7 @@ class Module():
 
             for sheet in sheets:
                 layer = self._layers[pcb_layer][sheet]['layer']
-                transform = "translate(%s,%s)" % (location.x, config.cfg['invert-y']*location.y)
+                transform = "translate(%s,%s)" % (location.x, config.cfg['iya']*location.y)
                 group = et.SubElement(layer, 'g',
                                       transform=transform)
                 group.set('{'+config.cfg['ns']['pcbmode']+'}type', 'layer-index')
@@ -768,9 +768,9 @@ class Module():
                 element = place.placeShape(text_shape, group)
                 element.set("transform", "translate(%s,%s)" % (rect_width/2+rect_gap+text_width/2, 0))
 
-                location.y += config.cfg['invert-y']*(rect_height+rect_gap)
+                location.y += config.cfg['iya']*(rect_height+rect_gap)
 
-            location.y += config.cfg['invert-y']*(rect_height+rect_gap*1.5)
+            location.y += config.cfg['iya']*(rect_height+rect_gap*1.5)
                 
 
 
@@ -819,7 +819,7 @@ class Module():
         location = utils.toPoint(location)        
 
         # Create group for placing index
-        transform = "translate(%s,%s)" % (location.x, config.cfg['invert-y']*location.y)
+        transform = "translate(%s,%s)" % (location.x, config.cfg['iya']*location.y)
         group = et.SubElement(drill_layer, 'g',
                               transform=transform)
         group.set('{'+config.cfg['ns']['pcbmode']+'}type', 'drill-index')
@@ -860,7 +860,7 @@ class Module():
 
         for diameter in reversed(sorted(drills_dict)):
             path = svg.drillPath(diameter)
-            transform = "translate(%s,%s)" % (location.x, config.cfg['invert-y']*location.y)
+            transform = "translate(%s,%s)" % (location.x, config.cfg['iya']*location.y)
             element = et.SubElement(group, 'path',
                                     d=path,
                                     transform=transform)
@@ -869,14 +869,14 @@ class Module():
             t = et.SubElement(group, 'text',
                               x=str(location.x),
                               y=str(-location.y),
-                              dy="%s" % (config.cfg['invert-y']*0.25),
+                              dy="%s" % (config.cfg['iya']*0.25),
                               style=count_style)
             t.text = str(drills_dict[diameter])
 
             t = et.SubElement(group, 'text',
                               x=str(location.x),
                               y=str(-location.y),
-                              dy="%s" % (config.cfg['invert-y']*-0.5),
+                              dy="%s" % (config.cfg['iya']*-0.5),
                               style=drill_size_style)
             t.text = "%s mm" % diameter
 

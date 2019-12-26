@@ -28,7 +28,7 @@ def placeShape(shape, svg_layer, invert=False, original=False):
 
     if original == False:
         translate = 'translate(%s,%s)' % (round((((1,-1)[invert])*location.x), sig_dig),
-                                          round(location.y*config.cfg['invert-y'], sig_dig))
+                                          round(location.y*config.cfg['iya'], sig_dig))
         transform = translate
     else:
         transform = None

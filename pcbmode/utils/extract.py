@@ -73,7 +73,7 @@ def extractComponents(svg_in):
                 old_location = utils.toPoint(comp_dict.get('location') or [0, 0])
      
                 # Invert 'y' coordinate
-                new_location.y *= config.cfg['invert-y']
+                new_location.y *= config.cfg['iya']
      
                 # Change component location if needed
                 if new_location != old_location:
@@ -128,7 +128,7 @@ def extractRefdefs(svg_in):
         group_trans_data = utils.parseTransform(refdef_element.get('transform'))
         group_loc = group_trans_data['location']
         # Invert 'y' coordinate because Inkscape
-        group_loc.y *= config.cfg['invert-y']
+        group_loc.y *= config.cfg['iya']
 
         # Get reference designator
         refdef = refdef_element.get('{'+config.cfg['ns']['pcbmode']+'}refdef')
@@ -320,7 +320,7 @@ def extractRouting(svg_in):
             transform_data = utils.parseTransform(marker.get('transform'))
             location = transform_data['location']
             # Invert 'y' coordinate
-            location.y *= config.cfg['invert-y']
+            location.y *= config.cfg['iya']
 
             # Change component rotation if needed
             if transform_data['type'] == 'matrix':
@@ -402,7 +402,7 @@ def extractDocs(svg_in):
         doc_key = doc.get('{'+config.cfg['ns']['pcbmode']+'}doc-key')
         translate_data = utils.parseTransform(doc.get('transform'))
         location = translate_data['location']
-        location.y *= config.cfg['invert-y']
+        location.y *= config.cfg['iya']
 
         current_location = utils.toPoint(config.brd['documentation'][doc_key]['location'])
         if current_location != location:
@@ -417,7 +417,7 @@ def extractDocs(svg_in):
                                           'svg':config.cfg['ns']['svg']})    
     transform_dict = utils.parseTransform(drill_index.get('transform'))
     location = transform_dict['location']
-    location.y *= config.cfg['invert-y']
+    location.y *= config.cfg['iya']
 
     # Modify the location in the board's config file. If a
     # 'drill-index' field doesn't exist, create it
