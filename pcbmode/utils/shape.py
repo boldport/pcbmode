@@ -102,7 +102,7 @@ class Shape():
 
             # With the units-per-em we can figure out the scale factor
             # to use for the desired font size
-            units_per_em = float(font_data.find("//n:font-face", namespaces={'n': config.cfg['namespace']['svg']}).get('units-per-em')) or 1000
+            units_per_em = float(font_data.find("//n:font-face", namespaces={'n': config.cfg['ns']['svg']}).get('units-per-em')) or 1000
             self._scale = font_size/units_per_em
 
             # Get the path to use. This returns the path without
