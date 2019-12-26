@@ -2,6 +2,7 @@
 
 import os
 import copy
+from pathlib import Path
 from lxml import etree as et
 from pkg_resources import resource_exists, resource_filename
 
@@ -73,22 +74,15 @@ class Shape():
             font = self._shape_dict.get('font-family') or config.stl['layout']['defaults']['font-family']
             font_filename = "%s.svg" % font
 
-            # Search for the font SVG in these paths
-            paths = [os.path.join(config.cfg['base-dir'],
-                                  config.cfg['locations']['fonts'],
-                                  font_filename)]
+            # Search the local folder and PCBmodE's folder for the font file
+            search_paths = [Path(config.tmp['project-path'] / config.cfg['fonts']['path']),
+                            Path(config.tmp['pcbmode-path'] / config.cfg['fonts']['path'])]
 
-            font_resource = ('pcbmode', '/'.join(['fonts',font_filename]))
-            if resource_exists(*font_resource):
-                paths.append(resource_filename(*font_resource))
-
-            filenames = ''
             font_data = None
-            for path in paths:
-                filename = path
-                filenames += "  %s \n" % filename
-                if os.path.isfile(filename):
-                    font_data = et.ElementTree(file=filename)
+            for path in search_paths:
+                filename = path / font_filename
+                if filename.exists():
+                    font_data = et.ElementTree(file=str(filename))
                     break
 
             if font_data == None:
