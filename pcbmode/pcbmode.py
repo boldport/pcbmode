@@ -1,10 +1,7 @@
 #!/usr/bin/python
 
-import os
 import json
 import argparse
-
-from os import getcwd as getcwd
 
 from pathlib import Path
 
