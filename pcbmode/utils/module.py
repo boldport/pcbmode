@@ -4,6 +4,7 @@ import os
 import datetime
 import copy
 import sys
+from pathlib import Path
 from lxml import etree as et
 import html.parser as HTMLParser
 
@@ -100,15 +101,15 @@ class Module():
                               component_type='shape',
                               print_refdef=False)
 
-        if config.tmp['no-docs'] == False:
+        if config.cfg['create']['docs'] == True:
             msg.subInfo('Placing documentation')
             self._placeDocs()
 
-        if config.tmp['no-drill-index'] == False:
+        if config.cfg['create']['drill-index'] == True:
             msg.subInfo('Placing drill index')
             self._placeDrillIndex()
 
-        if config.tmp['no-layer-index'] == False:
+        if config.cfg['create']['layer-index'] == True:
             msg.subInfo('Placing layer index')
             self._placeLayerIndex()
 
@@ -137,10 +138,9 @@ class Module():
         # TODO: this will eventually need to be done in main()
         # when PCBmodE supports multiple 'modules' combined into
         # a single 'board'
-        output_file = os.path.join(config.cfg['base-dir'],
-                                   config.cfg['locations']['build'],
-                                   config.cfg['name'] + '.svg')
-     
+        output_file = Path(config.tmp['project-path'] / 
+                           config.brd['project-params']['output']['svg-file'])
+
         try:
             f = open(output_file, 'wb')
         except IOError as e:
@@ -568,7 +568,7 @@ class Module():
                 # Add a custom buffer definition if it exists
                 custom_buffer = shape_dict.get('buffer-to-pour')
                 if custom_buffer != None:
-                    route_element.set('{'+config.cfg['namespace']['pcbmode']+'}%s' % "buffer-to-pour", str(custom_buffer))
+                    route_element.set('{'+config.cfg['ns']['pcbmode']+'}%s' % "buffer-to-pour", str(custom_buffer))
 
                 # TODO: can this be done more elegantly, and "general purpose"?
                 for extra_attrib in extra_attributes:
@@ -628,7 +628,7 @@ class Module():
         # 'pad', 'route' unless 'pour_buffer' is specified
         pour_buffer = shape.getPourBuffer()
         if pour_buffer == None:
-            pour_buffer = config.cfg['params']['distances']['from-pour-to'][kind]
+            pour_buffer = config.cfg['distances']['from-pour-to'][kind]
 
         style_template = "fill:%s;stroke:#000;stroke-linejoin:round;stroke-width:%s;stroke-linecap:round;"
 
@@ -659,7 +659,7 @@ class Module():
         shape_group.set('{'+config.cfg['ns']['pcbmode']+'}type', 'module-shapes')
         place.placeShape(self._outline, shape_group)
 
-        pour_buffer = config.cfg['params']['distances']['from-pour-to']['outline']
+        pour_buffer = config.cfg['distances']['from-pour-to']['outline']
 
         for pcb_layer in config.stk['layer-names']:
             if utils.checkForPoursInLayer(pcb_layer) is True:
