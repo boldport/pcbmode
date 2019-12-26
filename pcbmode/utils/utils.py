@@ -30,9 +30,6 @@ def dictToStyleText(style_dict):
     return style
 
 
-
-
-
 def open_board_svg():
     """
     Opens the built PCBmodE board SVG.
@@ -50,10 +47,6 @@ def open_board_svg():
     return data
 
 
-
-
-
-
 def parseDimension(string):
     """
     Parses a dimention recieved from the source files, separating the units,
@@ -69,16 +62,12 @@ def parseDimension(string):
     return value, unit
 
 
-
-
 def to_Point(coord=[0, 0]):
     """
     Takes a coordinate in the form of [x,y] and
     returns a Point type
     """
     return Point(coord[0], coord[1])
-
-
 
 
 def toPoint(coord=[0, 0]):
@@ -92,16 +81,9 @@ def toPoint(coord=[0, 0]):
         return Point(coord[0], coord[1])
 
 
-
-
-
 def get_git_revision():
 
     return get_distribution('pcbmode').version
-
-
-
-
 
 
 def makePngs():
@@ -140,9 +122,6 @@ def makePngs():
     return
 
 
-
-
-
 # get_json_data_from_file
 def dictFromJsonFile(filename, error=True):
     """
@@ -178,8 +157,6 @@ def dictFromJsonFile(filename, error=True):
     return json_data
 
 
-
-
 def getLayerList():
     """
     """
@@ -195,7 +172,6 @@ def getLayerList():
     return layer_list, layer_names
 
 
-
 def getSurfaceLayers():
     """
     Returns a list of surface layer names
@@ -205,8 +181,6 @@ def getSurfaceLayers():
     return config.stk['surface-layer-names']
 
 
-
-
 def getInternalLayers():
     """
     Returns a list of internal layer names
@@ -214,8 +188,6 @@ def getInternalLayers():
     codebase
     """    
     return config.stk['internal-layer-names']
-
-
 
 
 def getExtendedLayerList(layers):
@@ -230,8 +202,6 @@ def getExtendedLayerList(layers):
         layers.remove('internal')
         layers.extend(config.stk['internal-layer-names']) 
     return layers
-
-
 
 
 def getExtendedSheetList(layer, sheet):
@@ -258,9 +228,6 @@ def getExtendedSheetList(layer, sheet):
     return new_list
 
 
-
-
-
 def create_dir(path):
     """
     Checks if a directory exists, and creates one if not
@@ -280,9 +247,6 @@ def create_dir(path):
     return
 
 
-
-
-
 def add_dict_values(d1, d2):
     """
     Add the values of two dicts
@@ -291,10 +255,6 @@ def add_dict_values(d1, d2):
     """
 
     return dict((n, d1.get(n, 0)+d2.get(n, 0)) for n in set(d1)|set(d2) )
-
-
-
-
 
 
 def process_meander_type(type_string, meander_type):
@@ -327,9 +287,6 @@ def process_meander_type(type_string, meander_type):
     return meander
 
 
-
-
-
 def checkForPoursInLayer(layer):
     """
     Returns True or False if there are pours in the specified layer
@@ -350,8 +307,6 @@ def checkForPoursInLayer(layer):
  
     #return False
     return True
-
-
 
 
 def interpret_svg_matrix(matrix_data):
@@ -386,10 +341,6 @@ def interpret_svg_matrix(matrix_data):
     return coord, angle, scale
 
 
-
-
-
-
 def parse_refdef(refdef):
     """
     Parses a reference designator and returns the refdef categoty,
@@ -407,13 +358,8 @@ def parse_refdef(refdef):
         n = int(parse.group('n'))
         e = parse.group('e')
         return t, n, e
-    
 
 
-
-
-
-#def renumber_refdefs(cfg, order):
 def renumberRefdefs(order):
     """
     Renumber the refdefs in the specified order
@@ -484,10 +430,6 @@ def renumberRefdefs(order):
     return
 
 
-
-
-
-
 def getTextParams(font_size, letter_spacing, line_height):
     try:
         letter_spacing, letter_spacing_unit = parseDimension(letter_spacing)
@@ -514,8 +456,6 @@ def getTextParams(font_size, letter_spacing, line_height):
         font_size_unit = 'mm'
 
     return float(font_size), float(letter_spacing), float(line_height)
-
-
 
 
 def textToPath(font_data, text, letter_spacing, line_height, scale_factor):
@@ -592,15 +532,11 @@ def textToPath(font_data, text, letter_spacing, line_height, scale_factor):
     return text_path, gerber_lp
 
 
-
-
 def digest(string):
     """
     """
     digits = config.cfg['params']['num-of-digest-digits']
     return hashlib.md5(string.encode()).hexdigest()[:digits-1]
-
-
 
 
 def getStyleAttrib(style, attrib):
@@ -614,15 +550,11 @@ def getStyleAttrib(style, attrib):
         return match.group('s')
 
 
-
-
 def niceFloat(f):
     if f.is_integer():
         return int(f)
     else:
         return round(f, 6)
-
-
 
 
 def parseTransform(transform):
@@ -659,7 +591,6 @@ def parseTransform(transform):
     return data 
 
 
-
 def parseSvgRotate(rotate):
     """
     """
@@ -676,8 +607,6 @@ def parseSvgRotate(rotate):
     angle = rotate[0]
 
     return location, angle
-
-
 
 
 def parseSvgMatrix(matrix):
@@ -718,9 +647,5 @@ def parseSvgMatrix(matrix):
     angle = -angle
 
     return coord, angle, scale
-
-
-
-
 
 
