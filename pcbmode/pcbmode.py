@@ -72,22 +72,6 @@ def cl_arg_setup():
                       action='store_true', dest='pngs', default=False,
                       help='Generate a PNG of the board (requires Inkscape)')
 
-    argp.add_argument('--no-layer-index',
-                      action='store_true', dest='no_layer_index', default=False,
-                      help='Do not add a layer index to SVG')
-
-    argp.add_argument('--no-drill-index',
-                      action='store_true', dest='no_drill_index', default=False,
-                      help='Do not add a drill index to SVG')
-
-    argp.add_argument('--no-flashes',
-                      action='store_true', dest='no_flashes', default=False,
-                      help='Do not add pad flashes to Gerbers')
-
-    argp.add_argument('--no-docs',
-                      action='store_true', dest='no_docs', default=False,
-                      help='Do not add documentation')
-
     argp.add_argument('--renumber-refdefs', nargs='?',
                       dest='renumber', default=False,
                       help="Renumber refdefs (valid options are 'top-to-bottom' (default), 'bottom-to-top', 'left-to-right', 'right-to-left'")
@@ -99,6 +83,49 @@ def cl_arg_setup():
     argp.add_argument('--make-bom', nargs='?',
                       dest='make_bom', default=False, 
                       help='Create a bill of materials')
+
+
+    # Mutually exclusive optional overrides
+    layer_index = argp.add_mutually_exclusive_group(required=False)
+    layer_index.add_argument('--layer-index',
+                             action='store_true', dest='show_layer_index',
+                             help='Create a layer index to the SVG')
+    layer_index.add_argument('--no-layer-index',
+                             action='store_false', dest='show_layer_index',
+                             help='Do not create a layer index to SVG')
+    argp.set_defaults(show_layer_index=None)
+
+
+    drill_index = argp.add_mutually_exclusive_group(required=False)
+    drill_index.add_argument('--drill-index',
+                             action='store_true', dest='show_drill_index',
+                             help='Create a drill index to the SVG')
+    drill_index.add_argument('--no-drill-index',
+                             action='store_false', dest='show_drill_index',
+                             help='Do not create a drill index to SVG')
+    argp.set_defaults(show_drill_index=None)
+
+
+    docs = argp.add_mutually_exclusive_group(required=False)
+    docs.add_argument('--docs',
+                      action='store_true', dest='show_docs',
+                      help='Create the document text on SVG')
+    docs.add_argument('--no-docs',
+                      action='store_false', dest='show_docs',
+                      help='Do not create document text on SVG')
+    argp.set_defaults(show_docs=None)
+
+
+    flashes = argp.add_mutually_exclusive_group(required=False)
+    flashes.add_argument('--flashes',
+                         action='store_true', dest='show_flashes',
+                         help='Place flashes in Gerbers')
+    flashes.add_argument('--no-flashes',
+                         action='store_false', dest='show_flashes',
+                         help='Do not place flashes in Gerbers')
+    argp.set_defaults(show_flashes=None)
+
+
 
     return argp
 
@@ -187,72 +214,100 @@ def load_routing():
     config.rte = utils.dictFromJsonFile(filename)
 
 
+def set_y_axis_invert():
+    """
+    Inkscape inverts the 'y' axis for some historical reasons. This
+    means that we need to invert it as well. Use 'iya' whenever processing
+    outputting or reading the y-axis. Inkscape 1.0+ should have an option
+    to not invert the y-axis.
+    """
+
+    if config.cfg['params']['invert-y-axis'] :
+        config.cfg['iya'] = -1
+    else:
+        config.cfg['iya'] = 1
+
+
+def apply_overrides(cli_args):
+    """
+    Apply commandline switches's overrides 
+    """
+
+    if cli_args.show_layer_index is not None:
+        config.cfg['create']['layer-index'] = cli_args.show_layer_index
+
+    if cli_args.show_docs is not None:
+        config.cfg['create']['docs'] = cli_args.show_layer_index
+
+    if cli_args.show_drill_index is not None:
+        config.cfg['create']['drill-index'] = cli_args.show_layer_index
+
+    if cli_args.show_flashes is not None:
+        config.cfg['create']['flashes'] = cli_args.show_layer_index
+
+
+#    config.tmp['no-layer-index'] = (cmdline_args.no_layer_index or
+#                                    config.brd['config'].get('no-layer-index') or
+#                                    False)
+#    config.tmp['no-flashes'] = (cmdline_args.no_flashes or
+#                                config.brd['config'].get('no-flashes') or
+#                                False)
+#    config.tmp['no-docs'] = (cmdline_args.no_docs or
+#                             config.brd['config'].get('no-docs') or
+#                             False)
+#    config.tmp['no-drill-index'] = (cmdline_args.no_drill_index or
+#                                    config.brd['config'].get('no-drill-index') or
+#                                    False)
+
+
+
 def make_config(name, version, cmdline_args):
     """
     """
 
-    # namespace URLs
-    config.cfg['ns'] = {
-        None       : "http://www.w3.org/2000/svg",
-        "dc"       : "http://purl.org/dc/elements/1.1/",
-        "cc"       : "http://creativecommons.org/ns#",
-        "rdf"      : "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-        "svg"      : "http://www.w3.org/2000/svg",
-        "sodipodi" : "http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd",
-        "inkscape" : "http://www.inkscape.org/namespaces/inkscape",
-        # Namespace URI are strings; they don't need to be URLs. See:
-        #  http://en.wikipedia.org/wiki/XML_namespace
-        "pcbmode"  : "pcbmode"
-    }
-    config.cfg['namespace'] = config.cfg['ns']
+#    # namespace URLs
+#    config.cfg['ns'] = {
+#        None       : "http://www.w3.org/2000/svg",
+#        "dc"       : "http://purl.org/dc/elements/1.1/",
+#        "cc"       : "http://creativecommons.org/ns#",
+#        "rdf"      : "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+#        "svg"      : "http://www.w3.org/2000/svg",
+#        "sodipodi" : "http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd",
+#        "inkscape" : "http://www.inkscape.org/namespaces/inkscape",
+#        # Namespace URI are strings; they don't need to be URLs. See:
+#        #  http://en.wikipedia.org/wiki/XML_namespace
+#        "pcbmode"  : "pcbmode"
+#    }
+#    config.cfg['namespace'] = config.cfg['ns']
 
 
-    #------------------------------------------------------------------
-    # Distances
-    #------------------------------------------------------------------
-    # If any of the distance definitions are missing from the board's
-    # configuration file, use PCBmodE's defaults
-    #------------------------------------------------------------------
-    config_distances_dict = config.cfg['params']['distances']
-    try:
-        board_distances_dict = config.brd['params']['distances']
-    except:
-        board_distances_dict = {}
+#    #------------------------------------------------------------------
+#    # Distances
+#    #------------------------------------------------------------------
+#    # If any of the distance definitions are missing from the board's
+#    # configuration file, use PCBmodE's defaults
+#    #------------------------------------------------------------------
+#    config_distances_dict = config.cfg['params']['distances']
+#    try:
+#        board_distances_dict = config.brd['params']['distances']
+#    except:
+#        board_distances_dict = {}
+# 
+#    distance_keys = ['from-pour-to', 'soldermask', 'solderpaste']
+# 
+#    for dk in distance_keys:
+#        config_dict = config_distances_dict[dk]
+#        try:
+#            board_dict = board_distances_dict[dk]
+#        except:
+#            board_distances_dict[dk] = {}
+#            board_dict = board_distances_dict[dk]
+#        
+#        for k in config_dict.keys():
+#            board_dict[k] = (board_dict.get(k) or config_dict[k])
 
-    distance_keys = ['from-pour-to', 'soldermask', 'solderpaste']
-
-    for dk in distance_keys:
-        config_dict = config_distances_dict[dk]
-        try:
-            board_dict = board_distances_dict[dk]
-        except:
-            board_distances_dict[dk] = {}
-            board_dict = board_distances_dict[dk]
-        
-        for k in config_dict.keys():
-            board_dict[k] = (board_dict.get(k) or config_dict[k])
 
 
-    #-----------------------------------------------------------------
-    # Commandline overrides
-    #-----------------------------------------------------------------
-    # These are stored in a temporary dictionary so that they are not
-    # written to the config file when the board's configuration is
-    # dumped, with extraction, for example
-    #-----------------------------------------------------------------
-    config.tmp = {}
-    config.tmp['no-layer-index'] = (cmdline_args.no_layer_index or
-                                    config.brd['config'].get('no-layer-index') or
-                                    False)
-    config.tmp['no-flashes'] = (cmdline_args.no_flashes or
-                                config.brd['config'].get('no-flashes') or
-                                False)
-    config.tmp['no-docs'] = (cmdline_args.no_docs or
-                             config.brd['config'].get('no-docs') or
-                             False)
-    config.tmp['no-drill-index'] = (cmdline_args.no_drill_index or
-                                    config.brd['config'].get('no-drill-index') or
-                                    False)
 
 
     # Define Gerber setting from board's config or defaults
@@ -267,18 +322,6 @@ def make_config(name, version, cmdline_args):
     gd['min-segment-length'] = config.brd['gerber'].get('min-segment-length') or 0.05
 
 
-def set_y_axis_invert():
-    """
-    Inkscape inverts the 'y' axis for some historical reasons. This
-    means that we need to invert it as well. Use 'iya' whenever processing
-    outputting or reading the y-axis. Inkscape 1.0+ should have an option
-    to not invert the y-axis.
-    """
-
-    if config.cfg['params']['invert-y-axis'] :
-        config.cfg['iya'] = -1
-    else:
-        config.cfg['iya'] = 1
 
 
 def main():
@@ -310,6 +353,8 @@ def main():
     load_routing()
 
     set_y_axis_invert()
+
+    apply_overrides(cmdline_args)
 
     make_config(board_name, version, cmdline_args)
 
