@@ -33,7 +33,8 @@
     "units": "mm",
     "significant-digits": 8,
     "display-frame-buffer": 1.0,
-    "num-of-digest-digits": 12
+    "num-of-digest-digits": 12,
+    "invert-y-axis": true
   },
   "distances":
   {

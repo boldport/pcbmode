@@ -266,55 +266,19 @@ def make_config(name, version, cmdline_args):
     gd['steps-per-segment'] = config.brd['gerber'].get('steps-per-segment') or 100
     gd['min-segment-length'] = config.brd['gerber'].get('min-segment-length') or 0.05
 
-    # Inkscape inverts the 'y' axis for some historical reasons.
-    # This means that we need to invert it as well. This should
-    # be the only place this inversion happens so it's easy to
-    # control if things change.
-    config.cfg['invert-y'] = -1
 
+def set_y_axis_invert():
+    """
+    Inkscape inverts the 'y' axis for some historical reasons. This
+    means that we need to invert it as well. Use 'iya' whenever processing
+    outputting or reading the y-axis. Inkscape 1.0+ should have an option
+    to not invert the y-axis.
+    """
 
-    #-----------------------------------------------------------------
-    # Commandline overrides
-    #-----------------------------------------------------------------
-    # Controls the visibility of layers and whether they are locked by
-    # default. This is the "master" control; settings in the board's
-    # config file will override these settings
-    #-----------------------------------------------------------------
-    layer_control_default = {
-      "conductor": { 
-        "place": True, "hide": False, "lock": False, 
-        "pours": { "place": True, "hide": False, "lock": True },
-        "pads": { "place": True, "hide": False, "lock": False },
-        "routing": { "place": True, "hide": False, "lock": False }
-      },
-      "soldermask": { "place": True, "hide": False, "lock": False },
-      "solderpaste": { "place": True, "hide": True, "lock": True },
-      "silkscreen": { "place": True, "hide": False, "lock": False },
-      "assembly": { "place": True, "hide": False, "lock": False },
-      "documentation": { "place": True, "hide": False, "lock": False },
-      "dimensions": { "place": True, "hide": False, "lock": True },
-      "origin": { "place": True, "hide": False, "lock": True },
-      "drills": { "place": True, "hide": False, "lock": False },
-      "placement": { "place": True, "hide": False, "lock": False },
-      "outline": { "place": True, "hide": False, "lock": True }
-    }
-
-    # Get overrides
-    layer_control_config = config.brd.get('layer-control')
-    if layer_control_config != None:
-        # Python2
-        #config.brd['layer-control'] = dict(layer_control_default.items() +
-        #                                   layer_control_config.items())
-        
-        # Python3
-        config.brd['layer-control'] = {**layer_control_default, **layer_control_config}
-        
-
+    if config.cfg['params']['invert-y-axis'] :
+        config.cfg['iya'] = -1
     else:
-        config.brd['layer-control'] = layer_control_default
-
-
-    return
+        config.cfg['iya'] = 1
 
 
 def main():
@@ -344,6 +308,8 @@ def main():
     load_stackup()
     load_cache()
     load_routing()
+
+    set_y_axis_invert()
 
     make_config(board_name, version, cmdline_args)
 
