@@ -246,68 +246,11 @@ def apply_overrides(cli_args):
         config.cfg['create']['flashes'] = cli_args.show_layer_index
 
 
-#    config.tmp['no-layer-index'] = (cmdline_args.no_layer_index or
-#                                    config.brd['config'].get('no-layer-index') or
-#                                    False)
-#    config.tmp['no-flashes'] = (cmdline_args.no_flashes or
-#                                config.brd['config'].get('no-flashes') or
-#                                False)
-#    config.tmp['no-docs'] = (cmdline_args.no_docs or
-#                             config.brd['config'].get('no-docs') or
-#                             False)
-#    config.tmp['no-drill-index'] = (cmdline_args.no_drill_index or
-#                                    config.brd['config'].get('no-drill-index') or
-#                                    False)
-
 
 
 def make_config(name, version, cmdline_args):
     """
     """
-
-#    # namespace URLs
-#    config.cfg['ns'] = {
-#        None       : "http://www.w3.org/2000/svg",
-#        "dc"       : "http://purl.org/dc/elements/1.1/",
-#        "cc"       : "http://creativecommons.org/ns#",
-#        "rdf"      : "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-#        "svg"      : "http://www.w3.org/2000/svg",
-#        "sodipodi" : "http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd",
-#        "inkscape" : "http://www.inkscape.org/namespaces/inkscape",
-#        # Namespace URI are strings; they don't need to be URLs. See:
-#        #  http://en.wikipedia.org/wiki/XML_namespace
-#        "pcbmode"  : "pcbmode"
-#    }
-#    config.cfg['namespace'] = config.cfg['ns']
-
-
-#    #------------------------------------------------------------------
-#    # Distances
-#    #------------------------------------------------------------------
-#    # If any of the distance definitions are missing from the board's
-#    # configuration file, use PCBmodE's defaults
-#    #------------------------------------------------------------------
-#    config_distances_dict = config.cfg['params']['distances']
-#    try:
-#        board_distances_dict = config.brd['params']['distances']
-#    except:
-#        board_distances_dict = {}
-# 
-#    distance_keys = ['from-pour-to', 'soldermask', 'solderpaste']
-# 
-#    for dk in distance_keys:
-#        config_dict = config_distances_dict[dk]
-#        try:
-#            board_dict = board_distances_dict[dk]
-#        except:
-#            board_distances_dict[dk] = {}
-#            board_dict = board_distances_dict[dk]
-#        
-#        for k in config_dict.keys():
-#            board_dict[k] = (board_dict.get(k) or config_dict[k])
-
-
-
 
 
     # Define Gerber setting from board's config or defaults
