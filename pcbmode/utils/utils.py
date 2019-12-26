@@ -527,14 +527,14 @@ def textToPath(font_data, text, letter_spacing, line_height, scale_factor):
 
     # This the horizontal advance that applied to all glyphs unless there's a specification for
     # for the glyph itself
-    font_horiz_adv_x = float(font_data.find("//n:font", namespaces={'n': config.cfg['namespace']['svg']}).get('horiz-adv-x'))
+    font_horiz_adv_x = float(font_data.find("//n:font", namespaces={'n': config.cfg['ns']['svg']}).get('horiz-adv-x'))
     
     # This is the number if 'units' per 'em'. The default, in the absence of a definition is 1000
     # according to the SVG spec
-    units_per_em = float(font_data.find("//n:font-face", namespaces={'n': config.cfg['namespace']['svg']}).get('units-per-em')) or 1000
+    units_per_em = float(font_data.find("//n:font-face", namespaces={'n': config.cfg['ns']['svg']}).get('units-per-em')) or 1000
 
-    glyph_ascent = float(font_data.find("//n:font-face", namespaces={'n': config.cfg['namespace']['svg']}).get('ascent'))
-    glyph_decent = float(font_data.find("//n:font-face", namespaces={'n': config.cfg['namespace']['svg']}).get('descent'))
+    glyph_ascent = float(font_data.find("//n:font-face", namespaces={'n': config.cfg['ns']['svg']}).get('ascent'))
+    glyph_decent = float(font_data.find("//n:font-face", namespaces={'n': config.cfg['ns']['svg']}).get('descent'))
  
     text_width = 0
     text_path = ''
@@ -562,7 +562,7 @@ def textToPath(font_data, text, letter_spacing, line_height, scale_factor):
             text_width = 0
             text_height += units_per_em + (line_height/scale_factor-units_per_em)
         else:
-            glyph = font_data.find(u'//n:glyph[@unicode="%s"]' % symbol, namespaces={'n': config.cfg['namespace']['svg']})
+            glyph = font_data.find(u'//n:glyph[@unicode="%s"]' % symbol, namespaces={'n': config.cfg['ns']['svg']})
             if glyph == None:
                 utils.throw("Damn, there's no glyph definition for '%s' in the '%s' font :(" % (symbol, font))
             else:
