@@ -2,6 +2,7 @@
 
 import json
 import os
+from pathlib import Path
 import re
 import subprocess as subp # for shell commands
 import math
@@ -32,17 +33,17 @@ def dictToStyleText(style_dict):
 
 
 
-def openBoardSVG():
+def open_board_svg():
     """
     Opens the built PCBmodE board SVG.
     Returns an ElementTree object
     """
 
-    filename = os.path.join(config.cfg['base-dir'],
-                            config.cfg['locations']['build'],
-                            config.cfg['name'] + '.svg')
+    filename = Path(config.tmp['project-path'] /
+                    config.brd['project-params']['input']['svg-file'])
+
     try:
-        data = et.ElementTree(file=filename) 
+        data = et.ElementTree(file=str(filename)) 
     except IOError as e:
         msg.error("Cannot open %s; has the board been made using the '-m' option yet?" % filename)
 

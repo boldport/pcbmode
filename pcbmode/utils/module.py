@@ -141,6 +141,9 @@ class Module():
         output_file = Path(config.tmp['project-path'] / 
                            config.brd['project-params']['output']['svg-file'])
 
+        output_file.parent.mkdir(parents=True, exist_ok=True)
+#        output_file.write_text(str(et.tostring(svg_doc, pretty_print=True)))
+
         try:
             f = open(output_file, 'wb')
         except IOError as e:

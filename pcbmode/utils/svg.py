@@ -1135,7 +1135,7 @@ def makeSvgLayers(top_layer, transform=None, refdef=None):
     Returns a dictionary of layer instantiations.
     """
 
-    layer_control = config.brd['layer-control']
+    layer_control = config.cfg['layer-control']
 
     # Holds SVG layers 
     layers = {}

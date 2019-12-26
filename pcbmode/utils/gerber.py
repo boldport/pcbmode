@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import os
+from pathlib import Path
 import re
 from lxml import etree as et
 import pyparsing as pyp
@@ -20,10 +21,10 @@ def gerberise(manufacturer='default'):
     """
 
     # Open the board's SVG
-    svg_in = utils.openBoardSVG()
+    svg_in = utils.open_board_svg()
 
     # Get Gerber generation settings
-    gcd = config.brd['gerber']
+    gcd = config.cfg['gerber']
     decimals = gcd['decimals']
     digits = gcd['digits'] 
     steps = gcd['steps-per-segment']
@@ -34,16 +35,12 @@ def gerberise(manufacturer='default'):
     ns = {'pcbmode':config.cfg['ns']['pcbmode'],
           'svg':config.cfg['ns']['svg']} 
 
+    prod_dir = Path(config.tmp['project-path'] /
+                    config.brd['project-params']['output']['gerber-preamble']).parent
+    gerber_preamble = Path(config.brd['project-params']['output']['gerber-preamble']).name
 
-    # Save to file
-    base_dir = os.path.join(config.cfg['base-dir'], 
-                            config.cfg['locations']['build'], 
-                            'production')
-    # Create directory if it doesn't exist already
-    utils.create_dir(base_dir)
-    base_name = "%s_rev_%s" % (config.brd['config']['name'],
-                               config.brd['config']['rev'])
- 
+    prod_dir.mkdir(parents=True, exist_ok=True)
+
     filename_info = config.cfg['manufacturers'][manufacturer]['filenames']['gerbers']
 
     # Process Gerbers for PCB layers and sheets
