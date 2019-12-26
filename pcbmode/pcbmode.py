@@ -6,6 +6,8 @@ import argparse
 
 from os import getcwd as getcwd
 
+from pathlib import Path
+
 from pkg_resources import resource_filename, resource_exists
 
 # PCBmodE modules
@@ -20,7 +22,7 @@ from pcbmode.utils import coord_file
 from pcbmode.utils.board import Board
 
 
-def cmdArgSetup(pcbmode_version):
+def cl_arg_setup():
     """
     Sets up the commandline arguments form and variables
     """
@@ -101,96 +103,63 @@ def cmdArgSetup(pcbmode_version):
     return argp
 
 
-
-
 def load_pcbmode_config():
     """
-    Load the default and local configuration files into memory
+    Load the default configuration.  If a local 'pcbmode_config'
+    exists in 'config/' then override the settings in there.
     """
 
-    pcbmode_file = os.path.realpath(__file__)    # Get location of pcbmode.py
-    pcbmode_path = os.path.dirname(pcbmode_file) # Get only the path
     config_path = 'config'
     config_filename = 'pcbmode_config.json'
-    config.cfg = utils.dictFromJsonFile(os.path.join(pcbmode_path,
-                                                     config_path,
-                                                     config_filename))
+
+    pcbmode_path = Path(__file__).parent
+    config_file = pcbmode_path / config_path / config_filename
+    config.cfg = utils.dictFromJsonFile(config_file)
+
+    # Override with local settings, if any
+    project_config_file = config.tmp['project-path'] / config_path / config_filename
+    if project_config_file.exists():
+        project_config = utils.dictFromJsonFile(project_config_file)
+        for key in project_config:
+            config.cfg[key] = {**config.cfg[key], **project_config[key]}
 
 
-def load_board_config():
+def load_board_file():
     """
     Load the board's configuration data
     """
 
-    filename = os.path.join(config.cfg['locations']['boards'], 
-                            config.cfg['name'], 
-                            config.cfg['name'] + '.json')
+    filename = config.tmp['project-path'] / config.tmp['project-file']
     config.brd = utils.dictFromJsonFile(filename)
-
-    tmp_dict = config.brd.get('config')
-
-    if tmp_dict != None:
-        config.brd['config']['units'] = tmp_dict.get('units', 'mm') or 'mm'
-        config.brd['config']['style-layout'] = tmp_dict.get('style-layout', 'default') or 'default'
-    else:
-        config.brd['config'] = {}
-        config.brd['config']['units'] = 'mm'
-        config.brd['config']['style-layout'] = 'default'
-
 
 
 def load_style():
     """
+    Load the stylesheets. (For now only for 'layout')
+    First look for the file in the project path (assuming the default was overriden),
+    then load the default from PCBmodE.
     """
 
-    layout_style = config.brd['config']['style-layout']
-    layout_style_filename = 'layout.json'
-    paths = [os.path.join(config.cfg['base-dir'],
-                          config.cfg['locations']['styles'],
-                          layout_style, layout_style_filename)] # project dir
+    filename = Path(config.cfg['styles']['stylesheet-for-layout'])
 
-    style_resource = (__name__, '/'.join(['styles', layout_style, layout_style_filename]))
-    if resource_exists(*style_resource):
-        paths.append(resource_filename(*style_resource))
+    if (config.tmp['project-path'] / filename).exists():
+        config.stl['layout'] = utils.dictFromJsonFile(config.tmp['project-path'] / filename)
+    else:
+        config.stl['layout'] = utils.dictFromJsonFile(Path(__file__).parent / filename)
 
-    filenames = ''
-    for path in paths:
-        filename = path
-        filenames += "  %s \n" % filename
-        if os.path.isfile(filename):
-            config.stl['layout'] = utils.dictFromJsonFile(filename)
-            break
-
-    if not 'layout' in config.stl or config.stl['layout'] == {}:
-        msg.error("Couldn't find style file %s. Looked for it here:\n%s" % (layout_style_filename, filenames))
-
-
-
+    
 def load_stackup():
     """
+    Load and process the stackup for the board
     """
 
-    try:
-        stackup_filename = config.brd['stackup']['name'] + '.json'
-    except:
-        stackup_filename = 'two-layer.json'
+    filename = Path(config.cfg['stackup']['definition-file'])
 
-    paths = [os.path.join(config.cfg['base-dir'], config.cfg['locations']['stackups'], stackup_filename)] # project dir
+    if (config.tmp['project-path'] / filename).exists():
+        config.stk = utils.dictFromJsonFile(config.tmp['project-path'] / filename)
+    else:
+        config.stk = utils.dictFromJsonFile(Path(__file__).parent / filename)
 
-    stackup_resource = (__name__, '/'.join(['stackups', stackup_filename]))
-    if resource_exists(*stackup_resource):
-        paths.append(resource_filename(*stackup_resource))
-
-    filenames = ''
-    for path in paths:
-        filename = path
-        filenames += "  %s \n" % filename
-        if os.path.isfile(filename):
-            config.stk = utils.dictFromJsonFile(filename)
-            break
-
-    if config.stk == {}:
-        msg.error("Couldn't find stackup file %s. Looked for it here:\n%s" % (stackup_filename, filenames))
 
     config.stk['layers-dict'], config.stk['layer-names'] = utils.getLayerList()
     config.stk['surface-layers'] = [config.stk['layers-dict'][0], config.stk['layers-dict'][-1]]
@@ -199,32 +168,23 @@ def load_stackup():
     config.stk['internal-layer-names'] = config.stk['layer-names'][1:-1]
 
 
-
 def load_cache():
     """
+    Load cache file if it exists
     """
 
-    filename = os.path.join(config.cfg['locations']['boards'], 
-                            config.cfg['name'],
-                            config.cfg['locations']['build'],
-                            'paths_db.json')
-
-    if os.path.isfile(filename):
+    filename = config.tmp['project-path'] / config.cfg['cache']['file'] 
+    if filename.exists():
         config.pth = utils.dictFromJsonFile(filename)
-
 
 
 def load_routing():
     """
     """
 
-    filename = os.path.join(config.cfg['base-dir'], 
-                            config.brd['files'].get('routing-json') or config.cfg['name'] + '_routing.json')
-
-    if os.path.isfile(filename):
-        config.rte = utils.dictFromJsonFile(filename)
-
-
+    filename = Path(config.tmp['project-path'] / 
+                    config.brd['project-params']['input']['routing-file'])
+    config.rte = utils.dictFromJsonFile(filename)
 
 
 def make_config(name, version, cmdline_args):
@@ -357,9 +317,6 @@ def make_config(name, version, cmdline_args):
     return
 
 
-
-
-
 def main():
 
     # Info while in development
@@ -367,29 +324,21 @@ def main():
     msg.info("You are using a version of PCBmodE ('cinco') that's actively under development.")
     msg.info("Please support this project at https://github.com/sponsors/saardrimer.\n")
 
-    # Get PCBmodE version
-    version = utils.get_git_revision()
-
     # Setup and parse commandline arguments
-    argp = cmdArgSetup(version)
+    argp = cl_arg_setup()
     cmdline_args = argp.parse_args()
 
     # Might support running multiple boards in the future,
-    # for now get the first onw
-    board_name = cmdline_args.boards[0]
+    # for now get the first one
+    project_path = cmdline_args.boards[0] 
+    config.tmp['project-file'] = Path(project_path).name
+    config.tmp['project-path'] = Path(project_path).parent
 
     msg.info("Loading PCBmodE's configuration data")
     load_pcbmode_config()
 
-    # Add more config
-    config.cfg['name'] = board_name
-    config.cfg['version'] = version
-    config.cfg['base-dir'] = os.path.join(config.cfg['locations']['boards'], board_name)
-
-    config.cfg['digest-digits'] = 10
-
     msg.info("Loading board's configuration data")
-    load_board_config()
+    load_board_file()
 
     load_style()
     load_stackup()

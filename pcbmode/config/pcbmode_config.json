@@ -9,6 +9,18 @@
     "stackups": "stackups/",
     "shapes": "shapes/"
   },
+  "styles":
+  {
+    "stylesheet-for-layout": "styles/default/layout.json"
+  },
+  "stackup":
+  {
+    "definition-file": "stackups/two-layer.json"
+  },
+  "cache":
+  {
+    "file": "build/cache/temp.json"
+  },
   "create-and-display":
   {
     "docs": true, 
@@ -20,7 +32,7 @@
   {
     "units": "mm",
     "significant-digits": 8,
-    "display-frame-buffer": 1.0
+    "display-frame-buffer": 1.0,
     "num-of-digest-digits": 12
   },
   "distances":
