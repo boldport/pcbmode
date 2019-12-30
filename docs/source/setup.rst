@@ -56,27 +56,28 @@ virtual environment like this:
                 source pcbmode-env/bin/activate
 		cd pcbmode
 
-If you want to just run *PCBmodE*, run
+where you can replace ``pcbmode-env`` with a name of your chooseing. If you want
+to install *PCBmodE*, run
 
 .. code-block:: bash
 
-		python3 setup.py install
+		pip install .
 
 but if you want to develop it, run
 
 .. code-block:: bash
 
-		python3 setup.py develop
+		pip install --editable . 
 
 After installation, *PCBmodE* will be available in your path as an
-executable ``pcbmode``. But since it was installed in a virtualenv,
+executable ``pcbmode``. But since it was installed in a virtual environment,
 the ``pcbmode`` command will only be available in your path after
 running ``source pcbmode-env/bin/activate`` and will no longer be in
 your path after running ``deactivate``, which gets you out of the
-virtual environment. You will need to activate the virtualenv each
+virtual environment. You will need to activate the virtual environment each
 time you want to run ``pcbmode`` from a new terminal window.
 
-Nothing is installed globally, so to start from scratch you can just
+Packages are not installed globally, so to start from scratch you can just
 follow these steps:
 
 .. code-block:: bash
@@ -86,25 +87,67 @@ follow these steps:
   cd pcbmode
   git clean -dfX     # erases any untracked files (build files etc). Save your work!
 
-
 Running PCBmodE
 ===============
 
 .. tip:: To see all the options that *PCBmodE* supports, use ``pcbmode
          --help``
 
-By default *PCBmodE* expects to find the board files under
+To make a create an SVG of your board you'd use a command like this: 
 
 .. code-block:: bash
 
-                boards/<board-name>
+                pcbmode -b <board-name>.json -m
 
-*relative to the place where it is invoked*. 
+where ``board-name.json`` is your board file. If you're nor running ``pcbmode``
+at the path where ``board.json`` is, you'll need to specify the path to it,
+like this for example:
 
-.. tip:: Paths where *PCBmodE* looks for things can be changed in the
-         config file ``pcbmode_config.json``.
+.. code-block:: bash
 
-Here's one way to organise the build environment
+                boards/<project-name>/<board-name>.json
+
+Youre ``board-name.json`` will tell *PCBmodE* where the rest of the file are,
+for example
+
+.. code-block:: json
+
+                "project-params":
+                {
+                "input":
+                  {
+                    "routing-file": "board-routing.json",
+                    "svg-file": "build/gent-pcbmode-v5-test.svg"
+                  },
+                  "output":
+                  {
+                    "svg-file": "build/gent-pcbmode-v5-test.svg",
+                    "gerber-preamble": "build/prod/gent-pcbmode-v5-test_"
+                  }
+                }
+
+Again, you'll need to specify the path where *PCBmodE* should expect file and
+place files relative to the path where ``board-name.json`` is.
+
+Where component and shape files are are defined in ``pcbmode_config.json``.
+*PCBmodE* will load its default settings and override it with settings in a
+local ``config/pcbmode_config.json`` if it exists.
+
+The defaults for where to find component and shape files are the following:
+
+.. code-block:: bash
+
+                "shapes":
+                {
+                  "path": "shapes"
+                },
+                "components":
+                {
+                  "path": "components"
+                }
+
+
+So here's one way to organise the build environment
 
 .. code-block:: bash
 
@@ -123,13 +166,13 @@ Here's one way to organise the build environment
                       ...
 
 
-To make the ``my-board`` board, run *PCBmodE* within ``beautiful-pcbs``
+To make the ``my-board`` board from the ``beautiful-pcbs`` path, run
 
 .. code-block:: bash
 
-                pcbmode -b my-board -m
+                pcbmode -b boards/my-board/my-board.json -m
 
-Then open the SVG with Inkscape
+and then open the SVG with Inkscape
 
 .. code-block:: bash
 
