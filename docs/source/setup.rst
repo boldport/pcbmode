@@ -52,7 +52,7 @@ virtual environment like this:
 
 .. code-block:: bash
 
-                python3 venv -m pcbmode-env
+                python3 -m venv pcbmode-env
                 source pcbmode-env/bin/activate
 		cd pcbmode
 
