@@ -162,6 +162,14 @@ def apply_overrides(cli_args):
 
 def main():
 
+    # License information
+
+    print("PCBmodE, Copyright (C) 2020 Saar Drimer")
+    print("This program comes with ABSOLUTELY NO WARRANTY. This is free software,")
+    print("and you are welcome to redistribute it under certain conditions.")
+    print("See the LICENSE file that came with this software for details.")
+    print()
+
     # Info while in development
     msg.info("Important!")
     msg.info(
