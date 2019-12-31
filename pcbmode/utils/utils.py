@@ -24,7 +24,6 @@ import re
 import subprocess as subp  # for shell commands
 import math
 from operator import itemgetter  # for sorting lists by dict value
-from lxml import etree as et
 import html.parser as HTMLParser
 import hashlib
 from pkg_resources import get_distribution
