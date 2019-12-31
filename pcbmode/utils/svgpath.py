@@ -18,7 +18,6 @@
 
 
 from math import sqrt, ceil
-import pyparsing as PYP
 import re
 
 from pcbmode.config import config
