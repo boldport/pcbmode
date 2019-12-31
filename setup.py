@@ -16,6 +16,8 @@ setup(
 
     packages=find_namespace_packages(include=['pcbmode.*']),
 
+    test_suite='tests',
+
     install_requires = [
         'lxml>=4.4.0',
         'pyparsing>=2.4.2'
