@@ -17,11 +17,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-import os
-import re
-import json
 import copy
-from lxml import etree as et
 
 from pcbmode.config import config
 from pcbmode.utils import messages as msg
@@ -72,14 +68,14 @@ class Footprint:
 
             try:
                 pad_name = pins[pin]["layout"]["pad"]
-            except:
+            except KeyError:
                 msg.error(
-                    "Each defined 'pin' must have a 'pad' name that is defined in the 'pads' dection of the footprint."
+                    "Each defined 'pin' must have a 'pad' name that is defined in the 'pads' section of the footprint."
                 )
 
             try:
                 pad_dict = self._footprint["pads"][pad_name]
-            except:
+            except KeyError:
                 msg.error(
                     "There doesn't seem to be a pad definition for pad '%s'." % pad_name
                 )
@@ -116,11 +112,11 @@ class Footprint:
                     shape = Shape(shape_dict)
                     style = Style(shape_dict, "conductor")
                     shape.setStyle(style)
-                    try:
+
+                    if layer in self._shapes["conductor"]:
                         self._shapes["conductor"][layer].append(shape)
-                    except:
-                        self._shapes["conductor"][layer] = []
-                        self._shapes["conductor"][layer].append(shape)
+                    else:
+                        self._shapes["conductor"][layer] = [shape]
 
                     for stype in ["soldermask", "solderpaste"]:
 
@@ -167,11 +163,10 @@ class Footprint:
 
                             # Add shape to footprint's shape dictionary
                             # self._shapes[stype][layer].append(sshape)
-                            try:
+                            if layer in self._shapes[stype]:
                                 self._shapes[stype][layer].append(sshape)
-                            except:
-                                self._shapes[stype][layer] = []
-                                self._shapes[stype][layer].append(sshape)
+                            else:
+                                self._shapes[stype][layer] = [sshape]
 
                         # Do not place shape
                         elif (sdict_list == {}) or (sdict_list == []):
@@ -217,12 +212,11 @@ class Footprint:
 
                                 # Add shape to footprint's shape dictionary
                                 # self._shapes[stype][layer].append(sshape)
-                                try:
+                                if layer in self._shapes[stype]:
                                     self._shapes[stype][layer].append(sshape)
-                                except:
-                                    self._shapes[stype][layer] = []
-                                    self._shapes[stype][layer].append(sshape)
-
+                                else:
+                                    self._shapes[stype][layer] = [sshape]
+                                    
                     # Add pin label
                     if pin_label != None:
                         shape.setLabel(pin_label)
@@ -239,11 +233,11 @@ class Footprint:
                 shape = Shape(drill_dict)
                 style = Style(drill_dict, "drills")
                 shape.setStyle(style)
-                try:
+
+                if "top" in self._shapes["drills"]:
                     self._shapes["drills"]["top"].append(shape)
-                except:
-                    self._shapes["drills"]["top"] = []
-                    self._shapes["drills"]["top"].append(shape)
+                else:
+                    self._shapes["drills"]["top"] = [shape]
 
     def _processPours(self):
         """
@@ -261,11 +255,10 @@ class Footprint:
                 style = Style(shape_dict, "conductor", "pours")
                 shape.setStyle(style)
 
-                try:
+                if layer in self._shapes["pours"]:
                     self._shapes["pours"][layer].append(shape)
-                except:
-                    self._shapes["pours"][layer] = []
-                    self._shapes["pours"][layer].append(shape)
+                else:
+                    self._shapes["pours"][layer] = [shape]
 
     def _processShapes(self):
         """
@@ -276,7 +269,7 @@ class Footprint:
         for sheet in sheets:
 
             try:
-                shapes = self._footprint["layout"][sheet]["shapes"]
+                shapes = self._footprint["layout"][sheet]["shapes"] or []
             except:
                 shapes = []
 
@@ -291,11 +284,11 @@ class Footprint:
                     shape = Shape(shape_dict)
                     style = Style(shape_dict, sheet)
                     shape.setStyle(style)
-                    try:
+
+                    if layer in self._shapes[sheet]:
                         self._shapes[sheet][layer].append(shape)
-                    except:
-                        self._shapes[sheet][layer] = []
-                        self._shapes[sheet][layer].append(shape)
+                    else:
+                        self._shapes[sheet][layer] = [shape]
 
     def _processAssemblyShapes(self):
         """
@@ -311,8 +304,8 @@ class Footprint:
                 shape = Shape(shape_dict)
                 style = Style(shape_dict, "assembly")
                 shape.setStyle(style)
-                try:
+
+                if layer in self._shapes["assembly"]:
                     self._shapes["assembly"][layer].append(shape)
-                except:
-                    self._shapes["assembly"][layer] = []
-                    self._shapes["assembly"][layer].append(shape)
+                else:
+                    self._shapes["assembly"][layer] = [shape]
