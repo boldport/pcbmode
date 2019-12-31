@@ -109,6 +109,13 @@ def setup():
     )
 
     argp.add_argument(
+        "--no-cache",
+        action="store_true",
+        dest="cache",
+        help="Do not create a cache file (use for testing)",
+    )
+
+    argp.add_argument(
         "--renumber-refdefs",
         nargs="?",
         dest="renumber",
