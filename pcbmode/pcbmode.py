@@ -195,7 +195,7 @@ def main():
     load_board_file()
     load_style()
     load_stackup()
-    if cmdline_args.cache is True:
+    if cmdline_args.cache is False:
         load_cache()
     load_routing()
     set_y_axis_invert()
@@ -247,7 +247,7 @@ def main():
             msg.info("Creating PNGs")
             utils.makePngs()
 
-    if cmdline_args.cache is True:
+    if cmdline_args.cache is False:
         filename = config.tmp["project-path"] / config.cfg["cache"]["file"]
         filename.parent.mkdir(parents=True, exist_ok=True)
         filename.write_text(json.dumps(config.pth, sort_keys=True, indent=2))
