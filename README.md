@@ -9,11 +9,17 @@
 
 # A circuit board design software with a twist
 
-PCBmodE is a circuit board design software written in Python. Its main advantage is allowing the design to create and use arbitrary shapes for any element of the board. Using stock [Inkscape](http://inkscape.org) as the GUI provides all the features of a drawing tool. This, in contrast to traditional PCB design tools that restrict visual freedom and don't have the full feature set of a vector editing software.
+PCBmodE is a circuit board design software written in Python. Its main advantage
+is allowing the design to create and use arbitrary shapes for any element of the
+board. Using stock [Inkscape](http://inkscape.org) as the GUI provides all the
+features of a drawing tool. This, in contrast to traditional PCB design tools that
+restrict visual freedom and don't have the full feature set of a vector editing software.
 
 ## Workflow
 
-PCBmodE folows a layout-driven design flow. There's no schematic functionality or DRC other than the designer's eyes. It's essentiallya script that runs from commandline generating files depending on the stage of the design.
+PCBmodE folows a layout-driven design flow. There's no schematic functionality or DRC
+other than the designer's eyes. It's essentiallya script that runs from commandline
+generating files depending on the stage of the design.
 
 1. Text editor: edit input [JSON](http://en.wikipedia.org/wiki/JSON) files
 2. PCBmodE: convert JSON files to Inkscape SVG
@@ -28,7 +34,7 @@ Iterate the above until the design is ready, and then
 
 ## Requirements
 
-* Python 2.7
+* Python 3.7+
 * [PyParsing](http://pyparsing.wikispaces.com/)
 * [lxml](http://lxml.de/)
 * [Inkscape](http://inkscape.org)
@@ -41,7 +47,10 @@ PCBmodE is developed and tested under Linux, so it might or might not work under
 
 ## Roadmap
 
-PCBmodE was written and is maintained by Saar Drimer of [Boldport](https://boldport.com). It has been used to design all of Boldport's [products](https://boldport.com/shop) since 2013. It is, therefore, very functional but sadly not that well documented and development happens in bursts.
+PCBmodE was written and is maintained by Saar Drimer of [Boldport](https://boldport.com). 
+It has been used to design all of Boldport's [products](https://boldport.com/shop) since 2013.
+It is, therefore, very functional but sadly not that well documented and development happens
+in bursts.
 
 The next version of PCBmodE is v5, codename 'cinco'. For this release I'd like to get the following done:
 * Package PCBmodE so it's easy to install
@@ -62,12 +71,15 @@ New desired extensions:
 
 ## Contributing
 
-For contributing code, see the CONTRIBUTE.md included in this repository.
+For contributing code, see CONTRIBUTE.md.
 
-If you'd like to contribute _towards_ development in the form of hard cold electronic money, see the end of [this](https://boldport.com/pcbmode) page.
+If you'd like to contribute _towards_ development in the form of hard cold electronic money,
+see the end of [this](https://boldport.com/pcbmode) page.
 
 ## The name
-The 'mod' in PCBmodE has a double meaning. The first is short for 'modern' (in contrast to tired old EDA tools). The second is a play on the familiar 'modifications' or 'mods' done to imperfect PCBs. Call it 'PCB mode' or 'PCB mod E', whichever you prefer. 
+The 'mod' in PCBmodE has a double meaning. The first is short for 'modern' (in contrast
+to tired old EDA tools). The second is a play on the familiar 'modifications' or 'mods'
+done to imperfect PCBs. Call it 'PCB mode' or 'PCB mod E', whichever you prefer. 
 
 ## License
-PCBmodE is licensed under the [MIT License](http://opensource.org/licenses/MIT).
+PCBmodE is licensed under GPL 3.0. See LICENSE.
