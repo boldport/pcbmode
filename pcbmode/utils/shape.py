@@ -42,18 +42,15 @@ class Shape:
         self._shape_dict = shape
 
         # Invert rotation so it's clock-wise. Inkscape is counter-clockwise and
-        # it's unclear to ma what's the "right" direction. clockwise makse more
+        # it's unclear to me what's the "right" direction. clockwise makes more
         # sense to me. This should be the only place to make the change.
         self._inv_rotate = -1
 
-        try:
-            self._type = shape.get("type")
-        except:
-            msg.error("Shapes must have a 'type' defined")
+        self._get_shape_type()
 
         # A 'layer' type is a copy of the outline. Here we copy the
         # outline shape and override the type
-        if self._type in ["layer"]:
+        if self._type == "layer":
             self._shape_dict = config.brd["outline"].get("shape").copy()
             self._type = self._shape_dict.get("type")
 
@@ -69,7 +66,7 @@ class Shape:
         # labels
         self._label = None
 
-        if self._type in ["rect", "rectangle"]:
+        if self._type == "rect":
             path = svg.width_and_height_to_path(
                 self._shape_dict["width"],
                 self._shape_dict["height"],
@@ -169,6 +166,23 @@ class Shape:
         )
 
         self._location = utils.toPoint(shape.get("location", [0, 0]))
+
+    def _get_shape_type(self):
+        """
+        Get the shape type. There are some equivalent options available, so define one for the rest of the processing.
+        """
+
+        try:
+            self._type = self._shape_dict.get("type")
+        except:
+            msg.error("Shapes must have a 'type' defined")
+
+        if self._type in ["rect", "rectangle"]:
+            self._type = "rect"
+        elif self._type in ["circ", "circle", "round"]:
+            self._type = "circ"
+        elif self._type in ["text", "string"]:
+            self._type = "text"
 
     def transformPath(
         self, scale=1, rotate=0, rotate_point=Point(), mirror=False, add=False
