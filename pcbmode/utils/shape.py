@@ -35,29 +35,29 @@ class Shape:
 
     def __init__(self, shape):
 
-        mirror = False
-
-        self._shape_dict = shape
-
-        self._gerber_lp = shape.get("gerber-lp") or shape.get("gerber_lp") or None
-
         # Invert rotation so it's clock-wise. Inkscape is counter-clockwise and
         # it's unclear to me what's the "right" direction. clockwise makes more
         # sense to me. This should be the only place to make the change.
         self._inv_rotate = -1
 
+        # A general purpose label field
+        self._label = None
+
+        self._shape_dict = shape
+        self._gerber_lp = shape.get("gerber-lp") or shape.get("gerber_lp") or None
         self._place_mirrored = shape.get("mirror") or False
         self._rotate = shape.get("rotate") or 0
         self._rotate *= self._inv_rotate
         self._rotate_point = shape.get("rotate-point") or Point(0, 0)
         self._scale = shape.get("scale") or 1
         self._pour_buffer = shape.get("buffer-to-pour")
+        self._location = utils.toPoint(shape.get("location", [0, 0]))
 
-        self._get_shape_type()
+        # Create the SVG path for the shape
+        self._get_path_from_shape_type()
 
-        # A general purpose label field; intended for use for pad
-        # labels
-        self._label = None
+        # Convert the path to an object
+        self._path = SvgPath(self._path, self._gerber_lp)
 
         self._path.transform(
             scale=self._scale,
@@ -66,63 +66,73 @@ class Shape:
             mirror=self._place_mirrored,
         )
 
-        self._location = utils.toPoint(shape.get("location", [0, 0]))
-
-    def _get_shape_type(self):
+    def _get_path_from_shape_type(self):
         """
-        Get the shape type. There are some equivalent options available, so define one for the rest of the processing.
+        There are various shape types. Here we create an SVG path from the shape type and parameters provided by the shape dict.
         """
 
         try:
             self._type = self._shape_dict.get("type")
         except:
-            msg.error("Shapes must have a 'type' defined")
+            msg.error("Shapes must have a 'type' definition.")
 
-        # A 'layer' type is a shape that covers the entire board. So here we copy
+        # A 'layer' shape type is a shape that covers the entire board. So here we copy
         # the outline shape and continue with processing
         if self._type == "layer":
             self._shape_dict = config.brd["outline"].get("shape").copy()
             self._type = self._shape_dict.get("type")
 
         if self._type in ["rect", "rectangle"]:
+            self._type = "rect"
             self._process_rect()
         elif self._type in ["circ", "circle", "round"]:
+            self._type = "circ"
             self._process_circ()
         elif self._type == "drill":
             self._process_drill()
         elif self._type in ["text", "string"]:
+            self._type == "text"
             self._process_text()
         elif self._type == "path":
             self._process_path()
         else:
             msg.error("'%s' is not a recongnised shape type" % self._type)
 
-        self._path = SvgPath(self._path, self._gerber_lp)
-
     def _process_rect(self):
-        self._type = "rect"
+        try:
+            width = self._shape_dict["width"]
+        except KeyError:
+            msg.error("A 'rect' shape requires a 'width' definition")
+
+        try:
+            height = self._shape_dict["height"]
+        except KeyError:
+            msg.error("A 'rect' shape requires a 'height' definition")
+
         self._path = svg.width_and_height_to_path(
-            self._shape_dict["width"],
-            self._shape_dict["height"],
-            self._shape_dict.get("radii"),
+            width, height, self._shape_dict.get("radii")
         )
 
     def _process_circ(self):
-        self._type = "circ"
-        self._path = svg.circle_diameter_to_path(self._shape_dict["diameter"])
+        try:
+            self._diameter = self._shape_dict["diameter"]
+        except KeyError:
+            msg.error("A 'circle' shape requires a 'diameter' definition")
+        self._path = svg.circle_diameter_to_path(self._diameter)
 
     def _process_drill(self):
-        self._type = "drill"
-        self._diameter = self._shape_dict["diameter"]
+        try:
+            self._diameter = self._shape_dict["diameter"]
+        except KeyError:
+            msg.error("A 'drill' shape requires a 'diameter' definition")
         self._path = svg.drillPath(self._diameter)
 
     def _process_text(self):
-        self._type == "text"
         try:
-            self._text = self._shape_dict["value"]
+            self._text = self._shape_dict["value"] or self._shape_dict["text"]
         except KeyError:
             msg.error(
-                "Could not find the text to display. The text to be displayed ld be defined in the 'value' field, for example, 'value': DBEEF\\nhar\\nhar'"
+                "A 'text' shape type must have a 'value' or 'text' definition with the text to display."
             )
         # Get the font's name
         font = (
@@ -148,8 +158,10 @@ class Shape:
             )
         try:
             fs = self._shape_dict["font-size"]
-        except:
-            msg.error("A 'font-size' attribute must be specified for a 'text' type")
+        except KeyError:
+            msg.error(
+                "A 'font-size' attribute must be specified for a 'text' shape type"
+            )
         ls = self._shape_dict.get("letter-spacing") or "0mm"
         lh = self._shape_dict.get("line-height") or fs
         font_size, letter_spacing, line_height = utils.getTextParams(fs, ls, lh)
@@ -175,11 +187,16 @@ class Shape:
         if self._shape_dict.get("style") == "stroke":
             self._gerber_lp = None
 
+        # For some reason SVG fonts are rotated by 180 degrees. This undos that
         self._rotate += 180
 
     def _process_path(self):
-        self._type = "path"
-        self._path = self._shape_dict.get("value")
+        try:
+            self._path = self._shape_dict.get("value") or self._shape_dict.get("d")
+        except KeyError:
+            msg.error(
+                "A 'path' shape requires a 'value' or 'd' definition with a valid SVG path."
+            )
 
     def transformPath(
         self, scale=1, rotate=0, rotate_point=Point(), mirror=False, add=False
@@ -195,8 +212,6 @@ class Shape:
             )
 
     def rotateLocation(self, angle, point=Point()):
-        """
-        """
         self._location.rotate(angle, point)
 
     def getRotation(self):
@@ -206,9 +221,6 @@ class Shape:
         self._rotate = rotate
 
     def getOriginalPath(self):
-        """
-        Returns that original, unmodified path
-        """
         return self._path.getOriginal()
 
     def getTransformedPath(self, mirrored=False):
@@ -227,15 +239,9 @@ class Shape:
         return self._gerber_lp
 
     def setStyle(self, style):
-        """
-        style: Style object
-        """
         self._style = style
 
     def getStyle(self):
-        """
-        Return the shape's style Style object
-        """
         return self._style
 
     def getStyleString(self):
