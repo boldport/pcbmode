@@ -26,6 +26,7 @@ from pcbmode.utils import messages as msg
 from pcbmode.utils import utils
 from pcbmode.utils import svg
 from pcbmode.utils.point import Point
+from pcbmode.utils import svg_path_grammar
 
 
 class SvgPath:
@@ -40,7 +41,7 @@ class SvgPath:
         digest = utils.digest(path)
         self._record = config.pth.get(digest)
 
-        self._svgGrammar = self._makeSVGGrammar()
+        self._svgGrammar = svg_path_grammar.get_grammar()
 
         if self._record == None:
             self._original_parsed = self._svgGrammar.parseString(self._original)
@@ -110,73 +111,6 @@ class SvgPath:
 
     def getHeight(self):
         return self._height
-
-    def _makeSVGGrammar(self):
-        """
-        Creates an SVG path parsing grammar
-        """
-
-        # pyparsing grammar
-        comma = PYP.Literal(",").suppress()  # supress removes the ',' when captured
-        dot = PYP.Literal(".")
-        coord = PYP.Regex(r"-?\d+(\.\d*)?([Ee][+-]?\d+)?")
-        one_coord = PYP.Group(coord)
-        xycoords = PYP.Group(coord + PYP.Optional(comma) + coord)
-        two_xycoords = xycoords + PYP.Optional(comma) + xycoords
-        three_xycoords = (
-            xycoords + PYP.Optional(comma) + xycoords + PYP.Optional(comma) + xycoords
-        )
-
-        # TODO optimise this; there has to be a more efficient way to describe this
-        c_M = PYP.Literal("M") + PYP.OneOrMore(xycoords)
-        c_m = PYP.Literal("m") + PYP.OneOrMore(xycoords)
-
-        c_C = PYP.Literal("C") + PYP.OneOrMore(three_xycoords)
-        c_c = PYP.Literal("c") + PYP.OneOrMore(three_xycoords)
-
-        c_Q = PYP.Literal("Q") + PYP.OneOrMore(two_xycoords)
-        c_q = PYP.Literal("q") + PYP.OneOrMore(two_xycoords)
-
-        c_T = PYP.Literal("T") + PYP.OneOrMore(xycoords)
-        c_t = PYP.Literal("t") + PYP.OneOrMore(xycoords)
-
-        c_L = PYP.Literal("L") + PYP.OneOrMore(xycoords)
-        c_l = PYP.Literal("l") + PYP.OneOrMore(xycoords)
-
-        c_V = PYP.Literal("V") + PYP.OneOrMore(one_coord)
-        c_v = PYP.Literal("v") + PYP.OneOrMore(one_coord)
-
-        c_H = PYP.Literal("H") + PYP.OneOrMore(one_coord)
-        c_h = PYP.Literal("h") + PYP.OneOrMore(one_coord)
-
-        c_S = PYP.Literal("S") + PYP.OneOrMore(two_xycoords)
-        c_s = PYP.Literal("s") + PYP.OneOrMore(two_xycoords)
-
-        c_z = PYP.Literal("z")
-        c_Z = PYP.Literal("Z")
-
-        path_cmd = (
-            c_M
-            | c_m
-            | c_C
-            | c_c
-            | c_Q
-            | c_q
-            | c_T
-            | c_t
-            | c_L
-            | c_l
-            | c_V
-            | c_v
-            | c_H
-            | c_h
-            | c_S
-            | c_s
-            | c_Z
-            | c_z
-        )
-
-        return PYP.OneOrMore(PYP.Group(path_cmd))
 
     def _makeRelative(self, path):
         """
