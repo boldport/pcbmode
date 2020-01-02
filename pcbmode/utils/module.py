@@ -29,6 +29,7 @@ from pcbmode.utils import messages as msg
 from pcbmode.utils import svg
 from pcbmode.utils import utils
 from pcbmode.utils import place
+from pcbmode.utils import inkscape_svg
 from pcbmode.utils.shape import Shape
 from pcbmode.utils.style import Style
 from pcbmode.utils.component import Component
@@ -67,7 +68,7 @@ class Module:
         )
 
         # Create the Inkscape SVG document
-        self._module = self._get_module_element()
+        self._module = inkscape_svg.create(self._width, self._height)
         svg_doc = et.ElementTree(self._module)
 
         # Get a dictionary of SVG layers
@@ -183,71 +184,6 @@ class Module:
             shape = None
 
         return shape
-
-    def _get_module_element(self):
-        """
-        Create a skelaton of an Inkscape SVG element
-        """
-        module = et.Element(
-            "svg",
-            width="%s%s" % (self._width, config.cfg["params"]["units"]),
-            height="%s%s" % (self._height, config.cfg["params"]["units"]),
-            viewBox="%s, %s, %s, %s" % (0, 0, self._width, self._height),
-            version="1.1",
-            nsmap=config.cfg["ns"],
-            fill="black",
-        )
-
-        # Set Inkscape options tag
-        inkscape_opt = et.SubElement(
-            module,
-            "{" + config.cfg["ns"]["sodipodi"] + "}%s" % "namedview",
-            id="namedview-pcbmode",
-            showgrid="true",
-        )
-
-        # Add units definition (only 'mm' is supported)
-        inkscape_opt.set(
-            "{" + config.cfg["ns"]["inkscape"] + "}%s" % "document-units",
-            config.cfg["params"]["units"],
-        )
-
-        # Open window maximised
-        inkscape_opt.set(
-            "{" + config.cfg["ns"]["inkscape"] + "}%s" % "window-maximized", "1"
-        )
-
-        # Define a grid
-        et.SubElement(
-            inkscape_opt,
-            "{" + config.cfg["ns"]["inkscape"] + "}%s" % "grid",
-            type="xygrid",
-            id="pcbmode-grid",
-            visible="true",
-            enabled="false",
-            units="mm",
-            emspacing="5",
-            spacingx="0.1mm",
-            spacingy="0.1mm",
-        )
-
-        # Add a welcome message as a comment in the SVG
-        welcome_message = """
-Hello! This SVG file was generated using PCBmodE on %s GMT. 
-PCBmodE is open source software
-
-  http://pcbmode.com
-
-and is maintained by Boldport
-
-  http://boldport.com
-
-""" % (
-            datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
-        )
-        module.append(et.Comment(welcome_message))
-
-        return module
 
     def _placeOutlineDimensions(self):
         """
