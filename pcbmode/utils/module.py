@@ -48,7 +48,7 @@ class Module:
         self._module_dict = module_dict
         self._routing_dict = routing_dict
 
-        self._outline = self._getOutline()
+        self._outline = self._get_outline()
         self._width = self._outline.getWidth()
         self._height = self._outline.getHeight()
 
@@ -179,7 +179,7 @@ class Module:
 
         return components
 
-    def _getOutline(self):
+    def _get_outline(self):
         """
         Process the module's outline shape. Modules don't have to have an outline
         defined, so in that case return None.
