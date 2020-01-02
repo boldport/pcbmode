@@ -52,16 +52,12 @@ class Module:
         self._width = self._outline.getWidth()
         self._height = self._outline.getHeight()
 
-        # Get dictionary of component definitions
-        components_dict = self._module_dict.get("components") or {}
+        # Get dictionaries of component/via/shape definitions
+        components_dict = self._module_dict.get("components", {})
         self._components = self._getComponents(components_dict)
-
-        # Get dictionary of component definitions
-        vias_dict = self._routing_dict.get("vias") or {}
+        vias_dict = self._routing_dict.get("vias", {})
         self._vias = self._getComponents(vias_dict)
-
-        # Get dictionary of component definitions
-        shapes_dict = self._module_dict.get("shapes") or {}
+        shapes_dict = self._module_dict.get("shapes", {})
         self._shapes = self._getComponents(shapes_dict)
 
         sig_dig = config.cfg["params"]["significant-digits"]
@@ -156,6 +152,50 @@ class Module:
         f.write(et.tostring(svg_doc, pretty_print=True))
         f.close()
 
+    def _getComponents(self, components_dict):
+        """
+        Create the components for this module.
+        Return a list of items of class 'component'
+        """
+
+        # Store components here
+        components = []
+
+        # Get shapes for each component definition
+        for refdef in components_dict:
+            component_dict = components_dict[refdef]
+
+            # Show or hide the component.
+            # This will still account the component for the BoM
+            show = component_dict.get("show", True)
+
+            # Place or do not place the component
+            # Also ignored for BoM
+            place = component_dict.get("place", True)
+
+            if (show == True) and (place == True):
+                component = Component(refdef, component_dict)
+                components.append(component)
+
+        return components
+
+    def _getOutline(self):
+        """
+        Process the module's outline shape. Modules don't have to have an outline
+        defined, so in that case return None.
+        """
+        shape = None
+
+        outline_dict = self._module_dict.get("outline")
+        if outline_dict != None:
+            shape_dict = outline_dict.get("shape")
+            if shape_dict != None:
+                shape = Shape(shape_dict)
+                style = Style(shape_dict, "outline")
+                shape.setStyle(style)
+
+        return shape
+
     def _placeOutlineDimensions(self):
         """
         Places outline dimension arrows
@@ -222,13 +262,13 @@ class Module:
         # Create text shapes
         shape_dict = {}
         shape_dict["type"] = "text"
-        style_dict = config.stl["layout"]["dimensions"].get("text") or {}
+        style_dict = config.stl["layout"]["dimensions"].get("text", {})
         shape_dict["font-family"] = (
-            style_dict.get("font-family") or "UbuntuMono-R-webfont"
+            style_dict.get("font-family", "UbuntuMono-R-webfont")
         )
-        shape_dict["font-size"] = style_dict.get("font-size") or "1.5mm"
-        shape_dict["line-height"] = style_dict.get("line-height") or "1mm"
-        shape_dict["letter-spacing"] = style_dict.get("letter-spacing") or "0mm"
+        shape_dict["font-size"] = style_dict.get("font-size", "1.5mm")
+        shape_dict["line-height"] = style_dict.get("line-height", "1mm")
+        shape_dict["letter-spacing"] = style_dict.get("letter-spacing", "0mm")
 
         # Locations
         arrow_gap = 1.5
@@ -310,7 +350,7 @@ class Module:
                 there_are_pours = utils.checkForPoursInLayer(pcb_layer)
 
                 # Copper
-                shapes = shapes_dict["conductor"].get(pcb_layer) or []
+                shapes = shapes_dict["conductor"].get(pcb_layer, [])
 
                 if len(shapes) > 0:
 
@@ -367,7 +407,7 @@ class Module:
                             )
 
                 # Pours
-                shapes = shapes_dict["pours"].get(pcb_layer) or []
+                shapes = shapes_dict["pours"].get(pcb_layer, [])
                 try:
                     svg_layer = self._layers[pcb_layer]["conductor"]["pours"]["layer"]
                 except:
@@ -387,7 +427,7 @@ class Module:
                         placed_element = place.placeShape(shape, group, invert)
 
                 # Soldermask
-                shapes = shapes_dict["soldermask"].get(pcb_layer) or []
+                shapes = shapes_dict["soldermask"].get(pcb_layer, [])
                 try:
                     svg_layer = self._layers[pcb_layer]["soldermask"]["layer"]
                 except:
@@ -406,7 +446,7 @@ class Module:
                         placed_element = place.placeShape(shape, group, invert)
 
                 # Solderpaste
-                shapes = shapes_dict["solderpaste"].get(pcb_layer) or []
+                shapes = shapes_dict["solderpaste"].get(pcb_layer, [])
                 try:
                     svg_layer = self._layers[pcb_layer]["solderpaste"]["layer"]
                 except:
@@ -425,7 +465,7 @@ class Module:
                         placed_element = place.placeShape(shape, group, invert)
 
                 # Silkscreen
-                shapes = shapes_dict["silkscreen"].get(pcb_layer) or []
+                shapes = shapes_dict["silkscreen"].get(pcb_layer, [])
                 try:
                     svg_layer = self._layers[pcb_layer]["silkscreen"]["layer"]
                 except:
@@ -473,7 +513,7 @@ class Module:
                             )
 
                 # Assembly
-                shapes = shapes_dict["assembly"].get(pcb_layer) or []
+                shapes = shapes_dict["assembly"].get(pcb_layer, [])
                 try:
                     svg_layer = self._layers[pcb_layer]["assembly"]["layer"]
                 except:
@@ -489,7 +529,7 @@ class Module:
                         placed_element = place.placeShape(shape, group, invert)
 
                 # Drills
-                shapes = shapes_dict["drills"].get(pcb_layer) or []
+                shapes = shapes_dict["drills"].get(pcb_layer, [])
                 if len(shapes) > 0:
                     svg_layer = self._layers["drills"]["layer"]
                     transform = "translate(%s,%s)" % (
@@ -546,7 +586,6 @@ class Module:
 
             if component_type == "component":
                 style = utils.dictToStyleText(config.stl["layout"]["placement"]["text"])
-
                 t = et.SubElement(group, "text", x="0", y="-0.17", style=style)
                 ts = et.SubElement(t, "tspan", x="0", dy="0.1")
                 ts.text = "%s" % (refdef)
@@ -556,7 +595,6 @@ class Module:
                 ts.text = "[%.2f,%.2f]" % (location[0], location[1])
             elif component_type == "shape":
                 style = utils.dictToStyleText(config.stl["layout"]["placement"]["text"])
-
                 t = et.SubElement(group, "text", x="0", y="-0.17", style=style)
                 ts = et.SubElement(t, "tspan", x="0", dy="0.1")
                 ts.text = "%s" % (refdef)
@@ -566,7 +604,6 @@ class Module:
                 ts.text = "[%.2f,%.2f]" % (location[0], location[1])
             elif component_type == "via":
                 style = utils.dictToStyleText(config.stl["layout"]["placement"]["text"])
-
                 t = et.SubElement(group, "text", x="0", y="-0.11", style=style)
                 ts = et.SubElement(t, "tspan", x="0", dy="0.1")
                 ts.text = htmlpar.unescape("%s&#176;" % (rotation))
@@ -580,7 +617,7 @@ class Module:
         """
 
         routing = config.rte
-        routes = routing.get("routes") or {}
+        routes = routing.get("routes", {})
 
         # Path effects are used for meandering paths, for example
         path_effects = routes.get("path_effects")
@@ -604,7 +641,7 @@ class Module:
             # Place defined routes on this SVG layer
             sheet = self._layers[pcb_layer]["conductor"]["routing"]["layer"]
 
-            for route_key in routes.get(pcb_layer) or {}:
+            for route_key in routes.get(pcb_layer, {}):
                 shape_dict = routes[pcb_layer][route_key]
                 shape = Shape(shape_dict)
                 style = Style(shape_dict, "conductor")
@@ -1022,47 +1059,3 @@ and is maintained by Boldport
         module.append(et.Comment(welcome_message))
 
         return module
-
-    def _getComponents(self, components_dict):
-        """
-        Create the components for this module.
-        Return a list of items of class 'component'
-        """
-
-        # Store components here
-        components = []
-
-        # Get shapes for each component definition
-        for refdef in components_dict:
-            component_dict = components_dict[refdef]
-
-            # Show or hide the component.
-            # This will still account the component for the BoM
-            show = component_dict.get("show", True)
-
-            # Place or do not place the component
-            # Also ignored for BoM
-            place = component_dict.get("place", True)
-
-            if (show == True) and (place == True):
-                component = Component(refdef, component_dict)
-                components.append(component)
-
-        return components
-
-    def _getOutline(self):
-        """
-        Process the module's outline shape. Modules don't have to have an outline
-        defined, so in that case return None.
-        """
-        shape = None
-
-        outline_dict = self._module_dict.get("outline")
-        if outline_dict != None:
-            shape_dict = outline_dict.get("shape")
-            if shape_dict != None:
-                shape = Shape(shape_dict)
-                style = Style(shape_dict, "outline")
-                shape.setStyle(style)
-
-        return shape
