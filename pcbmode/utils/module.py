@@ -67,7 +67,7 @@ class Module:
         )
 
         # Create the Inkscape SVG document
-        self._module = self._getModuleElement()
+        self._module = self._get_module_element()
         svg_doc = et.ElementTree(self._module)
 
         # Get a dictionary of SVG layers
@@ -157,22 +157,11 @@ class Module:
         Create the components for this module.
         Return a list of items of class 'component'
         """
-
-        # Store components here
         components = []
-
-        # Get shapes for each component definition
         for refdef in components_dict:
             component_dict = components_dict[refdef]
-
-            # Show or hide the component.
-            # This will still account the component for the BoM
             show = component_dict.get("show", True)
-
-            # Place or do not place the component
-            # Also ignored for BoM
             place = component_dict.get("place", True)
-
             if (show == True) and (place == True):
                 component = Component(refdef, component_dict)
                 components.append(component)
@@ -181,11 +170,8 @@ class Module:
 
     def _get_outline(self):
         """
-        Process the module's outline shape. Modules don't have to have an outline
-        defined, so in that case return None.
+        Get the (optional) module's outline.
         """
-        shape = None
-
         outline_dict = self._module_dict.get("outline")
         if outline_dict != None:
             shape_dict = outline_dict.get("shape")
@@ -193,8 +179,75 @@ class Module:
                 shape = Shape(shape_dict)
                 style = Style(shape_dict, "outline")
                 shape.setStyle(style)
+        else:
+            shape = None
 
         return shape
+
+    def _get_module_element(self):
+        """
+        Create a skelaton of an Inkscape SVG element
+        """
+        module = et.Element(
+            "svg",
+            width="%s%s" % (self._width, config.cfg["params"]["units"]),
+            height="%s%s" % (self._height, config.cfg["params"]["units"]),
+            viewBox="%s, %s, %s, %s" % (0, 0, self._width, self._height),
+            version="1.1",
+            nsmap=config.cfg["ns"],
+            fill="black",
+        )
+
+        # Set Inkscape options tag
+        inkscape_opt = et.SubElement(
+            module,
+            "{" + config.cfg["ns"]["sodipodi"] + "}%s" % "namedview",
+            id="namedview-pcbmode",
+            showgrid="true",
+        )
+
+        # Add units definition (only 'mm' is supported)
+        inkscape_opt.set(
+            "{" + config.cfg["ns"]["inkscape"] + "}%s" % "document-units",
+            config.cfg["params"]["units"],
+        )
+
+        # Open window maximised
+        inkscape_opt.set(
+            "{" + config.cfg["ns"]["inkscape"] + "}%s" % "window-maximized", "1"
+        )
+
+        # Define a grid
+        et.SubElement(
+            inkscape_opt,
+            "{" + config.cfg["ns"]["inkscape"] + "}%s" % "grid",
+            type="xygrid",
+            id="pcbmode-grid",
+            visible="true",
+            enabled="false",
+            units="mm",
+            emspacing="5",
+            spacingx="0.1mm",
+            spacingy="0.1mm",
+        )
+
+        # Add a welcome message as a comment in the SVG
+        welcome_message = """
+Hello! This SVG file was generated using PCBmodE on %s GMT. 
+PCBmodE is open source software
+
+  http://pcbmode.com
+
+and is maintained by Boldport
+
+  http://boldport.com
+
+""" % (
+            datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+        )
+        module.append(et.Comment(welcome_message))
+
+        return module
 
     def _placeOutlineDimensions(self):
         """
@@ -263,8 +316,8 @@ class Module:
         shape_dict = {}
         shape_dict["type"] = "text"
         style_dict = config.stl["layout"]["dimensions"].get("text", {})
-        shape_dict["font-family"] = (
-            style_dict.get("font-family", "UbuntuMono-R-webfont")
+        shape_dict["font-family"] = style_dict.get(
+            "font-family", "UbuntuMono-R-webfont"
         )
         shape_dict["font-size"] = style_dict.get("font-size", "1.5mm")
         shape_dict["line-height"] = style_dict.get("line-height", "1mm")
@@ -994,68 +1047,3 @@ class Module:
             t.text = "%s mm" % diameter
 
             location.x += max(diameter, 2.5)
-
-    def _getModuleElement(self):
-        """
-        Returns the skelaton of an Inkscape SVG element
-        """
-        module = et.Element(
-            "svg",
-            width="%s%s" % (self._width, config.cfg["params"]["units"]),
-            height="%s%s" % (self._height, config.cfg["params"]["units"]),
-            viewBox="%s, %s, %s, %s" % (0, 0, self._width, self._height),
-            version="1.1",
-            nsmap=config.cfg["ns"],
-            fill="black",
-        )
-
-        # Set Inkscape options tag
-        inkscape_opt = et.SubElement(
-            module,
-            "{" + config.cfg["ns"]["sodipodi"] + "}%s" % "namedview",
-            id="namedview-pcbmode",
-            showgrid="true",
-        )
-
-        # Add units definition (only 'mm' is supported)
-        inkscape_opt.set(
-            "{" + config.cfg["ns"]["inkscape"] + "}%s" % "document-units",
-            config.cfg["params"]["units"],
-        )
-
-        # Open window maximised
-        inkscape_opt.set(
-            "{" + config.cfg["ns"]["inkscape"] + "}%s" % "window-maximized", "1"
-        )
-
-        # Define a grid
-        et.SubElement(
-            inkscape_opt,
-            "{" + config.cfg["ns"]["inkscape"] + "}%s" % "grid",
-            type="xygrid",
-            id="pcbmode-grid",
-            visible="true",
-            enabled="false",
-            units="mm",
-            emspacing="5",
-            spacingx="0.1mm",
-            spacingy="0.1mm",
-        )
-
-        # Add a welcome message as a comment in the SVG
-        welcome_message = """
-Hello! This SVG file was generated using PCBmodE on %s GMT. 
-PCBmodE is open source software
-
-  http://pcbmode.com
-
-and is maintained by Boldport
-
-  http://boldport.com
-
-""" % (
-            datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
-        )
-        module.append(et.Comment(welcome_message))
-
-        return module
