@@ -95,20 +95,14 @@ class Module:
         self._placeOutline()
         self._placeOutlineDimensions()
 
-        self._placeComponents(
-            components=self._components, component_type="component"
-        )
+        self._placeComponents(components=self._components, component_type="component")
         sys.stdout.write("\n")
 
         self._placeRouting()
 
-        self._placeComponents(
-            components=self._vias, component_type="via"
-        )
+        self._placeComponents(components=self._vias, component_type="via")
 
-        self._placeComponents(
-            components=self._shapes, component_type="shape"
-        )
+        self._placeComponents(components=self._shapes, component_type="shape")
 
         if config.cfg["create"]["docs"] == True:
             self._placeDocs()
