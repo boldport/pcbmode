@@ -54,11 +54,11 @@ class Module:
 
         # Get dictionaries of component/via/shape definitions
         components_dict = self._module_dict.get("components", {})
-        self._components = self._getComponents(components_dict)
+        self._components = self._get_components(components_dict)
         vias_dict = self._routing_dict.get("vias", {})
-        self._vias = self._getComponents(vias_dict)
+        self._vias = self._get_components(vias_dict)
         shapes_dict = self._module_dict.get("shapes", {})
-        self._shapes = self._getComponents(shapes_dict)
+        self._shapes = self._get_components(shapes_dict)
 
         sig_dig = config.cfg["params"]["significant-digits"]
         self._transform = "translate(%s %s)" % (
@@ -152,7 +152,7 @@ class Module:
         f.write(et.tostring(svg_doc, pretty_print=True))
         f.close()
 
-    def _getComponents(self, components_dict):
+    def _get_components(self, components_dict):
         """
         Create the components for this module.
         Return a list of items of class 'component'
