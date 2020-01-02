@@ -330,7 +330,6 @@ def checkForPoursInLayer(layer):
         pours = {}
 
     if pours is not None:
-        print(pours)
         for pour_dict in pours:
             layers = getExtendedLayerList(pour_dict.get("layers"))
             if layer in layers:

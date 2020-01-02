@@ -95,35 +95,28 @@ class Module:
         self._placeOutline()
         self._placeOutlineDimensions()
 
-        msg.subInfo("Placing components:", newline=False)
         self._placeComponents(
-            components=self._components, component_type="component", print_refdef=True
+            components=self._components, component_type="component"
         )
         sys.stdout.write("\n")
 
-        msg.subInfo("Placing routes")
         self._placeRouting()
 
-        msg.subInfo("Placing vias")
         self._placeComponents(
-            components=self._vias, component_type="via", print_refdef=False
+            components=self._vias, component_type="via"
         )
 
-        msg.subInfo("Placing shapes")
         self._placeComponents(
-            components=self._shapes, component_type="shape", print_refdef=False
+            components=self._shapes, component_type="shape"
         )
 
         if config.cfg["create"]["docs"] == True:
-            msg.subInfo("Placing documentation")
             self._placeDocs()
 
         if config.cfg["create"]["drill-index"] == True:
-            msg.subInfo("Placing drill index")
             self._placeDrillIndex()
 
         if config.cfg["create"]["layer-index"] == True:
-            msg.subInfo("Placing layer index")
             self._placeLayerIndex()
 
         # This 'cover' "enables" the mask shapes defined in the mask are
@@ -292,9 +285,9 @@ class Module:
         place.placeShape(width_arrow, group)
         place.placeShape(height_arrow, group)
 
-    def _placeComponents(self, components, component_type, print_refdef=False):
+    def _placeComponents(self, components, component_type):
         """
-        Places the component on the board.  
+        Places the component on the board.
 
         'component_type' is the content of the 'type' fiels of the
         placed group. This is used by the extractor to identify the
@@ -308,9 +301,6 @@ class Module:
             location = component.getLocation()
             rotation = component.getRotation()
             refdef = component.getRefdef()
-
-            if print_refdef == True:
-                sys.stdout.write("%s " % refdef)
 
             # If the component is placed on the bottom layer we need
             # to invert the shapes AND their 'x' coordinate.  This is

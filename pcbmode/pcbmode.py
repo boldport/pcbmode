@@ -163,7 +163,6 @@ def apply_overrides(cli_args):
 def main():
 
     # License information
-
     print("PCBmodE, Copyright (C) 2020 Saar Drimer")
     print("This program comes with ABSOLUTELY NO WARRANTY. This is free software,")
     print("and you are welcome to redistribute it under certain conditions.")
@@ -171,16 +170,17 @@ def main():
     print()
 
     # Info while in development
-    msg.info("Important!")
-    msg.info(
-        "You are using a version of PCBmodE ('cinco') that's actively under development."
-    )
-    msg.info("Please support this project at https://github.com/sponsors/saardrimer.\n")
+    print("Important!")
+    print("This version of PCBmodE ('cinco') is actively under development.")
+    print("Support this project at https://github.com/sponsors/saardrimer")
+    print()
 
-    # Setup and parse commandline arguments
-    argp = cli_arg.setup()
-    cmdline_args = argp.parse_args()
+    print("Running... ", end = '', flush=True)
 
+    argp = cli_arg.setup() # setup cli arguments
+    cmdline_args = argp.parse_args() # parse arguments
+
+    # Get the path to PCBmodE
     config.tmp["pcbmode-path"] = Path(__file__).parent
 
     # Might support running multiple boards in the future,
@@ -189,21 +189,16 @@ def main():
     config.tmp["project-file"] = Path(project_path).name
     config.tmp["project-path"] = Path(project_path).parent
 
-    msg.info("Loading PCBmodE's configuration data")
     load_pcbmode_config()
-    msg.info("Loading board's configuration data")
     load_board_file()
     load_style()
     load_stackup()
-    if cmdline_args.cache is False:
-        load_cache()
     load_routing()
     set_y_axis_invert()
     apply_overrides(cmdline_args)
 
     # Renumber refdefs and dump board config file
     if cmdline_args.renumber is not False:
-        msg.info("Renumbering refdefs")
         if cmdline_args.renumber is None:
             order = "top-to-bottom"
         else:
@@ -225,9 +220,12 @@ def main():
         coord_file.makeCoordFile(cmdline_args.coord_file)
 
     else:
+
+        if cmdline_args.cache is False:
+            load_cache()
+
         # Make the board
         if cmdline_args.make is True:
-            msg.info("Creating board")
             board = Board()
 
         # Create production files (Gerbers, Excellon, etc.)
@@ -237,14 +235,10 @@ def main():
             else:
                 manufacturer = cmdline_args.fab.lower()
 
-            msg.info("Creating Gerbers")
             gerber.gerberise(manufacturer)
-
-            msg.info("Creating excellon drill file")
             excellon.makeExcellon(manufacturer)
 
         if cmdline_args.pngs is True:
-            msg.info("Creating PNGs")
             utils.makePngs()
 
     if cmdline_args.cache is False:
@@ -252,7 +246,7 @@ def main():
         filename.parent.mkdir(parents=True, exist_ok=True)
         filename.write_text(json.dumps(config.pth, sort_keys=True, indent=2))
 
-    msg.info("Done!")
+    print("done!")
 
 
 if __name__ == "__main__":
