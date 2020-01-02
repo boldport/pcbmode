@@ -1,114 +1,149 @@
 {
-  "locations":
-  {
+  "locations": {
     "boards": "boards/",
     "fonts": "fonts/",
     "build": "build/",
     "styles": "styles/",
     "stackups": "stackups/"
   },
-  "styles":
-  {
+  "styles": {
     "stylesheet-for-layout": "styles/default/layout.json"
   },
-  "stackup":
-  {
+  "stackup": {
     "definition-file": "stackups/two-layer.json"
   },
-  "cache":
-  {
+  "cache": {
     "file": "build/cache/temp.json"
   },
-  "shapes":
-  {
+  "shapes": {
     "path": "shapes"
   },
-  "fonts":
-  {
+  "fonts": {
     "path": "fonts"
   },
-  "components":
-  {
+  "components": {
     "path": "components"
   },
-  "create":
-  {
-    "docs": true, 
-    "drill-index": true, 
-    "flashes": true, 
-    "layer-index": true  
+  "create": {
+    "docs": true,
+    "drill-index": true,
+    "flashes": true,
+    "layer-index": true
   },
-  "params":
-  {
+  "params": {
     "units": "mm",
     "significant-digits": 8,
     "display-frame-buffer": 1.0,
     "num-of-digest-digits": 12,
     "invert-y-axis": true
   },
-  "distances":
-  {
-    "from-pour-to": 
-    {
+  "distances": {
+    "from-pour-to": {
       "outline": 0.5,
-      "drill": 1.0, 
-      "pad": 0.2, 
+      "drill": 1.0,
+      "pad": 0.2,
       "route": 0.25
     },
-    "soldermask": 
-    {
+    "soldermask": {
       "path-scale": 1.05,
       "rect-buffer": 0.05,
       "circle-buffer": 0.05
     },
-    "solderpaste":
-    {
+    "solderpaste": {
       "path-scale": 0.9,
       "rect-buffer": -0.1,
       "circle-buffer": -0.1
     }
   },
-  "gerber":
-  {
-    "decimals": 6, 
-    "digits": 6, 
-    "min-segment-length": 0.05, 
+  "gerber": {
+    "decimals": 6,
+    "digits": 6,
+    "min-segment-length": 0.05,
     "steps-per-segment": 100
   },
-  "layer-control":
-  {
-    "conductor":
-    { 
-      "place": true, "hide": false, "lock": false, 
-      "pours": { "place": true, "hide": false, "lock": true },
-      "pads": { "place": true, "hide": false, "lock": false },
-      "routing": { "place": true, "hide": false, "lock": false }
+  "layer-control": {
+    "conductor": {
+      "place": true,
+      "hide": false,
+      "lock": false,
+      "pours": {
+        "place": true,
+        "hide": false,
+        "lock": true
+      },
+      "pads": {
+        "place": true,
+        "hide": false,
+        "lock": false
+      },
+      "routing": {
+        "place": true,
+        "hide": false,
+        "lock": false
+      }
     },
-    "soldermask": { "place": true, "hide": false, "lock": false },
-    "solderpaste": { "place": true, "hide": true, "lock": true },
-    "silkscreen": { "place": true, "hide": false, "lock": false },
-    "assembly": { "place": true, "hide": false, "lock": false },
-    "documentation": { "place": true, "hide": false, "lock": false },
-    "dimensions": { "place": true, "hide": false, "lock": true },
-    "origin": { "place": true, "hide": false, "lock": true },
-    "drills": { "place": true, "hide": false, "lock": false },
-    "placement": { "place": true, "hide": false, "lock": false },
-    "outline": { "place": true, "hide": false, "lock": true }
+    "soldermask": {
+      "place": true,
+      "hide": false,
+      "lock": false
+    },
+    "solderpaste": {
+      "place": true,
+      "hide": true,
+      "lock": true
+    },
+    "silkscreen": {
+      "place": true,
+      "hide": false,
+      "lock": false
+    },
+    "assembly": {
+      "place": true,
+      "hide": false,
+      "lock": false
+    },
+    "documentation": {
+      "place": true,
+      "hide": false,
+      "lock": false
+    },
+    "dimensions": {
+      "place": true,
+      "hide": false,
+      "lock": true
+    },
+    "origin": {
+      "place": true,
+      "hide": false,
+      "lock": true
+    },
+    "drills": {
+      "place": true,
+      "hide": false,
+      "lock": false
+    },
+    "placement": {
+      "place": true,
+      "hide": false,
+      "lock": false
+    },
+    "outline": {
+      "place": true,
+      "hide": false,
+      "lock": true
+    }
   },
-  "ns":
-  {
-    "dc"       : "http://purl.org/dc/elements/1.1/",
-    "cc"       : "http://creativecommons.org/ns#",
-    "rdf"      : "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-    "svg"      : "http://www.w3.org/2000/svg",
-    "sodipodi" : "http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd",
-    "inkscape" : "http://www.inkscape.org/namespaces/inkscape",
-    "pcbmode"  : "pcbmode"
+  "ns": {
+    "dc": "http://purl.org/dc/elements/1.1/",
+    "cc": "http://creativecommons.org/ns#",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "svg": "http://www.w3.org/2000/svg",
+    "sodipodi": "http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd",
+    "inkscape": "http://www.inkscape.org/namespaces/inkscape",
+    "pcbmode": "pcbmode"
   },
-  "refdef-index":
-  {
-    "common":
-    {
+  "refdef-index": {
+    "common": {
       "AT": "Attenuator",
       "BR": "Bridge rectifier",
       "BT": "Battery",
@@ -147,8 +182,7 @@
       "Y": "Crystal / oscillator",
       "Z": "Zener diode"
     },
-    "pcbmode":
-    {
+    "pcbmode": {
       "BJT": "BJT",
       "C": "Capacitor",
       "D": "Diode",
@@ -173,129 +207,186 @@
       "ZEN": "Zener diode"
     }
   },
-  "manufacturers":
-  {
-    "default":
-    {
-      "filenames":
-      {
-        "gerbers":
-        {
-          "top":
-          {
-            "conductor": {"ext": "gbr"},
-            "soldermask": {"ext": "gbr"},
-            "silkscreen": {"ext": "gbrr"},
-            "solderpaste": {"ext": "gbrr"}
+  "manufacturers": {
+    "default": {
+      "filenames": {
+        "gerbers": {
+          "top": {
+            "conductor": {
+              "ext": "gbr"
+            },
+            "soldermask": {
+              "ext": "gbr"
+            },
+            "silkscreen": {
+              "ext": "gbrr"
+            },
+            "solderpaste": {
+              "ext": "gbrr"
+            }
           },
-          "internal":
-          {
-            "conductor": {"ext": "gbrr"}
+          "internal": {
+            "conductor": {
+              "ext": "gbrr"
+            }
           },
-          "bottom":
-          {
-            "conductor": {"ext": "gbrr"},
-            "soldermask": {"ext": "gbr"},
-            "silkscreen": {"ext": "gbrr"},
-            "solderpaste": {"ext": "gbr"}
+          "bottom": {
+            "conductor": {
+              "ext": "gbrr"
+            },
+            "soldermask": {
+              "ext": "gbr"
+            },
+            "silkscreen": {
+              "ext": "gbrr"
+            },
+            "solderpaste": {
+              "ext": "gbr"
+            }
           },
-          "other":
-   	  {
-            "documentation": {"ext": "gbr"},
-            "outline": {"ext": "gbrr"}
+          "other": {
+            "documentation": {
+              "ext": "gbr"
+            },
+            "outline": {
+              "ext": "gbrr"
+            }
           }
         },
-        "drills":
-        {
-          "plated": {"ext": "txt"},
-          "non-plated": {"ext": "txt"}
+        "drills": {
+          "plated": {
+            "ext": "txt"
+          },
+          "non-plated": {
+            "ext": "txt"
+          }
         },
-        "text":
-	{
-          "readme": {"ext": "txt"}
+        "text": {
+          "readme": {
+            "ext": "txt"
+          }
         }
       }
     },
-    "oshpark":
-    {
-      "filenames":
-      {
-        "gerbers":
-        {
-          "top":
-          {
-            "conductor": {"ext": "GTL"},
-            "soldermask": {"ext": "GTS"},
-            "silkscreen": {"ext": "GTO"},
-            "solderpaste": {"ext": "GTP"}
+    "oshpark": {
+      "filenames": {
+        "gerbers": {
+          "top": {
+            "conductor": {
+              "ext": "GTL"
+            },
+            "soldermask": {
+              "ext": "GTS"
+            },
+            "silkscreen": {
+              "ext": "GTO"
+            },
+            "solderpaste": {
+              "ext": "GTP"
+            }
           },
-          "internal":
-          {
-            "conductor": {"ext": "ger"}
+          "internal": {
+            "conductor": {
+              "ext": "ger"
+            }
           },
-          "bottom":
-          {
-            "conductor": {"ext": "GBL"},
-            "soldermask": {"ext": "GBS"},
-            "silkscreen": {"ext": "GBO"},
-            "solderpaste": {"ext": "GBP"}  
+          "bottom": {
+            "conductor": {
+              "ext": "GBL"
+            },
+            "soldermask": {
+              "ext": "GBS"
+            },
+            "silkscreen": {
+              "ext": "GBO"
+            },
+            "solderpaste": {
+              "ext": "GBP"
+            }
           },
-          "other":
-   	  {
-            "documentation": {"ext": "GBR"},
-            "outline": {"ext": "GKO"}
+          "other": {
+            "documentation": {
+              "ext": "GBR"
+            },
+            "outline": {
+              "ext": "GKO"
+            }
           }
         },
-        "drills":
-        {
-          "plated": {"ext": "XLN"},
-          "non-plated": {"end": "_NPTH", "ext": "drl"}
+        "drills": {
+          "plated": {
+            "ext": "XLN"
+          },
+          "non-plated": {
+            "end": "_NPTH",
+            "ext": "drl"
+          }
         },
-        "text":
-	{
-          "readme": {"ext": "txt"}
+        "text": {
+          "readme": {
+            "ext": "txt"
+          }
         }
       }
     },
-    "dirtypcb":
-    {
-      "filenames":
-      {
-	"gerbers":
-	{
-	  "top":
-	  {
-	    "copper": {"ext": "gtl"},
-	    "soldermask": {"ext": "gts"},
-	    "silkscreen": {"ext": "gto"},
-	    "solderpaste": {"ext": "gtp"}
-	  },
-          "internal":
-          {
-            "conductor": {"ext": "ger"}
+    "dirtypcb": {
+      "filenames": {
+        "gerbers": {
+          "top": {
+            "copper": {
+              "ext": "gtl"
+            },
+            "soldermask": {
+              "ext": "gts"
+            },
+            "silkscreen": {
+              "ext": "gto"
+            },
+            "solderpaste": {
+              "ext": "gtp"
+            }
           },
-	  "bottom":
-	  {
-	    "copper": {"ext": "gbl"},
-	    "soldermask": {"ext": "gbs"},
-	    "silkscreen": {"ext": "gbo"},
-	    "solderpaste": {"ext": "gbp"}
-	  },
-	  "other":
-	  {
-	    "documentation": {"ext": "ger"},
-	    "outline": {"ext": "gbr"}
-	  }
-	},
-	"drills":
-	{
-	  "plated": {"ext": "txt"},
-	  "non-plated": {"ext": "txt"}
-	},
-	"text":
-	{
-	  "readme": {"ext": "txt"}
-	}
+          "internal": {
+            "conductor": {
+              "ext": "ger"
+            }
+          },
+          "bottom": {
+            "copper": {
+              "ext": "gbl"
+            },
+            "soldermask": {
+              "ext": "gbs"
+            },
+            "silkscreen": {
+              "ext": "gbo"
+            },
+            "solderpaste": {
+              "ext": "gbp"
+            }
+          },
+          "other": {
+            "documentation": {
+              "ext": "ger"
+            },
+            "outline": {
+              "ext": "gbr"
+            }
+          }
+        },
+        "drills": {
+          "plated": {
+            "ext": "txt"
+          },
+          "non-plated": {
+            "ext": "txt"
+          }
+        },
+        "text": {
+          "readme": {
+            "ext": "txt"
+          }
+        }
       }
     }
   }
