@@ -21,11 +21,14 @@ import datetime
 from lxml import etree as et
 
 from pcbmode.config import config
+from pcbmode.utils import lxml_utils as lxu
+
 
 def create(width, height):
     """
     Create a skelaton of an Inkscape SVG element
     """
+
     module = et.Element(
         "svg",
         width="%s%s" % (width, config.cfg["params"]["units"]),
@@ -36,63 +39,101 @@ def create(width, height):
         fill="black",
     )
 
+    # Short namespaces
+    ns_svg = config.cfg["ns"]["svg"]
+    ns_rdf = config.cfg["ns"]["rdf"]
+    ns_ink = config.cfg["ns"]["inkscape"]
+    ns_cc = config.cfg["ns"]["cc"]
+    ns_dc = config.cfg["ns"]["dc"]
+    ns_sp = config.cfg["ns"]["sodipodi"]
+
+    # Title
     title = config.brd["metadata"].get("title", None)
     if title not in [None, ""]:
-        title_element = et.SubElement(
-            module,
-            "{" + config.cfg["ns"]["svg"] + "}%s" % ("title"),
-            id="title",
-        )
-        title_element.text = title
-        module.append(title_element)
+        title_element = lxu.addch(module, ns_svg, "title", "title", title)
 
     # Set Inkscape options tag
-    inkscape_opt = et.SubElement(
-        module,
-        "{" + config.cfg["ns"]["sodipodi"] + "}%s" % "namedview",
-        id="namedview-pcbmode",
-        showgrid="true",
-    )
-
-    # Add units definition (only 'mm' is supported)
+    inkscape_opt = lxu.addch(module, ns_sp, "namedview", "namedview-pcbmode")
+    inkscape_opt.set("{{{}}}{}".format(ns_ink, "window-maximized"), "1")
     inkscape_opt.set(
-        "{" + config.cfg["ns"]["inkscape"] + "}%s" % "document-units",
-        config.cfg["params"]["units"],
+        "{{{}}}{}".format(ns_ink, "document-units"), config.cfg["params"]["units"]
     )
-
-    # Open window maximised
-    inkscape_opt.set(
-        "{" + config.cfg["ns"]["inkscape"] + "}%s" % "window-maximized", "1"
-    )
-
-    # Define a grid
+    # Create grid
     et.SubElement(
         inkscape_opt,
-        "{" + config.cfg["ns"]["inkscape"] + "}%s" % "grid",
+        "{{{}}}{}".format(ns_ink, "grid"),
         type="xygrid",
         id="pcbmode-grid",
         visible="true",
-        enabled="false",
+        enabled="false",  # Change to enable by default
         units="mm",
         emspacing="5",
         spacingx="0.1mm",
         spacingy="0.1mm",
     )
 
-    # Add a welcome message as a comment in the SVG
-    welcome_message = """
-Hello! This SVG file was generated using PCBmodE on %s GMT. 
-PCBmodE is open source software
+    # Metadata - rdf - work
+    md_el = lxu.addch(module, ns_svg, "metadata", "metadata-by-pcbmode")
+    rdf_el = lxu.addch(md_el, ns_rdf, "RDF")
+    work_el = lxu.addch(rdf_el, ns_cc, "Work")
 
-  https://pcbmode.com
+    # Format
+    lxu.addch(work_el, ns_dc, "format", None, "image/svg+xml")
 
-and is maintained by Boldport
+    # Creator
+    creator = config.brd["metadata"].get("creator", None)
+    if creator not in [None, ""]:
+        work_c_el = lxu.addch(work_el, ns_dc, "creator")
+        work_ca_el = lxu.addch(work_c_el, ns_cc, "Agent")
+        lxu.addch(work_ca_el, ns_dc, "title", None, creator)
 
-  https://boldport.com
+    # Identifier
+    identifier = config.brd["metadata"].get("project-id", None)
+    if identifier not in [None, ""]:
+        lxu.addch(work_el, ns_dc, "identifier", None, identifier)
 
-""" % (
-        datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
-    )
-    module.append(et.Comment(welcome_message))
+    # Source
+    source = config.brd["metadata"].get("sourcecode-url", None)
+    if source not in [None, ""]:
+        lxu.addch(work_el, ns_dc, "source", None, source)
+
+    # Description
+    desc = config.brd["metadata"].get("description", None)
+    if desc not in [None, ""]:
+        work_d = lxu.addch(work_el, ns_dc, "description", None, desc)
+
+    # Contributors
+    contrib = config.brd["metadata"].get("contributors", None)
+    if contrib not in [None, ""]:
+        work_c_el = lxu.addch(work_el, ns_dc, "contributor")
+        work_ca_el = lxu.addch(work_c_el, ns_cc, "Agent")
+        lxu.addch(work_ca_el, ns_dc, "title", None, contrib)
+
+    # Rights - license
+    license_name = config.brd["metadata"].get("license-name", None)
+    if license_name not in [None, ""]:
+        work_c_el = lxu.addch(work_el, ns_dc, "rights")
+        work_ca_el = lxu.addch(work_c_el, ns_cc, "Agent")
+        lxu.addch(work_ca_el, ns_dc, "title", None, "License: {}".format(license_name))
+
+    # License - url
+    license_url = config.brd["metadata"].get("license-url", None)
+    if desc not in [None, ""]:
+        work_d = lxu.addch(work_el, ns_cc, "license")
+        work_d.set("{{{}}}{}".format(ns_rdf, "resource"), license_url)
+
+    # Keywords
+    keywords = config.brd["metadata"].get("keywords", None)
+    if keywords not in [None, ""]:
+        work_c_el = lxu.addch(work_el, ns_dc, "subject")
+        work_ca_el = lxu.addch(work_c_el, ns_rdf, "Bag")
+        lxu.addch(work_ca_el, ns_rdf, "li", None, keywords)
+
+    # Date
+    now = config.brd["metadata"].get("date", None)
+    if now not in [None, ""]:
+        if now.lower() == "now":
+            now = datetime.datetime.now().isoformat(" ", "seconds")
+        lxu.addch(work_el, ns_dc, "date", None, now)
 
     return module
