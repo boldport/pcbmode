@@ -31,9 +31,9 @@ def create(width, height):
 
     module = et.Element(
         "svg",
-        width="%s%s" % (width, config.cfg["params"]["units"]),
-        height="%s%s" % (height, config.cfg["params"]["units"]),
-        viewBox="%s, %s, %s, %s" % (0, 0, width, height),
+        width=f"{width}{config.cfg['params']['units']}",
+        height=f"{height}{config.cfg['params']['units']}",
+        viewBox=f"0, 0, {width}, {height}",
         version="1.1",
         nsmap=config.cfg["ns"],
         fill="black",
@@ -50,18 +50,16 @@ def create(width, height):
     # Title
     title = config.brd["metadata"].get("title", None)
     if title not in [None, ""]:
-        title_element = lxu.addch(module, ns_svg, "title", "title", title)
+        lxu.addch(module, ns_svg, "title", "title", title)
 
     # Set Inkscape options tag
     inkscape_opt = lxu.addch(module, ns_sp, "namedview", "namedview-pcbmode")
-    inkscape_opt.set("{{{}}}{}".format(ns_ink, "window-maximized"), "1")
-    inkscape_opt.set(
-        "{{{}}}{}".format(ns_ink, "document-units"), config.cfg["params"]["units"]
-    )
+    inkscape_opt.set(f"{{{ns_ink}}}window-maximized", "1")
+    inkscape_opt.set(f"{{{ns_ink}}}document-units", config.cfg["params"]["units"])
     # Create grid
     et.SubElement(
         inkscape_opt,
-        "{{{}}}{}".format(ns_ink, "grid"),
+        f"{{{ns_ink}}}grid",
         type="xygrid",
         id="pcbmode-grid",
         visible="true",
@@ -114,13 +112,13 @@ def create(width, height):
     if license_name not in [None, ""]:
         work_c_el = lxu.addch(work_el, ns_dc, "rights")
         work_ca_el = lxu.addch(work_c_el, ns_cc, "Agent")
-        lxu.addch(work_ca_el, ns_dc, "title", None, "License: {}".format(license_name))
+        lxu.addch(work_ca_el, ns_dc, "title", None, f"License: {license_name}")
 
     # License - url
     license_url = config.brd["metadata"].get("license-url", None)
     if desc not in [None, ""]:
         work_d = lxu.addch(work_el, ns_cc, "license")
-        work_d.set("{{{}}}{}".format(ns_rdf, "resource"), license_url)
+        work_d.set(f"{{{ns_rdf}}}resource", license_url)
 
     # Keywords
     keywords = config.brd["metadata"].get("keywords", None)
