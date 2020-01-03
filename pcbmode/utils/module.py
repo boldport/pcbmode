@@ -129,17 +129,13 @@ class Module:
                     "{" + config.cfg["ns"]["pcbmode"] + "}type", "mask-cover"
                 )
 
-        # Remove layers that were not made to be 'placed'. This
-        # is a bit of a cheat, but it works for now.
-        # TODO ;)
-
-        # Output SVG
+        # Output module SVG
         output_file = Path(
             config.tmp["project-path"]
             / config.brd["project-params"]["output"]["svg-file"]
         )
         output_file.parent.mkdir(parents=True, exist_ok=True)
-        output_file.write_bytes(et.tostring(svg_doc, pretty_print=True))
+        output_file.write_text(et.tostring(svg_doc, encoding = "unicode", pretty_print=True))
 
     def _get_components(self, components_dict):
         """
