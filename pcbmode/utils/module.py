@@ -134,24 +134,12 @@ class Module:
         # TODO ;)
 
         # Output SVG
-        # TODO: this will eventually need to be done in main()
-        # when PCBmodE supports multiple 'modules' combined into
-        # a single 'board'
         output_file = Path(
             config.tmp["project-path"]
             / config.brd["project-params"]["output"]["svg-file"]
         )
-
         output_file.parent.mkdir(parents=True, exist_ok=True)
-        #        output_file.write_text(str(et.tostring(svg_doc, pretty_print=True)))
-
-        try:
-            f = open(output_file, "wb")
-        except IOError as e:
-            print("I/O error({0}): {1}".format(e.errno, e.strerror))
-
-        f.write(et.tostring(svg_doc, pretty_print=True))
-        f.close()
+        output_file.write_bytes(et.tostring(svg_doc, pretty_print=True))
 
     def _get_components(self, components_dict):
         """
