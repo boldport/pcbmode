@@ -1,0 +1,75 @@
+p {
+  padding: 0;
+  line-height: 50%;
+  font-family: Ubuntu, Arial, sans-serif;
+  font-size: 12px;
+  font-weight: normal;
+}
+a {
+  text-decoration: none;
+  color: #3399cc;
+  font-weight: bold;
+}
+.tg {
+  border-collapse: collapse;
+  border-spacing: 0;
+  border-color: #3399cc;
+}
+.tg td {
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  padding: 10px 10px;
+  border-style: solid;
+  border-width: 0px;
+  overflow: hidden;
+  word-break: normal;
+  border-color: #3399cc;
+  color: #333;
+  background-color: #e8edff;
+  border-top-width: 1px;
+  border-bottom-width: 1px;
+}
+.tg th {
+  font-family: Ubuntu, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: normal;
+  padding: 10px 10px;
+  border-style: solid;
+  border-width: 0px;
+  overflow: hidden;
+  word-break: normal;
+  border-color: #3399cc;
+  color: #333;
+  background-color: #b9c9fe;
+  border-top-width: 1px;
+  border-bottom-width: 1px;
+  white-space: nowrap;
+}
+.tg .tg-title {
+  font-weight: bold;
+  background-color: #67b8de;
+  font-size: 18px;
+  text-align: left;
+}
+.tg .tg-header {
+  font-weight: bold;
+  background-color: #91c9e8;
+  text-align: left;
+}
+
+.tg .tg-header-des {
+  font-weight: bold;
+  background-color: #91c9e8;
+  text-align: left;
+  width: 350px;
+}
+.tg .tg-item-odd {
+  background-color: #fefefe;
+}
+.tg .tg-item-even {
+  background-color: #eeeeee;
+}
+.tg .tg-skip {
+  background-color: #ffffff;
+  height: 8px;
+}
