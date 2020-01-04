@@ -198,13 +198,13 @@ def main():
     apply_overrides(cmdline_args)
 
     # Extract information from SVG file
-    elif cmdline_args.extract is True or cmdline_args.extract_refdefs is True:
+    if cmdline_args.extract is True or cmdline_args.extract_refdefs is True:
         extract.extract(
             extract=cmdline_args.extract, extract_refdefs=cmdline_args.extract_refdefs
         )
 
     # Renumber refdefs and dump board config file
-    if cmdline_args.renumber is not False:
+    elif cmdline_args.renumber is not False:
         if cmdline_args.renumber is None:
             order = "top-to-bottom"
         else:
