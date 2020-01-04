@@ -26,7 +26,6 @@ import math
 from operator import itemgetter  # for sorting lists by dict value
 import html.parser as HTMLParser
 import hashlib
-from pkg_resources import get_distribution
 
 from pcbmode.config import config
 from pcbmode.utils.point import Point
@@ -40,7 +39,7 @@ def dictToStyleText(style_dict):
 
     style = ""
     for key in style_dict:
-        style += "%s:%s;" % (key, style_dict[key])
+        style += f"{key}:{style_dict[key]};"
 
     return style
 
@@ -58,10 +57,7 @@ def open_board_svg():
     try:
         data = et.ElementTree(file=str(filename))
     except IOError as e:
-        msg.error(
-            "Cannot open %s; has the board been made using the '-m' option yet?"
-            % filename
-        )
+        msg.error(f"Cannot open {filename}; has the board SVG been created?")
 
     return data
 
@@ -98,11 +94,6 @@ def toPoint(coord=[0, 0]):
         return None
     else:
         return Point(coord[0], coord[1])
-
-
-def get_git_revision():
-
-    return get_distribution("pcbmode").version
 
 
 def makePngs():
@@ -165,9 +156,7 @@ def dictFromJsonFile(filename, error=True):
         result = dict()
         for key, value in pairs:
             if key in result:
-                msg.error(
-                    "duplicate key ('%s') specified in %s" % (key, filename), KeyError
-                )
+                msg.error(f"duplicate key ('{key}') specified in {filename}", KeyError)
             result[key] = value
         return result
 
@@ -272,7 +261,7 @@ def create_dir(path):
         if os.path.isdir(path):
             pass
         else:
-            print("ERROR: couldn't create build path %s" % path)
+            print(f"ERROR: couldn't create build path {path}")
             raise
 
     return
@@ -404,7 +393,7 @@ def renumberRefdefs(order):
     for refdef in components:
 
         rd_type, rd_number, rd_extra = parse_refdef(refdef)
-        location = to_Point(components[refdef].get("location") or [0, 0])
+        location = to_Point(components[refdef].get("location", [0, 0]))
         tmp = {}
         tmp["record"] = components[refdef]
         tmp["type"] = rd_type
@@ -439,9 +428,9 @@ def renumberRefdefs(order):
             )
 
             for i, record in enumerate(sorted_list):
-                new_refdef = "%s%s" % (record["type"], i + 1)
+                new_refdef = f"{record['type']}{i+1}"
                 if record["extra"] is not None:
-                    new_refdef += "%s" % (record["extra"])
+                    new_refdef += f"record['extra']"
                 new_dict[new_refdef] = record["record"]
 
     config.brd["components"] = new_dict
@@ -467,8 +456,7 @@ def getTextParams(font_size, letter_spacing, line_height):
         letter_spacing, letter_spacing_unit = parseDimension(letter_spacing)
     except:
         msg.error(
-            "There's a problem with parsing the 'letter-spacing' property with value '%s'. The format should be an integer or float followed by 'mm' (the only unit supported). For example, '0.3mm' or '-2 mm' should work."
-            % letter_spacing
+            f"There's a problem with parsing the 'letter-spacing' property with value '{letter_spacing}'. The format should be an integer or float followed by 'mm' (the only unit supported). For example, '0.3mm' or '-2 mm' should work."
         )
 
     if letter_spacing_unit == None:
@@ -478,8 +466,7 @@ def getTextParams(font_size, letter_spacing, line_height):
         line_height, line_height_unit = parseDimension(line_height)
     except:
         msg.error(
-            "There's a problem parsing the 'line-height' property with value '%s'. The format should be an integer or float followed by 'mm' (the only unit supported). For example, '0.3mm' or '-2 mm' should work."
-            % line_height
+            f"There's a problem parsing the 'line-height' property with value '{line_height}'. The format should be an integer or float followed by 'mm' (the only unit supported). For example, '0.3mm' or '-2 mm' should work."
         )
 
     if line_height_unit == None:
@@ -507,34 +494,30 @@ def textToPath(font_data, text, letter_spacing, line_height, scale_factor):
     to the original scale of the font.
     """
 
+    ns_svg = config.cfg["ns"]["svg"]
+
     # This the horizontal advance that applied to all glyphs unless there's a specification for
     # for the glyph itself
     font_horiz_adv_x = float(
-        font_data.find("//n:font", namespaces={"n": config.cfg["ns"]["svg"]}).get(
-            "horiz-adv-x"
-        )
+        font_data.find("//n:font", namespaces={"n": ns_svg}).get("horiz-adv-x")
     )
 
     # This is the number if 'units' per 'em'. The default, in the absence of a definition is 1000
     # according to the SVG spec
     units_per_em = (
         float(
-            font_data.find(
-                "//n:font-face", namespaces={"n": config.cfg["ns"]["svg"]}
-            ).get("units-per-em")
+            font_data.find("//n:font-face", namespaces={"n": ns_svg}).get(
+                "units-per-em"
+            )
         )
         or 1000
     )
 
     glyph_ascent = float(
-        font_data.find("//n:font-face", namespaces={"n": config.cfg["ns"]["svg"]}).get(
-            "ascent"
-        )
+        font_data.find("//n:font-face", namespaces={"n": ns_svg}).get("ascent")
     )
     glyph_decent = float(
-        font_data.find("//n:font-face", namespaces={"n": config.cfg["ns"]["svg"]}).get(
-            "descent"
-        )
+        font_data.find("//n:font-face", namespaces={"n": ns_svg}).get("descent")
     )
 
     text_width = 0
@@ -545,8 +528,7 @@ def textToPath(font_data, text, letter_spacing, line_height, scale_factor):
         text = re.findall(r"(\&#x[0-9abcdef]*;|.|\n)", text)
     except:
         throw(
-            "There's a problem parsing the text '%s'. Unicode and \\n newline should be fine, by the way."
-            % text
+            f"There's a problem parsing the text '{text}'. Unicode and \\n newline should be fine, by the way."
         )
 
     # instantiate HTML parser
@@ -566,13 +548,11 @@ def textToPath(font_data, text, letter_spacing, line_height, scale_factor):
             text_height += units_per_em + (line_height / scale_factor - units_per_em)
         else:
             glyph = font_data.find(
-                u'//n:glyph[@unicode="%s"]' % symbol,
-                namespaces={"n": config.cfg["ns"]["svg"]},
+                f'//n:glyph[@unicode="{symbol}"]', namespaces={"n": ns_svg},
             )
             if glyph == None:
                 utils.throw(
-                    "Damn, there's no glyph definition for '%s' in the '%s' font :("
-                    % (symbol, font)
+                    f"There's no glyph definition for '{symbol}' in the '{font}' font."
                 )
             else:
                 # Unless the glyph has its own width, use the global font width
@@ -585,8 +565,7 @@ def textToPath(font_data, text, letter_spacing, line_height, scale_factor):
                     path = glyph_path.getRelative()
                     path = re.sub(
                         "^(m\s?[-\d\.]+\s?,\s?[-\d\.]+)",
-                        "M %s,%s"
-                        % (str(text_width + offset_x), str(offset_y - text_height)),
+                        f"M {str(text_width + offset_x)},{str(offset_y - text_height)}",
                         path,
                     )
                     gerber_lp += (
