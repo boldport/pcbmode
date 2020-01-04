@@ -3,11 +3,11 @@
     "boards": "boards/",
     "fonts": "fonts/",
     "build": "build/",
-    "styles": "styles/",
+    "styles": "stylessheets/",
     "stackups": "stackups/"
   },
   "styles": {
-    "stylesheet-for-layout": "styles/default/layout.json"
+    "stylesheet-for-layout": "stylesheets/two-layer.json"
   },
   "stackup": {
     "definition-file": "stackups/two-layer.json"
