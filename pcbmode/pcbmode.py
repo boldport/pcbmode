@@ -65,21 +65,18 @@ def load_board_file():
     config.brd = utils.dictFromJsonFile(filename)
 
 
-def load_style():
+def load_stylesheet():
     """
-    Load the stylesheets. (For now only for 'layout')
-    First look for the file in the project path (assuming the default was overriden),
-    then load the default from PCBmodE.
+    Load the layout CSS stylesheets.
     """
 
     filename = Path(config.cfg["styles"]["stylesheet-for-layout"])
-
-    if (config.tmp["project-path"] / filename).exists():
-        config.stl["layout"] = utils.dictFromJsonFile(
-            config.tmp["project-path"] / filename
-        )
+    fn = config.tmp["project-path"] / filename
+    if fn.exists():
+        config.stl["layout"] = (fn / filename).read_text()
     else:
-        config.stl["layout"] = utils.dictFromJsonFile(Path(__file__).parent / filename)
+        fn = Path(__file__).parent / filename
+        config.stl["layout"] = fn.read_text()
 
 
 def load_stackup():
@@ -175,10 +172,10 @@ def main():
     print("Support this project at https://github.com/sponsors/saardrimer")
     print()
 
-    print("Running... ", end = '', flush=True)
+    print("Running... ", end="", flush=True)
 
-    argp = cli_arg.setup() # setup cli arguments
-    cmdline_args = argp.parse_args() # parse arguments
+    argp = cli_arg.setup()  # setup cli arguments
+    cmdline_args = argp.parse_args()  # parse arguments
 
     # Get the path to PCBmodE
     config.tmp["pcbmode-path"] = Path(__file__).parent
@@ -191,7 +188,7 @@ def main():
 
     load_pcbmode_config()
     load_board_file()
-    load_style()
+    load_stylesheet()
     load_stackup()
     load_routing()
     set_y_axis_invert()
