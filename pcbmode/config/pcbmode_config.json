@@ -7,7 +7,7 @@
     "stackups": "stackups/"
   },
   "styles": {
-    "stylesheet-for-layout": "stylesheets/two-layer.json"
+    "stylesheet-for-layout": "stylesheets/two-layer.css"
   },
   "stackup": {
     "definition-file": "stackups/two-layer.json"
