@@ -98,7 +98,7 @@ class Module:
         self._placeComponents(components=self._components, component_type="component")
         sys.stdout.write("\n")
 
-        self._placeRouting()
+        self._place_routing()
 
         self._placeComponents(components=self._vias, component_type="via")
 
@@ -287,7 +287,7 @@ class Module:
 
         # Width text
         width_text_dict = shape_dict.copy()
-        width_text_dict["value"] = f"{round(self._width, 2)} mm" 
+        width_text_dict["value"] = f"{round(self._width, 2)} mm"
         width_text_dict["location"] = width_loc
         width_text_dict["style_class"] = "dimensions-text"
         width_text = Shape(width_text_dict)
@@ -305,7 +305,7 @@ class Module:
         shape_dict["type"] = "path"
         shape_dict["value"] = make_arrow(self._width, width_text.getWidth() * 1.5)
         shape_dict["location"] = width_loc
-        shape_dict['style_class'] = "dimensions-arrow"
+        shape_dict["style_class"] = "dimensions-arrow"
         width_arrow = Shape(shape_dict)
 
         # Height arrow
@@ -314,7 +314,7 @@ class Module:
         shape_dict["value"] = make_arrow(self._height, height_text.getHeight() * 1.5)
         shape_dict["rotate"] = -90
         shape_dict["location"] = height_loc
-        shape_dict['style_class'] = "dimensions-arrow"
+        shape_dict["style_class"] = "dimensions-arrow"
         height_arrow = Shape(shape_dict)
 
         svg_layer = self._layers["dimensions"]["layer"]
@@ -324,7 +324,6 @@ class Module:
         place.placeShape(height_text, group)
         place.placeShape(width_arrow, group)
         place.placeShape(height_arrow, group)
-
 
     def _placeComponents(self, components, component_type):
         """
@@ -622,9 +621,12 @@ class Module:
             else:
                 continue
 
-    def _placeRouting(self):
+    def _place_routing(self):
         """
         """
+
+        ns_pcm = config.cfg["ns"]["pcbmode"]
+        ns_ink = config.cfg["ns"]["inkscape"]
 
         routing = config.rte
         routes = routing.get("routes", {})
@@ -654,8 +656,8 @@ class Module:
             for route_key in routes.get(pcb_layer, {}):
                 shape_dict = routes[pcb_layer][route_key]
                 shape = Shape(shape_dict)
-                # style = Style(shape_dict, "conductor")
-                # shape.setStyle(style)
+                if shape.get_style_class() is None:
+                    shape.set_style_class(f"routing-stroke-{pcb_layer}")
 
                 # Routes are a special case where they are used as-is
                 # counting on Inkscapes 'optimised' setting to modify
@@ -668,21 +670,16 @@ class Module:
                     shape, sheet, mirror_path, use_original_path
                 )
 
-                # route_element.set("style", shape.getStyleString())
-
                 # Set the key as pcbmode:id of the route. This is used
                 # when extracting routing to offset the location of a
                 # modified route
-                route_element.set(
-                    "{" + config.cfg["ns"]["pcbmode"] + "}%s" % ("id"), route_key
-                )
+                route_element.set(f"{{{ns_pcm}}}id", route_key)
 
                 # Add a custom buffer definition if it exists
                 custom_buffer = shape_dict.get("buffer-to-pour")
                 if custom_buffer != None:
                     route_element.set(
-                        "{" + config.cfg["ns"]["pcbmode"] + "}%s" % "buffer-to-pour",
-                        str(custom_buffer),
+                        f"{{{ns_pcm}}}buffer-to-pour", str(custom_buffer),
                     )
 
                 # TODO: can this be done more elegantly, and "general purpose"?
@@ -691,7 +688,7 @@ class Module:
                     if ea is not None:
                         route_element.set(
                             "{"
-                            + config.cfg["namespace"]["inkscape"]
+                            + ns_ink
                             + "}%s" % (extra_attrib[extra_attrib.index(":") + 1 :], ea)
                         )
 
