@@ -53,6 +53,7 @@ class Shape:
         self._pour_buffer = shape.get("buffer-to-pour")
         self._location = utils.toPoint(shape.get("location", [0, 0]))
 
+        self._style_class = self._shape_dict.get("style_class", None)
         self._style = self._shape_dict.get("style", None)
 
         # Create the SVG path for the shape
@@ -216,6 +217,18 @@ class Shape:
     def rotateLocation(self, angle, point=Point()):
         self._location.rotate(angle, point)
 
+    def get_style_class(self):
+        return self._style_class
+
+    def set_style_class(self, new_class):
+        self._style_class = new_class
+
+    def set_style(self, new_style):
+        self._style = new_style
+
+    def get_style(self):
+        return self._style
+
     def getRotation(self):
         return self._rotate
 
@@ -239,20 +252,6 @@ class Shape:
 
     def getGerberLP(self):
         return self._gerber_lp
-
-    def setStyle(self, style):
-        self._style = style
-
-    def getStyle(self):
-        return self._style
-
-    def getStyleString(self):
-        #style = self._style.getStyleString()
-        return self._style
-
-    def getStyleType(self):
-        style = self._style.getStyleType()
-        return style
 
     def getScale(self):
         return self._scale

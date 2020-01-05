@@ -204,12 +204,6 @@ class Footprint:
                                 # Create new shape
                                 sshape = Shape(sdict)
 
-                                # Create new style
-                                sstyle = Style(sdict, stype)
-
-                                # Apply style
-                                sshape.setStyle(sstyle)
-
                                 # Add shape to footprint's shape dictionary
                                 # self._shapes[stype][layer].append(sshape)
                                 if layer in self._shapes[stype]:

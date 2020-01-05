@@ -28,15 +28,14 @@ from pcbmode.utils.point import Point
 
 def placeShape(shape, svg_layer, invert=False, original=False):
     """
-    Places a shape or type 'Shape' onto SVG layer 'svg_layer'.
+    Places a shape of type 'Shape' onto SVG layer 'svg_layer'.
     'invert'  : placed path should be mirrored
     'original': use the original path, not the transformed one
     """
 
+    ns_pcm = config.cfg["ns"]["pcbmode"]
     sig_dig = config.cfg["params"]["significant-digits"]
 
-    style = shape.getStyleString()
-#    style_type = shape.getStyleType()
     gerber_lp = shape.getGerberLP()
     location = shape.getLocation()
 
@@ -57,26 +56,26 @@ def placeShape(shape, svg_layer, invert=False, original=False):
         else:
             path = shape.getTransformedPath()
 
-    element = et.SubElement(svg_layer, "path", d=path)
+    el = et.SubElement(svg_layer, "path", d=path)
 
-    # Set style string
-#    if style is not None:
-#        element.set("style", style)
+    style_class = shape.get_style_class()
+    if style_class is not None:
+        el.set("class", style_class)
 
-    # Set style type in pcbmode namespace. This is later used to easliy
-    # identify the type when the path is converted to Gerber format
-    #element.set("{" + config.cfg["ns"]["pcbmode"] + "}style", style_type)
+    style = shape.get_style()
+    if style is not None:
+        el.set("style", style)
 
     if transform != None:
-        element.set("transform", transform)
+        el.set("transform", transform)
 
     if gerber_lp != None:
-        element.set("{" + config.cfg["ns"]["pcbmode"] + "}gerber-lp", gerber_lp)
+        el.set(f"{{{ns_pcm}}}gerber-lp", gerber_lp)
 
     if shape.getType() == "text":
-        element.set("{" + config.cfg["ns"]["pcbmode"] + "}text", shape.getText())
+        el.set(f"{{{ns_pcm}}}text", shape.getText())
 
-    return element
+    return el
 
 
 def placeDrill(drill, layer, location, scale, soldermask_layers={}, mask_groups={}):

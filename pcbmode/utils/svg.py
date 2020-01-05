@@ -1238,7 +1238,7 @@ def mirror_transform(transform, axis="y"):
     return mirrored_transform
 
 
-def makeSvgLayers(top_layer, transform=None, refdef=None):
+def make_svg_layers(top_layer, transform=None, refdef=None):
     """
     Creates Inkscape SVG layers that correspond to a board's layers.
     Includes the default style definition from the stylesheet.
@@ -1258,7 +1258,7 @@ def makeSvgLayers(top_layer, transform=None, refdef=None):
 
         # create SVG layer for PCB layer
         layers[layer_name] = {}
-        element = layers[layer_name]["layer"] = makeSvgLayer(
+        element = layers[layer_name]["layer"] = make_svg_layer(
             top_layer, layer_name, transform, None, refdef
         )
         element.set(
@@ -1303,7 +1303,7 @@ def makeSvgLayers(top_layer, transform=None, refdef=None):
 
             tmp = layers[layer_name]
             tmp[sheet_type] = {}
-            element = tmp[sheet_type]["layer"] = makeSvgLayer(
+            element = tmp[sheet_type]["layer"] = make_svg_layer(
                 parent_layer=tmp["layer"],
                 layer_name=sheet_name,
                 transform=None,
@@ -1345,7 +1345,7 @@ def makeSvgLayers(top_layer, transform=None, refdef=None):
                         style = None
 
                     tmp2[cond_type] = {}
-                    element = tmp2[cond_type]["layer"] = makeSvgLayer(
+                    element = tmp2[cond_type]["layer"] = make_svg_layer(
                         parent_layer=tmp2["layer"],
                         layer_name=cond_type,
                         transform=None,
@@ -1370,7 +1370,7 @@ def makeSvgLayers(top_layer, transform=None, refdef=None):
         else:
             style = None
         layers[info_layer] = {}
-        element = layers[info_layer]["layer"] = makeSvgLayer(
+        element = layers[info_layer]["layer"] = make_svg_layer(
             parent_layer=top_layer, 
             layer_name=info_layer,
             transform=transform,
@@ -1385,7 +1385,7 @@ def makeSvgLayers(top_layer, transform=None, refdef=None):
     return layers
 
 
-def makeSvgLayer(
+def make_svg_layer(
     parent_layer, layer_name, transform=None, style_class=None, style=None, refdef=None
 ):
     """
@@ -1395,14 +1395,14 @@ def makeSvgLayer(
     ns_ink = config.cfg["ns"]["inkscape"]
 
     new_layer = et.SubElement(parent_layer, "g")
-    new_layer.set("{" + ns_ink + "}groupmode", "layer")
-    new_layer.set("{" + ns_ink + "}label", layer_name)
+    new_layer.set(f"{{{ns_ink}}}groupmode", "layer")
+    new_layer.set(f"{{{ns_ink}}}label", layer_name)
     if transform is not None:
         new_layer.set("transform", transform)
-    if style_class is not None:
-        new_layer.set("class", style_class)
-    if style is not None:
-        new_layer.set("style", style)
+#    if style_class is not None:
+#        new_layer.set("class", style_class)
+#    if style is not None:
+#        new_layer.set("style", style)
     if refdef is not None:
         new_layer.set("refdef", refdef)
 

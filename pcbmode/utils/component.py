@@ -168,8 +168,6 @@ class Component:
                     config.stl["layout"], f"{sheet}-refdef", "font-size"
                 )
 
-                print(refdef_dict["font-size"])
-
                 #                refdef_dict["font-size"] = (
                 #                    refdef_dict.get("font-size")
                 #                    or config.stl["layout"][sheet]["refdef"].get("font-size")
@@ -179,8 +177,6 @@ class Component:
 
                 refdef_shape.is_refdef = True
                 refdef_shape.rotateLocation(self._rotate, self._rotate_point)
-                style = Style(refdef_dict, sheet, "refdef")
-                refdef_shape.setStyle(style)
 
                 # Add the refdef to the silkscreen/assembly list. It's
                 # important that this is added at the very end since the
