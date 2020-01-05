@@ -246,17 +246,21 @@
   stroke: none;
   font-family: Sans serif;
 }
-.dimensions {
+.dimensions-arrow {
   stroke: #555555;
   stroke-opacity: 1;
-  fill: #555555;
   stroke-width: 0.2;
+  fill: none;
+  stroke-linejoin: round;
+  stroke-linecap: round;
 }
-.dimentions-text {
+.dimensions-text {
   font-family: "UbuntuMono-R-webfont";
+  fill: #555555;
   font-size: 1.5mm;
   line-height: 1mm;
   letter-spacing: 0mm;
+  stroke: none;
 }
 .origin {
   stroke: #555555;
