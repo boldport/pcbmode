@@ -15,17 +15,31 @@
   fill: #555555;
   fill-opacity: 1;
 }
-.conductor-top {
-  stroke: #008500;
+.routing-fill-top {
+  stroke: none;
   fill: #008500;
+  fill-opacity: 0.6;  
+}
+.routing-stroke-top {
+  stroke: #008500;
+  fill: none;
   stroke-opacity: 0.6;
+  stroke-width: 0.25;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.routing-fill-bottom {
+  fill: #850000;
+  stroke: none;
   fill-opacity: 0.6;
 }
-.conductor-bottom {
-  stroke: #a60000;
-  fill: #a60000;
+.routing-stroke-bottom {
+  stroke: #850000;
+  fill: none;
   stroke-opacity: 0.6;
-  fill-opacity: 0.6;
+  stroke-width: 0.25;
+  stroke-linejoin: round;
+  stroke-linecap: round;
 }
 .pads-top {
   stroke: none;
