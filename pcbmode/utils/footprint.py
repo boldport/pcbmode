@@ -110,8 +110,8 @@ class Footprint:
                 for layer in layers:
 
                     shape = Shape(shape_dict)
-                    style = Style(shape_dict, "conductor")
-                    shape.setStyle(style)
+#                    style = Style(shape_dict, "conductor")
+#                    shape.setStyle(style)
 
                     if layer in self._shapes["conductor"]:
                         self._shapes["conductor"][layer].append(shape)
@@ -156,10 +156,10 @@ class Footprint:
                             sshape = Shape(sdict)
 
                             # Define style
-                            sstyle = Style(sdict, stype)
+#                            sstyle = Style(sdict, stype)
 
                             # Apply style
-                            sshape.setStyle(sstyle)
+#                            sshape.setStyle(sstyle)
 
                             # Add shape to footprint's shape dictionary
                             # self._shapes[stype][layer].append(sshape)
@@ -231,8 +231,8 @@ class Footprint:
                     drill_location[1] + pin_location[1],
                 ]
                 shape = Shape(drill_dict)
-                style = Style(drill_dict, "drills")
-                shape.setStyle(style)
+#                style = Style(drill_dict, "drills")
+#                shape.setStyle(style)
 
                 if "top" in self._shapes["drills"]:
                     self._shapes["drills"]["top"].append(shape)
@@ -282,8 +282,8 @@ class Footprint:
                         if shape_dict["type"] == "text":
                             shape_dict["mirror"] = shape_dict.get("mirror") or "True"
                     shape = Shape(shape_dict)
-                    style = Style(shape_dict, sheet)
-                    shape.setStyle(style)
+#                    style = Style(shape_dict, sheet)
+#                    shape.setStyle(style)
 
                     if layer in self._shapes[sheet]:
                         self._shapes[sheet][layer].append(shape)
@@ -302,8 +302,8 @@ class Footprint:
             layers = utils.getExtendedLayerList(shape_dict.get("layer") or ["top"])
             for layer in layers:
                 shape = Shape(shape_dict)
-                style = Style(shape_dict, "assembly")
-                shape.setStyle(style)
+#                style = Style(shape_dict, "assembly")
+#                shape.setStyle(style)
 
                 if layer in self._shapes["assembly"]:
                     self._shapes["assembly"][layer].append(shape)

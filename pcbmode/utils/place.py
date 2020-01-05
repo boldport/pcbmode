@@ -35,8 +35,8 @@ def placeShape(shape, svg_layer, invert=False, original=False):
 
     sig_dig = config.cfg["params"]["significant-digits"]
 
-    style_string = shape.getStyleString()
-    style_type = shape.getStyleType()
+    style = shape.getStyleString()
+#    style_type = shape.getStyleType()
     gerber_lp = shape.getGerberLP()
     location = shape.getLocation()
 
@@ -58,12 +58,14 @@ def placeShape(shape, svg_layer, invert=False, original=False):
             path = shape.getTransformedPath()
 
     element = et.SubElement(svg_layer, "path", d=path)
+
     # Set style string
-    element.set("style", style_string)
+#    if style is not None:
+#        element.set("style", style)
 
     # Set style type in pcbmode namespace. This is later used to easliy
     # identify the type when the path is converted to Gerber format
-    element.set("{" + config.cfg["ns"]["pcbmode"] + "}style", style_type)
+    #element.set("{" + config.cfg["ns"]["pcbmode"] + "}style", style_type)
 
     if transform != None:
         element.set("transform", transform)

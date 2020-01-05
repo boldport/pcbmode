@@ -1279,25 +1279,27 @@ def makeSvgLayers(top_layer, transform=None, refdef=None):
             sheet_type = sheet["type"]
             sheet_name = sheet["name"]
 
-            # Set default style for this sheet
-            try:
-                style = utils.dictToStyleText(
-                    config.stl["layout"][sheet_type]["default"][layer_name]
-                )
-            except:
-                # A stylesheet may define one style for any sheet type
-                # or a specific style for multiple layers of the same
-                # type. If, for example, a specific style for
-                # 'internal-2' cannot be found, PCBmodE will default
-                # to the general definition for this type of sheet
-                style = utils.dictToStyleText(
-                    config.stl["layout"][sheet_type]["default"][
-                        layer_name.split("-")[0]
-                    ]
-                )
+            # # Set default style for this sheet
+            # try:
+            #     style = utils.dictToStyleText(
+            #         config.stl["layout"][sheet_type]["default"][layer_name]
+            #     )
+            # except:
+            #     # A stylesheet may define one style for any sheet type
+            #     # or a specific style for multiple layers of the same
+            #     # type. If, for example, a specific style for
+            #     # 'internal-2' cannot be found, PCBmodE will default
+            #     # to the general definition for this type of sheet
+            #     style = utils.dictToStyleText(
+            #         config.stl["layout"][sheet_type]["default"][
+            #             layer_name.split("-")[0]
+            #         ]
+            #     )
 
             if layer_control[sheet_type]["hide"] == True:
-                style += "display:none;"
+                style = "display:none;"
+            else:
+                style = None
 
             tmp = layers[layer_name]
             tmp[sheet_type] = {}
@@ -1305,6 +1307,7 @@ def makeSvgLayers(top_layer, transform=None, refdef=None):
                 parent_layer=tmp["layer"],
                 layer_name=sheet_name,
                 transform=None,
+                style_class=f"{sheet_type}-{layer_name}",
                 style=style,
                 refdef=refdef,
             )
@@ -1323,26 +1326,30 @@ def makeSvgLayers(top_layer, transform=None, refdef=None):
                 conductor_types = ["routing", "pads", "pours"]
 
                 for cond_type in conductor_types:
-                    try:
-                        style = utils.dictToStyle(
-                            config.stl["layout"]["conductor"][cond_type].get(layer_name)
-                        )
-                    except:
-                        # See comment above for rationalle
-                        style = utils.dictToStyleText(
-                            config.stl["layout"]["conductor"][cond_type][
-                                layer_name.split("-")[0]
-                            ]
-                        )
+
+                    # try:
+                    #     style = utils.dictToStyle(
+                    #         config.stl["layout"]["conductor"][cond_type].get(layer_name)
+                    #     )
+                    # except:
+                    #     # See comment above for rationalle
+                    #     style = utils.dictToStyleText(
+                    #         config.stl["layout"]["conductor"][cond_type][
+                    #             layer_name.split("-")[0]
+                    #         ]
+                    #     )
 
                     if layer_control["conductor"][cond_type]["hide"] == True:
-                        style += "display:none;"
+                        style = "display:none;"
+                    else:
+                        style = None
 
                     tmp2[cond_type] = {}
                     element = tmp2[cond_type]["layer"] = makeSvgLayer(
                         parent_layer=tmp2["layer"],
                         layer_name=cond_type,
                         transform=None,
+                        style_class=layer_name,
                         style=style,
                         refdef=refdef,
                     )
@@ -1357,12 +1364,19 @@ def makeSvgLayers(top_layer, transform=None, refdef=None):
                         )
 
     for info_layer in ["origin", "dimensions", "outline", "drills", "documentation"]:
-        style = utils.dictToStyleText(config.stl["layout"][info_layer].get("default"))
+        # style = utils.dictToStyleText(config.stl["layout"][info_layer].get("default"))
         if layer_control[info_layer]["hide"] == True:
-            style += "display:none;"
+            style = "display:none;"
+        else:
+            style = None
         layers[info_layer] = {}
         element = layers[info_layer]["layer"] = makeSvgLayer(
-            top_layer, info_layer, transform, style, refdef
+            parent_layer=top_layer, 
+            layer_name=info_layer,
+            transform=transform,
+            style_class=info_layer,
+            style=style,
+            refdef=refdef
         )
         element.set("{" + config.cfg["ns"]["pcbmode"] + "}%s" % ("sheet"), info_layer)
         if layer_control[info_layer]["lock"] == True:
@@ -1371,16 +1385,22 @@ def makeSvgLayers(top_layer, transform=None, refdef=None):
     return layers
 
 
-def makeSvgLayer(parent_layer, layer_name, transform=None, style=None, refdef=None):
+def makeSvgLayer(
+    parent_layer, layer_name, transform=None, style_class=None, style=None, refdef=None
+):
     """
     Create and return an Inkscape SVG layer 
     """
 
+    ns_ink = config.cfg["ns"]["inkscape"]
+
     new_layer = et.SubElement(parent_layer, "g")
-    new_layer.set("{" + config.cfg["ns"]["inkscape"] + "}groupmode", "layer")
-    new_layer.set("{" + config.cfg["ns"]["inkscape"] + "}label", layer_name)
+    new_layer.set("{" + ns_ink + "}groupmode", "layer")
+    new_layer.set("{" + ns_ink + "}label", layer_name)
     if transform is not None:
         new_layer.set("transform", transform)
+    if style_class is not None:
+        new_layer.set("class", style_class)
     if style is not None:
         new_layer.set("style", style)
     if refdef is not None:

@@ -30,6 +30,7 @@ from pcbmode.utils import svg
 from pcbmode.utils import utils
 from pcbmode.utils import place
 from pcbmode.utils import inkscape_svg
+from pcbmode.utils import css_utils
 from pcbmode.utils.shape import Shape
 from pcbmode.utils.style import Style
 from pcbmode.utils.component import Component
@@ -135,7 +136,9 @@ class Module:
             / config.brd["project-params"]["output"]["svg-file"]
         )
         output_file.parent.mkdir(parents=True, exist_ok=True)
-        output_file.write_text(et.tostring(svg_doc, encoding = "unicode", pretty_print=True))
+        output_file.write_text(
+            et.tostring(svg_doc, encoding="unicode", pretty_print=True)
+        )
 
     def _get_components(self, components_dict):
         """
@@ -162,8 +165,8 @@ class Module:
             shape_dict = outline_dict.get("shape")
             if shape_dict != None:
                 shape = Shape(shape_dict)
-                style = Style(shape_dict, "outline")
-                shape.setStyle(style)
+                # style = Style(shape_dict, "outline")
+                # shape.setStyle(style)
         else:
             shape = None
 
@@ -235,13 +238,24 @@ class Module:
         # Create text shapes
         shape_dict = {}
         shape_dict["type"] = "text"
-        style_dict = config.stl["layout"]["dimensions"].get("text", {})
-        shape_dict["font-family"] = style_dict.get(
-            "font-family", "UbuntuMono-R-webfont"
+        style_class = "dimentions-text"
+        #        style_dict = config.stl["layout"]["dimensions"].get("text", {})
+        shape_dict["font-family"] = css_utils.get_prop(
+            config.stl["layout"], style_class, "font-family"
         )
-        shape_dict["font-size"] = style_dict.get("font-size", "1.5mm")
-        shape_dict["line-height"] = style_dict.get("line-height", "1mm")
-        shape_dict["letter-spacing"] = style_dict.get("letter-spacing", "0mm")
+        shape_dict["font-size"] = css_utils.get_prop(
+            config.stl["layout"], style_class, "font-size"
+        )
+        shape_dict["line-height"] = css_utils.get_prop(
+            config.stl["layout"], style_class, "line-height"
+        )
+        shape_dict["letter-spacing"] = css_utils.get_prop(
+            config.stl["layout"], style_class, "letter-spacing"
+        )
+
+#        shape_dict["font-size"] = style_dict.get("font-size", "1.5mm")
+#        shape_dict["line-height"] = style_dict.get("line-height", "1mm")
+#        shape_dict["letter-spacing"] = style_dict.get("letter-spacing", "0mm")
 
         # Locations
         arrow_gap = 1.5
@@ -253,8 +267,8 @@ class Module:
         width_text_dict["value"] = "%s mm" % round(self._width, 2)
         width_text_dict["location"] = width_loc
         width_text = Shape(width_text_dict)
-        style = Style(width_text_dict, "dimensions")
-        width_text.setStyle(style)
+#        style = Style(width_text_dict, "dimensions")
+#        width_text.setStyle(style)
 
         # Height text
         height_text_dict = shape_dict.copy()
@@ -262,8 +276,8 @@ class Module:
         height_text_dict["rotate"] = -90
         height_text_dict["location"] = height_loc
         height_text = Shape(height_text_dict)
-        style = Style(height_text_dict, "dimensions")
-        height_text.setStyle(style)
+#        style = Style(height_text_dict, "dimensions")
+#        height_text.setStyle(style)
 
         # Width arrow
         shape_dict = {}
@@ -271,8 +285,8 @@ class Module:
         shape_dict["value"] = makeArrow(self._width, width_text.getWidth() * 1.2)
         shape_dict["location"] = width_loc
         width_arrow = Shape(shape_dict)
-        style = Style(shape_dict, "dimensions")
-        width_arrow.setStyle(style)
+#        style = Style(shape_dict, "dimensions")
+#        width_arrow.setStyle(style)
 
         # Height arrow
         shape_dict = {}
@@ -281,8 +295,8 @@ class Module:
         shape_dict["rotate"] = -90
         shape_dict["location"] = height_loc
         height_arrow = Shape(shape_dict)
-        style = Style(shape_dict, "dimensions")
-        height_arrow.setStyle(style)
+#        style = Style(shape_dict, "dimensions")
+#        height_arrow.setStyle(style)
 
         svg_layer = self._layers["dimensions"]["layer"]
         group = et.SubElement(svg_layer, "g")
@@ -347,10 +361,11 @@ class Module:
                             component.getRefdef(),
                         )
 
-                    style = utils.dictToStyleText(
-                        config.stl["layout"]["conductor"]["pads"]["labels"]
-                    )
-                    label_group = et.SubElement(shape_group, "g", style=style)
+                    #style = utils.dictToStyleText(
+                    #    config.stl["layout"]["conductor"]["pads"]["labels"]
+                    #)
+                    label_group = et.SubElement(shape_group, "g")
+                    #label_group = et.SubElement(shape_group, "g", style=style)
 
                     for shape in shapes:
                         place.placeShape(shape, shape_group, invert)
@@ -557,9 +572,11 @@ class Module:
                 group, "path", d=path, transform="rotate(%s)" % rotation
             )
 
+            # Place markers
+            style_class = 'placement-text'
             if component_type == "component":
-                style = utils.dictToStyleText(config.stl["layout"]["placement"]["text"])
-                t = et.SubElement(group, "text", x="0", y="-0.17", style=style)
+                t = et.SubElement(group, "text", x="0", y="-0.17")
+                t.set("class",style_class)
                 ts = et.SubElement(t, "tspan", x="0", dy="0.1")
                 ts.text = "%s" % (refdef)
                 ts = et.SubElement(t, "tspan", x="0", dy="0.1")
@@ -567,8 +584,8 @@ class Module:
                 ts = et.SubElement(t, "tspan", x="0", dy="0.1")
                 ts.text = "[%.2f,%.2f]" % (location[0], location[1])
             elif component_type == "shape":
-                style = utils.dictToStyleText(config.stl["layout"]["placement"]["text"])
-                t = et.SubElement(group, "text", x="0", y="-0.17", style=style)
+                t = et.SubElement(group, "text", x="0", y="-0.17")
+                t.set("class",style_class)
                 ts = et.SubElement(t, "tspan", x="0", dy="0.1")
                 ts.text = "%s" % (refdef)
                 ts = et.SubElement(t, "tspan", x="0", dy="0.1")
@@ -576,8 +593,8 @@ class Module:
                 ts = et.SubElement(t, "tspan", x="0", dy="0.1")
                 ts.text = "[%.2f,%.2f]" % (location[0], location[1])
             elif component_type == "via":
-                style = utils.dictToStyleText(config.stl["layout"]["placement"]["text"])
-                t = et.SubElement(group, "text", x="0", y="-0.11", style=style)
+                t = et.SubElement(group, "text", x="0", y="-0.11")
+                t.set("class",style_class)
                 ts = et.SubElement(t, "tspan", x="0", dy="0.1")
                 ts.text = htmlpar.unescape("%s&#176;" % (rotation))
                 ts = et.SubElement(t, "tspan", x="0", dy="0.1")
@@ -617,8 +634,8 @@ class Module:
             for route_key in routes.get(pcb_layer, {}):
                 shape_dict = routes[pcb_layer][route_key]
                 shape = Shape(shape_dict)
-                style = Style(shape_dict, "conductor")
-                shape.setStyle(style)
+                #style = Style(shape_dict, "conductor")
+                #shape.setStyle(style)
 
                 # Routes are a special case where they are used as-is
                 # counting on Inkscapes 'optimised' setting to modify
@@ -631,7 +648,7 @@ class Module:
                     shape, sheet, mirror_path, use_original_path
                 )
 
-                route_element.set("style", shape.getStyleString())
+                #route_element.set("style", shape.getStyleString())
 
                 # Set the key as pcbmode:id of the route. This is used
                 # when extracting routing to offset the location of a
@@ -709,21 +726,21 @@ class Module:
 
         style = shape.getStyle()
 
-        if pour_buffer > 0:
-            mask_element = place.placeShape(shape, svg_layer, mirror, original)
-            if style.getStyleType() == "fill":
-                mask_element.set("style", style_template % ("#000", pour_buffer * 2))
-            else:
-                # This width provides a distance of 'pour_buffer' from the
-                # edge of the trace to a pour
-                width = style.getStrokeWidth() + pour_buffer * 2
-                mask_element.set("style", style_template % ("none", width))
+        # if pour_buffer > 0:
+        #     mask_element = place.placeShape(shape, svg_layer, mirror, original)
+        #     if style.getStyleType() == "fill":
+        #         mask_element.set("style", style_template % ("#000", pour_buffer * 2))
+        #     else:
+        #         # This width provides a distance of 'pour_buffer' from the
+        #         # edge of the trace to a pour
+        #         width = style.getStrokeWidth() + pour_buffer * 2
+        #         mask_element.set("style", style_template % ("none", width))
 
-            path = shape.getOriginalPath().lower()
-            segments = path.count("m")
-            mask_element.set(
-                "{" + config.cfg["ns"]["pcbmode"] + "}gerber-lp", "c" * segments
-            )
+        #     path = shape.getOriginalPath().lower()
+        #     segments = path.count("m")
+        #     mask_element.set(
+        #         "{" + config.cfg["ns"]["pcbmode"] + "}gerber-lp", "c" * segments
+        #     )
 
     def _placeOutline(self):
         """
@@ -907,14 +924,8 @@ class Module:
         group = et.SubElement(drill_layer, "g", transform=transform)
         group.set("{" + config.cfg["ns"]["pcbmode"] + "}type", "drill-index")
 
-        text_style_dict = config.stl["layout"]["drill-index"].get("text")
-        text_style = utils.dictToStyleText(text_style_dict)
-
-        count_style_dict = config.stl["layout"]["drill-index"].get("count-text")
-        count_style = utils.dictToStyleText(count_style_dict)
-
-        count_style_dict["font-size"] /= 2
-        drill_size_style = utils.dictToStyleText(count_style_dict)
+        text_style_class = "drill-index"
+        count_style_class = "drill-index-count"
 
         if drill_count == 0:
             text = "No drills"
@@ -922,7 +933,8 @@ class Module:
             text = "1 drill: "
         else:
             text = "%s drills: " % drill_count
-        t = et.SubElement(group, "text", x=str(0), y=str(0), style=text_style)
+        t = et.SubElement(group, "text", x=str(0), y=str(0))
+        t.set("class",text_style_class)
         t.text = text
 
         # "new line"
@@ -951,9 +963,9 @@ class Module:
                 "text",
                 x=str(location.x),
                 y=str(-location.y),
-                dy="%s" % (config.cfg["iya"] * 0.25),
-                style=count_style,
+                dy="%s" % (config.cfg["iya"] * 0.25)
             )
+            t.set("class", count_style_class)
             t.text = str(drills_dict[diameter])
 
             t = et.SubElement(
@@ -961,9 +973,9 @@ class Module:
                 "text",
                 x=str(location.x),
                 y=str(-location.y),
-                dy="%s" % (config.cfg["iya"] * -0.5),
-                style=drill_size_style,
+                dy="%s" % (config.cfg["iya"] * -0.5)
             )
+            t.set("class",count_style_class)
             t.text = "%s mm" % diameter
 
             location.x += max(diameter, 2.5)

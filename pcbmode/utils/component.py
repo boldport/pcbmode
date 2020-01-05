@@ -26,6 +26,7 @@ from pcbmode.utils import messages as msg
 from pcbmode.utils.shape import Shape
 from pcbmode.utils.style import Style
 from pcbmode.utils.footprint import Footprint
+from pcbmode.utils import css_utils
 
 
 class Component:
@@ -152,16 +153,28 @@ class Component:
                 refdef_dict["location"] = refdef_dict.get("location") or [0, 0]
                 refdef_dict["type"] = "text"
                 refdef_dict["value"] = refdef_dict.get("value") or refdef
-                refdef_dict["font-family"] = (
-                    refdef_dict.get("font-family")
-                    or config.stl["layout"][sheet]["refdef"].get("font-family")
-                    or config.stl["defaults"]["font-family"]
+
+                refdef_dict["font-family"] = css_utils.get_prop(
+                    config.stl["layout"], f"{sheet}-refdef", "font-family"
                 )
-                refdef_dict["font-size"] = (
-                    refdef_dict.get("font-size")
-                    or config.stl["layout"][sheet]["refdef"].get("font-size")
-                    or "2mm"
+
+                # refdef_dict["font-family"] = (
+                #     refdef_dict.get("font-family")
+                #     or config.stl["layout"][sheet]["refdef"].get("font-family")
+                #     or config.stl["defaults"]["font-family"]
+                # )
+
+                refdef_dict["font-size"] = css_utils.get_prop(
+                    config.stl["layout"], f"{sheet}-refdef", "font-size"
                 )
+
+                print(refdef_dict["font-size"])
+
+                #                refdef_dict["font-size"] = (
+                #                    refdef_dict.get("font-size")
+                #                    or config.stl["layout"][sheet]["refdef"].get("font-size")
+                #                    or "2mm"
+                #                )
                 refdef_shape = Shape(refdef_dict)
 
                 refdef_shape.is_refdef = True

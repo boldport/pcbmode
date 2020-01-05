@@ -53,6 +53,8 @@ class Shape:
         self._pour_buffer = shape.get("buffer-to-pour")
         self._location = utils.toPoint(shape.get("location", [0, 0]))
 
+        self._style = self._shape_dict.get("style", None)
+
         # Create the SVG path for the shape
         self._get_path_from_shape_type()
 
@@ -245,8 +247,8 @@ class Shape:
         return self._style
 
     def getStyleString(self):
-        style = self._style.getStyleString()
-        return style
+        #style = self._style.getStyleString()
+        return self._style
 
     def getStyleType(self):
         style = self._style.getStyleType()

@@ -37,11 +37,11 @@ class Style:
 
     def __init__(self, shape_dict, layer_name, sub_item=None):
 
-        default_style = config.stl["layout"]["defaults"]["style"][layer_name]
-        if sub_item == None:
-            layer_style = config.stl["layout"][layer_name]
-        else:
-            layer_style = config.stl["layout"][layer_name][sub_item]
+        # default_style = config.stl["layout"]["defaults"]["style"][layer_name]
+        # if sub_item == None:
+        #     layer_style = config.stl["layout"][layer_name]
+        # else:
+        #     layer_style = config.stl["layout"][layer_name][sub_item]
 
         # Unless specified, 'text' will default to 'fill' on all layers.
         # Other 'types' depend on the layers they are on.
