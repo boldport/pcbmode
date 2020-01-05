@@ -47,10 +47,15 @@ def create(width, height):
     ns_dc = config.cfg["ns"]["dc"]
     ns_sp = config.cfg["ns"]["sodipodi"]
 
+    # CSS classes
+    classes = config.stl.get("layout", None)
+    if classes not in [None, ""]:
+        lxu.addch(parent=module, ns=ns_svg, name="style", id="title", text=classes)
+
     # Title
     title = config.brd["metadata"].get("title", None)
     if title not in [None, ""]:
-        lxu.addch(module, ns_svg, "title", "title", title)
+        lxu.addch(parent=module, ns=ns_svg, name="title", id="title", text=title)
 
     # Set Inkscape options tag
     inkscape_opt = lxu.addch(module, ns_sp, "namedview", "namedview-pcbmode")
