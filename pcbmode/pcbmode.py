@@ -33,6 +33,7 @@ from pcbmode.utils import excellon
 from pcbmode.utils import messages as msg
 from pcbmode.utils import bom
 from pcbmode.utils import coord_file
+from pcbmode.utils import css_utils
 from pcbmode.utils.board import Board
 
 
@@ -73,10 +74,12 @@ def load_stylesheet():
     filename = Path(config.cfg["styles"]["stylesheet-for-layout"])
     fn = config.tmp["project-path"] / filename
     if fn.exists():
-        config.stl["layout"] = (fn / filename).read_text()
+        raw_css = (fn / filename).read_text()
     else:
         fn = Path(__file__).parent / filename
-        config.stl["layout"] = fn.read_text()
+        raw_css = fn.read_text()
+
+    config.stl["layout"] = raw_css 
 
 
 def load_stackup():
