@@ -1,38 +1,33 @@
+
 .board {
   fill-opacity: 1;
   fill: #000000;
   stroke: none;
 }
-
 .outline {
   stroke: #555555;
   stroke-width: 0.05;
   stroke-opacity: 1;
   fill: none;
 }
-
 .conductor-top {
   stroke: #008500;
   fill: #008500;
   stroke-opacity: 0.6;
   fill-opacity: 0.6;
 }
-
 .conductor-bottom {
   stroke: #a60000;
   fill: #a60000;
   stroke-opacity: 0.6;
   fill-opacity: 0.6;
 }
-
 .pads-top {
   stroke: none;
 }
-
 .pads-bottom {
   stroke: none;
 }
-
 .pads-labels {
   font-size: 0.1px;
   font-style: normal;
@@ -48,87 +43,74 @@
   fill: #f3ff00;
   fill-opacity: 1;
   stroke: none;
-  font-family: Sans serif;
+  font-family: "Sans serif";
 }
-
 .routing-top {
   stroke: #269926;
   fill: #269926;
   fill-opacity: 0.6;
 }
-
 .routing-bottom {
   stroke: #bf3030;
   fill: #bf3030;
   fill-opacity: 0.6;
 }
-
 .routing-fill {
   fill-opacity: 0.6;
   stroke: none;
 }
-
 .routing-stroke {
   fill: none;
   stroke-width: 0.15;
   stroke-linejoin: round;
   stroke-linecap: round;
 }
-
 .pours-top {
   fill-opacity: 0.2;
   stroke-opacity: 0.2;
   stroke-linejoin: round;
   stroke-linecap: round;
 }
-
 .pours-bottom {
   fill-opacity: 0.2;
   stroke-opacity: 0.2;
   stroke-linejoin: round;
   stroke-linecap: round;
 }
-
 .silkscreen-top {
   stroke: #9fee00;
   fill: #9fee00;
   stroke-opacity: 0.6;
   fill-opacity: 0.6;
 }
-
 .silkscreen-bottom {
   stroke: #cd0074;
   fill: #cd0074;
   stroke-opacity: 0.6;
   fill-opacity: 0.6;
 }
-
 .silkscreen-stroke {
   fill: none;
   stroke-width: 0.15;
   stroke-linejoin: round;
   stroke-linecap: round;
 }
-
 .silkscreen-fill {
   fill-opacity: 0.6;
   stroke: none;
 }
-
 .silkscreen-refdef {
-  font-family: UbuntuMono-R-webfont;
+  font-family: "UbuntuMono-R-webfont";
   font-size: 2mm;
   line-height: 2mm;
   letter-spacing: 0mm;
 }
-
 .silkscreen-text {
-  font-family: UbuntuMono-R-webfont;
+  font-family: "UbuntuMono-R-webfont";
   font-size: 1mm;
   line-height: 1mm;
   letter-spacing: 0mm;
 }
-
 .documentation {
   fill: #000455;
   fill-opacity: 1;
@@ -137,93 +119,79 @@
   stroke-opacity: 1;
   stroke-dasharray: none;
 }
-
 .documentation-text {
-  font-family: Overlock-Regular-OTF-webfont;
+  font-family: "Overlock-Regular-OTF-webfont";
   font-size: 1.5mm;
   letter-spacing: 0mm;
   line-height: 1.5mm;
 }
-
 .assembly-top {
   stroke: #009999;
   fill: #009999;
   stroke-opacity: 0.6;
   fill-opacity: 0.6;
 }
-
 .assembly-bottom {
   stroke: #ff7400;
   fill: #ff7400;
   stroke-opacity: 0.6;
   fill-opacity: 0.6;
 }
-
 .assembly-stroke {
   fill: none;
   stroke-width: 0.15;
   stroke-linejoin: round;
   stroke-linecap: round;
 }
-
 .assembly-fill {
   fill-opacity: 0.6;
   stroke: none;
 }
-
 .assembly-refdef {
-  font-family: UbuntuMono-R-webfont;
+  font-family: "UbuntuMono-R-webfont";
   font-size: 2mm;
   line-height: 2mm;
   letter-spacing: 0mm;
 }
-
 .assembly-text {
-  font-family: UbuntuMono-R-webfont;
+  font-family: "UbuntuMono-R-webfont";
   font-size: 1mm;
   line-height: 1mm;
   letter-spacing: 0mm;
 }
-
 .soldermask {
   stroke: #67e667;
   fill: #67e667;
   stroke-opacity: 0.6;
   fill-opacity: 0.6;
 }
-
 .soldermask-bottom {
   stroke: #ff7373;
   fill: #ff7373;
   stroke-opacity: 0.6;
   fill-opacity: 0.6;
 }
-
 .soldermask-fill {
   stroke: none;
 }
-
 .soldermask-stroke {
   fill: none;
   stroke-width: 0.15;
   stroke-linejoin: round;
   stroke-linecap: round;
 }
-
 .solderpaste-top {
   stroke: #a0a0a0;
   fill: #a0a0a0;
   stroke-opacity: 0.6;
   fill-opacity: 0.6;
 }
-
 .solderpaste-bottom {
   stroke: #a0a0a0;
   fill: #a0a0a0;
   stroke-opacity: 0.6;
   fill-opacity: 0.6;
 }
-
 .solderpaste-stroke {
   fill: none;
   stroke-width: 0.15;
@@ -234,14 +202,12 @@
   fill-opacity: 0.6;
   stroke: none;
 }
-
 .drills {
   fill: #444444;
   fill-opacity: 0.6;
   stroke: none;
   fill-rule: evenodd;
 }
-
 .placement-top {
   stroke: #444444;
   fill: none;
@@ -250,7 +216,6 @@
   stroke-linejoin: round;
   stroke-linecap: round;
 }
-
 .placement-bottom {
   stroke: #444444;
   fill: none;
@@ -259,7 +224,6 @@
   stroke-linejoin: round;
   stroke-linecap: round;
 }
-
 .placement-text {
   font-size: 0.1px;
   font-style: normal;
@@ -277,28 +241,24 @@
   stroke: none;
   font-family: Sans serif;
 }
-
 .dimensions {
   stroke: #555555;
   stroke-opacity: 1;
   fill: #555555;
   stroke-width: 0.2;
 }
-
 .dimentions-text {
-  font-family: UbuntuMono-R-webfont;
+  font-family: "UbuntuMono-R-webfont";
   font-size: 1.5mm;
   line-height: 1mm;
   letter-spacing: 0mm;
 }
-
 .origin {
   stroke: #555555;
   stroke-width: 0.05;
   stroke-opacity: 1;
   fill: none;
 }
-
 .drill-index {
   fill: #111111;
   fill-opacity: 0.8;
@@ -315,15 +275,12 @@
   stroke: none;
   font-family: "Courier 10 Pitch";
 }
-
 .drill-index-count {
   font-size: 1;
 }
-
 .drill-index-text {
   font-size: 1.6;
 }
-
 .layer-index-text {
   font-family: "Overlock-Regular-OTF-webfont";
   font-size: 1.2mm;
