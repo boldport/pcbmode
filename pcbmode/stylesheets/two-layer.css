@@ -4,11 +4,16 @@
   fill: #000000;
   stroke: none;
 }
-.outline {
+.outline-stroke {
   stroke: #555555;
   stroke-width: 0.05;
   stroke-opacity: 1;
-  fill: none;
+  fill:none;
+}
+.outline-fill {
+  stroke: none;
+  fill: #555555;
+  fill-opacity: 1;
 }
 .conductor-top {
   stroke: #008500;
