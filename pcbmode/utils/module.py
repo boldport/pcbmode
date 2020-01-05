@@ -211,22 +211,16 @@ class Module:
         Places outline dimension arrows
         """
 
-        def makeArrow(width, gap):
+        def make_arrow(width, gap):
             """
             Returns a path for an arrow of width 'width' with a center gap of
             width 'gap'
             """
 
-            # Length of bar perpendicular to the arrow's shaft
-            base_length = 1.8
+            base_length = 1.6  # bar against arrow head
+            arrow_height = 2.2  # height of arrow's head
+            arrow_base = 1.2  # width of arrow's head
 
-            # Height of arrow's head
-            arrow_height = 2.5
-
-            # Width of arrow's head
-            arrow_base = 1.2
-
-            # Create path
             path = (
                 "m %s,%s %s,%s m %s,%s %s,%s m %s,%s %s,%s m %s,%s %s,%s m %s,%s m %s,%s %s,%s m %s,%s %s,%s m %s,%s %s,%s m %s,%s %s,%s"
                 % (
@@ -272,8 +266,8 @@ class Module:
         # Create text shapes
         shape_dict = {}
         shape_dict["type"] = "text"
-        style_class = "dimentions-text"
-        #        style_dict = config.stl["layout"]["dimensions"].get("text", {})
+        style_class = "dimensions-text"
+
         shape_dict["font-family"] = css_utils.get_prop(
             config.stl["layout"], style_class, "font-family"
         )
@@ -287,58 +281,50 @@ class Module:
             config.stl["layout"], style_class, "letter-spacing"
         )
 
-        #        shape_dict["font-size"] = style_dict.get("font-size", "1.5mm")
-        #        shape_dict["line-height"] = style_dict.get("line-height", "1mm")
-        #        shape_dict["letter-spacing"] = style_dict.get("letter-spacing", "0mm")
-
-        # Locations
         arrow_gap = 1.5
         width_loc = [0, self._height / 2 + arrow_gap]
         height_loc = [-(self._width / 2 + arrow_gap), 0]
 
         # Width text
         width_text_dict = shape_dict.copy()
-        width_text_dict["value"] = "%s mm" % round(self._width, 2)
+        width_text_dict["value"] = f"{round(self._width, 2)} mm" 
         width_text_dict["location"] = width_loc
+        width_text_dict["style_class"] = "dimensions-text"
         width_text = Shape(width_text_dict)
-        #        style = Style(width_text_dict, "dimensions")
-        #        width_text.setStyle(style)
 
         # Height text
         height_text_dict = shape_dict.copy()
-        height_text_dict["value"] = "%s mm" % round(self._height, 2)
+        height_text_dict["value"] = f"{round(self._height, 2)} mm"
         height_text_dict["rotate"] = -90
         height_text_dict["location"] = height_loc
+        height_text_dict["style_class"] = "dimensions-text"
         height_text = Shape(height_text_dict)
-        #        style = Style(height_text_dict, "dimensions")
-        #        height_text.setStyle(style)
 
         # Width arrow
         shape_dict = {}
         shape_dict["type"] = "path"
-        shape_dict["value"] = makeArrow(self._width, width_text.getWidth() * 1.2)
+        shape_dict["value"] = make_arrow(self._width, width_text.getWidth() * 1.5)
         shape_dict["location"] = width_loc
+        shape_dict['style_class'] = "dimensions-arrow"
         width_arrow = Shape(shape_dict)
-        #        style = Style(shape_dict, "dimensions")
-        #        width_arrow.setStyle(style)
 
         # Height arrow
         shape_dict = {}
         shape_dict["type"] = "path"
-        shape_dict["value"] = makeArrow(self._height, height_text.getHeight() * 1.2)
+        shape_dict["value"] = make_arrow(self._height, height_text.getHeight() * 1.5)
         shape_dict["rotate"] = -90
         shape_dict["location"] = height_loc
+        shape_dict['style_class'] = "dimensions-arrow"
         height_arrow = Shape(shape_dict)
-        #        style = Style(shape_dict, "dimensions")
-        #        height_arrow.setStyle(style)
 
         svg_layer = self._layers["dimensions"]["layer"]
         group = et.SubElement(svg_layer, "g")
-        group.set("{" + config.cfg["ns"]["pcbmode"] + "}type", "module-shapes")
+        group.set(f"{{{config.cfg['ns']['pcbmode']}}}type", "module-shapes")
         place.placeShape(width_text, group)
         place.placeShape(height_text, group)
         place.placeShape(width_arrow, group)
         place.placeShape(height_arrow, group)
+
 
     def _placeComponents(self, components, component_type):
         """
