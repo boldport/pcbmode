@@ -156,8 +156,6 @@ class Module:
             shape_dict = outline_dict.get("shape")
             if shape_dict != None:
                 shape = Shape(shape_dict)
-                if shape.get_style_class() is None:
-                    shape.set_style_class("outline-stroke")
             else:
                 shape = None
         else:
@@ -622,7 +620,9 @@ class Module:
                 shape_dict = routes[pcb_layer][route_key]
                 shape = Shape(shape_dict)
                 if shape.get_style_class() is None:
-                    shape.set_style_class(f"routing-stroke-{pcb_layer}")
+                    shape.set_style_class(
+                        f"routing {pcb_layer}-routing {pcb_layer}-routing-stroke"
+                    )
 
                 # Routes are a special case where they are used as-is
                 # counting on Inkscapes 'optimised' setting to modify

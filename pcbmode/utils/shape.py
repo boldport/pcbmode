@@ -55,6 +55,10 @@ class Shape:
 
         self._style_class = self._shape_dict.get("style_class", None)
         self._style = self._shape_dict.get("style", None)
+        if self._style is not None:
+            self._style = utils.process_style(self._style)
+        else:
+            self._style = "stroke:none;"
 
         # Create the SVG path for the shape
         self._get_path_from_shape_type()

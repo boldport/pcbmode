@@ -1301,14 +1301,15 @@ def make_svg_layers(top_layer, transform=None, refdef=None):
             else:
                 style = None
 
+            print(f"{layer_name} {sheet_type}")
+
             tmp = layers[layer_name]
             tmp[sheet_type] = {}
             element = tmp[sheet_type]["layer"] = make_svg_layer(
                 parent_layer=tmp["layer"],
                 layer_name=sheet_name,
                 transform=None,
-                style_class=f"{sheet_type}-{layer_name}",
-                style=style,
+                style_class=f"{layer_name}-{sheet_type}",
                 refdef=refdef,
             )
 
@@ -1350,7 +1351,6 @@ def make_svg_layers(top_layer, transform=None, refdef=None):
                         layer_name=cond_type,
                         transform=None,
                         style_class=layer_name,
-                        style=style,
                         refdef=refdef,
                     )
 
@@ -1371,12 +1371,11 @@ def make_svg_layers(top_layer, transform=None, refdef=None):
             style = None
         layers[info_layer] = {}
         element = layers[info_layer]["layer"] = make_svg_layer(
-            parent_layer=top_layer, 
+            parent_layer=top_layer,
             layer_name=info_layer,
             transform=transform,
             style_class=info_layer,
-            style=style,
-            refdef=refdef
+            refdef=refdef,
         )
         element.set("{" + config.cfg["ns"]["pcbmode"] + "}%s" % ("sheet"), info_layer)
         if layer_control[info_layer]["lock"] == True:
@@ -1386,7 +1385,7 @@ def make_svg_layers(top_layer, transform=None, refdef=None):
 
 
 def make_svg_layer(
-    parent_layer, layer_name, transform=None, style_class=None, style=None, refdef=None
+    parent_layer, layer_name, transform=None, style_class=None, refdef=None
 ):
     """
     Create and return an Inkscape SVG layer 
@@ -1399,10 +1398,8 @@ def make_svg_layer(
     new_layer.set(f"{{{ns_ink}}}label", layer_name)
     if transform is not None:
         new_layer.set("transform", transform)
-#    if style_class is not None:
-#        new_layer.set("class", style_class)
-#    if style is not None:
-#        new_layer.set("style", style)
+    if style_class is not None:
+        new_layer.set("class", style_class)
     if refdef is not None:
         new_layer.set("refdef", refdef)
 

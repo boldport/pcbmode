@@ -699,3 +699,27 @@ def parseSvgMatrix(matrix):
     angle = -angle
 
     return coord, angle, scale
+
+
+def process_style(style):
+    """
+    Keep only relevant style properties. Plus, add 'fill:none' if a
+    'stroke-width' is captured, otherwise Inkscape still displays the
+    shape as a stroke+fill. This means that we don't require an additional
+    'fill:none' after every 'stroke-width' in the shape definitions.
+    """
+    
+    keep = ['stroke-width']
+    add_if_stroke = 'fill:none;'
+
+    pattern = '^\s*?%s\s*:\s*(.*?)\s*;?\s*$'
+
+    new_style = ""
+    for k in keep:
+        result = re.findall(pattern%k, style)
+        if result != []:
+            new_style += f"{k}:{result[0]};"
+            if k == 'stroke-width':
+                new_style += add_if_stroke
+
+    return new_style
