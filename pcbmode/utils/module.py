@@ -45,6 +45,8 @@ class Module:
         """
         """
 
+        ns_pcm = config.cfg["ns"]["pcbmode"]
+        ns_svg = config.cfg["ns"]["svg"]
         ns = {"pcbmode": config.cfg["ns"]["pcbmode"], "svg": config.cfg["ns"]["svg"]}
 
         self._module_dict = module_dict
@@ -64,10 +66,7 @@ class Module:
         self._shapes = self._get_components(shapes_dict)
 
         sig_dig = config.cfg["params"]["significant-digits"]
-        self._transform = "translate(%s %s)" % (
-            round(self._width / 2, sig_dig),
-            round(self._height / 2, sig_dig),
-        )
+        self._transform = f"translate({round(self._width / 2, sig_dig)} {round(self._height / 2, sig_dig)})"
 
         # Create the Inkscape SVG document
         self._module = inkscape_svg.create(self._width, self._height)
@@ -88,28 +87,20 @@ class Module:
             )
             # This will identify the masks for each PCB layer when
             # the layer is converted to Gerber
-            element.set("{" + config.cfg["ns"]["pcbmode"] + "}pcb-layer", pcb_layer)
+            element.set(f"{{{ns_pcm}}}pcb-layer", pcb_layer)
             self._masks[pcb_layer] = element
 
         self._place_outline()
-
         self._place_outline_dims()
-
         self._placeComponents(components=self._components, component_type="component")
-        sys.stdout.write("\n")
-
         self._place_routing()
-
         self._placeComponents(components=self._vias, component_type="via")
-
         self._placeComponents(components=self._shapes, component_type="shape")
 
         if config.cfg["create"]["docs"] == True:
             self._placeDocs()
-
         if config.cfg["create"]["drill-index"] == True:
             self._placeDrillIndex()
-
         if config.cfg["create"]["layer-index"] == True:
             self._placeLayerIndex()
 
@@ -121,16 +112,14 @@ class Module:
                 mask_cover = et.SubElement(
                     self._masks[pcb_layer],
                     "rect",
-                    x="%s" % str(-self._width / 2),
-                    y="%s" % str(-self._height / 2),
-                    width="%s" % self._width,
-                    height="%s" % self._height,
+                    x=f"{str(-self._width / 2)}",
+                    y=f"{str(-self._height / 2)}",
+                    width=f"{self._width}",
+                    height=f"{self._height}",
                     style="fill:#fff;",
                 )
                 # This tells the Gerber conversion to ignore this shape
-                mask_cover.set(
-                    "{" + config.cfg["ns"]["pcbmode"] + "}type", "mask-cover"
-                )
+                mask_cover.set(f"{{{ns_pcm}}}type", "mask-cover")
 
         # Output module SVG
         output_file = Path(
@@ -334,6 +323,8 @@ class Module:
         type of component ('component', 'via', 'shape')
         """
 
+        ns_pcm = config.cfg["ns"]["pcbmode"]
+
         htmlpar = HTMLParser.HTMLParser()
 
         for component in components:
@@ -424,12 +415,9 @@ class Module:
                     shape_group = et.SubElement(
                         svg_layer, "g", mask="url(#mask-%s)" % pcb_layer
                     )
-                    transform = "translate(%s,%s)" % (
-                        location[0],
-                        config.cfg["iya"] * location[1],
-                    )
+                    transform = f"translate({location[0]},{config.cfg['iya'] * location[1]})"
                     group = et.SubElement(shape_group, "g", transform=transform)
-                    group.set("{" + config.cfg["ns"]["pcbmode"] + "}type", "pours")
+                    group.set(f"{{{ns_pcm}}}type", "pours")
                     for shape in shapes:
                         placed_element = place.placeShape(shape, group, invert)
 
@@ -447,7 +435,7 @@ class Module:
                     )
                     group = et.SubElement(svg_layer, "g", transform=transform)
                     group.set(
-                        "{" + config.cfg["ns"]["pcbmode"] + "}type", "component-shapes"
+                        "{" + ns_pcm + "}type", "component-shapes"
                     )
                     for shape in shapes:
                         placed_element = place.placeShape(shape, group, invert)
@@ -460,13 +448,10 @@ class Module:
                     svg_layer = None
 
                 if len(shapes) > 0 and svg_layer != None:
-                    transform = "translate(%s,%s)" % (
-                        location[0],
-                        config.cfg["iya"] * location[1],
-                    )
+                    transform = f"translate({location[0]},{config.cfg['iya'] * location[1]})"
                     group = et.SubElement(svg_layer, "g", transform=transform)
                     group.set(
-                        "{" + config.cfg["ns"]["pcbmode"] + "}type", "component-shapes"
+                        "{" + ns_pcm + "}type", "component-shapes"
                     )
                     for shape in shapes:
                         placed_element = place.placeShape(shape, group, invert)
@@ -479,14 +464,9 @@ class Module:
                     svg_layer = None
 
                 if len(shapes) > 0 and svg_layer != None:
-                    transform = "translate(%s,%s)" % (
-                        location[0],
-                        config.cfg["iya"] * location[1],
-                    )
+                    transform = f"translate({location[0]},{config.cfg['iya'] * location[1]})"
                     shape_group = et.SubElement(svg_layer, "g", transform=transform)
-                    shape_group.set(
-                        "{" + config.cfg["ns"]["pcbmode"] + "}type", "component-shapes"
-                    )
+                    shape_group.set(f"{{{ns_pcm}}}type", "component-shapes")
 
                     for shape in shapes:
                         # Refdefs need to be in their own groups so that their
@@ -503,14 +483,8 @@ class Module:
                                 refdef_group = et.SubElement(
                                     svg_layer, "g", transform=transform
                                 )
-                                refdef_group.set(
-                                    "{" + config.cfg["ns"]["pcbmode"] + "}type",
-                                    "refdef",
-                                )
-                                refdef_group.set(
-                                    "{" + config.cfg["ns"]["pcbmode"] + "}refdef",
-                                    refdef,
-                                )
+                                refdef_group.set(f"{{{ns_pcm}}}type", "refdef")
+                                refdef_group.set(f"{{{ns_pcm}}}refdef", refdef)
                                 placed_element = place.placeShape(
                                     shape, refdef_group, invert
                                 )
@@ -527,10 +501,7 @@ class Module:
                     svg_layer = None
 
                 if len(shapes) > 0 and svg_layer != None:
-                    transform = "translate(%s,%s)" % (
-                        location[0],
-                        config.cfg["iya"] * location[1],
-                    )
+                    transform = f"translate({location[0]},{config.cfg['iya'] * location[1],})"
                     group = et.SubElement(svg_layer, "g", transform=transform)
                     for shape in shapes:
                         placed_element = place.placeShape(shape, group, invert)
@@ -539,19 +510,15 @@ class Module:
                 shapes = shapes_dict["drills"].get(pcb_layer, [])
                 if len(shapes) > 0:
                     svg_layer = self._layers["drills"]["layer"]
-                    transform = "translate(%s,%s)" % (
-                        location[0],
-                        config.cfg["iya"] * location[1],
-                    )
+                    transform = f"translate({location[0]},{config.cfg['iya'] * location[1]})"
                     group = et.SubElement(svg_layer, "g", transform=transform)
                     group.set(
-                        "{" + config.cfg["ns"]["pcbmode"] + "}type", "component-shapes"
+                        f"{{{ns_pcm}}}type", "component-shapes"
                     )
                     for shape in shapes:
                         placed_element = place.placeShape(shape, group, invert)
                         placed_element.set(
-                            "{" + config.cfg["ns"]["pcbmode"] + "}diameter",
-                            str(shape.getDiameter()),
+                            f"{{{ns_pcm}}}diameter", str(shape.getDiameter())
                         )
 
             # Place component origin marker
@@ -566,29 +533,26 @@ class Module:
                 return
 
             # Add PCBmodE information, useful for when extracting
-            group.set("{" + config.cfg["ns"]["pcbmode"] + "}type", component_type)
+            group.set(f"{{{ns_pcm}}}type", component_type)
             group.set(
-                "{" + config.cfg["ns"]["pcbmode"] + "}footprint",
-                component.getFootprintName(),
+                f"{{{ns_pcm}}}footprint",
+                component.getFootprintName()
             )
             if (component_type == "component") or (component_type == "shape"):
-                group.set("{" + config.cfg["ns"]["pcbmode"] + "}refdef", refdef)
+                group.set(f"{{{ns_pcm}}}refdef", refdef)
             elif component_type == "via":
-                group.set("{" + config.cfg["ns"]["pcbmode"] + "}id", refdef)
+                group.set(f"{{{ns_pcm}}}id", refdef)
             else:
                 pass
 
             path = svg.placementMarkerPath()
-            transform = "translate(%s,%s)" % (
-                location[0],
-                config.cfg["iya"] * location[1],
-            )
+            transform = f"translate({location[0]},{config.cfg['iya'] * location[1]})"
 
             if placement_layer == "bottom":
                 rotation *= -1
 
             marker_element = et.SubElement(
-                group, "path", d=path, transform="rotate(%s)" % rotation
+                group, "path", d=path, transform=f"rotate({rotation})" 
             )
 
             # Place markers
@@ -597,7 +561,7 @@ class Module:
                 t = et.SubElement(group, "text", x="0", y="-0.17")
                 t.set("class", style_class)
                 ts = et.SubElement(t, "tspan", x="0", dy="0.1")
-                ts.text = "%s" % (refdef)
+                ts.text = f"{refdef}"
                 ts = et.SubElement(t, "tspan", x="0", dy="0.1")
                 ts.text = htmlpar.unescape("%s&#176;" % (rotation))
                 ts = et.SubElement(t, "tspan", x="0", dy="0.1")
@@ -606,7 +570,7 @@ class Module:
                 t = et.SubElement(group, "text", x="0", y="-0.17")
                 t.set("class", style_class)
                 ts = et.SubElement(t, "tspan", x="0", dy="0.1")
-                ts.text = "%s" % (refdef)
+                ts.text = f"{refdef}"
                 ts = et.SubElement(t, "tspan", x="0", dy="0.1")
                 ts.text = htmlpar.unescape("%s&#176;" % (rotation))
                 ts = et.SubElement(t, "tspan", x="0", dy="0.1")
@@ -763,6 +727,8 @@ class Module:
         """
         Places documentation blocks on the documentation layer
         """
+        ns_pcm = config.cfg["ns"]["pcbmode"]
+
         try:
             docs_dict = config.brd["documentation"]
         except:
@@ -774,13 +740,11 @@ class Module:
             docs_dict[key]["location"] = [0, 0]
 
             shape_group = et.SubElement(self._layers["documentation"]["layer"], "g")
-            shape_group.set(
-                "{" + config.cfg["ns"]["pcbmode"] + "}type", "module-shapes"
-            )
-            shape_group.set("{" + config.cfg["ns"]["pcbmode"] + "}doc-key", key)
+            shape_group.set(f"{{{ns_pcm}}}type", "module-shapes")
+            shape_group.set(f"{{{ns_pcm}}}doc-key", key)
             shape_group.set(
                 "transform",
-                "translate(%s,%s)" % (location.x, config.cfg["iya"] * location.y),
+                f"translate({location.x},{config.cfg['iya']*location.y})"
             )
 
             location = docs_dict[key]["location"]
@@ -839,10 +803,7 @@ class Module:
 
             for sheet in sheets:
                 layer = self._layers[pcb_layer][sheet]["layer"]
-                transform = "translate(%s,%s)" % (
-                    location.x,
-                    config.cfg["iya"] * location.y,
-                )
+                transform = f"translate({location.x},{config.cfg['iya']*location.y})"
                 group = et.SubElement(layer, "g", transform=transform)
                 group.set("{" + config.cfg["ns"]["pcbmode"] + "}type", "layer-index")
 
@@ -851,7 +812,7 @@ class Module:
                 rect_shape.setStyle(style)
                 place.placeShape(rect_shape, group)
 
-                text_dict["value"] = "%s %s" % (pcb_layer, sheet)
+                text_dict["value"] = f"{pcb_layer} {sheet}"
                 text_shape = Shape(text_dict)
                 text_width = text_shape.getWidth()
                 style = Style(text_dict, sheet)
@@ -872,6 +833,8 @@ class Module:
         Adds a drill index
         """
 
+        ns_pcm = config.cfg["ns"]["pcbmode"]
+  
         # Get the drills sheet / SVG layer
         drill_layer = self._layers["drills"]["layer"]
         ns = {"pcbmode": config.cfg["ns"]["pcbmode"], "svg": config.cfg["ns"]["svg"]}
@@ -882,7 +845,7 @@ class Module:
         largest_drill = 0
         drill_count = 0
         for drill in drills:
-            diameter = drill.get("{" + config.cfg["ns"]["pcbmode"] + "}diameter")
+            diameter = drill.get(f"{{{ns_pcm}}}diameter")
             diameter = round(float(diameter), 2)
             if diameter not in drills_dict:
                 drills_dict[diameter] = 1
@@ -908,9 +871,9 @@ class Module:
         location = utils.toPoint(location)
 
         # Create group for placing index
-        transform = "translate(%s,%s)" % (location.x, config.cfg["iya"] * location.y)
+        transform = f"translate({location.x},{config.cfg['iya']*location.y})"
         group = et.SubElement(drill_layer, "g", transform=transform)
-        group.set("{" + config.cfg["ns"]["pcbmode"] + "}type", "drill-index")
+        group.set(f"{{{ns_pcm}}}type", "drill-index")
 
         text_style_class = "drill-index"
         count_style_class = "drill-index-count"
@@ -920,7 +883,7 @@ class Module:
         elif drill_count == 1:
             text = "1 drill: "
         else:
-            text = "%s drills: " % drill_count
+            text = f"{drill_count} drills: " 
         t = et.SubElement(group, "text", x=str(0), y=str(0))
         t.set("class", text_style_class)
         t.text = text
@@ -939,10 +902,7 @@ class Module:
 
         for diameter in reversed(sorted(drills_dict)):
             path = svg.drillPath(diameter)
-            transform = "translate(%s,%s)" % (
-                location.x,
-                config.cfg["iya"] * location.y,
-            )
+            transform = f"translate({location.x},{config.cfg['iya']*location.y})"
             element = et.SubElement(group, "path", d=path, transform=transform)
             element.set("fill-rule", "evenodd")
 
@@ -951,7 +911,7 @@ class Module:
                 "text",
                 x=str(location.x),
                 y=str(-location.y),
-                dy="%s" % (config.cfg["iya"] * 0.25),
+                dy=f"{config.cfg['iya'] * 0.25}"
             )
             t.set("class", count_style_class)
             t.text = str(drills_dict[diameter])
@@ -961,9 +921,9 @@ class Module:
                 "text",
                 x=str(location.x),
                 y=str(-location.y),
-                dy="%s" % (config.cfg["iya"] * -0.5),
+                dy=f"{config.cfg['iya'] * -0.5}"
             )
             t.set("class", count_style_class)
-            t.text = "%s mm" % diameter
+            t.text = f"{diameter} mm" 
 
             location.x += max(diameter, 2.5)
