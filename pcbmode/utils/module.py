@@ -415,7 +415,9 @@ class Module:
                     shape_group = et.SubElement(
                         svg_layer, "g", mask="url(#mask-%s)" % pcb_layer
                     )
-                    transform = f"translate({location[0]},{config.cfg['iya'] * location[1]})"
+                    transform = (
+                        f"translate({location[0]},{config.cfg['iya'] * location[1]})"
+                    )
                     group = et.SubElement(shape_group, "g", transform=transform)
                     group.set(f"{{{ns_pcm}}}type", "pours")
                     for shape in shapes:
@@ -434,9 +436,7 @@ class Module:
                         config.cfg["iya"] * location[1],
                     )
                     group = et.SubElement(svg_layer, "g", transform=transform)
-                    group.set(
-                        "{" + ns_pcm + "}type", "component-shapes"
-                    )
+                    group.set("{" + ns_pcm + "}type", "component-shapes")
                     for shape in shapes:
                         placed_element = place.placeShape(shape, group, invert)
 
@@ -448,11 +448,11 @@ class Module:
                     svg_layer = None
 
                 if len(shapes) > 0 and svg_layer != None:
-                    transform = f"translate({location[0]},{config.cfg['iya'] * location[1]})"
-                    group = et.SubElement(svg_layer, "g", transform=transform)
-                    group.set(
-                        "{" + ns_pcm + "}type", "component-shapes"
+                    transform = (
+                        f"translate({location[0]},{config.cfg['iya'] * location[1]})"
                     )
+                    group = et.SubElement(svg_layer, "g", transform=transform)
+                    group.set("{" + ns_pcm + "}type", "component-shapes")
                     for shape in shapes:
                         placed_element = place.placeShape(shape, group, invert)
 
@@ -464,7 +464,9 @@ class Module:
                     svg_layer = None
 
                 if len(shapes) > 0 and svg_layer != None:
-                    transform = f"translate({location[0]},{config.cfg['iya'] * location[1]})"
+                    transform = (
+                        f"translate({location[0]},{config.cfg['iya'] * location[1]})"
+                    )
                     shape_group = et.SubElement(svg_layer, "g", transform=transform)
                     shape_group.set(f"{{{ns_pcm}}}type", "component-shapes")
 
@@ -501,7 +503,9 @@ class Module:
                     svg_layer = None
 
                 if len(shapes) > 0 and svg_layer != None:
-                    transform = f"translate({location[0]},{config.cfg['iya'] * location[1],})"
+                    transform = (
+                        f"translate({location[0]},{config.cfg['iya'] * location[1],})"
+                    )
                     group = et.SubElement(svg_layer, "g", transform=transform)
                     for shape in shapes:
                         placed_element = place.placeShape(shape, group, invert)
@@ -510,11 +514,11 @@ class Module:
                 shapes = shapes_dict["drills"].get(pcb_layer, [])
                 if len(shapes) > 0:
                     svg_layer = self._layers["drills"]["layer"]
-                    transform = f"translate({location[0]},{config.cfg['iya'] * location[1]})"
-                    group = et.SubElement(svg_layer, "g", transform=transform)
-                    group.set(
-                        f"{{{ns_pcm}}}type", "component-shapes"
+                    transform = (
+                        f"translate({location[0]},{config.cfg['iya'] * location[1]})"
                     )
+                    group = et.SubElement(svg_layer, "g", transform=transform)
+                    group.set(f"{{{ns_pcm}}}type", "component-shapes")
                     for shape in shapes:
                         placed_element = place.placeShape(shape, group, invert)
                         placed_element.set(
@@ -534,10 +538,7 @@ class Module:
 
             # Add PCBmodE information, useful for when extracting
             group.set(f"{{{ns_pcm}}}type", component_type)
-            group.set(
-                f"{{{ns_pcm}}}footprint",
-                component.getFootprintName()
-            )
+            group.set(f"{{{ns_pcm}}}footprint", component.getFootprintName())
             if (component_type == "component") or (component_type == "shape"):
                 group.set(f"{{{ns_pcm}}}refdef", refdef)
             elif component_type == "via":
@@ -552,7 +553,7 @@ class Module:
                 rotation *= -1
 
             marker_element = et.SubElement(
-                group, "path", d=path, transform=f"rotate({rotation})" 
+                group, "path", d=path, transform=f"rotate({rotation})"
             )
 
             # Place markers
@@ -743,8 +744,7 @@ class Module:
             shape_group.set(f"{{{ns_pcm}}}type", "module-shapes")
             shape_group.set(f"{{{ns_pcm}}}doc-key", key)
             shape_group.set(
-                "transform",
-                f"translate({location.x},{config.cfg['iya']*location.y})"
+                "transform", f"translate({location.x},{config.cfg['iya']*location.y})"
             )
 
             location = docs_dict[key]["location"]
@@ -834,7 +834,7 @@ class Module:
         """
 
         ns_pcm = config.cfg["ns"]["pcbmode"]
-  
+
         # Get the drills sheet / SVG layer
         drill_layer = self._layers["drills"]["layer"]
         ns = {"pcbmode": config.cfg["ns"]["pcbmode"], "svg": config.cfg["ns"]["svg"]}
@@ -883,7 +883,7 @@ class Module:
         elif drill_count == 1:
             text = "1 drill: "
         else:
-            text = f"{drill_count} drills: " 
+            text = f"{drill_count} drills: "
         t = et.SubElement(group, "text", x=str(0), y=str(0))
         t.set("class", text_style_class)
         t.text = text
@@ -911,7 +911,7 @@ class Module:
                 "text",
                 x=str(location.x),
                 y=str(-location.y),
-                dy=f"{config.cfg['iya'] * 0.25}"
+                dy=f"{config.cfg['iya'] * 0.25}",
             )
             t.set("class", count_style_class)
             t.text = str(drills_dict[diameter])
@@ -921,9 +921,9 @@ class Module:
                 "text",
                 x=str(location.x),
                 y=str(-location.y),
-                dy=f"{config.cfg['iya'] * -0.5}"
+                dy=f"{config.cfg['iya'] * -0.5}",
             )
             t.set("class", count_style_class)
-            t.text = f"{diameter} mm" 
+            t.text = f"{diameter} mm"
 
             location.x += max(diameter, 2.5)
