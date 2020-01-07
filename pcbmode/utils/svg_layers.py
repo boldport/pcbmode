@@ -21,7 +21,7 @@ from lxml import etree as et
 from pcbmode.config import config
 
 
-def create_layers(top_layer, transform=None, refdef=None):
+def create_layers(parent_el, transform=None, refdef=None):
     """
     Creates Inkscape SVG layers that correspond to a board's layers.
     Includes the default style definition from the stylesheet.
@@ -45,10 +45,16 @@ def create_layers(top_layer, transform=None, refdef=None):
         layer_name = layer_dict["name"]
         layers[layer_name] = {}
 
+        # Create the primary layers ('top', 'bottom')
+        # These have no 'style_class' or 'style'
         el = layers[layer_name]["layer"] = create_layer(
-            top_layer, layer_name, transform, None, refdef
+            parent=parent_el,
+            name=layer_name,
+            transform=transform,
+            style_class=None,
+            refdef=refdef,
         )
-        el.set(f"{{{ns_pcm}}}pcb-layer", layer_name)
+        el.set(f"{{{ns_pcm}}}pcb-layer", layer_name) # PCBmodE name
 
         sheets = layer_dict["stack"]
         if layer_type == "signal-layer-surface":
@@ -64,23 +70,6 @@ def create_layers(top_layer, transform=None, refdef=None):
             sheet_type = sheet["type"]
             sheet_name = sheet["name"]
 
-            # # Set default style for this sheet
-            # try:
-            #     style = utils.dictToStyleText(
-            #         config.stl["layout"][sheet_type]["default"][layer_name]
-            #     )
-            # except:
-            #     # A stylesheet may define one style for any sheet type
-            #     # or a specific style for multiple layers of the same
-            #     # type. If, for example, a specific style for
-            #     # 'internal-2' cannot be found, PCBmodE will default
-            #     # to the general definition for this type of sheet
-            #     style = utils.dictToStyleText(
-            #         config.stl["layout"][sheet_type]["default"][
-            #             layer_name.split("-")[0]
-            #         ]
-            #     )
-
             if layer_control[sheet_type]["hide"] == True:
                 style = "display:none;"
             else:
@@ -91,8 +80,8 @@ def create_layers(top_layer, transform=None, refdef=None):
             tmp = layers[layer_name]
             tmp[sheet_type] = {}
             el = tmp[sheet_type]["layer"] = create_layer(
-                parent_layer=tmp["layer"],
-                layer_name=sheet_name,
+                parent=tmp["layer"],
+                name=sheet_name,
                 transform=None,
                 style_class=f"{layer_name}-{sheet_type}",
                 refdef=refdef,
@@ -110,19 +99,6 @@ def create_layers(top_layer, transform=None, refdef=None):
                 conductor_types = ["routing", "pads", "pours"]
 
                 for cond_type in conductor_types:
-
-                    # try:
-                    #     style = utils.dictToStyle(
-                    #         config.stl["layout"]["conductor"][cond_type].get(layer_name)
-                    #     )
-                    # except:
-                    #     # See comment above for rationalle
-                    #     style = utils.dictToStyleText(
-                    #         config.stl["layout"]["conductor"][cond_type][
-                    #             layer_name.split("-")[0]
-                    #         ]
-                    #     )
-
                     if layer_control["conductor"][cond_type]["hide"] == True:
                         style = "display:none;"
                     else:
@@ -130,8 +106,8 @@ def create_layers(top_layer, transform=None, refdef=None):
 
                     tmp2[cond_type] = {}
                     el = tmp2[cond_type]["layer"] = create_layer(
-                        parent_layer=tmp2["layer"],
-                        layer_name=cond_type,
+                        parent=tmp2["layer"],
+                        name=cond_type,
                         transform=None,
                         style_class=layer_name,
                         refdef=refdef,
@@ -148,10 +124,11 @@ def create_layers(top_layer, transform=None, refdef=None):
             style = "display:none;"
         else:
             style = None
+
         layers[info_layer] = {}
         el = layers[info_layer]["layer"] = create_layer(
-            parent_layer=top_layer,
-            layer_name=info_layer,
+            parent=parent_el,
+            name=info_layer,
             transform=transform,
             style_class=info_layer,
             refdef=refdef,
@@ -163,18 +140,16 @@ def create_layers(top_layer, transform=None, refdef=None):
     return layers
 
 
-def create_layer(
-    parent_layer, layer_name, transform=None, style_class=None, refdef=None
-):
+def create_layer(parent, name, transform=None, style_class=None, refdef=None):
     """
     Create and return an Inkscape SVG layer 
     """
 
     ns_ink = config.cfg["ns"]["inkscape"]
 
-    new_layer = et.SubElement(parent_layer, "g")
+    new_layer = et.SubElement(parent, "g")
     new_layer.set(f"{{{ns_ink}}}groupmode", "layer")
-    new_layer.set(f"{{{ns_ink}}}label", layer_name)
+    new_layer.set(f"{{{ns_ink}}}label", name)
     if transform is not None:
         new_layer.set("transform", transform)
     if style_class is not None:
