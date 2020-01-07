@@ -44,15 +44,15 @@ class Component:
         if self._layer == "bottom":
             self._rotate *= -1
 
-        self._rotate_point = utils.toPoint(component.get("rotate-point") or [0, 0])
-        self._scale = component.get("scale") or 1
-        self._location = component.get("location") or [0, 0]
+        self._rotate_point = utils.toPoint(component.get("rotate-point",[0, 0]))
+        self._scale = component.get("scale", 1)
+        self._location = component.get("location", [0, 0])
 
         # Get footprint definition and shapes
         try:
             self._footprint_name = component["footprint"]
         except:
-            msg.error("Cannot find a 'footprint' name for refdef %s." % refdef)
+            msg.error(f"Cannot find a 'footprint' name for refdef {refdef}.")
 
         filename = self._footprint_name + ".json"
 
@@ -77,7 +77,7 @@ class Component:
             )
 
         footprint = Footprint(footprint_dict)
-        footprint_shapes = footprint.getShapes()
+        footprint_shapes = footprint.get_shapes()
 
         # ------------------------------------------------
         # Apply component-specific modifiers to footprint

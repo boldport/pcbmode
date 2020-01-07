@@ -47,24 +47,24 @@ class Footprint:
             "drills": {},
         }
 
-        self._processPins()
-        self._processPours()
-        self._processShapes()
-        self._processAssemblyShapes()
+        self._process_pins()
+        self._process_pours()
+        self._process_shapes()
+        self._process_assembly_shapes()
 
-    def getShapes(self):
+    def get_shapes(self):
         return self._shapes
 
-    def _processPins(self):
+    def _process_pins(self):
         """
         Converts pins into 'shapes'
         """
 
-        pins = self._footprint.get("pins") or {}
+        pins = self._footprint.get("pins", {})
 
         for pin in pins:
 
-            pin_location = pins[pin]["layout"]["location"] or [0, 0]
+            pin_location = pins[pin]["layout"].get("location", [0, 0])
 
             try:
                 pad_name = pins[pin]["layout"]["pad"]
@@ -77,11 +77,11 @@ class Footprint:
                 pad_dict = self._footprint["pads"][pad_name]
             except KeyError:
                 msg.error(
-                    "There doesn't seem to be a pad definition for pad '%s'." % pad_name
+                    f"There doesn't seem to be a pad definition for pad '{pad_name}'."
                 )
 
             # Get the pin's rotation, if any
-            pin_rotate = pins[pin]["layout"].get("rotate") or 0
+            pin_rotate = pins[pin]["layout"].get("rotate", 0)
 
             shapes = pad_dict.get("shapes") or []
 
@@ -93,7 +93,7 @@ class Footprint:
                 layers = utils.getExtendedLayerList(shape_dict.get("layers") or ["top"])
 
                 # Add the pin's location to the pad's location
-                shape_location = shape_dict.get("location") or [0, 0]
+                shape_location = shape_dict.get("location", [0, 0])
                 shape_dict["location"] = [
                     shape_location[0] + pin_location[0],
                     shape_location[1] + pin_location[1],
@@ -103,9 +103,9 @@ class Footprint:
                 shape_dict["rotate"] = (shape_dict.get("rotate") or 0) + pin_rotate
 
                 # Determine if and which label to show
-                show_name = pins[pin]["layout"].get("show-label") or True
+                show_name = pins[pin]["layout"].get("show-label", True)
                 if show_name == True:
-                    pin_label = pins[pin]["layout"].get("label") or pin
+                    pin_label = pins[pin]["layout"].get("label", pin)
 
                 for layer in layers:
 
@@ -185,12 +185,12 @@ class Footprint:
                             for sdict_ in sdict_list:
                                 sdict = sdict_.copy()
                                 shape_loc = utils.toPoint(
-                                    sdict.get("location") or [0, 0]
+                                    sdict.get("location", [0, 0])
                                 )
 
                                 # Apply rotation
                                 sdict["rotate"] = (
-                                    sdict.get("rotate") or 0
+                                    sdict.get("rotate", 0)
                                 ) + pin_rotate
 
                                 # Rotate location
@@ -233,7 +233,7 @@ class Footprint:
                 else:
                     self._shapes["drills"]["top"] = [shape]
 
-    def _processPours(self):
+    def _process_pours(self):
         """
         """
 
@@ -254,7 +254,7 @@ class Footprint:
                 else:
                     self._shapes["pours"][layer] = [shape]
 
-    def _processShapes(self):
+    def _process_shapes(self):
         """
         """
 
@@ -284,7 +284,7 @@ class Footprint:
                     else:
                         self._shapes[sheet][layer] = [shape]
 
-    def _processAssemblyShapes(self):
+    def _process_assembly_shapes(self):
         """
         """
         try:

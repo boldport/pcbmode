@@ -344,7 +344,7 @@ class Module:
 
                 there_are_pours = utils.checkForPoursInLayer(pcb_layer)
 
-                # Copper
+                # Conductor
                 shapes = shapes_dict["conductor"].get(pcb_layer, [])
 
                 if len(shapes) > 0:
@@ -357,7 +357,7 @@ class Module:
 
                     shape_group = et.SubElement(svg_layer, "g", transform=transform)
 
-                    shape_group.set(f"{{{ns_pcb}}}type", component_type)
+                    shape_group.set(f"{{{ns_pcm}}}type", component_type)
                     # Add the reference designator as well if it's a
                     # 'component'
                     if component_type == "component":
