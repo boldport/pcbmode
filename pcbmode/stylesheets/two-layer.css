@@ -6,15 +6,69 @@
   stroke: none;
 }
 
-/* */
+/* Info layers - single */
+.origin {
+  stroke: #555555;
+  stroke-width: 0.05;
+  stroke-opacity: 1;
+  fill: none;
+}
 .outline {
   stroke: #555555;
   fill: #555555;
   stroke-opacity: 1;
   fill-opacity: 1;
 }
+.dimensions {
+  fill: #555555;
+  stroke: #555555;
+  stroke-opacity: 1;
+  fill-opacity: 1;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  font-family: "UbuntuMono-R-webfont";
+  font-size: 1.5mm;
+  line-height: 1mm;
+  letter-spacing: 0mm;
+}
+.drills {
+  fill: #444444;
+  fill-opacity: 0.6;
+  stroke: none;
+  fill-rule: evenodd;
+}
 
-/* */
+/* Info layers - multiple layers*/
+.top-placement {
+  stroke: #444444;
+  fill: none;
+  stroke-opacity: 0.5;
+  stroke-width: 0.03;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.bottom-placement {
+  stroke: #444444;
+  fill: none;
+  stroke-opacity: 0.5;
+  stroke-width: 0.03;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.top-assembly {
+  stroke: #009999;
+  fill: #009999;
+  stroke-opacity: 0.6;
+  fill-opacity: 0.6;
+}
+.bottom-assembly {
+  stroke: #ff7400;
+  fill: #ff7400;
+  stroke-opacity: 0.6;
+  fill-opacity: 0.6;
+}
+
+/* Physical layers */
 .top-routing {
   fill: #008500;
   stroke: #008500;
@@ -31,17 +85,9 @@
   stroke-linejoin: round;
   stroke-linecap: round;
 }
-.top-assembly {
-  stroke: #009999;
-  fill: #009999;
-  stroke-opacity: 0.6;
-  fill-opacity: 0.6;
+.top-pads {
 }
-.bottom-assembly {
-  stroke: #ff7400;
-  fill: #ff7400;
-  stroke-opacity: 0.6;
-  fill-opacity: 0.6;
+.bottom-pads {
 }
 .top-pours {
   fill-opacity: 0.2;
@@ -95,22 +141,27 @@
   stroke-opacity: 0.6;
   fill-opacity: 0.6;
 }
-.placement-top {
-  stroke: #444444;
-  fill: none;
-  stroke-opacity: 0.5;
-  stroke-width: 0.03;
-  stroke-linejoin: round;
-  stroke-linecap: round;
+
+
+
+.pads-labels {
+  font-size: 0.1px;
+  font-style: normal;
+  font-variant: normal;
+  font-weight: bold;
+  font-stretch: normal;
+  text-align: center;
+  line-height: 100%;
+  letter-spacing: 0;
+  word-spacing: 0;
+  writing-mode: lr-tb;
+  text-anchor: middle;
+  fill: #f3ff00;
+  fill-opacity: 1;
+  stroke: none;
+  font-family: "Sans serif";
 }
-.placement-bottom {
-  stroke: #444444;
-  fill: none;
-  stroke-opacity: 0.5;
-  stroke-width: 0.03;
-  stroke-linejoin: round;
-  stroke-linecap: round;
-}
+
 
 /* */
 .assembly-refdef {
@@ -154,12 +205,6 @@
   line-height: 1.5mm;
 }
 
-.drills {
-  fill: #444444;
-  fill-opacity: 0.6;
-  stroke: none;
-  fill-rule: evenodd;
-}
 .placement-text {
   font-size: 0.1px;
   font-style: normal;
@@ -177,28 +222,7 @@
   stroke: none;
   font-family: Sans serif;
 }
-.dimensions-arrow {
-  stroke: #555555;
-  stroke-opacity: 1;
-  stroke-width: 0.2;
-  fill: none;
-  stroke-linejoin: round;
-  stroke-linecap: round;
-}
-.dimensions-text {
-  font-family: "UbuntuMono-R-webfont";
-  fill: #555555;
-  font-size: 1.5mm;
-  line-height: 1mm;
-  letter-spacing: 0mm;
-  stroke: none;
-}
-.origin {
-  stroke: #555555;
-  stroke-width: 0.05;
-  stroke-opacity: 1;
-  fill: none;
-}
+
 .drill-index {
   fill: #111111;
   fill-opacity: 0.8;
@@ -228,26 +252,3 @@
   line-height: 1.2mm;
 }
 
-.pads-top {
-  stroke: none;
-}
-.pads-bottom {
-  stroke: none;
-}
-.pads-labels {
-  font-size: 0.1px;
-  font-style: normal;
-  font-variant: normal;
-  font-weight: bold;
-  font-stretch: normal;
-  text-align: center;
-  line-height: 100%;
-  letter-spacing: 0;
-  word-spacing: 0;
-  writing-mode: lr-tb;
-  text-anchor: middle;
-  fill: #f3ff00;
-  fill-opacity: 1;
-  stroke: none;
-  font-family: "Sans serif";
-}
