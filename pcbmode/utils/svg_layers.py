@@ -28,6 +28,9 @@ def create_layers(top_layer, transform=None, refdef=None):
     Returns a dictionary of layer instantiations.
     """
 
+    ns_pcm = config.cfg["ns"]["pcbmode"]
+    ns_sp = config.cfg["ns"]["sodipodi"]
+
     layer_control = config.cfg["layer-control"]
 
     # Holds SVG layers
@@ -44,9 +47,7 @@ def create_layers(top_layer, transform=None, refdef=None):
         element = layers[layer_name]["layer"] = create_layer(
             top_layer, layer_name, transform, None, refdef
         )
-        element.set(
-            "{" + config.cfg["ns"]["pcbmode"] + "}%s" % ("pcb-layer"), layer_name
-        )
+        element.set(f"{{{ns_pcm}}}pcb-layer", layer_name)
 
         sheets = layer_dict["stack"]
         if layer_type == "signal-layer-surface":
@@ -96,11 +97,9 @@ def create_layers(top_layer, transform=None, refdef=None):
                 refdef=refdef,
             )
 
-            element.set(
-                "{" + config.cfg["ns"]["pcbmode"] + "}%s" % ("sheet"), sheet_type
-            )
+            element.set(f"{{{ns_pcm}}}sheet", sheet_type)
             if layer_control[sheet_type]["lock"] == True:
-                element.set("{" + config.cfg["ns"]["sodipodi"] + "}insensitive", "true")
+                element.set(f"{{{ns_sp}}}insensitive", "true")
 
             # A PCB layer of type 'conductor' is best presented in
             # seperate sub-layers of 'pours', 'pads', and
@@ -137,14 +136,10 @@ def create_layers(top_layer, transform=None, refdef=None):
                         refdef=refdef,
                     )
 
-                    element.set(
-                        "{" + config.cfg["ns"]["pcbmode"] + "}%s" % ("sheet"), cond_type
-                    )
+                    element.set(f"{{{ns_pcm}}}sheet", cond_type)
 
                     if layer_control["conductor"][cond_type]["lock"] == True:
-                        element.set(
-                            "{" + config.cfg["ns"]["sodipodi"] + "}insensitive", "true"
-                        )
+                        element.set(f"{{{ns_sp}}}insensitive", "true")
 
     for info_layer in ["origin", "dimensions", "outline", "drills", "documentation"]:
         # style = utils.dictToStyleText(config.stl["layout"][info_layer].get("default"))
@@ -160,9 +155,9 @@ def create_layers(top_layer, transform=None, refdef=None):
             style_class=info_layer,
             refdef=refdef,
         )
-        element.set("{" + config.cfg["ns"]["pcbmode"] + "}%s" % ("sheet"), info_layer)
+        element.set(f"{{{ns_pcm}}}sheet", info_layer)
         if layer_control[info_layer]["lock"] == True:
-            element.set("{" + config.cfg["ns"]["sodipodi"] + "}insensitive", "true")
+            element.set(f"{{{ns_sp}}}insensitive", "true")
 
     return layers
 
