@@ -40,12 +40,10 @@ def create_layers(parent_el, transform=None, refdef=None):
     # order so that Inkscape shows them in the 'correct' order.
     for layer_dict in reversed(config.stk["layers-dict"]):
 
-        layer_type = layer_dict["type"]
-
-        layer_name = layer_dict["name"]
+        layer_name = layer_dict["name"]       
         layers[layer_name] = {}
 
-        # Create the primary layers ('top', 'bottom')
+        # Create the primary layers ('top', 'bottom', etc.)
         # These have no 'style_class' or 'style'
         el = layers[layer_name]["layer"] = create_layer(
             parent=parent_el,
@@ -54,22 +52,17 @@ def create_layers(parent_el, transform=None, refdef=None):
             style_class=None,
             refdef=refdef,
         )
-        el.set(f"{{{ns_pcm}}}pcb-layer", layer_name) # PCBmodE name
+        el.set(f"{{{ns_pcm}}}pcb-layer", layer_name)
 
+        # Each PCB layer is composed of 'sheets' (silkscreen, soldermask, etc.)
+        # but also 'solderpaste' and 'assembly' and even 'placement' are part of
+        # the stackup, which is defined in the chosen stack JSON.
         sheets = layer_dict["stack"]
-        if layer_type == "signal-layer-surface":
-            placement_dict = [{"name": "placement", "type": "placement"}]
-            assembly_dict = [{"name": "assembly", "type": "assembly"}]
-            solderpaste_dict = [{"name": "solderpaste", "type": "solderpaste"}]
-
-            # Layer appear in Inkscape first/top to bottom/last
-            sheets = placement_dict + assembly_dict + solderpaste_dict + sheets
 
         for sheet in reversed(sheets):
 
             sheet_type = sheet["type"]
-            sheet_name = sheet["name"]
-
+ 
             if layer_control[sheet_type]["hide"] == True:
                 style = "display:none;"
             else:
@@ -79,15 +72,17 @@ def create_layers(parent_el, transform=None, refdef=None):
 
             tmp = layers[layer_name]
             tmp[sheet_type] = {}
+ 
             el = tmp[sheet_type]["layer"] = create_layer(
                 parent=tmp["layer"],
-                name=sheet_name,
+                name=sheet["name"],
                 transform=None,
                 style_class=f"{layer_name}-{sheet_type}",
                 refdef=refdef,
             )
 
             el.set(f"{{{ns_pcm}}}sheet", sheet_type)
+ 
             if layer_control[sheet_type]["lock"] == True:
                 el.set(f"{{{ns_sp}}}insensitive", "true")
 
