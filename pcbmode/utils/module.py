@@ -92,10 +92,10 @@ class Module:
 
         self._place_outline()
         self._place_outline_dims()
-        self._placeComponents(components=self._components, component_type="component")
+        self._place_components(components=self._components, component_type="component")
         self._place_routing()
-        self._placeComponents(components=self._vias, component_type="via")
-        self._placeComponents(components=self._shapes, component_type="shape")
+        self._place_components(components=self._vias, component_type="via")
+        self._place_components(components=self._shapes, component_type="shape")
 
         if config.cfg["create"]["docs"] == True:
             self._placeDocs()
@@ -312,7 +312,7 @@ class Module:
         place.placeShape(width_arrow, group)
         place.placeShape(height_arrow, group)
 
-    def _placeComponents(self, components, component_type):
+    def _place_components(self, components, component_type):
         """
         Places the component on the board.
 
