@@ -281,10 +281,13 @@ class Shape:
     def getDiameter(self):
         return self._diameter
 
-    def setLabel(self, label):
+    def set_label(self, label):
         self._label = label
 
-    def getLabel(self):
+    def set_label_style_class(self, new_style_class):
+        self._label_style_class = new_style_class
+
+    def get_label(self):
         return self._label
 
     def getMirrorPlacement(self):

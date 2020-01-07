@@ -377,7 +377,7 @@ class Module:
 
                         # Add pin labels
                         # TODO: This isn't perfect, but good enough for now
-                        label = shape.getLabel()
+                        label = shape.get_label()
                         if label != None:
                             label_location = shape.getLocation()
                             label_rotation = shape.getRotation()

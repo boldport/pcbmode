@@ -78,7 +78,7 @@ def create_layers(parent_el, transform=None, refdef=None):
                         parent=layers[layer_name]["conductor"]["layer"],
                         name=cond_type,
                         transform=None,
-                        style_class=layer_name,
+                        style_class=f"{layer_name}-{sheet_type}-{cond_type}",
                         refdef=refdef,
                         pcbmode_prop="sheet",
                         pcbmode_value=cond_type,
