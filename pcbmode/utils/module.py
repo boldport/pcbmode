@@ -254,7 +254,9 @@ class Module:
         # Create text shapes
         shape_dict = {}
         shape_dict["type"] = "text"
-        style_class = "dimensions-text"
+
+        # Where to get properties from
+        style_class = "dimensions"
 
         shape_dict["font-family"] = css_utils.get_prop(
             config.stl["layout"], style_class, "font-family"
@@ -277,7 +279,6 @@ class Module:
         width_text_dict = shape_dict.copy()
         width_text_dict["value"] = f"{round(self._width, 2)} mm"
         width_text_dict["location"] = width_loc
-        width_text_dict["style_class"] = "dimensions-text"
         width_text = Shape(width_text_dict)
 
         # Height text
@@ -285,7 +286,6 @@ class Module:
         height_text_dict["value"] = f"{round(self._height, 2)} mm"
         height_text_dict["rotate"] = -90
         height_text_dict["location"] = height_loc
-        height_text_dict["style_class"] = "dimensions-text"
         height_text = Shape(height_text_dict)
 
         # Width arrow
@@ -293,7 +293,7 @@ class Module:
         shape_dict["type"] = "path"
         shape_dict["value"] = make_arrow(self._width, width_text.getWidth() * 1.5)
         shape_dict["location"] = width_loc
-        shape_dict["style_class"] = "dimensions-arrow"
+        shape_dict['style'] = 'stroke-width:0.2;'
         width_arrow = Shape(shape_dict)
 
         # Height arrow
@@ -302,7 +302,7 @@ class Module:
         shape_dict["value"] = make_arrow(self._height, height_text.getHeight() * 1.5)
         shape_dict["rotate"] = -90
         shape_dict["location"] = height_loc
-        shape_dict["style_class"] = "dimensions-arrow"
+        shape_dict['style'] = 'stroke-width:0.2;'
         height_arrow = Shape(shape_dict)
 
         svg_layer = self._layers["dimensions"]["layer"]
