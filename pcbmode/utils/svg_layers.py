@@ -31,23 +31,24 @@ def create_layers(top_layer, transform=None, refdef=None):
     ns_pcm = config.cfg["ns"]["pcbmode"]
     ns_sp = config.cfg["ns"]["sodipodi"]
 
+    # Contains whether to show, place, or lock each layer
     layer_control = config.cfg["layer-control"]
 
-    # Holds SVG layers
     layers = {}
 
-    # Create layers for top and bottom PCB layers
+    # Create layers for the PCB according to the stackup. We need to reverse the
+    # order so that Inkscape shows them in the 'correct' order.
     for layer_dict in reversed(config.stk["layers-dict"]):
 
         layer_type = layer_dict["type"]
-        layer_name = layer_dict["name"]
 
-        # create SVG layer for PCB layer
+        layer_name = layer_dict["name"]
         layers[layer_name] = {}
-        element = layers[layer_name]["layer"] = create_layer(
+
+        el = layers[layer_name]["layer"] = create_layer(
             top_layer, layer_name, transform, None, refdef
         )
-        element.set(f"{{{ns_pcm}}}pcb-layer", layer_name)
+        el.set(f"{{{ns_pcm}}}pcb-layer", layer_name)
 
         sheets = layer_dict["stack"]
         if layer_type == "signal-layer-surface":
@@ -89,7 +90,7 @@ def create_layers(top_layer, transform=None, refdef=None):
 
             tmp = layers[layer_name]
             tmp[sheet_type] = {}
-            element = tmp[sheet_type]["layer"] = create_layer(
+            el = tmp[sheet_type]["layer"] = create_layer(
                 parent_layer=tmp["layer"],
                 layer_name=sheet_name,
                 transform=None,
@@ -97,9 +98,9 @@ def create_layers(top_layer, transform=None, refdef=None):
                 refdef=refdef,
             )
 
-            element.set(f"{{{ns_pcm}}}sheet", sheet_type)
+            el.set(f"{{{ns_pcm}}}sheet", sheet_type)
             if layer_control[sheet_type]["lock"] == True:
-                element.set(f"{{{ns_sp}}}insensitive", "true")
+                el.set(f"{{{ns_sp}}}insensitive", "true")
 
             # A PCB layer of type 'conductor' is best presented in
             # seperate sub-layers of 'pours', 'pads', and
@@ -128,7 +129,7 @@ def create_layers(top_layer, transform=None, refdef=None):
                         style = None
 
                     tmp2[cond_type] = {}
-                    element = tmp2[cond_type]["layer"] = create_layer(
+                    el = tmp2[cond_type]["layer"] = create_layer(
                         parent_layer=tmp2["layer"],
                         layer_name=cond_type,
                         transform=None,
@@ -136,10 +137,10 @@ def create_layers(top_layer, transform=None, refdef=None):
                         refdef=refdef,
                     )
 
-                    element.set(f"{{{ns_pcm}}}sheet", cond_type)
+                    el.set(f"{{{ns_pcm}}}sheet", cond_type)
 
                     if layer_control["conductor"][cond_type]["lock"] == True:
-                        element.set(f"{{{ns_sp}}}insensitive", "true")
+                        el.set(f"{{{ns_sp}}}insensitive", "true")
 
     for info_layer in ["origin", "dimensions", "outline", "drills", "documentation"]:
         # style = utils.dictToStyleText(config.stl["layout"][info_layer].get("default"))
@@ -148,16 +149,16 @@ def create_layers(top_layer, transform=None, refdef=None):
         else:
             style = None
         layers[info_layer] = {}
-        element = layers[info_layer]["layer"] = create_layer(
+        el = layers[info_layer]["layer"] = create_layer(
             parent_layer=top_layer,
             layer_name=info_layer,
             transform=transform,
             style_class=info_layer,
             refdef=refdef,
         )
-        element.set(f"{{{ns_pcm}}}sheet", info_layer)
+        el.set(f"{{{ns_pcm}}}sheet", info_layer)
         if layer_control[info_layer]["lock"] == True:
-            element.set(f"{{{ns_sp}}}insensitive", "true")
+            el.set(f"{{{ns_sp}}}insensitive", "true")
 
     return layers
 
