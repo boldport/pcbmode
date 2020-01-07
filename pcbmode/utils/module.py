@@ -31,6 +31,7 @@ from pcbmode.utils import utils
 from pcbmode.utils import place
 from pcbmode.utils import inkscape_svg
 from pcbmode.utils import css_utils
+from pcbmode.utils import svg_layers
 from pcbmode.utils.shape import Shape
 from pcbmode.utils.style import Style
 from pcbmode.utils.component import Component
@@ -73,7 +74,7 @@ class Module:
         svg_doc = et.ElementTree(self._module)
 
         # Get a dictionary of SVG layers
-        self._layers = svg.make_svg_layers(self._module, self._transform)
+        self._layers = svg_layers.create_layers(self._module, self._transform)
 
         # Add a 'defs' element:
         #   http://www.w3.org/TR/SVG/struct.html#Head
