@@ -5,6 +5,18 @@
       "type": "signal-layer-surface",
       "stack": [
         {
+          "type": "placement",
+          "name": "placement"
+        },
+        {
+          "type": "assembly",
+          "name": "assembly"
+        },
+        {
+          "type": "solderpaste",
+          "name": "solderpaste"
+        },
+        {
           "type": "silkscreen",
           "name": "silkscreen"
         },
@@ -44,8 +56,20 @@
         {
           "type": "silkscreen",
           "name": "silkscreen"
+        },
+        {
+          "type": "solderpaste",
+          "name": "solderpaste"
+        },
+        {
+          "type": "assembly",
+          "name": "assembly"
+        },
+        {
+          "type": "placement",
+          "name": "placement"
         }
       ]
     }
-  ] 
+  ]
 }
