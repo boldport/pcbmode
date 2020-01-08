@@ -40,9 +40,8 @@ class Shape:
         # sense to me. This should be the only place to make the change.
         self._inv_rotate = -1
 
-        # A general purpose label field
-        self._label = None
-
+        self._label = shape.get("label", None) 
+        self._label_style_class = shape.get("label_style_class", None)
         self._shape_dict = shape
         self._gerber_lp = shape.get("gerber-lp") or shape.get("gerber_lp") or None
         self._place_mirrored = shape.get("mirror") or False
@@ -75,7 +74,8 @@ class Shape:
 
     def _get_path_from_shape_type(self):
         """
-        There are various shape types. Here we create an SVG path from the shape type and parameters provided by the shape dict.
+        There are various shape types. Here we create an SVG path from the shape type
+        and parameters provided by the shape dict.
         """
 
         try:
@@ -218,9 +218,6 @@ class Shape:
                 mirror,
             )
 
-    def rotateLocation(self, angle, point=Point()):
-        self._location.rotate(angle, point)
-
     def get_style_class(self):
         return self._style_class
 
@@ -232,6 +229,21 @@ class Shape:
 
     def get_style(self):
         return self._style
+
+    def set_label(self, label):
+        self._label = label
+
+    def set_label_style_class(self, new_style_class):
+        self._label_style_class = new_style_class
+
+    def get_label_style_class(self):
+        return self._label_style_class
+
+    def get_label(self):
+        return self._label
+
+    def rotateLocation(self, angle, point=Point()):
+        self._location.rotate(angle, point)
 
     def getRotation(self):
         return self._rotate
@@ -280,15 +292,6 @@ class Shape:
 
     def getDiameter(self):
         return self._diameter
-
-    def set_label(self, label):
-        self._label = label
-
-    def set_label_style_class(self, new_style_class):
-        self._label_style_class = new_style_class
-
-    def get_label(self):
-        return self._label
 
     def getMirrorPlacement(self):
         return self._place_mirrored

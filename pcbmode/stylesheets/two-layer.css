@@ -37,6 +37,23 @@
   stroke: none;
   fill-rule: evenodd;
 }
+.pad-labels {
+  font-size: 0.1px;
+  font-style: normal;
+  font-variant: normal;
+  font-weight: bold;
+  font-stretch: normal;
+  text-align: center;
+  line-height: 100%;
+  letter-spacing: 0;
+  word-spacing: 0;
+  writing-mode: lr-tb;
+  text-anchor: middle;
+  fill: #f3ff00;
+  fill-opacity: 1;
+  stroke: none;
+  font-family: "Sans serif";  
+}
 
 /* Info layers - multiple layers*/
 .top-placement {
@@ -86,38 +103,8 @@
   stroke-linecap: round;
 }
 .top-conductor-pads {
-  font-size: 0.1px;
-  font-style: normal;
-  font-variant: normal;
-  font-weight: bold;
-  font-stretch: normal;
-  text-align: center;
-  line-height: 100%;
-  letter-spacing: 0;
-  word-spacing: 0;
-  writing-mode: lr-tb;
-  text-anchor: middle;
-  fill: #f3ff00;
-  fill-opacity: 1;
-  stroke: none;
-  font-family: "Sans serif";  
 }
 .bottom-conductor-pads {
-  font-size: 0.1px;
-  font-style: normal;
-  font-variant: normal;
-  font-weight: bold;
-  font-stretch: normal;
-  text-align: center;
-  line-height: 100%;
-  letter-spacing: 0;
-  word-spacing: 0;
-  writing-mode: lr-tb;
-  text-anchor: middle;
-  fill: #f3ff00;
-  fill-opacity: 1;
-  stroke: none;
-  font-family: "Sans serif";  
 }
 .top-pours {
   fill-opacity: 0.2;

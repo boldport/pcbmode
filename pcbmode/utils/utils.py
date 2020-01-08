@@ -603,11 +603,11 @@ def getStyleAttrib(style, attrib):
         return match.group("s")
 
 
-def niceFloat(f):
+def pretty_num(f, sig_dig=6):
     if f.is_integer():
         return int(f)
     else:
-        return round(f, 6)
+        return round(f, sig_dig)
 
 
 def parseTransform(transform):

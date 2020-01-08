@@ -62,6 +62,7 @@ class Footprint:
 
         pins = self._footprint.get("pins", {})
 
+        
         for pin in pins:
 
             pin_location = pins[pin]["layout"].get("location", [0, 0])
@@ -79,6 +80,8 @@ class Footprint:
                 msg.error(
                     f"There doesn't seem to be a pad definition for pad '{pad_name}'."
                 )
+
+
 
             # Get the pin's rotation, if any
             pin_rotate = pins[pin]["layout"].get("rotate", 0)
@@ -102,20 +105,24 @@ class Footprint:
                 # Add the pin's rotation to the pad's rotation
                 shape_dict["rotate"] = (shape_dict.get("rotate") or 0) + pin_rotate
 
-                # Determine if and which label to show
-                show_name = pins[pin]["layout"].get("show-label", True)
-                if show_name == True:
-                    pin_label = pins[pin]["layout"].get("label", pin)
-
                 for layer in layers:
 
-                    shape = Shape(shape_dict)
+                    pad_shape = Shape(shape_dict)
 
+                    # Add the label to the shape instance and not to the dict so
+                    # theat is doesn't propegate to the other derived shapes later on
+                    show_label = pins[pin]["layout"].get("show-label", True)
+                    if show_label is True:
+                        # Use 'label' or default to the pin name
+                        pad_shape.set_label(pins[pin]["layout"].get("label", pin))
+                        pad_shape.set_label_style_class('pad-labels')
+
+                    # Add the exact shape to the conductor layer shapes
                     if layer in self._shapes["conductor"]:
-                        self._shapes["conductor"][layer].append(shape)
+                        self._shapes["conductor"][layer].append(pad_shape)
                     else:
-                        self._shapes["conductor"][layer] = [shape]
-
+                        self._shapes["conductor"][layer] = [pad_shape]
+    
                     for stype in ["soldermask", "solderpaste"]:
 
                         # Get a custom shape specification if it exists
@@ -128,12 +135,12 @@ class Footprint:
                             sdict = shape_dict.copy()
 
                             # Which shape type is the pad?
-                            shape_type = shape.getType()
+                            shape_type = pad_shape.getType()
 
                             # Apply modifier based on shape type
                             if shape_type == "path":
                                 sdict["scale"] = (
-                                    shape.getScale()
+                                    pad_shape.getScale()
                                     * config.cfg["distances"][stype]["path-scale"]
                                 )
                             elif shape_type in ["rect", "rectangle"]:
@@ -152,12 +159,6 @@ class Footprint:
 
                             # Create shape based on new dictionary
                             sshape = Shape(sdict)
-
-                            # Define style
-                            #                            sstyle = Style(sdict, stype)
-
-                            # Apply style
-                            #                            sshape.setStyle(sstyle)
 
                             # Add shape to footprint's shape dictionary
                             # self._shapes[stype][layer].append(sshape)
@@ -205,11 +206,6 @@ class Footprint:
                                 else:
                                     self._shapes[stype][layer] = [sshape]
 
-                    # Add pin label
-                    if pin_label != None:
-                        shape.set_label(pin_label)
-                        #shape.set_style_class()
-
             drills = pad_dict.get("drills") or []
             for drill_dict in drills:
                 drill_dict = drill_dict.copy()
@@ -242,7 +238,7 @@ class Footprint:
             for layer in layers:
                 shape = Shape(shape_dict)
                 style = Style(shape_dict, "conductor", "pours")
-                shape.setStyle(style)
+                shape.set_style(style)
 
                 if layer in self._shapes["pours"]:
                     self._shapes["pours"][layer].append(shape)

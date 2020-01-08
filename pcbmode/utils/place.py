@@ -41,8 +41,8 @@ def placeShape(shape, svg_layer, invert=False, original=False):
 
     if original == False:
         translate = "translate(%s,%s)" % (
-            round((((1, -1)[invert]) * location.x), sig_dig),
-            round(location.y * config.cfg["iya"], sig_dig),
+            utils.pretty_num((((1, -1)[invert]) * location.x), sig_dig),
+            utils.pretty_num(location.y * config.cfg["iya"], sig_dig),
         )
         transform = translate
     else:
@@ -62,9 +62,30 @@ def placeShape(shape, svg_layer, invert=False, original=False):
     if style_class is not None:
         el.set("class", style_class)
 
+    style_class = shape.get_style_class()
+    if style_class is not None:
+        el.set("class", style_class)
+
     style = shape.get_style()
     if style is not None:
         el.set("style", style)
+
+    label = shape.get_label()
+    if label is not None:
+        coord_x = str(utils.pretty_num(((1, -1)[invert]) * location.x, sig_dig))
+        coord_y = str(utils.pretty_num(config.cfg["iya"] * location.y, sig_dig))
+        label_el = et.SubElement(
+            svg_layer,
+            "text",
+            x=coord_x,
+            y=coord_y,
+            # rotate against center, not x,y:
+            transform=f"rotate({shape.getRotation()},{coord_x},{coord_y})",
+        )
+        label_el.text = label
+        label_el.set("class", shape.get_label_style_class())
+        label_el.set("text-anchor", "middle")
+        label_el.set("dominant-baseline", "central")
 
     if transform != None:
         el.set("transform", transform)
@@ -76,6 +97,12 @@ def placeShape(shape, svg_layer, invert=False, original=False):
         el.set(f"{{{ns_pcm}}}text", shape.getText())
 
     return el
+
+
+def place_label(shape, parent_el, label_text, label_class):
+    """
+    Add a label to the shape
+    """
 
 
 def placeDrill(drill, layer, location, scale, soldermask_layers={}, mask_groups={}):

@@ -366,30 +366,8 @@ class Module:
                             f"{{{ns_pcm}}}refdef", component.getRefdef(),
                         )
 
-                    # style = utils.dictToStyleText(
-                    #    config.stl["layout"]["conductor"]["pads"]["labels"]
-                    # )
-                    label_group = et.SubElement(shape_group, "g")
-                    # label_group = et.SubElement(shape_group, "g", style=style)
-
                     for shape in shapes:
                         place.placeShape(shape, shape_group, invert)
-
-                        # Add pin labels
-                        # TODO: This isn't perfect, but good enough for now
-                        label = shape.get_label()
-                        if label != None:
-                            label_location = shape.getLocation()
-                            label_rotation = shape.getRotation()
-                            label_transform = f"rotate({label_rotation})" 
-                            t = et.SubElement(
-                                label_group,
-                                "text",
-                                x=str(((1, -1)[invert]) * label_location.x),
-                                y=str(config.cfg["iya"] * label_location.y),
-                                transform=label_transform,
-                            )
-                            t.text = label
 
                         if there_are_pours == True:
                             mask_group = et.SubElement(
