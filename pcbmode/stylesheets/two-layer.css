@@ -1,12 +1,10 @@
-
-/* Canvas background */
 .board {
   fill-opacity: 1;
   fill: #000000;
   stroke: none;
 }
 
-/* Info layers - single */
+
 .origin {
   stroke: #555555;
   stroke-width: 0.05;
@@ -55,7 +53,6 @@
   font-family: "Sans serif";  
 }
 
-/* Info layers - multiple layers*/
 .top-placement {
   stroke: #444444;
   fill: none;
@@ -85,7 +82,6 @@
   fill-opacity: 0.6;
 }
 
-/* Physical layers */
 .top-conductor {
   fill: #008500;
   stroke: #008500;
@@ -102,21 +98,25 @@
   stroke-linejoin: round;
   stroke-linecap: round;
 }
-.top-routing {
+.top-conductor-routing {
+  /* optional */
 }
-.bottom-routing {
+.bottom-conductor-routing {
+  /* optional */
 }
 .top-conductor-pads {
+  /* optional */
 }
 .bottom-conductor-pads {
+  /* optional */
 }
-.top-pours {
+.top-conductor-pours {
   fill-opacity: 0.2;
   stroke-opacity: 0.2;
   stroke-linejoin: round;
   stroke-linecap: round;
 }
-.bottom-pours {
+.bottom-conductor-pours {
   fill-opacity: 0.2;
   stroke-opacity: 0.2;
   stroke-linejoin: round;
@@ -163,7 +163,7 @@
   fill-opacity: 0.6;
 }
 
-/* */
+
 .assembly-refdef {
   font-family: "UbuntuMono-R-webfont";
   font-size: 2mm;
