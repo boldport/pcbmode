@@ -293,7 +293,7 @@ class Module:
         shape_dict["type"] = "path"
         shape_dict["value"] = make_arrow(self._width, width_text.getWidth() * 1.5)
         shape_dict["location"] = width_loc
-        shape_dict['style'] = 'stroke-width:0.2;'
+        shape_dict["style"] = "stroke-width:0.2;"
         width_arrow = Shape(shape_dict)
 
         # Height arrow
@@ -302,7 +302,7 @@ class Module:
         shape_dict["value"] = make_arrow(self._height, height_text.getHeight() * 1.5)
         shape_dict["rotate"] = -90
         shape_dict["location"] = height_loc
-        shape_dict['style'] = 'stroke-width:0.2;'
+        shape_dict["style"] = "stroke-width:0.2;"
         height_arrow = Shape(shape_dict)
 
         svg_layer = self._layers["dimensions"]["layer"]
@@ -386,7 +386,7 @@ class Module:
 
                 if len(shapes) > 0 and svg_layer != None:
                     shape_group = et.SubElement(
-                        svg_layer, "g", mask=f"url(#mask-{pcb_layer})" 
+                        svg_layer, "g", mask=f"url(#mask-{pcb_layer})"
                     )
                     transform = (
                         f"translate({location[0]},{config.cfg['iya']*location[1]})"
@@ -404,7 +404,9 @@ class Module:
                     svg_layer = None
 
                 if len(shapes) > 0 and svg_layer != None:
-                    transform = f"translate({location[0]},{config.cfg['iya']*location[1]})"
+                    transform = (
+                        f"translate({location[0]},{config.cfg['iya']*location[1]})"
+                    )
                     group = et.SubElement(svg_layer, "g", transform=transform)
                     group.set(f"{{{ns_pcm}}}type", "component-shapes")
                     for shape in shapes:
@@ -591,10 +593,6 @@ class Module:
             for route_key in routes.get(pcb_layer, {}):
                 shape_dict = routes[pcb_layer][route_key]
                 shape = Shape(shape_dict)
-                if shape.get_style_class() is None:
-                    shape.set_style_class(
-                        f"routing {pcb_layer}-routing {pcb_layer}-routing-stroke"
-                    )
 
                 # Routes are a special case where they are used as-is
                 # counting on Inkscapes 'optimised' setting to modify
@@ -618,21 +616,6 @@ class Module:
                     route_element.set(
                         f"{{{ns_pcm}}}buffer-to-pour", str(custom_buffer),
                     )
-
-                # TODO: can this be done more elegantly, and "general purpose"?
-                for extra_attrib in extra_attributes:
-                    ea = shape_dict.get(extra_attrib)
-                    if ea is not None:
-                        route_element.set(
-                            "{"
-                            + ns_ink
-                            + "}%s" % (extra_attrib[extra_attrib.index(":") + 1 :], ea)
-                        )
-
-                # TODO: this needs to eventually go away or be done properly
-                pcbmode_params = shape_dict.get("pcbmode")
-                if pcbmode_params is not None:
-                    route_element.set("pcbmode", pcbmode_params)
 
                 if (there_are_pours == True) and (custom_buffer != "0"):
                     self._placeMask(
