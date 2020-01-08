@@ -86,7 +86,7 @@
 }
 
 /* Physical layers */
-.top-routing {
+.top-conductor {
   fill: #008500;
   stroke: #008500;
   fill-opacity: 0.6;
@@ -94,13 +94,17 @@
   stroke-linejoin: round;
   stroke-linecap: round;
 }
-.bottom-routing {
+.bottom-conductor {
   fill: #850000;
   stroke: #850000;
   fill-opacity: 0.6;
   stroke-opacity: 0.6;
   stroke-linejoin: round;
   stroke-linecap: round;
+}
+.top-routing {
+}
+.bottom-routing {
 }
 .top-conductor-pads {
 }
