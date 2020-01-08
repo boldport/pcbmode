@@ -62,7 +62,6 @@ class Footprint:
 
         pins = self._footprint.get("pins", {})
 
-        
         for pin in pins:
 
             pin_location = pins[pin]["layout"].get("location", [0, 0])
@@ -80,8 +79,6 @@ class Footprint:
                 msg.error(
                     f"There doesn't seem to be a pad definition for pad '{pad_name}'."
                 )
-
-
 
             # Get the pin's rotation, if any
             pin_rotate = pins[pin]["layout"].get("rotate", 0)
@@ -115,14 +112,14 @@ class Footprint:
                     if show_label is True:
                         # Use 'label' or default to the pin name
                         pad_shape.set_label(pins[pin]["layout"].get("label", pin))
-                        pad_shape.set_label_style_class('pad-labels')
+                        pad_shape.set_label_style_class("pad-labels")
 
                     # Add the exact shape to the conductor layer shapes
                     if layer in self._shapes["conductor"]:
                         self._shapes["conductor"][layer].append(pad_shape)
                     else:
                         self._shapes["conductor"][layer] = [pad_shape]
-    
+
                     for stype in ["soldermask", "solderpaste"]:
 
                         # Get a custom shape specification if it exists
