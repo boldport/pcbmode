@@ -44,7 +44,7 @@ class Component:
         if self._layer == "bottom":
             self._rotate *= -1
 
-        self._rotate_point = utils.toPoint(component.get("rotate-point",[0, 0]))
+        self._rotate_point = utils.toPoint(component.get("rotate-point", [0, 0]))
         self._scale = component.get("scale", 1)
         self._location = component.get("location", [0, 0])
 
@@ -158,23 +158,11 @@ class Component:
                     config.stl["layout"], f"{sheet}-refdef", "font-family"
                 )
 
-                # refdef_dict["font-family"] = (
-                #     refdef_dict.get("font-family")
-                #     or config.stl["layout"][sheet]["refdef"].get("font-family")
-                #     or config.stl["defaults"]["font-family"]
-                # )
-
                 refdef_dict["font-size"] = css_utils.get_prop(
                     config.stl["layout"], f"{sheet}-refdef", "font-size"
                 )
 
-                #                refdef_dict["font-size"] = (
-                #                    refdef_dict.get("font-size")
-                #                    or config.stl["layout"][sheet]["refdef"].get("font-size")
-                #                    or "2mm"
-                #                )
                 refdef_shape = Shape(refdef_dict)
-
                 refdef_shape.is_refdef = True
                 refdef_shape.rotateLocation(self._rotate, self._rotate_point)
 

@@ -236,7 +236,7 @@ class Footprint:
                 if layer in self._shapes["pours"]:
                     self._shapes["pours"][layer].append(shape)
                 else:
-                    self._shapes["pours"][layer] = [shape]
+                    self._shapes["pours"][layer] = [shape]    
 
     def _process_shapes(self):
         """
