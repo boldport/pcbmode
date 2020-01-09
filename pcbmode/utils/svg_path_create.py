@@ -155,7 +155,7 @@ def ring(d1, d2):
     path = None
 
     if d1 == d2:
-        path = circle_diameter_to_path(d1)
+        path = circle(d1)
     else:
         if d1 > d2:
             outer = d1
@@ -228,7 +228,7 @@ def drill(diameter):
     # by Aleksas Riskus
     k = 0.5522847498
 
-    # internal circle
+    # Internal circle
     b = r * 0.9
 
     return (
@@ -298,10 +298,8 @@ def marker():
     # by Aleksas Riskus
     k = 0.5522847498
 
-    # extension
+    # Extension
     b = r * 1.8
-
-    #    return "m %s,%s c %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s m %s,%s %s,%s m %s,%s %s,%s z" % (0,r, k*r,0, r,-r*(1-k), r,-r, 0,-r*k, -r*(1-k),-r, -r,-r, -r*k,0, -r,r*(1-k), -r,r, 0,r*k, r*(1-k),r, r,r, 0,-(r-b), 0,-2*b, -b,b, 2*b,0)
 
     return (
         "m %s,%s c %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s m %s,%s %s,%s z"
