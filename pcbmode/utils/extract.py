@@ -23,6 +23,7 @@ import json
 from pcbmode.config import config
 from pcbmode.utils import messages as msg
 from pcbmode.utils import utils
+from pcbmode.utils import css_utils
 from pcbmode.utils.point import Point
 
 
@@ -279,7 +280,7 @@ def extractRouting(svg_in):
             routes_dict[pcb_layer][digest]["type"] = "path"
             routes_dict[pcb_layer][digest]["value"] = path
 
-            stroke_width = utils.getStyleAttrib(style_text, "stroke-width")
+            stroke_width = css_utils.get_style_value(style_text, "stroke-width")
             if stroke_width != None:
                 # Sometimes Inkscape will add a 'px' suffix to the stroke-width
                 # property pf a path; this removes it

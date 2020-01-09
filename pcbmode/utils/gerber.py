@@ -170,7 +170,7 @@ class Gerber():
             style_string = path.get('style')
             tmp['style'] = path.get('{'+config.cfg['ns']['pcbmode']+'}style')
             if tmp['style'] == 'stroke':
-                tmp['stroke-width'] = utils.getStyleAttrib(style_string, 'stroke-width')
+                tmp['stroke-width'] = css_utils.get_style_value(style_string, 'stroke-width')
                 # Build aperture list
                 if tmp['stroke-width'] not in self._apertures:
                     self._apertures[tmp['stroke-width']] = self._aperture_num
