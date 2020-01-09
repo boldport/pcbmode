@@ -28,6 +28,7 @@ import html.parser as HTMLParser
 import hashlib
 
 from pcbmode.config import config
+from pcbmode.utils import css_utils
 from pcbmode.utils.point import Point
 from pcbmode.utils import messages as msg
 
@@ -590,17 +591,6 @@ def digest(string):
     """
     digits = config.cfg["params"]["num-of-digest-digits"]
     return hashlib.md5(string.encode()).hexdigest()[: digits - 1]
-
-
-def getStyleAttrib(style, attrib):
-    """
-    """
-    regex = r".*?%s:\s?(?P<s>[^;]*)(?:;|$)"
-    match = re.match(regex % attrib, style)
-    if match == None:
-        return None
-    else:
-        return match.group("s")
 
 
 def pretty_num(f, sig_dig=6):
