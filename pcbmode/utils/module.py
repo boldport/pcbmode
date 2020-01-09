@@ -84,7 +84,7 @@ class Module:
 
         for pcb_layer in config.stk["layer-names"]:
             element = et.SubElement(
-                defs, "mask", id="mask-%s" % pcb_layer, transform=self._transform
+                defs, "mask", id=f"mask-{pcb_layer}", transform=self._transform
             )
             # This will identify the masks for each PCB layer when
             # the layer is converted to Gerber

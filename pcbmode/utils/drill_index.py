@@ -72,7 +72,7 @@ def place(layer, width, height):
 
     for diameter in reversed(sorted(drills_dict)):
         location.x = diameter / 2
-        location.y += config.cfg['iya'] * max(diameter/2, 2)
+        location.y += config.cfg["iya"] * max(diameter / 2, 2)
         path = svg_path_create.drill(diameter)
         transform = f"translate({location.x},{config.cfg['iya']*location.y})"
         symbol_el = et.SubElement(group, "path", d=path, transform=transform)
