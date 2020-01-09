@@ -374,7 +374,7 @@ class Module:
                             mask_group = et.SubElement(
                                 self._masks[pcb_layer], "g", transform=transform
                             )
-                            self._placeMask(
+                            self._place_mask(
                                 mask_group, shape, "pad", original=False, mirror=invert
                             )
 
@@ -619,7 +619,7 @@ class Module:
                     )
 
                 if (there_are_pours == True) and (custom_buffer != "0"):
-                    self._placeMask(
+                    self._place_mask(
                         self._masks[pcb_layer], shape, "route", use_original_path
                     )
 
@@ -647,7 +647,7 @@ class Module:
     #
     #                            i += 1
 
-    def _placeMask(self, svg_layer, shape, kind, original=False, mirror=False):
+    def _place_mask(self, svg_layer, shape, kind, original=False, mirror=False):
         """
         Places a mask of a shape of type 'Shape' on SVG layer 'svg_layer'.
         'kind'    : type of shape; used to fetch the correct distance to pour
@@ -670,7 +670,6 @@ class Module:
             mask_el = place.placeShape(shape, svg_layer, mirror, original)
 
             stroke_width = css_utils.get_style_value("stroke-width", style)
-            print(stroke_width)
 
             if stroke_width is not None:
                 # This width provides a distance of 'pour_buffer' from the
