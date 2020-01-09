@@ -25,6 +25,7 @@ from pcbmode.config import config
 from pcbmode.utils import messages as msg
 from pcbmode.utils import utils
 from pcbmode.utils import svg
+from pcbmode.utils import svg_path_create
 from pcbmode.utils.point import Point
 from pcbmode.utils.svgpath import SvgPath
 
@@ -40,7 +41,7 @@ class Shape:
         # sense to me. This should be the only place to make the change.
         self._inv_rotate = -1
 
-        self._label = shape.get("label", None) 
+        self._label = shape.get("label", None)
         self._label_style_class = shape.get("label_style_class", None)
         self._shape_dict = shape
         self._gerber_lp = shape.get("gerber-lp") or shape.get("gerber_lp") or None
@@ -116,30 +117,28 @@ class Shape:
         except KeyError:
             msg.error("A 'rect' shape requires a 'height' definition")
 
-        self._path = svg.width_and_height_to_path(
-            width, height, self._shape_dict.get("radii")
-        )
+        self._path = svg_path_create.rect(width, height, self._shape_dict.get("radii"))
 
     def _process_circ(self):
         try:
             self._diameter = self._shape_dict["diameter"]
         except KeyError:
             msg.error("A 'circle' shape requires a 'diameter' definition")
-        self._path = svg.circle_diameter_to_path(self._diameter)
+        self._path = svg_path_create.circle(self._diameter)
 
     def _process_drill(self):
         try:
             self._diameter = self._shape_dict["diameter"]
         except KeyError:
             msg.error("A 'drill' shape requires a 'diameter' definition")
-        
+
         # Keep track of drill diameters for index
         try:
-            config.tmp['drill-count'].append(self._diameter)
+            config.tmp["drill-count"].append(self._diameter)
         except:
-            config.tmp['drill-count'] = [self._diameter]
+            config.tmp["drill-count"] = [self._diameter]
 
-        self._path = svg.drillPath(self._diameter)
+        self._path = svg_path_create.drill(self._diameter)
 
     def _process_text(self):
         try:

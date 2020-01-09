@@ -23,6 +23,7 @@ from pcbmode.config import config
 from pcbmode.utils import messages as msg
 from pcbmode.utils import utils
 from pcbmode.utils import svg
+from pcbmode.utils import svg_path_create
 from pcbmode.utils.point import Point
 
 
@@ -113,7 +114,7 @@ def placeDrill(drill, layer, location, scale, soldermask_layers={}, mask_groups=
     diameter = drill.get("diameter")
     offset = utils.to_Point(drill.get("offset") or [0, 0])
     path = svg.drill_diameter_to_path(diameter)
-    mask_path = svg.circle_diameter_to_path(diameter)
+    mask_path = svg_path_create.circle(diameter)
 
     sig_dig = config.cfg["params"]["significant-digits"]
     transform = "translate(%s %s)" % (
@@ -183,10 +184,10 @@ def placeDrill(drill, layer, location, scale, soldermask_layers={}, mask_groups=
             "top": 1.2,
             "bottom": 1.2,
         }
-        path_top = svg.circle_diameter_to_path(
+        path_top = svg_path_create.circle(
             diameter * drill_soldermask_scale_factors["top"]
         )
-        path_bottom = svg.circle_diameter_to_path(
+        path_bottom = svg_path_create.circle(
             diameter * drill_soldermask_scale_factors["bottom"]
         )
 

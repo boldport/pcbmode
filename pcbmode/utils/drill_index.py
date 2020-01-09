@@ -22,6 +22,7 @@ from lxml import etree as et
 from pcbmode.config import config
 from pcbmode.utils import utils
 from pcbmode.utils import svg
+from pcbmode.utils import svg_path_create
 
 
 def place(layer, width, height):
@@ -72,7 +73,7 @@ def place(layer, width, height):
     for diameter in reversed(sorted(drills_dict)):
         location.x = diameter / 2
         location.y += config.cfg['iya'] * max(diameter/2, 2)
-        path = svg.drillPath(diameter)
+        path = svg_path_create.drill(diameter)
         transform = f"translate({location.x},{config.cfg['iya']*location.y})"
         symbol_el = et.SubElement(group, "path", d=path, transform=transform)
         symbol_el.set("fill-rule", "evenodd")

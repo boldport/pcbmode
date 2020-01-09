@@ -33,6 +33,7 @@ from pcbmode.utils import inkscape_svg
 from pcbmode.utils import css_utils
 from pcbmode.utils import svg_layers
 from pcbmode.utils import drill_index
+from pcbmode.utils import svg_path_create
 from pcbmode.utils.shape import Shape
 from pcbmode.utils.style import Style
 from pcbmode.utils.component import Component
@@ -48,8 +49,6 @@ class Module:
         """
 
         ns_pcm = config.cfg["ns"]["pcbmode"]
-        ns_svg = config.cfg["ns"]["svg"]
-        ns = {"pcbmode": config.cfg["ns"]["pcbmode"], "svg": config.cfg["ns"]["svg"]}
 
         self._module_dict = module_dict
         self._routing_dict = routing_dict
@@ -102,9 +101,8 @@ class Module:
         if config.cfg["create"]["docs"] == True:
             self._placeDocs()
         if config.cfg["create"]["drill-index"] == True:
-            drill_index.place(
-                self._layers["drills"]["layer"], self._width, self._height
-            )
+            drills_layer = self._layers["drills"]["layer"]
+            drill_index.place(drills_layer, self._width, self._height)
         if config.cfg["create"]["layer-index"] == True:
             self._placeLayerIndex()
 
@@ -521,7 +519,7 @@ class Module:
             else:
                 pass
 
-            path = svg.placementMarkerPath()
+            path = svg_path_create.marker()
             transform = f"translate({location[0]},{config.cfg['iya'] * location[1]})"
 
             if placement_layer == "bottom":
