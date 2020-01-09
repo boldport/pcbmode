@@ -654,6 +654,8 @@ class Module:
         'original': use the original path, not the transformed one
         """
 
+        ns_pcm = config.cfg["ns"]["pcbmode"]
+
         # Get the desired distance based on 'kind' 'outline', 'drill',
         # 'pad', 'route' unless 'pour_buffer' is specified
         pour_buffer = shape.getPourBuffer()
@@ -664,21 +666,23 @@ class Module:
 
         style = shape.get_style()
 
-        # if pour_buffer > 0:
-        #     mask_element = place.placeShape(shape, svg_layer, mirror, original)
-        #     if style.getStyleType() == "fill":
-        #         mask_element.set("style", style_template % ("#000", pour_buffer * 2))
-        #     else:
-        #         # This width provides a distance of 'pour_buffer' from the
-        #         # edge of the trace to a pour
-        #         width = style.getStrokeWidth() + pour_buffer * 2
-        #         mask_element.set("style", style_template % ("none", width))
+        if pour_buffer > 0:
+            mask_el = place.placeShape(shape, svg_layer, mirror, original)
 
-        #     path = shape.getOriginalPath().lower()
-        #     segments = path.count("m")
-        #     mask_element.set(
-        #         "{" + config.cfg["ns"]["pcbmode"] + "}gerber-lp", "c" * segments
-        #     )
+            stroke_width = css_utils.get_style_value("stroke-width", style)
+            print(stroke_width)
+
+            if stroke_width is not None:
+                # This width provides a distance of 'pour_buffer' from the
+                # edge of the trace to a pour
+                width = float(stroke_width) + pour_buffer * 2
+                mask_el.set("style", style_template % ("none", width))
+            else:
+                mask_el.set("style", style_template % ("#000", pour_buffer * 2))
+
+            path = shape.getOriginalPath().lower()
+            segments = path.count("m")
+            mask_el.set(f"{{{ns_pcm}}}gerber-lp", "c" * segments)
 
     def _placeDocs(self):
         """
