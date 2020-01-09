@@ -20,6 +20,7 @@
 from pcbmode.config import config
 from pcbmode.utils.point import Point
 
+
 def rect(width, height, radii=None):
     """
     Returns a centered path based on width and height; smooth corners
