@@ -27,3 +27,13 @@ def get_prop(css, class_name, prop_name):
     pattern = '\.%s\s*{[\s\S]*?%s:\s+"?([-\w]*)"?;[\s\S]*?' % (class_name, prop_name)
     result = re.findall(pattern, css)
     return result[0]
+
+def get_style_value(attrib, style):
+    """
+    """
+    regex = r".*?%s:\s?(?P<s>[^;]*)(?:;|$)"
+    match = re.match(regex % attrib, style)
+    if match == None:
+        return None
+    else:
+        return match.group("s")
