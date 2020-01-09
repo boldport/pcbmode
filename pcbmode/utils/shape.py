@@ -132,6 +132,13 @@ class Shape:
             self._diameter = self._shape_dict["diameter"]
         except KeyError:
             msg.error("A 'drill' shape requires a 'diameter' definition")
+        
+        # Keep track of drill diameters for index
+        try:
+            config.tmp['drill-count'].append(self._diameter)
+        except:
+            config.tmp['drill-count'] = [self._diameter]
+
         self._path = svg.drillPath(self._diameter)
 
     def _process_text(self):

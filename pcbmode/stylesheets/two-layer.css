@@ -163,6 +163,29 @@
   fill-opacity: 0.6;
 }
 
+.drill-index {
+  font-size: 0.5mm;
+  fill: #111111;
+  fill-opacity: 1;
+  font-style: normal;
+  font-variant: normal;
+  font-weight: bold;
+  font-stretch: normal;
+  text-align: left;
+  line-height: 100%;
+  letter-spacing: 0;
+  word-spacing: 0;
+  writing-mode: lr-tb;
+  text-anchor: left;
+  stroke: none;
+  font-family: "Ubuntu";
+}
+.drill-index-symbol {
+  fill: #393e79;
+}
+.drill-index-symbol-text {
+  font-size: 0.25mm;
+}
 
 .assembly-refdef {
   font-family: "UbuntuMono-R-webfont";
@@ -223,28 +246,7 @@
   font-family: Sans serif;
 }
 
-.drill-index {
-  fill: #111111;
-  fill-opacity: 0.8;
-  font-style: normal;
-  font-variant: normal;
-  font-weight: bold;
-  font-stretch: normal;
-  text-align: center;
-  line-height: 100%;
-  letter-spacing: 0;
-  word-spacing: 0;
-  writing-mode: lr-tb;
-  text-anchor: middle;
-  stroke: none;
-  font-family: "Courier 10 Pitch";
-}
-.drill-index-count {
-  font-size: 1;
-}
-.drill-index-text {
-  font-size: 1.6;
-}
+
 .layer-index-text {
   font-family: "Overlock-Regular-OTF-webfont";
   font-size: 1.2mm;

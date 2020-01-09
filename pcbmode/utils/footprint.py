@@ -203,7 +203,7 @@ class Footprint:
                                 else:
                                     self._shapes[stype][layer] = [sshape]
 
-            drills = pad_dict.get("drills") or []
+            drills = pad_dict.get("drills", [])
             for drill_dict in drills:
                 drill_dict = drill_dict.copy()
                 drill_dict["type"] = drill_dict.get("type") or "drill"
@@ -213,8 +213,6 @@ class Footprint:
                     drill_location[1] + pin_location[1],
                 ]
                 shape = Shape(drill_dict)
-                #                style = Style(drill_dict, "drills")
-                #                shape.setStyle(style)
 
                 if "top" in self._shapes["drills"]:
                     self._shapes["drills"]["top"].append(shape)

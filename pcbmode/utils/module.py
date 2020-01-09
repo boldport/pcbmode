@@ -32,6 +32,7 @@ from pcbmode.utils import place
 from pcbmode.utils import inkscape_svg
 from pcbmode.utils import css_utils
 from pcbmode.utils import svg_layers
+from pcbmode.utils import drill_index
 from pcbmode.utils.shape import Shape
 from pcbmode.utils.style import Style
 from pcbmode.utils.component import Component
@@ -101,7 +102,9 @@ class Module:
         if config.cfg["create"]["docs"] == True:
             self._placeDocs()
         if config.cfg["create"]["drill-index"] == True:
-            self._placeDrillIndex()
+            drill_index.place(
+                self._layers["drills"]["layer"], self._width, self._height
+            )
         if config.cfg["create"]["layer-index"] == True:
             self._placeLayerIndex()
 
@@ -783,102 +786,3 @@ class Module:
 
             location.y += config.cfg["iya"] * (rect_height + rect_gap * 1.5)
 
-    def _placeDrillIndex(self):
-        """
-        Adds a drill index
-        """
-
-        ns_pcm = config.cfg["ns"]["pcbmode"]
-
-        # Get the drills sheet / SVG layer
-        drill_layer = self._layers["drills"]["layer"]
-        ns = {"pcbmode": config.cfg["ns"]["pcbmode"], "svg": config.cfg["ns"]["svg"]}
-        drills = drill_layer.findall(".//*[@pcbmode:diameter]", namespaces=ns)
-
-        drills_dict = {}
-        longest_text = 0
-        largest_drill = 0
-        drill_count = 0
-        for drill in drills:
-            diameter = drill.get(f"{{{ns_pcm}}}diameter")
-            diameter = round(float(diameter), 2)
-            if diameter not in drills_dict:
-                drills_dict[diameter] = 1
-            else:
-                drills_dict[diameter] += 1
-            if diameter > largest_drill:
-                largest_drill = diameter
-            drill_count += 1
-
-            if len(str(diameter)) > longest_text:
-                longest_text = len(str(diameter))
-
-        # Get location, or generate one
-        try:
-            location = config.brd["drill-index"]["location"]
-        except:
-            # If no location is specified, put the drill index at the
-            # bottom left of the board. The 'gap' defines the extra
-            # spcae between the top of the largest drill and the
-            # board's edge
-            gap = 2
-            location = [-self._width / 2, -(self._height / 2 + gap)]
-        location = utils.toPoint(location)
-
-        # Create group for placing index
-        transform = f"translate({location.x},{config.cfg['iya']*location.y})"
-        group = et.SubElement(drill_layer, "g", transform=transform)
-        group.set(f"{{{ns_pcm}}}type", "drill-index")
-
-        text_style_class = "drill-index"
-        count_style_class = "drill-index-count"
-
-        if drill_count == 0:
-            text = "No drills"
-        elif drill_count == 1:
-            text = "1 drill: "
-        else:
-            text = f"{drill_count} drills: "
-        t = et.SubElement(group, "text", x=str(0), y=str(0))
-        t.set("class", text_style_class)
-        t.text = text
-
-        # "new line"
-        location.y = -(largest_drill / 2 + 1.5)
-
-        # TODO: this hack'ish thing for aligning the text isn't going
-        # to work when the font is changed in the stylesheet
-        if float(longest_text * 0.5) > largest_drill:
-            location.x = longest_text * 0.3
-        else:
-            location.x = largest_drill / 2
-
-        gap = 2
-
-        for diameter in reversed(sorted(drills_dict)):
-            path = svg.drillPath(diameter)
-            transform = f"translate({location.x},{config.cfg['iya']*location.y})"
-            element = et.SubElement(group, "path", d=path, transform=transform)
-            element.set("fill-rule", "evenodd")
-
-            t = et.SubElement(
-                group,
-                "text",
-                x=str(location.x),
-                y=str(-location.y),
-                dy=f"{config.cfg['iya'] * 0.25}",
-            )
-            t.set("class", count_style_class)
-            t.text = str(drills_dict[diameter])
-
-            t = et.SubElement(
-                group,
-                "text",
-                x=str(location.x),
-                y=str(-location.y),
-                dy=f"{config.cfg['iya'] * -0.5}",
-            )
-            t.set("class", count_style_class)
-            t.text = f"{diameter} mm"
-
-            location.x += max(diameter, 2.5)
