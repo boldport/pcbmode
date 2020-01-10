@@ -81,14 +81,10 @@ def place_index(layers, width, height):
             group = et.SubElement(layer, "g", transform=transform)
             group.set(f"{{{ns_pcm}}}type", "layer-index")
             rect_shape = Shape(rect_dict)
-            #            style = Style(rect_dict, sheet)
-            #            rect_shape.setStyle(style)
             place.placeShape(rect_shape, group)
             text_dict["value"] = f"{pcb_layer} {sheet}"
             text_shape = Shape(text_dict)
             text_width = text_shape.getWidth()
-            #            style = Style(text_dict, sheet)
-            #            text_shape.setStyle(style)
             element = place.placeShape(text_shape, group)
             element.set(
                 "transform",
