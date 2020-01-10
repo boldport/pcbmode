@@ -200,58 +200,6 @@ class Module:
         Places outline dimension arrows
         """
 
-        def make_arrow(width, gap):
-            """
-            Returns a path for an arrow of width 'width' with a center gap of
-            width 'gap'
-            """
-
-            base_length = 1.6  # bar against arrow head
-            arrow_height = 2.2  # height of arrow's head
-            arrow_base = 1.2  # width of arrow's head
-
-            path = (
-                "m %s,%s %s,%s m %s,%s %s,%s m %s,%s %s,%s m %s,%s %s,%s m %s,%s m %s,%s %s,%s m %s,%s %s,%s m %s,%s %s,%s m %s,%s %s,%s"
-                % (
-                    -gap / 2,
-                    0,
-                    -width / 2 + gap / 2,
-                    0,
-                    0,
-                    base_length / 2,
-                    0,
-                    -base_length,
-                    arrow_height,
-                    (base_length - arrow_base) / 2,
-                    -arrow_height,
-                    arrow_base / 2,
-                    arrow_height,
-                    arrow_base / 2,
-                    -arrow_height,
-                    -arrow_base / 2,
-                    width / 2,
-                    0,
-                    gap / 2,
-                    0,
-                    width / 2 - gap / 2,
-                    0,
-                    0,
-                    base_length / 2,
-                    0,
-                    -base_length,
-                    -arrow_height,
-                    (base_length - arrow_base) / 2,
-                    arrow_height,
-                    arrow_base / 2,
-                    -arrow_height,
-                    arrow_base / 2,
-                    arrow_height,
-                    -arrow_base / 2,
-                )
-            )
-
-            return path
-
         # Create text shapes
         shape_dict = {}
         shape_dict["type"] = "text"
@@ -292,7 +240,9 @@ class Module:
         # Width arrow
         shape_dict = {}
         shape_dict["type"] = "path"
-        shape_dict["value"] = make_arrow(self._width, width_text.getWidth() * 1.5)
+        shape_dict["value"] = svg_path_create.arrow(
+            self._width, width_text.getWidth() * 1.5
+        )
         shape_dict["location"] = width_loc
         shape_dict["style"] = "stroke-width:0.2;"
         width_arrow = Shape(shape_dict)
@@ -300,7 +250,9 @@ class Module:
         # Height arrow
         shape_dict = {}
         shape_dict["type"] = "path"
-        shape_dict["value"] = make_arrow(self._height, height_text.getHeight() * 1.5)
+        shape_dict["value"] = svg_path_create.arrow(
+            self._height, height_text.getHeight() * 1.5
+        )
         shape_dict["rotate"] = -90
         shape_dict["location"] = height_loc
         shape_dict["style"] = "stroke-width:0.2;"

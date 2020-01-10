@@ -337,3 +337,54 @@ def marker():
             0,
         )
     )
+
+
+def arrow(width, gap):
+    """
+    Returns a path for an arrow of width 'width' with a center gap of
+    width 'gap'
+    """
+    base_length = 1.6  # bar against arrow head
+    arrow_height = 2.2  # height of arrow's head
+    arrow_base = 1.2  # width of arrow's head
+
+    path = (
+        "m %s,%s %s,%s m %s,%s %s,%s m %s,%s %s,%s m %s,%s %s,%s m %s,%s m %s,%s %s,%s m %s,%s %s,%s m %s,%s %s,%s m %s,%s %s,%s"
+        % (
+            -gap / 2,
+            0,
+            -width / 2 + gap / 2,
+            0,
+            0,
+            base_length / 2,
+            0,
+            -base_length,
+            arrow_height,
+            (base_length - arrow_base) / 2,
+            -arrow_height,
+            arrow_base / 2,
+            arrow_height,
+            arrow_base / 2,
+            -arrow_height,
+            -arrow_base / 2,
+            width / 2,
+            0,
+            gap / 2,
+            0,
+            width / 2 - gap / 2,
+            0,
+            0,
+            base_length / 2,
+            0,
+            -base_length,
+            -arrow_height,
+            (base_length - arrow_base) / 2,
+            arrow_height,
+            arrow_base / 2,
+            -arrow_height,
+            arrow_base / 2,
+            arrow_height,
+            -arrow_base / 2,
+        )
+    )
+    return path
