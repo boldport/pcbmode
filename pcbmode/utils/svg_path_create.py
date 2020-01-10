@@ -339,14 +339,14 @@ def marker():
     )
 
 
-def arrow(width, gap):
+def arrow(width, height, base, bar, gap):
     """
-    Returns a path for an arrow of width 'width' with a center gap of
-    width 'gap'
+    width: width of arrow
+    bar: length of the bar against arrow head
+    height: height of arrow's head
+    base: width of arrow's head
+    gap: the gap for where the text goes
     """
-    base_length = 1.6  # bar against arrow head
-    arrow_height = 2.2  # height of arrow's head
-    arrow_base = 1.2  # width of arrow's head
 
     path = (
         "m %s,%s %s,%s m %s,%s %s,%s m %s,%s %s,%s m %s,%s %s,%s m %s,%s m %s,%s %s,%s m %s,%s %s,%s m %s,%s %s,%s m %s,%s %s,%s"
@@ -356,17 +356,17 @@ def arrow(width, gap):
             -width / 2 + gap / 2,
             0,
             0,
-            base_length / 2,
+            bar / 2,
             0,
-            -base_length,
-            arrow_height,
-            (base_length - arrow_base) / 2,
-            -arrow_height,
-            arrow_base / 2,
-            arrow_height,
-            arrow_base / 2,
-            -arrow_height,
-            -arrow_base / 2,
+            -bar,
+            height,
+            (bar - base) / 2,
+            -height,
+            base / 2,
+            height,
+            base / 2,
+            -height,
+            -base / 2,
             width / 2,
             0,
             gap / 2,
@@ -374,17 +374,17 @@ def arrow(width, gap):
             width / 2 - gap / 2,
             0,
             0,
-            base_length / 2,
+            bar / 2,
             0,
-            -base_length,
-            -arrow_height,
-            (base_length - arrow_base) / 2,
-            arrow_height,
-            arrow_base / 2,
-            -arrow_height,
-            arrow_base / 2,
-            arrow_height,
-            -arrow_base / 2,
+            -bar,
+            -height,
+            (bar - base) / 2,
+            height,
+            base / 2,
+            -height,
+            base / 2,
+            height,
+            -base / 2,
         )
     )
     return path

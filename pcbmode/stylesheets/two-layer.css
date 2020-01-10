@@ -1,9 +1,9 @@
+
 .board {
   fill-opacity: 1;
   fill: #000000;
   stroke: none;
 }
-
 
 .origin {
   stroke: #555555;
@@ -81,7 +81,6 @@
   stroke-opacity: 0.6;
   fill-opacity: 0.6;
 }
-
 .top-conductor {
   fill: #008500;
   stroke: #008500;

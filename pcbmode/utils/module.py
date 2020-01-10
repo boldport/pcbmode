@@ -220,7 +220,12 @@ class Module:
             config.stl["layout"], style_class, "letter-spacing"
         )
 
+        # Dimension arrow properties
         arrow_gap = 1.5
+        arrow_bar_length = 1.6  # bar against arrow head
+        arrow_height = 2.2  # height of arrow's head
+        arrow_base = 1.2  # width of arrow's head
+
         width_loc = [0, self._height / 2 + arrow_gap]
         height_loc = [-(self._width / 2 + arrow_gap), 0]
 
@@ -241,7 +246,11 @@ class Module:
         shape_dict = {}
         shape_dict["type"] = "path"
         shape_dict["value"] = svg_path_create.arrow(
-            self._width, width_text.getWidth() * 1.5
+            width=self._width,
+            height=arrow_height,
+            base=arrow_base,
+            bar=arrow_bar_length,
+            gap=width_text.getWidth() * 1.5,
         )
         shape_dict["location"] = width_loc
         shape_dict["style"] = "stroke-width:0.2;"
@@ -251,7 +260,11 @@ class Module:
         shape_dict = {}
         shape_dict["type"] = "path"
         shape_dict["value"] = svg_path_create.arrow(
-            self._height, height_text.getHeight() * 1.5
+            width=self._height,
+            height=arrow_height,
+            base=arrow_base,
+            bar=arrow_bar_length,
+            gap=height_text.getHeight() * 1.5,
         )
         shape_dict["rotate"] = -90
         shape_dict["location"] = height_loc
