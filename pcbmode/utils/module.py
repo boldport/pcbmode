@@ -34,6 +34,7 @@ from pcbmode.utils import css_utils
 from pcbmode.utils import svg_layers
 from pcbmode.utils import drill_index
 from pcbmode.utils import layer_index
+from pcbmode.utils import documentation
 from pcbmode.utils import svg_path_create
 from pcbmode.utils.shape import Shape
 from pcbmode.utils.style import Style
@@ -100,7 +101,8 @@ class Module:
         self._place_components(components=self._shapes, component_type="shape")
 
         if config.cfg["create"]["docs"] == True:
-            self._place_docs()
+            docs_layer = self._layers["documentation"]["layer"]
+            documentation.place_docs(docs_layer)
         if config.cfg["create"]["drill-index"] == True:
             drills_layer = self._layers["drills"]["layer"]
             drill_index.place(drills_layer, self._width, self._height)
@@ -648,32 +650,3 @@ class Module:
             path = shape.getOriginalPath().lower()
             segments = path.count("m")
             mask_el.set(f"{{{ns_pcm}}}gerber-lp", "c" * segments)
-
-    def _place_docs(self):
-        """
-        Places documentation blocks on the documentation layer
-        """
-        ns_pcm = config.cfg["ns"]["pcbmode"]
-
-        try:
-            docs_dict = config.brd["documentation"]
-        except:
-            return
-
-        for key in docs_dict:
-
-            location = utils.toPoint(docs_dict[key]["location"])
-            docs_dict[key]["location"] = [0, 0]
-
-            shape_group = et.SubElement(self._layers["documentation"]["layer"], "g")
-            shape_group.set(f"{{{ns_pcm}}}type", "module-shapes")
-            shape_group.set(f"{{{ns_pcm}}}doc-key", key)
-            shape_group.set(
-                "transform", f"translate({location.x},{config.cfg['iya']*location.y})"
-            )
-
-            location = docs_dict[key]["location"]
-            docs_dict[key]["location"] = [0, 0]
-
-            shape = Shape(docs_dict[key])
-            place.placeShape(shape, shape_group)
