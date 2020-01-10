@@ -33,6 +33,7 @@ from pcbmode.utils import inkscape_svg
 from pcbmode.utils import css_utils
 from pcbmode.utils import svg_layers
 from pcbmode.utils import drill_index
+from pcbmode.utils import layer_index
 from pcbmode.utils import svg_path_create
 from pcbmode.utils.shape import Shape
 from pcbmode.utils.style import Style
@@ -99,12 +100,12 @@ class Module:
         self._place_components(components=self._shapes, component_type="shape")
 
         if config.cfg["create"]["docs"] == True:
-            self._placeDocs()
+            self._place_docs()
         if config.cfg["create"]["drill-index"] == True:
             drills_layer = self._layers["drills"]["layer"]
             drill_index.place(drills_layer, self._width, self._height)
         if config.cfg["create"]["layer-index"] == True:
-            self._placeLayerIndex()
+            layer_index.place_index(self._layers, self._width, self._height)
 
         # This 'cover' "enables" the mask shapes defined in the mask are
         # shown. It *must* be the last element in the mask definition;
@@ -648,7 +649,7 @@ class Module:
             segments = path.count("m")
             mask_el.set(f"{{{ns_pcm}}}gerber-lp", "c" * segments)
 
-    def _placeDocs(self):
+    def _place_docs(self):
         """
         Places documentation blocks on the documentation layer
         """
@@ -675,80 +676,4 @@ class Module:
             docs_dict[key]["location"] = [0, 0]
 
             shape = Shape(docs_dict[key])
-            style = Style(docs_dict[key], "documentation")
-            shape.setStyle(style)
-            element = place.placeShape(shape, shape_group)
-
-    def _placeLayerIndex(self):
-        """
-        Adds a layer index
-        """
-
-        text_dict = config.stl["layout"]["layer-index"]["text"]
-        text_dict["type"] = "text"
-
-        # Set the height (and width) of the rectangle (square) to the
-        # size of the text
-        rect_width = utils.parseDimension(text_dict["font-size"])[0]
-        rect_height = rect_width
-        rect_gap = 0.25
-
-        # Get location, or generate one
-        try:
-            location = config.brd["layer-index"]["location"]
-        except:
-            # If not location is specified, put the drill index at the
-            # top right of the board. The 'gap' defines the extra
-            # spcae between the top of the largest drill and the
-            # board's edge
-            gap = 2
-            location = [self._width / 2 + gap, self._height / 2 - rect_height / 2]
-        location = utils.toPoint(location)
-
-        rect_dict = {}
-        rect_dict["type"] = "rect"
-        rect_dict["style"] = "fill"
-        rect_dict["width"] = rect_width
-        rect_dict["height"] = rect_height
-
-        # Create group for placing index
-        for pcb_layer in config.stk["layer-names"]:
-
-            if pcb_layer in config.stk["surface-layer-names"]:
-                sheets = [
-                    "conductor",
-                    "soldermask",
-                    "silkscreen",
-                    "assembly",
-                    "solderpaste",
-                ]
-            else:
-                sheets = ["conductor"]
-
-            for sheet in sheets:
-                layer = self._layers[pcb_layer][sheet]["layer"]
-                transform = f"translate({location.x},{config.cfg['iya']*location.y})"
-                group = et.SubElement(layer, "g", transform=transform)
-                group.set("{" + config.cfg["ns"]["pcbmode"] + "}type", "layer-index")
-
-                rect_shape = Shape(rect_dict)
-                style = Style(rect_dict, sheet)
-                rect_shape.setStyle(style)
-                place.placeShape(rect_shape, group)
-
-                text_dict["value"] = f"{pcb_layer} {sheet}"
-                text_shape = Shape(text_dict)
-                text_width = text_shape.getWidth()
-                style = Style(text_dict, sheet)
-                text_shape.setStyle(style)
-                element = place.placeShape(text_shape, group)
-                element.set(
-                    "transform",
-                    "translate(%s,%s)"
-                    % (rect_width / 2 + rect_gap + text_width / 2, 0),
-                )
-
-                location.y += config.cfg["iya"] * (rect_height + rect_gap)
-
-            location.y += config.cfg["iya"] * (rect_height + rect_gap * 1.5)
-
+            place.placeShape(shape, shape_group)

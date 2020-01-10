@@ -186,6 +186,13 @@
   font-size: 0.25mm;
 }
 
+.layer-index {
+  font-family: "Overlock-Regular-OTF-webfont";
+  font-size: 1.2mm;
+  letter-spacing: 0mm;
+  line-height: 1.2mm;
+}
+
 .assembly-refdef {
   font-family: "UbuntuMono-R-webfont";
   font-size: 2mm;
@@ -244,12 +251,3 @@
   stroke: none;
   font-family: Sans serif;
 }
-
-
-.layer-index-text {
-  font-family: "Overlock-Regular-OTF-webfont";
-  font-size: 1.2mm;
-  letter-spacing: 0mm;
-  line-height: 1.2mm;
-}
-

@@ -63,21 +63,6 @@ def open_board_svg():
     return data
 
 
-def parseDimension(string):
-    """
-    Parses a dimention recieved from the source files, separating the units,
-    if specified, from the value
-    """
-    if string != None:
-        result = re.match("(-?\d*\.?\d+)\s?(\w+)?", string)
-        value = float(result.group(1))
-        unit = result.group(2)
-    else:
-        value = None
-        unit = None
-    return value, unit
-
-
 def to_Point(coord=[0, 0]):
     """
     Takes a coordinate in the form of [x,y] and
@@ -452,9 +437,24 @@ def renumberRefdefs(order):
     return
 
 
-def getTextParams(font_size, letter_spacing, line_height):
+def parse_dimension(string):
+    """
+    Parses a dimention recieved from the source files, separating the units,
+    if specified, from the value
+    """
+    if string != None:
+        result = re.match("(-?\d*\.?\d+)\s?(\w+)?", string)
+        value = float(result.group(1))
+        unit = result.group(2)
+    else:
+        value = None
+        unit = None
+    return value, unit
+
+
+def get_text_params(font_size, letter_spacing, line_height):
     try:
-        letter_spacing, letter_spacing_unit = parseDimension(letter_spacing)
+        letter_spacing, letter_spacing_unit = parse_dimension(letter_spacing)
     except:
         msg.error(
             f"There's a problem with parsing the 'letter-spacing' property with value '{letter_spacing}'. The format should be an integer or float followed by 'mm' (the only unit supported). For example, '0.3mm' or '-2 mm' should work."
@@ -464,7 +464,7 @@ def getTextParams(font_size, letter_spacing, line_height):
         letter_spacing_unit = "mm"
 
     try:
-        line_height, line_height_unit = parseDimension(line_height)
+        line_height, line_height_unit = parse_dimension(line_height)
     except:
         msg.error(
             f"There's a problem parsing the 'line-height' property with value '{line_height}'. The format should be an integer or float followed by 'mm' (the only unit supported). For example, '0.3mm' or '-2 mm' should work."
@@ -474,7 +474,7 @@ def getTextParams(font_size, letter_spacing, line_height):
         line_height_unit = "mm"
 
     try:
-        font_size, font_size_unit = parseDimension(font_size)
+        font_size, font_size_unit = parse_dimension(font_size)
     except:
         throw(
             "There's a problem parsing the 'font-size'. It's most likely missing. The format should be an integer or float followed by 'mm' (the only unit supported). For example, '0.3mm' or '2 mm' should work. Of course, it needs to be a positive figure."
@@ -698,18 +698,18 @@ def process_style(style):
     shape as a stroke+fill. This means that we don't require an additional
     'fill:none' after every 'stroke-width' in the shape definitions.
     """
-    
-    keep = ['stroke-width']
-    add_if_stroke = 'fill:none;'
 
-    pattern = '^\s*?%s\s*:\s*(.*?)\s*;?\s*$'
+    keep = ["stroke-width"]
+    add_if_stroke = "fill:none;"
+
+    pattern = "^\s*?%s\s*:\s*(.*?)\s*;?\s*$"
 
     new_style = ""
     for k in keep:
-        result = re.findall(pattern%k, style)
+        result = re.findall(pattern % k, style)
         if result != []:
             new_style += f"{k}:{result[0]};"
-            if k == 'stroke-width':
+            if k == "stroke-width":
                 new_style += add_if_stroke
 
     return new_style

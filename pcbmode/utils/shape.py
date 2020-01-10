@@ -152,7 +152,7 @@ class Shape:
             self._shape_dict.get("font-family")
             or config.stl["layout"]["defaults"]["font-family"]
         )
-        font_filename = "%s.svg" % font
+        font_filename = f"{font}.svg"
         # Search the local folder and PCBmodE's folder for the font file
         search_paths = [
             Path(config.tmp["project-path"] / config.cfg["fonts"]["path"]),
@@ -166,8 +166,7 @@ class Shape:
                 break
         if font_data == None:
             msg.error(
-                "Couldn't find style file %s. Looked for it here:\n%s"
-                % (font_filename, filenames)
+                f"Couldn't find style file {font_filename}. Looked for it here:\n{filenames}"
             )
         try:
             fs = self._shape_dict["font-size"]
@@ -175,9 +174,11 @@ class Shape:
             msg.error(
                 "A 'font-size' attribute must be specified for a 'text' shape type"
             )
-        ls = self._shape_dict.get("letter-spacing") or "0mm"
-        lh = self._shape_dict.get("line-height") or fs
-        font_size, letter_spacing, line_height = utils.getTextParams(fs, ls, lh)
+        ls = self._shape_dict.get("letter-spacing", "0mm")
+        lh = self._shape_dict.get("line-height", fs)
+
+        font_size, letter_spacing, line_height = utils.get_text_params(fs, ls, lh)
+
         # With the units-per-em we can figure out the scale factor
         # to use for the desired font size
         units_per_em = (
