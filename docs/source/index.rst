@@ -10,7 +10,7 @@ Contents:
    introduction
    workflow
    setup
-   structure
+   style
    components
    shapes
    pours
