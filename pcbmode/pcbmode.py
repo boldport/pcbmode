@@ -42,7 +42,6 @@ def load_pcbmode_config():
     Load the default configuration.  If a local 'pcbmode_config'
     exists in 'config/' then override the settings in there.
     """
-
     config_path = "config"
     config_filename = "pcbmode_config.json"
 
@@ -70,7 +69,6 @@ def load_stylesheet():
     """
     Load the layout CSS stylesheets.
     """
-
     filename = Path(config.cfg["styles"]["stylesheet-for-layout"])
     fn = config.tmp["project-path"] / filename
     if fn.exists():
@@ -86,7 +84,6 @@ def load_stackup():
     """
     Load and process the stackup for the board
     """
-
     filename = Path(config.cfg["stackup"]["definition-file"])
 
     if (config.tmp["project-path"] / filename).exists():
@@ -111,7 +108,6 @@ def load_cache():
     """
     Load cache file if it exists
     """
-
     filename = config.tmp["project-path"] / config.cfg["cache"]["file"]
     if filename.is_file():
         config.pth = utils.dictFromJsonFile(filename)
@@ -120,7 +116,6 @@ def load_cache():
 def load_routing():
     """
     """
-
     filename = Path(
         config.tmp["project-path"]
         / config.brd["project-params"]["input"]["routing-file"]
@@ -135,7 +130,6 @@ def set_y_axis_invert():
     outputting or reading the y-axis. Inkscape 1.0+ should have an option
     to not invert the y-axis.
     """
-
     if config.cfg["params"]["invert-y-axis"]:
         config.cfg["iya"] = -1
     else:
@@ -146,22 +140,17 @@ def apply_overrides(cli_args):
     """
     Apply commandline switches's overrides 
     """
-
     if cli_args.show_layer_index is not None:
         config.cfg["create"]["layer-index"] = cli_args.show_layer_index
-
     if cli_args.show_docs is not None:
         config.cfg["create"]["docs"] = cli_args.show_layer_index
-
     if cli_args.show_drill_index is not None:
         config.cfg["create"]["drill-index"] = cli_args.show_layer_index
-
     if cli_args.show_flashes is not None:
         config.cfg["create"]["flashes"] = cli_args.show_layer_index
 
 
 def main():
-
     # License information
     print("PCBmodE, Copyright (C) 2020 Saar Drimer")
     print("This program comes with ABSOLUTELY NO WARRANTY. This is free software,")

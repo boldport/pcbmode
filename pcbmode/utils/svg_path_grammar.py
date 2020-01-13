@@ -25,14 +25,14 @@ def get_grammar():
     Return the pyparsing grammar for an SVG path
     """
 
-    comma = PP.Literal(",").suppress() # supress doesn't capture the 'comma
+    comma = PP.Literal(",").suppress() # suppress doesn't capture the 'comma
     coord = PP.Regex(r"-?\d+(\.\d*)?([Ee][+-]?\d+)?")
     coord_x1 = PP.Group(coord)
     xy_x1 = PP.Group(coord + PP.Optional(comma) + coord)
     xy_x2 = (xy_x1 + PP.Optional(comma))*2
     xy_x3 = (xy_x1 + PP.Optional(comma))*3
 
-    # Note to future self trying to potimise (from pp docs):
+    # Note to future self trying to optimise (from pp docs):
     # CaselessLiteral - construct with a string to be matched, but without case
     # checking;results are always returned as the defining literal, NOT as they are 
     # found in the input string

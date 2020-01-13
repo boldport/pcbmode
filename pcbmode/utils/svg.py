@@ -42,7 +42,7 @@ def absolute_to_relative_path(path):
         return
 
     # get SVG path grammar
-    look_for = svg_path_grammar.get_grammer()
+    look_for = svg_path_grammar.get_grammar()
 
     # parse the input based on this grammar
     pd = look_for.parseString(path)
