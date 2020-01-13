@@ -111,7 +111,7 @@ def setup():
     argp.add_argument(
         "--no-cache",
         action="store_true",
-        dest="cache",
+        dest="no_cache",
         help="Do not create a cache file (use for testing)",
     )
 

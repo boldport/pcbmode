@@ -79,7 +79,7 @@ def load_stylesheet():
         fn = Path(__file__).parent / filename
         raw_css = fn.read_text()
 
-    config.stl["layout"] = raw_css 
+    config.stl["layout"] = raw_css
 
 
 def load_stackup():
@@ -221,7 +221,8 @@ def main():
 
     else:
 
-        if cmdline_args.cache is False:
+        # Load the cache file
+        if cmdline_args.no_cache is False:
             load_cache()
 
         # Make the board
@@ -241,7 +242,8 @@ def main():
         if cmdline_args.pngs is True:
             utils.makePngs()
 
-    if cmdline_args.cache is False:
+    # Save cache to file if cache isn't disabled
+    if cmdline_args.no_cache is False:
         filename = config.tmp["project-path"] / config.cfg["cache"]["file"]
         filename.parent.mkdir(parents=True, exist_ok=True)
         filename.write_text(json.dumps(config.pth, sort_keys=True, indent=2))
