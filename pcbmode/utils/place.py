@@ -41,10 +41,7 @@ def placeShape(shape, svg_layer, invert=False, original=False):
     location = shape.getLocation()
 
     if original == False:
-        translate = "translate(%s,%s)" % (
-            utils.pretty_num((((1, -1)[invert]) * location.x), sig_dig),
-            utils.pretty_num(location.y * config.cfg["iya"], sig_dig),
-        )
+        translate = f"translate({((1, -1)[invert]) * location.px()},{config.cfg['iya'] * location.py()})"
         transform = translate
     else:
         transform = None
@@ -73,8 +70,8 @@ def placeShape(shape, svg_layer, invert=False, original=False):
 
     label = shape.get_label()
     if label is not None:
-        coord_x = str(utils.pretty_num(((1, -1)[invert]) * location.x, sig_dig))
-        coord_y = str(utils.pretty_num(config.cfg["iya"] * location.y, sig_dig))
+        coord_x = f"{((1, -1)[invert]) * location.px()}"
+        coord_y = f"{config.cfg['iya'] * location.py()}"
         label_el = et.SubElement(
             svg_layer,
             "text",
@@ -117,10 +114,10 @@ def placeDrill(drill, layer, location, scale, soldermask_layers={}, mask_groups=
     mask_path = svg_path_create.circle(diameter)
 
     sig_dig = config.cfg["params"]["significant-digits"]
-    transform = "translate(%s %s)" % (
-        round((location.x + offset.x) * scale, sig_dig),
-        round((-location.y - offset.y) * scale, sig_dig),
-    )
+
+    location.mult(scalar)
+    offset.mult(scalar)
+    transform = f"translate({(location + offset).px()} {(-location - offset).py()})"
 
     drill_element = et.SubElement(
         layer,
