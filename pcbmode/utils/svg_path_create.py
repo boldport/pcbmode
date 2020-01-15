@@ -170,10 +170,13 @@ def ring(d1, d2):
     return path
 
 
-def circle(d, offset=Point()):
+def circle(d, offset=None):
     """
     Returns an SVG path of a circle of diameter 'diameter'
     """
+
+    if offset is None:
+        offset = Point()
 
     r = d / 2.0
 

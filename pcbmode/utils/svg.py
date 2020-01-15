@@ -826,10 +826,13 @@ def calculate_points_of_cubic_bezier(p, steps=10):
     return points
 
 
-def transform_path(p, center=False, scale=1, rotate_angle=0, rotate_point=Point()):
+def transform_path(p, center=False, scale=1, rotate_angle=0, rotate_point=None):
     """
     transforms a path
     """
+
+    if rotate_point is None:
+        rotate_point = Point()
 
     p_tl, p_br = calculate_bounding_box_of_path(p)
 
@@ -1041,11 +1044,14 @@ def create_meandering_path(params):
     return path, spacing
 
 
-def create_round_meander(radius, theta=0, offset=Point()):
+def create_round_meander(radius, theta=0, offset=None):
     """
     Returns a single period of a meandering path based on radius
     and angle theta
     """
+
+    if offset is None:
+        offest = Point()
 
     deg_to_rad = 2 * pi / 360
 

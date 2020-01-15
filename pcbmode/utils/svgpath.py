@@ -613,11 +613,14 @@ class SvgPath:
         )
 
     def transform(
-        self, scale=1, rotate_angle=0, rotate_point=Point(), mirror=False, center=True
+        self, scale=1, rotate_angle=0, rotate_point=None, mirror=False, center=True
     ):
         """
         Transforms a path
         """
+
+        if rotate_point is None:
+            rotate_point = Point()
 
         path = self._relative_parsed
 

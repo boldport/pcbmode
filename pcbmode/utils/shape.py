@@ -213,8 +213,11 @@ class Shape:
             )
 
     def transformPath(
-        self, scale=1, rotate=0, rotate_point=Point(), mirror=False, add=False
+        self, scale=1, rotate=0, rotate_point=None, mirror=False, add=False
     ):
+        if rotate_point is None:
+            rotate_point = Point()
+
         if add == False:
             self._path.transform(scale, rotate * self._inv_rotate, rotate_point, mirror)
         else:
@@ -249,7 +252,9 @@ class Shape:
     def get_label(self):
         return self._label
 
-    def rotateLocation(self, angle, point=Point()):
+    def rotateLocation(self, angle, point=None):
+        if point is None:
+            point = Point()
         self._location.rotate(angle, point)
 
     def getRotation(self):

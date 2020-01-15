@@ -390,12 +390,15 @@ class Gerber:
 
         return coords
 
-    def _getCommandListOfPath(self, path, offset=Point()):
+    def _getCommandListOfPath(self, path, offset=None):
         """
         Linearises a path into Gerber points. The 'offset' Point() is
         added to the location.
         Returns a list of Gerber 'commands'.
         """
+
+        if offset is None:
+            offset = Point()
 
         # store the Gerber commands in this list
         commands = {}
