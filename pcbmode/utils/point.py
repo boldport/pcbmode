@@ -23,22 +23,19 @@ import decimal
 from pcbmode.config import config
 
 
-DEG2RAD = 2 * pi / 360
-
-
 class Point:
-    def __init__(self, xy_list=[0,0]):
+    def __init__(self, xy_list=[0, 0]):
         self.set_sig_dig(config.cfg["params"].get("significant-digits", 8))
         self.x = float(xy_list[0])
         self.y = float(xy_list[1])
 
     def __add__(self, p):
         """ add point 'p' of type Point to current point"""
-        return Point(self.x + p.x, self.y + p.y)
+        return Point([self.x + p.x, self.y + p.y])
 
     def __sub__(self, p):
         """ subtract point 'p' of type Point to current point"""
-        return Point(self.x - p.x, self.y - p.y)
+        return Point([self.x - p.x, self.y - p.y])
 
     def __repr__(self, d=2):
         """ 
@@ -65,32 +62,32 @@ class Point:
 
     def rotate(self, deg, p):
         """ rotate the point in degrees around another point """
+        DEG2RAD = 2 * pi / 360
         rad = deg * DEG2RAD
-        x = self.x
-        y = self.y
-        self.x = x * cos(rad) + y * sin(rad)
-        self.y = x * -sin(rad) + y * cos(rad)
-
-    def round(self):
-        """ round decimal to nearest 'd' decimal digits """
-        self.x = self.x
-        self.y = self.y
+        self.x = self.x * cos(rad) + self.y * sin(rad)
+        self.y = self.x * -sin(rad) + self.y * cos(rad)
 
     def mult(self, scalar):
         """ multiply by scalar """
         self.x *= float(scalar)
         self.y *= float(scalar)
 
-    def px(self):
+    def px(self, sd=None):
         """ Apply significant digits and int() floats """
-        if self.x.is_integer():
+        if float(self.x).is_integer():
             return int(self.x)
         else:
-            return round(self.x, self._sig_dig)
+            if sd is None:
+                return round(self.x, self._sig_dig)
+            else:
+                return round(self.x, sd)
 
-    def py(self):
+    def py(self, sd=None):
         """ Apply significant digits and int() floats """
-        if self.y.is_integer():
+        if float(self.y).is_integer():
             return int(self.y)
         else:
-          return round(self.y, self._sig_dig)
+            if sd is None:
+                return round(self.y, self._sig_dig)
+            else:
+                return round(self.y, sd)
