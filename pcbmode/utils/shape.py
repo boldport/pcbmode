@@ -48,10 +48,10 @@ class Shape:
         self._place_mirrored = shape.get("mirror") or False
         self._rotate = shape.get("rotate") or 0
         self._rotate *= self._inv_rotate
-        self._rotate_point = shape.get("rotate-point") or Point(0, 0)
+        self._rotate_point = shape.get("rotate-point") or Point([0,0])
         self._scale = shape.get("scale") or 1
         self._pour_buffer = shape.get("buffer-to-pour")
-        self._location = utils.toPoint(shape.get("location", [0, 0]))
+        self._location = Point(shape.get("location", [0, 0]))
 
         self._style_class = self._shape_dict.get("style_class", None)
         self._style = self._shape_dict.get("style", None)

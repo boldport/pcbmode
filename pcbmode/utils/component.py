@@ -24,6 +24,7 @@ from pcbmode.config import config
 from pcbmode.utils import utils
 from pcbmode.utils import messages as msg
 from pcbmode.utils.shape import Shape
+from pcbmode.utils.point import Point
 from pcbmode.utils.style import Style
 from pcbmode.utils.footprint import Footprint
 from pcbmode.utils import css_utils
@@ -44,9 +45,9 @@ class Component:
         if self._layer == "bottom":
             self._rotate *= -1
 
-        self._rotate_point = utils.toPoint(comp_dict.get("rotate-point", [0, 0]))
+        self._rotate_point = Point(comp_dict.get("rotate-point", [0, 0]))
         self._scale = comp_dict.get("scale", 1)
-        self._location = comp_dict.get("location", [0, 0])
+        self._location = Point(comp_dict.get("location", [0, 0]))
 
         # Get footprint definition and shapes
         try:
@@ -130,7 +131,7 @@ class Component:
         for sheet in ["silkscreen", "assembly"]:
 
             try:
-                refdef_dict = comp_dict[sheet].get("refdef") or {}
+                refdef_dict = comp_dict[sheet].get("refdef", {})
             except:
                 refdef_dict = {}
 
@@ -146,11 +147,11 @@ class Component:
                 if refdef_dict.get("rotate-with-component") != False:
                     refdef_dict["rotate"] += self._rotate
 
-                refdef_dict["rotate-point"] = (
-                    utils.toPoint(refdef_dict.get("rotate-point")) or self._rotate_point
+                refdef_dict["rotate-point"] = Point(
+                    refdef_dict.get("rotate-point", self._rotate_point)
                 )
 
-                refdef_dict["location"] = refdef_dict.get("location") or [0, 0]
+                refdef_dict["location"] = Point(refdef_dict.get("location", [0, 0]))
                 refdef_dict["type"] = "text"
                 refdef_dict["value"] = refdef_dict.get("value") or refdef
 
@@ -213,7 +214,7 @@ class Component:
         """
         return self._footprint_shapes
 
-    def getLocation(self):
+    def get_location(self):
         """
         """
         return self._location
