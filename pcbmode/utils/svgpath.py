@@ -221,7 +221,7 @@ class SvgPath:
                     for coord_tmp in path[i][1:]:
                         coord.assign(coord_tmp[0], coord_tmp[1])
                         p += (
-                            str(float(coord[0]) - abspos["x"]) # why like this?
+                            str(float(coord[0]) - abspos["x"])  # why like this?
                             + ","
                             + str(float(coord[1]) - abspos["y"])
                             + " "
@@ -539,9 +539,6 @@ class SvgPath:
                             bbox_top_left, bbox_bot_right, bezier_point_array[m]
                         )
 
-            #        elif re.match('S', path[i][0], re.I):
-            #            pass
-
             # 'line to'  command
             elif re.match("l", path[i][0]):
                 for coord in path[i][1:]:
@@ -578,8 +575,7 @@ class SvgPath:
 
         self._bbox_top_left = bbox_top_left
         self._bbox_bot_right = bbox_bot_right
-        # self._width = (bbox_bot_right.x - bbox_top_left.x)
-        # self._height = abs(bbox_bot_right.y - bbox_top_left.y)
+
         return (
             (bbox_bot_right.x - bbox_top_left.x),
             abs(bbox_bot_right.y - bbox_top_left.y),
@@ -625,7 +621,6 @@ class SvgPath:
                     self._bbox_top_left.x + width / 2,
                     self._bbox_top_left.y - height / 2,
                 )
-
                 # caluclate what's the new starting point of path based on the new origin
                 new_first_point = Point(
                     first_point.x - origin_point.x, first_point.y - origin_point.y
@@ -938,9 +933,6 @@ class SvgPath:
                     )
 
                     p += bezier_point_array
-
-            #        elif re.match('s', cmd):
-            #            pass
 
             # 'line to'  command
             elif re.match("l", cmd):
