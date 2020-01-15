@@ -29,8 +29,8 @@ DEG2RAD = 2 * pi / 360
 class Point:
     def __init__(self, x=0, y=0):
         self.set_sig_dig(config.cfg["params"].get("significant-digits", 8))
-        self.x = round(float(x), self._sig_dig)
-        self.y = round(float(y), self._sig_dig)
+        self.x = float(x)
+        self.y = float(y)
 
     def __add__(self, p):
         """ add point 'p' of type Point to current point"""
@@ -60,23 +60,37 @@ class Point:
         self._sig_dig = sig_dig
 
     def assign(self, x=0, y=0):
-        self.x = round(float(x), self._sig_dig)
-        self.y = round(float(y), self._sig_dig)
+        self.x = float(x)
+        self.y = float(y)
 
     def rotate(self, deg, p):
         """ rotate the point in degrees around another point """
         rad = deg * DEG2RAD
         x = self.x
         y = self.y
-        self.x = round(x * cos(rad) + y * sin(rad), self._sig_dig)
-        self.y = round(x * -sin(rad) + y * cos(rad), self._sig_dig)
+        self.x = x * cos(rad) + y * sin(rad)
+        self.y = x * -sin(rad) + y * cos(rad)
 
     def round(self):
         """ round decimal to nearest 'd' decimal digits """
-        self.x = round(self.x, self._sig_dig)
-        self.y = round(self.y, self._sig_dig)
+        self.x = self.x
+        self.y = self.y
 
     def mult(self, scalar):
         """ multiply by scalar """
-        self.x *= round(float(scalar), self._sig_dig)
-        self.y *= round(float(scalar), self._sig_dig)
+        self.x *= float(scalar)
+        self.y *= float(scalar)
+
+    def px(self):
+        """ Apply significant digits and int() floats """
+        if self.x.is_integer():
+            return int(self.x)
+        else:
+            return round(self.x, self._sig_dig)
+
+    def py(self):
+        """ Apply significant digits and int() floats """
+        if self.y.is_integer():
+            return int(self.y)
+        else:
+          return round(self.y, self._sig_dig)
