@@ -38,7 +38,7 @@ def placeShape(shape, svg_layer, invert=False, original=False):
     sig_dig = config.cfg["params"]["significant-digits"]
 
     gerber_lp = shape.getGerberLP()
-    location = shape.getLocation()
+    location = shape.get_location()
 
     if original == False:
         translate = f"translate({((1, -1)[invert]) * location.px()},{config.cfg['iya'] * location.py()})"

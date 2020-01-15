@@ -22,6 +22,7 @@ from pcbmode.config import config
 from pcbmode.utils import place
 from pcbmode.utils import utils
 from pcbmode.utils.shape import Shape
+from pcbmode.utils.point import Point
 
 
 def place_docs(layer):
@@ -34,15 +35,15 @@ def place_docs(layer):
         return
 
     for key in docs_dict:
-        location = utils.toPoint(docs_dict[key]["location"])
+        location = Point(docs_dict[key]["location"])
         docs_dict[key]["location"] = [0, 0]
         shape_group = et.SubElement(layer, "g")
         shape_group.set(f"{{{ns_pcm}}}type", "module-shapes")
         shape_group.set(f"{{{ns_pcm}}}doc-key", key)
         shape_group.set(
-            "transform", f"translate({location.x},{config.cfg['iya']*location.y})"
+            "transform", f"translate({location.px()},{config.cfg['iya']*location.py()})"
         )
         location = docs_dict[key]["location"]
-        docs_dict[key]["location"] = [0, 0]
+        docs_dict[key]["location"] = Point() #[0, 0]
         shape = Shape(docs_dict[key])
         place.placeShape(shape, shape_group)

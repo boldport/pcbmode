@@ -64,7 +64,7 @@ class Footprint:
 
         for pin in pins:
 
-            pin_location = pins[pin]["layout"].get("location", [0, 0])
+            pin_location = Point(pins[pin]["layout"].get("location", [0, 0]))
 
             try:
                 pad_name = pins[pin]["layout"]["pad"]
@@ -93,10 +93,10 @@ class Footprint:
                 layers = utils.getExtendedLayerList(shape_dict.get("layers") or ["top"])
 
                 # Add the pin's location to the pad's location
-                shape_location = shape_dict.get("location", [0, 0])
+                shape_location = Point(shape_dict.get("location", [0, 0]))
                 shape_dict["location"] = [
-                    shape_location[0] + pin_location[0],
-                    shape_location[1] + pin_location[1],
+                    shape_location.x + pin_location.x,
+                    shape_location.y + pin_location.y,
                 ]
 
                 # Add the pin's rotation to the pad's rotation
@@ -180,7 +180,7 @@ class Footprint:
                             # Process list of shapes
                             for sdict_ in sdict_list:
                                 sdict = sdict_.copy()
-                                shape_loc = utils.toPoint(sdict.get("location", [0, 0]))
+                                shape_loc = Point(sdict.get("location", [0, 0]))
 
                                 # Apply rotation
                                 sdict["rotate"] = (sdict.get("rotate", 0)) + pin_rotate
@@ -189,8 +189,8 @@ class Footprint:
                                 shape_loc.rotate(pin_rotate, Point())
 
                                 sdict["location"] = [
-                                    shape_loc.x + pin_location[0],
-                                    shape_loc.y + pin_location[1],
+                                    shape_loc.x + pin_location.x,
+                                    shape_loc.y + pin_location.y,
                                 ]
 
                                 # Create new shape
@@ -207,10 +207,10 @@ class Footprint:
             for drill_dict in drills:
                 drill_dict = drill_dict.copy()
                 drill_dict["type"] = drill_dict.get("type") or "drill"
-                drill_location = drill_dict.get("location") or [0, 0]
+                drill_location = Point(drill_dict.get("location", [0, 0]))
                 drill_dict["location"] = [
-                    drill_location[0] + pin_location[0],
-                    drill_location[1] + pin_location[1],
+                    drill_location.x + pin_location.x,
+                    drill_location.y + pin_location.y,
                 ]
                 shape = Shape(drill_dict)
 

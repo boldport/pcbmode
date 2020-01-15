@@ -96,7 +96,7 @@ class Component:
                 for shape in footprint_shapes[sheet].get(layer) or []:
 
                     # In order to apply the rotation we need to adust the location
-                    shape.rotateLocation(self._rotate, self._rotate_point)
+                    shape.rotate_location(self._rotate, self._rotate_point)
 
                     shape.transformPath(
                         scale=self._scale,
@@ -147,10 +147,6 @@ class Component:
                 if refdef_dict.get("rotate-with-component") != False:
                     refdef_dict["rotate"] += self._rotate
 
-                refdef_dict["rotate-point"] = Point(
-                    refdef_dict.get("rotate-point", self._rotate_point)
-                )
-
                 refdef_dict["location"] = Point(refdef_dict.get("location", [0, 0]))
                 refdef_dict["type"] = "text"
                 refdef_dict["value"] = refdef_dict.get("value") or refdef
@@ -165,7 +161,7 @@ class Component:
 
                 refdef_shape = Shape(refdef_dict)
                 refdef_shape.is_refdef = True
-                refdef_shape.rotateLocation(self._rotate, self._rotate_point)
+                refdef_shape.rotate_location(self._rotate, self._rotate_point)
 
                 # Add the refdef to the silkscreen/assembly list. It's
                 # important that this is added at the very end since the

@@ -23,6 +23,7 @@ from pcbmode.config import config
 from pcbmode.utils import utils
 from pcbmode.utils import svg
 from pcbmode.utils import svg_path_create
+from pcbmode.utils.point import Point
 
 
 def place(layer, width, height):
@@ -47,10 +48,10 @@ def place(layer, width, height):
     # Location of index
     default_loc = [-width / 2, -(height / 2 + 2)]
     drill_index = config.brd.get("drill-index", {"location": default_loc})
-    location = utils.toPoint(drill_index.get("location", default_loc))
+    location = Point(drill_index.get("location", default_loc))
 
     # Element
-    transform = f"translate({location.x},{config.cfg['iya']*location.y})"
+    transform = f"translate({location.px()},{config.cfg['iya']*location.py()})"
     group = et.SubElement(layer, "g", transform=transform)
     group.set(f"{{{ns_pcm}}}type", "drill-index")
 
@@ -74,7 +75,7 @@ def place(layer, width, height):
         location.x = diameter / 2
         location.y += config.cfg["iya"] * max(diameter / 2, 2)
         path = svg_path_create.drill(diameter)
-        transform = f"translate({location.x},{config.cfg['iya']*location.y})"
+        transform = f"translate({location.px()},{config.cfg['iya']*location.py()})"
         symbol_el = et.SubElement(group, "path", d=path, transform=transform)
         symbol_el.set("fill-rule", "evenodd")
         symbol_el.set("class", "drill-index-symbol")

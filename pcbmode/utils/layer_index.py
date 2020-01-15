@@ -26,6 +26,7 @@ from pcbmode.utils import svg
 from pcbmode.utils import css_utils
 from pcbmode.utils import svg_path_create
 from pcbmode.utils.shape import Shape
+from pcbmode.utils.point import Point
 
 
 def place_index(layers, width, height):
@@ -55,7 +56,7 @@ def place_index(layers, width, height):
     # Location of index
     default_loc = [width / 2 + 2, config.cfg["iya"] * -(height / 2 - rect_height / 2)]
     drill_index = config.brd.get("layer-index", {"location": default_loc})
-    location = utils.toPoint(drill_index.get("location", default_loc))
+    location = Point(drill_index.get("location", default_loc))
 
     rect_dict = {}
     rect_dict["type"] = "rect"
@@ -77,7 +78,7 @@ def place_index(layers, width, height):
 
         for sheet in sheets:
             layer = layers[pcb_layer][sheet]["layer"]
-            transform = f"translate({location.x},{config.cfg['iya']*location.y})"
+            transform = f"translate({location.px()},{config.cfg['iya']*location.py()})"
             group = et.SubElement(layer, "g", transform=transform)
             group.set(f"{{{ns_pcm}}}type", "layer-index")
             rect_shape = Shape(rect_dict)

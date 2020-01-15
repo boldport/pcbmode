@@ -297,7 +297,7 @@ class Module:
 
         for component in components:
             shapes_dict = component.getShapes()
-            location = component.getLocation()
+            location = component.get_location()
             rotation = component.getRotation()
             refdef = component.getRefdef()
 
@@ -322,7 +322,7 @@ class Module:
                     svg_layer = self._layers[pcb_layer]["conductor"]["pads"]["layer"]
 
                     transform = (
-                        f"translate({location[0]},{config.cfg['iya']*location[1]})"
+                        f"translate({location.px()},{config.cfg['iya']*location.py()})"
                     )
 
                     shape_group = et.SubElement(svg_layer, "g", transform=transform)
@@ -358,7 +358,7 @@ class Module:
                         svg_layer, "g", mask=f"url(#mask-{pcb_layer})"
                     )
                     transform = (
-                        f"translate({location[0]},{config.cfg['iya']*location[1]})"
+                        f"translate({location.px()},{config.cfg['iya']*location.py()})"
                     )
                     group = et.SubElement(shape_group, "g", transform=transform)
                     group.set(f"{{{ns_pcm}}}type", "pours")
@@ -374,7 +374,7 @@ class Module:
 
                 if len(shapes) > 0 and svg_layer != None:
                     transform = (
-                        f"translate({location[0]},{config.cfg['iya']*location[1]})"
+                        f"translate({location.px()},{config.cfg['iya']*location.py()})"
                     )
                     group = et.SubElement(svg_layer, "g", transform=transform)
                     group.set(f"{{{ns_pcm}}}type", "component-shapes")
@@ -390,7 +390,7 @@ class Module:
 
                 if len(shapes) > 0 and svg_layer != None:
                     transform = (
-                        f"translate({location[0]},{config.cfg['iya']*location[1]})"
+                        f"translate({location.px()},{config.cfg['iya']*location.py()})"
                     )
                     group = et.SubElement(svg_layer, "g", transform=transform)
                     group.set(f"{{{ns_pcm}}}type", "component-shapes")
@@ -406,7 +406,7 @@ class Module:
 
                 if len(shapes) > 0 and svg_layer != None:
                     transform = (
-                        f"translate({location[0]},{config.cfg['iya']*location[1]})"
+                        f"translate({location.px()},{config.cfg['iya']*location.py()})"
                     )
                     shape_group = et.SubElement(svg_layer, "g", transform=transform)
                     shape_group.set(f"{{{ns_pcm}}}type", "component-shapes")
@@ -445,7 +445,7 @@ class Module:
 
                 if len(shapes) > 0 and svg_layer != None:
                     transform = (
-                        f"translate({location[0]},{config.cfg['iya']*location[1]})"
+                        f"translate({location.px()},{config.cfg['iya']*location.py()})"
                     )
                     group = et.SubElement(svg_layer, "g", transform=transform)
                     for shape in shapes:
@@ -456,7 +456,7 @@ class Module:
                 if len(shapes) > 0:
                     svg_layer = self._layers["drills"]["layer"]
                     transform = (
-                        f"translate({location[0]},{config.cfg['iya']*location[1]})"
+                        f"translate({location.px()},{config.cfg['iya']*location.py()})"
                     )
                     group = et.SubElement(svg_layer, "g", transform=transform)
                     group.set(f"{{{ns_pcm}}}type", "component-shapes")
@@ -488,7 +488,7 @@ class Module:
                 pass
 
             path = svg_path_create.marker()
-            transform = f"translate({location[0]},{config.cfg['iya'] * location[1]})"
+            transform = f"translate({location.px()},{config.cfg['iya'] * location.py()})"
 
             if placement_layer == "bottom":
                 rotation *= -1
@@ -507,7 +507,8 @@ class Module:
                 ts = et.SubElement(t, "tspan", x="0", dy="0.1")
                 ts.text = htmlpar.unescape("%s&#176;" % (rotation))
                 ts = et.SubElement(t, "tspan", x="0", dy="0.1")
-                ts.text = "[%.2f,%.2f]" % (location[0], location[1])
+                ts.text = f"[{location.px(2)},{location.py(2)}]"
+#                ts.text = "[%.2f,%.2f]" % (location[0], location[1])
             elif component_type == "shape":
                 t = et.SubElement(group, "text", x="0", y="-0.17")
                 t.set("class", style_class)
@@ -516,14 +517,16 @@ class Module:
                 ts = et.SubElement(t, "tspan", x="0", dy="0.1")
                 ts.text = htmlpar.unescape("%s&#176;" % (rotation))
                 ts = et.SubElement(t, "tspan", x="0", dy="0.1")
-                ts.text = "[%.2f,%.2f]" % (location[0], location[1])
+                ts.text = f"[{location.px(2)},{location.py(2)}]"
+#                ts.text = "[%.2f,%.2f]" % (location[0], location[1])
             elif component_type == "via":
                 t = et.SubElement(group, "text", x="0", y="-0.11")
                 t.set("class", style_class)
                 ts = et.SubElement(t, "tspan", x="0", dy="0.1")
                 ts.text = htmlpar.unescape("%s&#176;" % (rotation))
                 ts = et.SubElement(t, "tspan", x="0", dy="0.1")
-                ts.text = "[%.2f,%.2f]" % (location[0], location[1])
+                ts.text = f"[{location.px(2)},{location.py(2)}]"
+#                ts.text = "[%.2f,%.2f]" % (location[0], location[1])
             else:
                 continue
 

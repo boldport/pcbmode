@@ -61,7 +61,7 @@ def absolute_to_relative_path(path):
 
             # TODO: write this code more concisely
 
-            coord = Point(pd[i][1][0], pd[i][1][1])
+            coord = Point(pd[i][1])
             p += "m "
 
             # if this is the start of the path, the first M/m coordinate is
@@ -267,12 +267,12 @@ def relative_svg_path_to_absolute_coord_list(
         # 'move to' command
         if re.match("m", cmd):
             if i == 0:
-                coord = Point(pd[i][1][0], pd[i][1][1])
+                coord = Point(pd[i][1])
                 ap.assign(coord.x, coord.y)
                 p.append(ap)
                 po.assign(coord.x, coord.y)
             else:
-                coord_tmp = Point(pd[i][1][0], pd[i][1][1])
+                coord_tmp = Point(pd[i][1])
                 ap += coord_tmp
                 # a marker that a new path is starting after a previous one closed
                 points.append(p)
@@ -281,7 +281,7 @@ def relative_svg_path_to_absolute_coord_list(
                 po = ap
 
             for coord_tmp in pd[i][2:]:
-                coord = Point(coord_tmp[0], coord_tmp[1])
+                coord = Point(coord_tmp)
                 ap += coord
                 p.append(ap)
 
@@ -294,9 +294,9 @@ def relative_svg_path_to_absolute_coord_list(
                 bezier_curve_path.append(ap)
                 for m in range(0, 3):
                     coord = pd[i][n + m]
-                    point = Point(coord[0], coord[1])
+                    point = Point(coord)
                     bezier_curve_path.append(ap + point)
-                new_point = Point(pd[i][n + m][0], pd[i][n + m][1])
+                new_point = Point(pd[i][n + m])
                 ap += new_point
 
             for n in range(0, len(bezier_curve_path), 4):
@@ -331,9 +331,9 @@ def relative_svg_path_to_absolute_coord_list(
 
                 # put thos points back into a Point type array
                 for n in range(0, len(points_x), skip):
-                    bezier_point_array.append(Point(points_x[n], points_y[n]))
+                    bezier_point_array.append(Point([points_x[n], points_y[n]]))
                 bezier_point_array.append(
-                    Point(points_x[len(points_x) - 1], points_y[len(points_x) - 1])
+                    Point([points_x[len(points_x) - 1], points_y[len(points_x) - 1]])
                 )
 
                 p += bezier_point_array
@@ -347,7 +347,7 @@ def relative_svg_path_to_absolute_coord_list(
                 bezier_curve_path.append(ap)
                 for m in range(0, 2):
                     coord = pd[i][n + m]
-                    point = Point(coord[0], coord[1])
+                    point = Point(coord)
                     bezier_curve_path.append(ap + point)
                     # inject a second, identical control point so this quadratic
                     # bezier looks like a cubic one
@@ -355,7 +355,7 @@ def relative_svg_path_to_absolute_coord_list(
                         bezier_curve_path.append(ap + point)
                     if m == 0:
                         last_bezier_control_point = ap + point
-                new_point = Point(pd[i][n + m][0], pd[i][n + m][1])
+                new_point = Point(pd[i][n + m])
                 ap += new_point
 
             for n in range(0, len(bezier_curve_path), 4):
@@ -386,9 +386,9 @@ def relative_svg_path_to_absolute_coord_list(
 
                 # put those points back into a Point type array
                 for n in range(0, len(points_x), skip):
-                    bezier_point_array.append(Point(points_x[n], points_y[n]))
+                    bezier_point_array.append(Point([points_x[n], points_y[n]]))
                 bezier_point_array.append(
-                    Point(points_x[len(points_x) - 1], points_y[len(points_x) - 1])
+                    Point([points_x[len(points_x) - 1], points_y[len(points_x) - 1]])
                 )
 
                 p += bezier_point_array
@@ -401,18 +401,18 @@ def relative_svg_path_to_absolute_coord_list(
             for n in range(1, len(pd[i])):
                 bezier_curve_path.append(ap)
                 coord = pd[i][n]
-                point = Point(coord[0], coord[1])
+                point = Point(coord)
                 end_point = ap + point
                 diff = Point(
-                    ap.x - last_bezier_control_point.x,
-                    ap.y - last_bezier_control_point.y,
+                    [ap.x - last_bezier_control_point.x,
+                    ap.y - last_bezier_control_point.y]
                 )
                 control_point = ap + diff
                 bezier_curve_path.append(control_point)
                 bezier_curve_path.append(end_point)
                 bezier_curve_path.append(end_point)
                 last_bezier_control_point = control_point
-                new_point = Point(pd[i][n][0], pd[i][n][1])
+                new_point = Point(pd[i][n])
                 ap += new_point
 
             for n in range(0, len(bezier_curve_path), 4):
@@ -443,9 +443,9 @@ def relative_svg_path_to_absolute_coord_list(
 
                 # put those points back into a Point type array
                 for m in range(0, len(points_x), skip):
-                    bezier_point_array.append(Point(points_x[m], points_y[m]))
+                    bezier_point_array.append(Point([points_x[m], points_y[m]]))
                 bezier_point_array.append(
-                    Point(points_x[len(points_x) - 1], points_y[len(points_x) - 1])
+                    Point([points_x[len(points_x) - 1], points_y[len(points_x) - 1]])
                 )
 
                 p += bezier_point_array
@@ -456,21 +456,21 @@ def relative_svg_path_to_absolute_coord_list(
         # 'line to'  command
         elif re.match("l", cmd):
             for coord_tmp in pd[i][1:]:
-                coord = Point(coord_tmp[0], coord_tmp[1])
+                coord = Point(coord_tmp)
                 ap += coord
                 p.append(ap)
 
         # 'horizontal line' command
         elif re.match("h", cmd):
             for coord_tmp in pd[i][1:]:
-                coord = Point(coord_tmp[0], 0)
+                coord = Point([coord_tmp[0], 0])
                 ap += coord
                 p.append(ap)
 
         # 'vertical line' command
         elif re.match("v", cmd):
             for coord_tmp in pd[i][1:]:
-                coord = Point(0, coord_tmp[0])
+                coord = Point([0, coord_tmp[0]])
                 ap += coord
                 p.append(ap)
 
@@ -544,8 +544,8 @@ def mirror_path_over_axis(path, axis, width):
 
 def boundary_box_check(tl, br, p):
 
-    new_tl = Point(tl.x, tl.y)
-    new_br = Point(br.x, br.y)
+    new_tl = Point([tl.x, tl.y])
+    new_br = Point([br.x, br.y])
 
     if p.x > br.x:
         new_br.x = p.x
@@ -594,7 +594,7 @@ def calculate_bounding_box_of_path(path):
                 bbox_top_left.assign(pd[i][1][0], pd[i][1][1])
                 bbox_bot_right.assign(pd[i][1][0], pd[i][1][1])
             else:
-                new_point = Point(pd[i][1][0], pd[i][1][1])
+                new_point = Point(pd[i][1])
                 abs_point += new_point
                 bbox_top_left, bbox_bot_right = boundary_box_check(
                     bbox_top_left, bbox_bot_right, abs_point
@@ -602,7 +602,7 @@ def calculate_bounding_box_of_path(path):
 
             # for the rest of the coordinates
             for coord in pd[i][2:]:
-                new_point = Point(coord[0], coord[1])
+                new_point = Point(coord)
                 abs_point += new_point
                 bbox_top_left, bbox_bot_right = boundary_box_check(
                     bbox_top_left, bbox_bot_right, abs_point
@@ -617,9 +617,9 @@ def calculate_bounding_box_of_path(path):
                 bezier_curve_path.append(abs_point)
                 for m in range(0, 3):
                     coord = pd[i][n + m]
-                    point = Point(coord[0], coord[1])
+                    point = Point(coord)
                     bezier_curve_path.append(abs_point + point)
-                new_point = Point(pd[i][n + m][0], pd[i][n + m][1])
+                new_point = Point(pd[i][n + m])
                 abs_point += new_point
 
             for n in range(0, len(bezier_curve_path), 4):
@@ -643,7 +643,7 @@ def calculate_bounding_box_of_path(path):
 
                 # put those points back into a Point type array
                 for n in range(0, len(points_x)):
-                    bezier_point_array.append(Point(points_x[n], points_y[n]))
+                    bezier_point_array.append(Point([points_x[n], points_y[n]]))
 
                 # check each point if it extends the boundary box
                 for n in range(0, len(bezier_point_array)):
@@ -660,7 +660,7 @@ def calculate_bounding_box_of_path(path):
                 bezier_curve_path.append(abs_point)
                 for m in range(0, 2):
                     coord = pd[i][n + m]
-                    point = Point(coord[0], coord[1])
+                    point = Point(coord)
                     bezier_curve_path.append(abs_point + point)
                     # inject a second, identical control point so this quadratic
                     # bezier looks like a cubic one
@@ -668,7 +668,7 @@ def calculate_bounding_box_of_path(path):
                         bezier_curve_path.append(abs_point + point)
                     if m == 0:
                         last_bezier_control_point = abs_point + point
-                new_point = Point(pd[i][n + m][0], pd[i][n + m][1])
+                new_point = Point(pd[i][n + m])
                 abs_point += new_point
 
             for n in range(0, len(bezier_curve_path), 4):
@@ -692,7 +692,7 @@ def calculate_bounding_box_of_path(path):
 
                 # put those points back into a Point type array
                 for n in range(0, len(points_x)):
-                    bezier_point_array.append(Point(points_x[n], points_y[n]))
+                    bezier_point_array.append(Point([points_x[n], points_y[n]]))
 
                 # check each point if it extends the boundary box
                 for n in range(0, len(bezier_point_array)):
@@ -707,18 +707,18 @@ def calculate_bounding_box_of_path(path):
             for n in range(1, len(pd[i])):
                 bezier_curve_path.append(abs_point)
                 coord = pd[i][n]
-                point = Point(coord[0], coord[1])
+                point = Point(coord)
                 end_point = abs_point + point
                 diff = Point(
-                    abs_point.x - last_bezier_control_point.x,
-                    abs_point.y - last_bezier_control_point.y,
+                    [abs_point.x - last_bezier_control_point.x,
+                    abs_point.y - last_bezier_control_point.y]
                 )
                 control_point = abs_point + diff
                 bezier_curve_path.append(control_point)
                 bezier_curve_path.append(end_point)
                 bezier_curve_path.append(end_point)
                 last_bezier_control_point = control_point
-                new_point = Point(pd[i][n][0], pd[i][n][1])
+                new_point = Point(pd[i][n])
                 abs_point += new_point
 
             for n in range(0, len(bezier_curve_path), 4):
@@ -742,7 +742,7 @@ def calculate_bounding_box_of_path(path):
 
                 # put those points back into a Point type array
                 for n in range(0, len(points_x)):
-                    bezier_point_array.append(Point(points_x[n], points_y[n]))
+                    bezier_point_array.append(Point([points_x[n], points_y[n]]))
 
                 # check each point if it extends the boundary box
                 for m in range(0, len(bezier_point_array)):
@@ -756,7 +756,7 @@ def calculate_bounding_box_of_path(path):
         # 'line to'  command
         elif re.match("l", pd[i][0]):
             for coord in pd[i][1:]:
-                new_point = Point(coord[0], coord[1])
+                new_point = Point(coord)
                 abs_point += new_point
                 bbox_top_left, bbox_bot_right = boundary_box_check(
                     bbox_top_left, bbox_bot_right, abs_point
@@ -765,7 +765,7 @@ def calculate_bounding_box_of_path(path):
         # 'horizontal line' command
         elif re.match("h", pd[i][0]):
             for coord in pd[i][1:]:
-                new_point = Point(coord[0], 0)
+                new_point = Point([coord[0], 0])
                 abs_point += new_point
                 bbox_top_left, bbox_bot_right = boundary_box_check(
                     bbox_top_left, bbox_bot_right, abs_point
@@ -774,7 +774,7 @@ def calculate_bounding_box_of_path(path):
         # 'vertical line' command
         elif re.match("v", pd[i][0]):
             for coord in pd[i][1:]:
-                new_point = Point(0, coord[0])
+                new_point = Point([0, coord[0]])
                 abs_point += new_point
                 bbox_top_left, bbox_bot_right = boundary_box_check(
                     bbox_top_left, bbox_bot_right, abs_point
@@ -845,18 +845,18 @@ def transform_path(p, center=False, scale=1, rotate_angle=0, rotate_point=None):
     pd = look_for.parseString(p)
 
     # first point of path
-    first_point = Point(pd[0][1][0], pd[0][1][1])
+    first_point = Point(pd[0][1])
 
     if center is True:
         # center point of path
-        origin_point = Point(p_tl.x + width / 2, p_tl.y - height / 2)
+        origin_point = Point([p_tl.x + width / 2, p_tl.y - height / 2])
 
         # caluclate what's the new starting point of path based on the new origin
         new_first_point = Point(
-            first_point.x - origin_point.x, first_point.y - origin_point.y
+            [first_point.x - origin_point.x, first_point.y - origin_point.y]
         )
     else:
-        new_first_point = Point(first_point.x, first_point.y)
+        new_first_point = Point([first_point.x, first_point.y])
 
     new_first_point.rotate(rotate_angle, rotate_point)
     new_first_point.mult(scale)
@@ -1028,9 +1028,9 @@ def create_meandering_path(params):
     pitch = params.get("pitch") or 0
 
     coords = []
-    coords.append(Point(0, -(number - 1) * pitch / 2))
+    coords.append(Point([0, -(number - 1) * pitch / 2]))
     for n in range(1, int(number)):
-        coords.append(Point(2 * radius * cos(theta * deg_to_rad), pitch))
+        coords.append(Point([2 * radius * cos(theta * deg_to_rad), pitch]))
 
     path = ""
 
@@ -1115,11 +1115,11 @@ def calculate_cubic_bezier_length(px, py):
 
     length = 0.0
 
-    prev = Point(px[0], py[0])
+    prev = Point([px[0], py[0]])
 
     for i in range(1, len(px)):
         length += sqrt((px[i] - prev.x) ** 2 + (py[i] - prev.y) ** 2)
-        prev = Point(px[i], py[i])
+        prev = Point([px[i], py[i]])
 
     return length
 

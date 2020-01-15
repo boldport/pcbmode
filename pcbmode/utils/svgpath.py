@@ -132,7 +132,7 @@ class SvgPath:
 
                 # TODO: write this code more concisely
 
-                coord = Point(path[i][1][0], path[i][1][1])
+                coord = Point(path[i][1])
                 p += "m "
 
                 # if this is the start of the path, the first M/m coordinate is
@@ -371,7 +371,7 @@ class SvgPath:
                     bbox_top_left.assign(path[i][1][0], path[i][1][1])
                     bbox_bot_right.assign(path[i][1][0], path[i][1][1])
                 else:
-                    new_point = Point(path[i][1][0], path[i][1][1])
+                    new_point = Point(path[i][1])
                     abs_point += new_point
                     bbox_top_left, bbox_bot_right = svg.boundary_box_check(
                         bbox_top_left, bbox_bot_right, abs_point
@@ -379,7 +379,7 @@ class SvgPath:
 
                 # for the rest of the coordinates
                 for coord in path[i][2:]:
-                    new_point = Point(coord[0], coord[1])
+                    new_point = Point(coord)
                     abs_point += new_point
                     bbox_top_left, bbox_bot_right = svg.boundary_box_check(
                         bbox_top_left, bbox_bot_right, abs_point
@@ -394,9 +394,9 @@ class SvgPath:
                     bezier_curve_path.append(abs_point)
                     for m in range(0, 3):
                         coord = path[i][n + m]
-                        point = Point(coord[0], coord[1])
+                        point = Point(coord)
                         bezier_curve_path.append(abs_point + point)
-                    new_point = Point(path[i][n + m][0], path[i][n + m][1])
+                    new_point = Point(path[i][n + m])
                     abs_point += new_point
 
                 for n in range(0, len(bezier_curve_path), 4):
@@ -424,7 +424,7 @@ class SvgPath:
 
                     # put those points back into a Point type array
                     for n in range(0, len(points_x)):
-                        bezier_point_array.append(Point(points_x[n], points_y[n]))
+                        bezier_point_array.append(Point([points_x[n], points_y[n]]))
 
                     # check each point if it extends the boundary box
                     for n in range(0, len(bezier_point_array)):
@@ -441,7 +441,7 @@ class SvgPath:
                     bezier_curve_path.append(abs_point)
                     for m in range(0, 2):
                         coord = path[i][n + m]
-                        point = Point(coord[0], coord[1])
+                        point = Point(coord)
                         bezier_curve_path.append(abs_point + point)
                         # inject a second, identical control point so this quadratic
                         # bezier looks like a cubic one
@@ -449,7 +449,7 @@ class SvgPath:
                             bezier_curve_path.append(abs_point + point)
                         if m == 0:
                             last_bezier_control_point = abs_point + point
-                    new_point = Point(path[i][n + m][0], path[i][n + m][1])
+                    new_point = Point(path[i][n + m])
                     abs_point += new_point
 
                 for n in range(0, len(bezier_curve_path), 4):
@@ -477,7 +477,7 @@ class SvgPath:
 
                     # put those points back into a Point type array
                     for n in range(0, len(points_x)):
-                        bezier_point_array.append(Point(points_x[n], points_y[n]))
+                        bezier_point_array.append(Point([points_x[n], points_y[n]]))
 
                     # check each point if it extends the boundary box
                     for n in range(0, len(bezier_point_array)):
@@ -492,18 +492,20 @@ class SvgPath:
                 for n in range(1, len(path[i])):
                     bezier_curve_path.append(abs_point)
                     coord = path[i][n]
-                    point = Point(coord[0], coord[1])
+                    point = Point(coord)
                     end_point = abs_point + point
                     diff = Point(
-                        abs_point.x - last_bezier_control_point.x,
-                        abs_point.y - last_bezier_control_point.y,
+                        [
+                            abs_point.x - last_bezier_control_point.x,
+                            abs_point.y - last_bezier_control_point.y,
+                        ]
                     )
                     control_point = abs_point + diff
                     bezier_curve_path.append(control_point)
                     bezier_curve_path.append(end_point)
                     bezier_curve_path.append(end_point)
                     last_bezier_control_point = control_point
-                    new_point = Point(path[i][n][0], path[i][n][1])
+                    new_point = Point(path[i][n])
                     abs_point += new_point
 
                 for n in range(0, len(bezier_curve_path), 4):
@@ -531,7 +533,7 @@ class SvgPath:
 
                     # put those points back into a Point type array
                     for n in range(0, len(points_x)):
-                        bezier_point_array.append(Point(points_x[n], points_y[n]))
+                        bezier_point_array.append(Point([points_x[n], points_y[n]]))
 
                     # check each point if it extends the boundary box
                     for m in range(0, len(bezier_point_array)):
@@ -542,7 +544,7 @@ class SvgPath:
             # 'line to'  command
             elif re.match("l", path[i][0]):
                 for coord in path[i][1:]:
-                    new_point = Point(coord[0], coord[1])
+                    new_point = Point(coord)
                     abs_point += new_point
                     bbox_top_left, bbox_bot_right = svg.boundary_box_check(
                         bbox_top_left, bbox_bot_right, abs_point
@@ -551,7 +553,7 @@ class SvgPath:
             # 'horizontal line' command
             elif re.match("h", path[i][0]):
                 for coord in path[i][1:]:
-                    new_point = Point(coord[0], 0)
+                    new_point = Point([coord[0], 0])
                     abs_point += new_point
                     bbox_top_left, bbox_bot_right = svg.boundary_box_check(
                         bbox_top_left, bbox_bot_right, abs_point
@@ -560,7 +562,7 @@ class SvgPath:
             # 'vertical line' command
             elif re.match("v", path[i][0]):
                 for coord in path[i][1:]:
-                    new_point = Point(0, coord[0])
+                    new_point = Point([0, coord[0]])
                     abs_point += new_point
                     bbox_top_left, bbox_bot_right = svg.boundary_box_check(
                         bbox_top_left, bbox_bot_right, abs_point
@@ -613,20 +615,20 @@ class SvgPath:
             width, height = self._getDimensions(path)
 
             # first point of path
-            first_point = Point(path[0][1][0], path[0][1][1])
+            first_point = Point(path[0][1])
 
             if center is True:
                 # center point of path
                 origin_point = Point(
-                    self._bbox_top_left.x + width / 2,
-                    self._bbox_top_left.y - height / 2,
+                    [self._bbox_top_left.x + width / 2,
+                    self._bbox_top_left.y - height / 2]
                 )
                 # caluclate what's the new starting point of path based on the new origin
                 new_first_point = Point(
-                    first_point.x - origin_point.x, first_point.y - origin_point.y
+                    [first_point.x - origin_point.x, first_point.y - origin_point.y]
                 )
             else:
-                new_first_point = Point(first_point.x, first_point.y)
+                new_first_point = Point([first_point.x, first_point.y])
 
             new_first_point.rotate(rotate_angle, rotate_point)
             new_first_point.mult(scale)
@@ -730,7 +732,7 @@ class SvgPath:
 
         for i in range(1, len(px)):
             length += sqrt((px[i] - prev.x) ** 2 + (py[i] - prev.y) ** 2)
-            prev = Point(px[i], py[i])
+            prev = Point([px[i], py[i]])
 
         return length
 
@@ -762,12 +764,12 @@ class SvgPath:
             # 'move to' command
             if re.match("m", cmd):
                 if i == 0:
-                    coord = Point(pd[i][1][0], pd[i][1][1])
+                    coord = Point(pd[i][1])
                     ap.assign(coord.x, coord.y)
                     p.append(ap)
                     po.assign(coord.x, coord.y)
                 else:
-                    coord_tmp = Point(pd[i][1][0], pd[i][1][1])
+                    coord_tmp = Point(pd[i][1])
                     ap += coord_tmp
                     # a marker that a new path is starting after a previous one closed
                     points.append(p)
@@ -776,7 +778,7 @@ class SvgPath:
                     po = ap
 
                 for coord_tmp in pd[i][2:]:
-                    coord = Point(coord_tmp[0], coord_tmp[1])
+                    coord = Point(coord_tmp)
                     ap += coord
                     p.append(ap)
 
@@ -789,9 +791,9 @@ class SvgPath:
                     bezier_curve_path.append(ap)
                     for m in range(0, 3):
                         coord = pd[i][n + m]
-                        point = Point(coord[0], coord[1])
+                        point = Point(coord)
                         bezier_curve_path.append(ap + point)
-                    new_point = Point(pd[i][n + m][0], pd[i][n + m][1])
+                    new_point = Point(pd[i][n + m])
                     ap += new_point
 
                 for n in range(0, len(bezier_curve_path), 4):
@@ -823,9 +825,9 @@ class SvgPath:
 
                     # put thos points back into a Point type array
                     for n in range(0, len(points_x), skip):
-                        bezier_point_array.append(Point(points_x[n], points_y[n]))
+                        bezier_point_array.append(Point([points_x[n], points_y[n]]))
                     bezier_point_array.append(
-                        Point(points_x[len(points_x) - 1], points_y[len(points_x) - 1])
+                        Point([points_x[len(points_x) - 1], points_y[len(points_x) - 1]])
                     )
 
                     p += bezier_point_array
@@ -839,7 +841,7 @@ class SvgPath:
                     bezier_curve_path.append(ap)
                     for m in range(0, 2):
                         coord = pd[i][n + m]
-                        point = Point(coord[0], coord[1])
+                        point = Point(coord)
                         bezier_curve_path.append(ap + point)
                         # inject a second, identical control point so this quadratic
                         # bezier looks like a cubic one
@@ -847,7 +849,7 @@ class SvgPath:
                             bezier_curve_path.append(ap + point)
                         if m == 0:
                             last_bezier_control_point = ap + point
-                    new_point = Point(pd[i][n + m][0], pd[i][n + m][1])
+                    new_point = Point(pd[i][n + m])
                     ap += new_point
 
                 for n in range(0, len(bezier_curve_path), 4):
@@ -874,9 +876,9 @@ class SvgPath:
 
                     # put those points back into a Point type array
                     for n in range(0, len(points_x), skip):
-                        bezier_point_array.append(Point(points_x[n], points_y[n]))
+                        bezier_point_array.append(Point([points_x[n], points_y[n]]))
                     bezier_point_array.append(
-                        Point(points_x[len(points_x) - 1], points_y[len(points_x) - 1])
+                        Point([points_x[len(points_x) - 1], points_y[len(points_x) - 1]])
                     )
 
                     p += bezier_point_array
@@ -889,18 +891,18 @@ class SvgPath:
                 for n in range(1, len(pd[i])):
                     bezier_curve_path.append(ap)
                     coord = pd[i][n]
-                    point = Point(coord[0], coord[1])
+                    point = Point(coord)
                     end_point = ap + point
                     diff = Point(
-                        ap.x - last_bezier_control_point.x,
-                        ap.y - last_bezier_control_point.y,
+                        [ap.x - last_bezier_control_point.x,
+                        ap.y - last_bezier_control_point.y]
                     )
                     control_point = ap + diff
                     bezier_curve_path.append(control_point)
                     bezier_curve_path.append(end_point)
                     bezier_curve_path.append(end_point)
                     last_bezier_control_point = control_point
-                    new_point = Point(pd[i][n][0], pd[i][n][1])
+                    new_point = Point(pd[i][n])
                     ap += new_point
 
                 for n in range(0, len(bezier_curve_path), 4):
@@ -927,9 +929,9 @@ class SvgPath:
 
                     # put those points back into a Point type array
                     for m in range(0, len(points_x), skip):
-                        bezier_point_array.append(Point(points_x[m], points_y[m]))
+                        bezier_point_array.append(Point([points_x[m], points_y[m]]))
                     bezier_point_array.append(
-                        Point(points_x[len(points_x) - 1], points_y[len(points_x) - 1])
+                        Point([points_x[len(points_x) - 1], points_y[len(points_x) - 1]])
                     )
 
                     p += bezier_point_array
@@ -937,21 +939,21 @@ class SvgPath:
             # 'line to'  command
             elif re.match("l", cmd):
                 for coord_tmp in pd[i][1:]:
-                    coord = Point(coord_tmp[0], coord_tmp[1])
+                    coord = Point(coord_tmp)
                     ap += coord
                     p.append(ap)
 
             # 'horizontal line' command
             elif re.match("h", cmd):
                 for coord_tmp in pd[i][1:]:
-                    coord = Point(coord_tmp[0], 0)
+                    coord = Point([coord_tmp[0], 0])
                     ap += coord
                     p.append(ap)
 
             # 'vertical line' command
             elif re.match("v", cmd):
                 for coord_tmp in pd[i][1:]:
-                    coord = Point(0, coord_tmp[0])
+                    coord = Point([0, coord_tmp[0]])
                     ap += coord
                     p.append(ap)
 

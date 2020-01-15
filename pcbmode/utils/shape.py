@@ -51,7 +51,12 @@ class Shape:
         self._rotate_point = shape.get("rotate-point") or Point([0,0])
         self._scale = shape.get("scale") or 1
         self._pour_buffer = shape.get("buffer-to-pour")
-        self._location = Point(shape.get("location", [0, 0]))
+        self._location = shape.get("location", Point())
+
+        # Somewhere the location input isn't being converted to Point()
+        # This checks... but needs to be removed eventually
+        if isinstance(self._location, Point) is False:
+             self._location = Point(self._location)
 
         self._style_class = self._shape_dict.get("style_class", None)
         self._style = self._shape_dict.get("style", None)
@@ -252,7 +257,7 @@ class Shape:
     def get_label(self):
         return self._label
 
-    def rotateLocation(self, angle, point=None):
+    def rotate_location(self, angle, point=None):
         if point is None:
             point = Point()
         self._location.rotate(angle, point)
@@ -284,10 +289,10 @@ class Shape:
     def getScale(self):
         return self._scale
 
-    def getLocation(self):
+    def get_location(self):
         return self._location
 
-    def setLocation(self, location):
+    def set_location(self, location):
         self._location = location
 
     def getParsedPath(self):
