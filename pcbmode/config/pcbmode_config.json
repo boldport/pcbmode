@@ -32,7 +32,7 @@
   },
   "params": {
     "units": "mm",
-    "significant-digits": 8,
+    "significant-digits": 6,
     "display-frame-buffer": 1.0,
     "num-of-digest-digits": 12,
     "invert-y-axis": true
