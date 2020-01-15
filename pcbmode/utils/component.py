@@ -33,28 +33,28 @@ class Component:
     """
     """
 
-    def __init__(self, refdef, component):
+    def __init__(self, refdef, comp_dict):
         """
         """
 
         self._refdef = refdef
-        self._layer = component.get("layer") or "top"
+        self._layer = comp_dict.get("layer") or "top"
 
-        self._rotate = component.get("rotate") or 0
+        self._rotate = comp_dict.get("rotate") or 0
         if self._layer == "bottom":
             self._rotate *= -1
 
-        self._rotate_point = utils.toPoint(component.get("rotate-point", [0, 0]))
-        self._scale = component.get("scale", 1)
-        self._location = component.get("location", [0, 0])
+        self._rotate_point = utils.toPoint(comp_dict.get("rotate-point", [0, 0]))
+        self._scale = comp_dict.get("scale", 1)
+        self._location = comp_dict.get("location", [0, 0])
 
         # Get footprint definition and shapes
         try:
-            self._footprint_name = component["footprint"]
+            self._footprint_name = comp_dict["footprint"]
         except:
             msg.error(f"Cannot find a 'footprint' name for refdef {refdef}.")
 
-        filename = self._footprint_name + ".json"
+        filename = f"{self._footprint_name}.json"
 
         # Look for the files in both components and shapes paths.
         paths = [
@@ -114,7 +114,7 @@ class Component:
         for sheet in ["silkscreen", "assembly"]:
 
             try:
-                shapes_dict = component[sheet].get("shapes") or {}
+                shapes_dict = comp_dict[sheet].get("shapes") or {}
             except:
                 shapes_dict = {}
 
@@ -130,7 +130,7 @@ class Component:
         for sheet in ["silkscreen", "assembly"]:
 
             try:
-                refdef_dict = component[sheet].get("refdef") or {}
+                refdef_dict = comp_dict[sheet].get("refdef") or {}
             except:
                 refdef_dict = {}
 
