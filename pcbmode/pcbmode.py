@@ -130,10 +130,7 @@ def set_y_axis_invert():
     outputting or reading the y-axis. Inkscape 1.0+ should have an option
     to not invert the y-axis.
     """
-    if config.cfg["params"]["invert-y-axis"]:
-        config.cfg["iya"] = -1
-    else:
-        config.cfg["iya"] = 1
+    config.cfg["iya"] = -1 if config.cfg["params"]["invert-y-axis"] else 1
 
 
 def apply_overrides(cli_args):
