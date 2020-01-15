@@ -28,12 +28,9 @@ DEG2RAD = 2 * pi / 360
 
 class Point:
     def __init__(self, x=0, y=0):
-        try:
-            self.sig_dig = config.cfg["params"].get("significant-digits") or 8
-        except:
-            self.sig_dig = 8
-        self.x = round(float(x), self.sig_dig)
-        self.y = round(float(y), self.sig_dig)
+        self.set_sig_dig(config.cfg["params"].get("significant-digits", 8))
+        self.x = round(float(x), self._sig_dig)
+        self.y = round(float(y), self._sig_dig)
 
     def __add__(self, p):
         """ add point 'p' of type Point to current point"""
@@ -58,28 +55,28 @@ class Point:
         """ not equal attribute """
         return not ((self.x == p.x) and (self.y == p.y))
 
+    def set_sig_dig(self, sig_dig):
+        """ Set the significant digits to use """
+        self._sig_dig = sig_dig
+
     def assign(self, x=0, y=0):
-        self.x = round(float(x), self.sig_dig)
-        self.y = round(float(y), self.sig_dig)
-        return
+        self.x = round(float(x), self._sig_dig)
+        self.y = round(float(y), self._sig_dig)
 
     def rotate(self, deg, p):
         """ rotate the point in degrees around another point """
         rad = deg * DEG2RAD
         x = self.x
         y = self.y
-        self.x = x * cos(rad) + y * sin(rad)
-        self.y = x * -sin(rad) + y * cos(rad)
-        return
+        self.x = round(x * cos(rad) + y * sin(rad), self._sig_dig)
+        self.y = round(x * -sin(rad) + y * cos(rad), self._sig_dig)
 
-    def round(self, d):
+    def round(self):
         """ round decimal to nearest 'd' decimal digits """
-        self.x = round(self.x, d)
-        self.y = round(self.y, d)
-        return
+        self.x = round(self.x, self._sig_dig)
+        self.y = round(self.y, self._sig_dig)
 
     def mult(self, scalar):
         """ multiply by scalar """
-        self.x *= float(scalar)
-        self.y *= float(scalar)
-        return
+        self.x *= round(float(scalar), self._sig_dig)
+        self.y *= round(float(scalar), self._sig_dig)
