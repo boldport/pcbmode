@@ -59,8 +59,8 @@ class Module:
 
         self._outline_shape = self._get_outline_shape()
 
-        self._width = self._outline_shape.getWidth()
-        self._height = self._outline_shape.getHeight()
+        self._width = self._outline_shape.get_width()
+        self._height = self._outline_shape.get_height()
 
         # Get dictionaries of component/via/shape definitions
         components_dict = self._module_dict.get("components", {})
@@ -255,7 +255,7 @@ class Module:
             height=arrow_height,
             base=arrow_base,
             bar=arrow_bar_length,
-            gap=width_text.getWidth() * 1.5,
+            gap=width_text.get_width() * 1.5,
         )
         shape_dict["location"] = width_loc
         shape_dict["style"] = "stroke-width:0.2;"
@@ -269,7 +269,7 @@ class Module:
             height=arrow_height,
             base=arrow_base,
             bar=arrow_bar_length,
-            gap=height_text.getHeight() * 1.5,
+            gap=height_text.get_height() * 1.5,
         )
         shape_dict["rotate"] = -90
         shape_dict["location"] = height_loc

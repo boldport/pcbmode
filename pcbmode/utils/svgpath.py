@@ -105,10 +105,10 @@ class SvgPath:
     def getTransformedMirrored(self):
         return self._transformed_mirrored
 
-    def getWidth(self):
+    def get_width(self):
         return self._width
 
-    def getHeight(self):
+    def get_height(self):
         return self._height
 
     def _makeRelative(self, path):

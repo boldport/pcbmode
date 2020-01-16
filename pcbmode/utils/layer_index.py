@@ -85,7 +85,7 @@ def place_index(layers, width, height):
             place.placeShape(rect_shape, group)
             text_dict["value"] = f"{pcb_layer} {sheet}"
             text_shape = Shape(text_dict)
-            text_width = text_shape.getWidth()
+            text_width = text_shape.get_width()
             element = place.placeShape(text_shape, group)
             element.set(
                 "transform",
