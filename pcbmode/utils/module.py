@@ -46,14 +46,16 @@ class Module:
     """
     """
 
-    def __init__(self, module_dict, routing_dict, asmodule=False):
+    def __init__(self, module_name, asmodule=False):
         """
         """
 
         ns_pcm = config.cfg["ns"]["pcbmode"]
 
-        self._module_dict = module_dict
-        self._routing_dict = routing_dict
+        # These two statement assume that there's a single module. When we start working
+        # on multiple modules per board those will need to be named and seperated
+        self._module_dict = config.brd
+        self._routing_dict = config.rte
 
         self._outline_shape = self._get_outline_shape()
 
@@ -488,7 +490,9 @@ class Module:
                 pass
 
             path = svg_path_create.marker()
-            transform = f"translate({location.px()},{config.cfg['iya'] * location.py()})"
+            transform = (
+                f"translate({location.px()},{config.cfg['iya'] * location.py()})"
+            )
 
             if placement_layer == "bottom":
                 rotation *= -1
@@ -508,7 +512,7 @@ class Module:
                 ts.text = htmlpar.unescape("%s&#176;" % (rotation))
                 ts = et.SubElement(t, "tspan", x="0", dy="0.1")
                 ts.text = f"[{location.px(2)},{location.py(2)}]"
-#                ts.text = "[%.2f,%.2f]" % (location[0], location[1])
+            #                ts.text = "[%.2f,%.2f]" % (location[0], location[1])
             elif component_type == "shape":
                 t = et.SubElement(group, "text", x="0", y="-0.17")
                 t.set("class", style_class)
@@ -518,7 +522,7 @@ class Module:
                 ts.text = htmlpar.unescape("%s&#176;" % (rotation))
                 ts = et.SubElement(t, "tspan", x="0", dy="0.1")
                 ts.text = f"[{location.px(2)},{location.py(2)}]"
-#                ts.text = "[%.2f,%.2f]" % (location[0], location[1])
+            #                ts.text = "[%.2f,%.2f]" % (location[0], location[1])
             elif component_type == "via":
                 t = et.SubElement(group, "text", x="0", y="-0.11")
                 t.set("class", style_class)
@@ -526,7 +530,7 @@ class Module:
                 ts.text = htmlpar.unescape("%s&#176;" % (rotation))
                 ts = et.SubElement(t, "tspan", x="0", dy="0.1")
                 ts.text = f"[{location.px(2)},{location.py(2)}]"
-#                ts.text = "[%.2f,%.2f]" % (location[0], location[1])
+            #                ts.text = "[%.2f,%.2f]" % (location[0], location[1])
             else:
                 continue
 
