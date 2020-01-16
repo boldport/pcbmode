@@ -52,7 +52,7 @@ class SvgPath:
             self._relative = self._makeRelative(self._original_parsed)
             self._relative_parsed = self._svgGrammar.parseString(self._relative)
             self._relative_parsed = self._parseResultsToList(self._relative_parsed)
-            self._width, self._height = self._getDimensions(self._relative_parsed)
+            self._width, self._height = self._get_dimensions(self._relative_parsed)
             config.pth[digest] = {}
             config.pth[digest]["first-point"] = self._first_point
             config.pth[digest]["relative"] = self._relative
@@ -346,7 +346,7 @@ class SvgPath:
 
         return p
 
-    def _getDimensions(self, path):
+    def _get_dimensions(self, path):
         """
         """
 
@@ -612,7 +612,7 @@ class SvgPath:
             self._width = record["width"]
             self._height = record["height"]
         else:
-            width, height = self._getDimensions(path)
+            width, height = self._get_dimensions(path)
 
             # first point of path
             first_point = Point(path[0][1])
@@ -620,8 +620,10 @@ class SvgPath:
             if center is True:
                 # center point of path
                 origin_point = Point(
-                    [self._bbox_top_left.x + width / 2,
-                    self._bbox_top_left.y - height / 2]
+                    [
+                        self._bbox_top_left.x + width / 2,
+                        self._bbox_top_left.y - height / 2,
+                    ]
                 )
                 # caluclate what's the new starting point of path based on the new origin
                 new_first_point = Point(
@@ -672,7 +674,7 @@ class SvgPath:
                 self._transformed_mirrored = new_p
                 self._transformed = mirrored
 
-            width, height = self._getDimensions(parsed)
+            width, height = self._get_dimensions(parsed)
             self._width = width
             self._height = height
 
@@ -827,7 +829,9 @@ class SvgPath:
                     for n in range(0, len(points_x), skip):
                         bezier_point_array.append(Point([points_x[n], points_y[n]]))
                     bezier_point_array.append(
-                        Point([points_x[len(points_x) - 1], points_y[len(points_x) - 1]])
+                        Point(
+                            [points_x[len(points_x) - 1], points_y[len(points_x) - 1]]
+                        )
                     )
 
                     p += bezier_point_array
@@ -878,7 +882,9 @@ class SvgPath:
                     for n in range(0, len(points_x), skip):
                         bezier_point_array.append(Point([points_x[n], points_y[n]]))
                     bezier_point_array.append(
-                        Point([points_x[len(points_x) - 1], points_y[len(points_x) - 1]])
+                        Point(
+                            [points_x[len(points_x) - 1], points_y[len(points_x) - 1]]
+                        )
                     )
 
                     p += bezier_point_array
@@ -894,8 +900,10 @@ class SvgPath:
                     point = Point(coord)
                     end_point = ap + point
                     diff = Point(
-                        [ap.x - last_bezier_control_point.x,
-                        ap.y - last_bezier_control_point.y]
+                        [
+                            ap.x - last_bezier_control_point.x,
+                            ap.y - last_bezier_control_point.y,
+                        ]
                     )
                     control_point = ap + diff
                     bezier_curve_path.append(control_point)
@@ -931,7 +939,9 @@ class SvgPath:
                     for m in range(0, len(points_x), skip):
                         bezier_point_array.append(Point([points_x[m], points_y[m]]))
                     bezier_point_array.append(
-                        Point([points_x[len(points_x) - 1], points_y[len(points_x) - 1]])
+                        Point(
+                            [points_x[len(points_x) - 1], points_y[len(points_x) - 1]]
+                        )
                     )
 
                     p += bezier_point_array
