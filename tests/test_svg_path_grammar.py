@@ -1,6 +1,5 @@
-# try:
-#    import unittest2 as unittest
-# except ImportError:
+#!/usr/bin/python
+
 import unittest
 
 from pcbmode.utils.svg_path_grammar import get_grammar
