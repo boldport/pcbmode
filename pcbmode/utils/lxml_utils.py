@@ -25,7 +25,6 @@ def addch(parent, ns, name, id=None, text=None):
     Add a child element to parent
     """
     new_child = et.SubElement(parent, f"{{{ns}}}{name}")
-#    new_child = et.SubElement(parent, "{{{}}}{}".format(ns, name))
     if id is not None:
         new_child.set("id", id)
     if text is not None:
