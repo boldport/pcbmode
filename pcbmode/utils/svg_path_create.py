@@ -28,101 +28,108 @@ def rect(width, height, bor_rad=[]):
     one to four parameters.
     """
 
-    width = float(width)
-    height = float(height)
-
-    # Condition the array 
-    if all(br == 0 for br in bor_rad):
-        bor_rad = []
-    elif len(bor_rad) == 1:
-        bor_rad = [bor_rad[0]]*4
-    elif len(bor_rad) == 2:
-        bor_rad.append(bor_rad[0])
-        bor_rad.append(bor_rad[1])
-    else len(bor_rad) == 3:
-        bor_rad.append(bor_rad[1])
-
     # The calculation to obtain the 'k' coefficient can be found here:
     # http://itc.ktu.lt/itc354/Riskus354.pdf
     # "APPROXIMATION OF A CUBIC BEZIER CURVE BY CIRCULAR ARCS AND VICE VERSA"
     # by Aleksas Riskus
     k = 0.5522847498
 
-    all_zeros = True
+    sig_dig = config.cfg["params"]["significant-digits"]
+
+    width = float(width)
+    height = float(height)
+
+    # Condition the array
+    if all(br == 0 for br in bor_rad):
+        bor_rad = []
+    elif len(bor_rad) == 1:
+        bor_rad = [bor_rad[0]] * 4
+    elif len(bor_rad) == 2:
+        bor_rad.append(bor_rad[0])
+        bor_rad.append(bor_rad[1])
+    elif len(bor_rad) == 3:
+        bor_rad.append(bor_rad[1])
+
+    bor_rad = [float(i) for i in bor_rad]
 
     if bor_rad != []:
 
-        top_left = float(bor_rad[0])
-        top_right = float(bor_rad[1])
-        bot_right = float(bor_rad[2])
-        bot_left = float(bor_rad[3])
+        top_left = bor_rad[0]
+        top_right = bor_rad[1]
+        bot_right = bor_rad[2]
+        bot_left = bor_rad[3]
 
-        path = "m %f,%f " % (-width / 2, 0)
+        path = f"m {round(-width / 2, sig_dig)},0 "
         if top_left == 0:
             path += "v %f h %f " % (-height / 2, width / 2)
         else:
             r = top_left
+            round_r = round(r, sig_dig)
             path += "v %f c %f,%f %f,%f %f,%f h %f " % (
-                -(height / 2 - r),
+                round(-(height / 2 - r), sig_dig),
                 0,
-                -k * r,
-                -r * (k - 1),
-                -r,
-                r,
-                -r,
-                width / 2 - r,
+                round(-k * r, sig_dig),
+                round(-r * (k - 1), sig_dig),
+                -round_r,
+                round_r,
+                -round_r,
+                round(width / 2 - r, sig_dig),
             )
         if top_right == 0:
             path += "h %f v %f " % (width / 2, height / 2)
         else:
             r = top_right
+            round_r = round(r, sig_dig)
             path += "h %f c %f,%f %f,%f %f,%f v %f " % (
-                width / 2 - r,
-                k * r,
+                round(width / 2 - r, sig_dig),
+                round(k * r, sig_dig),
                 0,
-                r,
-                -r * (k - 1),
-                r,
-                r,
-                height / 2 - r,
+                round_r,
+                round(-r * (k - 1), sig_dig),
+                round_r,
+                round_r,
+                round(height / 2 - r, sig_dig),
             )
         if bot_right == 0:
             path += "v %f h %f " % (height / 2, -width / 2)
         else:
             r = bot_right
+            round_r = round(r, sig_dig)
             path += "v %f c %f,%f %f,%f %f,%f h %f " % (
-                height / 2 - r,
+                round(height / 2 - r, sig_dig),
                 0,
-                k * r,
-                r * (k - 1),
-                r,
-                -r,
-                r,
-                -(width / 2 - r),
+                round(k * r, sig_dig),
+                round(r * (k - 1), sig_dig),
+                round_r,
+                -round_r,
+                round_r,
+                round(-(width / 2 - r), sig_dig),
             )
         if bot_left == 0:
             path += "h %f v %f " % (-width / 2, -height / 2)
         else:
             r = bot_left
+            round_r = round(r, sig_dig)
             path += "h %f c %f,%f %f,%f %f,%f v %f " % (
-                -(width / 2 - r),
-                -k * r,
+                round(-(width / 2 - r), sig_dig),
+                round(-k * r, sig_dig),
                 0,
-                -r,
-                r * (k - 1),
-                -r,
-                -r,
-                -(height / 2 - r),
+                -round_r,
+                round(r * (k - 1), sig_dig),
+                -round_r,
+                -round_r,
+                round(-(height / 2 - r), sig_dig),
             )
         path += "z"
+
     else:
         path = "m %f,%f h %f v %f h %f v %f z" % (
-            -width / 2,
-            -height / 2,
-            width,
-            height,
-            -width,
-            -height,
+            round(-width / 2, sig_dig),
+            round(-height / 2, sig_dig),
+            round(width, sig_dig),
+            round(height, sig_dig),
+            round(-width, sig_dig),
+            round(-height, sig_dig),
         )
 
     return path
