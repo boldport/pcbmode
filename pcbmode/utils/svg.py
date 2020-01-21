@@ -1008,8 +1008,8 @@ def rect_to_path(shape):
     """
     width = float(shape["width"])
     height = float(shape["height"])
-    radii = shape.get("radii")
-    path = svg_path_create.rect(width, height, radii)
+    border_radius = shape.get("border-radius")
+    path = svg_path_create.rect(width, height, border_radius)
 
     return path
 

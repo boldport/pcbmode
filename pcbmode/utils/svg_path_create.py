@@ -21,14 +21,26 @@ from pcbmode.config import config
 from pcbmode.utils.point import Point
 
 
-def rect(width, height, radii=None):
+def rect(width, height, bor_rad=[]):
     """
-    Returns a centered path based on width and height; smooth corners
-    can be defined with radii
+    Returns a centered path based on width and height; optional rounded
+    corners are defined like CSS's 'border-radius' property as a list of
+    one to four parameters.
     """
 
     width = float(width)
     height = float(height)
+
+    # Condition the array 
+    if all(br == 0 for br in bor_rad):
+        bor_rad = []
+    elif len(bor_rad) == 1:
+        bor_rad = [bor_rad[0]]*4
+    elif len(bor_rad) == 2:
+        bor_rad.append(bor_rad[0])
+        bor_rad.append(bor_rad[1])
+    else len(bor_rad) == 3:
+        bor_rad.append(bor_rad[1])
 
     # The calculation to obtain the 'k' coefficient can be found here:
     # http://itc.ktu.lt/itc354/Riskus354.pdf
@@ -38,101 +50,71 @@ def rect(width, height, radii=None):
 
     all_zeros = True
 
-    if radii is not None:
-        # check if all values are equal to '0'
-        for value in radii.values():
-            if value != 0:
-                all_zeros = False
+    if bor_rad != []:
 
-        if all_zeros is True:
-            path = "m %f,%f h %f v %f h %f v %f z" % (
-                -width / 2,
-                -height / 2,
-                width,
-                height,
-                -width,
-                -height,
-            )
+        top_left = float(bor_rad[0])
+        top_right = float(bor_rad[1])
+        bot_right = float(bor_rad[2])
+        bot_left = float(bor_rad[3])
+
+        path = "m %f,%f " % (-width / 2, 0)
+        if top_left == 0:
+            path += "v %f h %f " % (-height / 2, width / 2)
         else:
-
-            top_left = float(radii.get("tl") or radii.get("top_left") or 0)
-            top_right = float(radii.get("tr") or radii.get("top_right") or 0)
-            bot_right = float(
-                radii.get("br")
-                or radii.get("bot_right")
-                or radii.get("bottom_right")
-                or 0
+            r = top_left
+            path += "v %f c %f,%f %f,%f %f,%f h %f " % (
+                -(height / 2 - r),
+                0,
+                -k * r,
+                -r * (k - 1),
+                -r,
+                r,
+                -r,
+                width / 2 - r,
             )
-            bot_left = float(
-                radii.get("bl")
-                or radii.get("bot_left")
-                or radii.get("bottom_left")
-                or 0
+        if top_right == 0:
+            path += "h %f v %f " % (width / 2, height / 2)
+        else:
+            r = top_right
+            path += "h %f c %f,%f %f,%f %f,%f v %f " % (
+                width / 2 - r,
+                k * r,
+                0,
+                r,
+                -r * (k - 1),
+                r,
+                r,
+                height / 2 - r,
             )
-
-            path = "m %f,%f " % (-width / 2, 0)
-            if top_left == 0:
-                path += "v %f h %f " % (-height / 2, width / 2)
-            else:
-                r = top_left
-                path += "v %f c %f,%f %f,%f %f,%f h %f " % (
-                    -(height / 2 - r),
-                    0,
-                    -k * r,
-                    -r * (k - 1),
-                    -r,
-                    r,
-                    -r,
-                    width / 2 - r,
-                )
-
-            if top_right == 0:
-                path += "h %f v %f " % (width / 2, height / 2)
-            else:
-                r = top_right
-                path += "h %f c %f,%f %f,%f %f,%f v %f " % (
-                    width / 2 - r,
-                    k * r,
-                    0,
-                    r,
-                    -r * (k - 1),
-                    r,
-                    r,
-                    height / 2 - r,
-                )
-
-            if bot_right == 0:
-                path += "v %f h %f " % (height / 2, -width / 2)
-            else:
-                r = bot_right
-                path += "v %f c %f,%f %f,%f %f,%f h %f " % (
-                    height / 2 - r,
-                    0,
-                    k * r,
-                    r * (k - 1),
-                    r,
-                    -r,
-                    r,
-                    -(width / 2 - r),
-                )
-
-            if bot_left == 0:
-                path += "h %f v %f " % (-width / 2, -height / 2)
-            else:
-                r = bot_left
-                path += "h %f c %f,%f %f,%f %f,%f v %f " % (
-                    -(width / 2 - r),
-                    -k * r,
-                    0,
-                    -r,
-                    r * (k - 1),
-                    -r,
-                    -r,
-                    -(height / 2 - r),
-                )
-
-            path += "z"
-
+        if bot_right == 0:
+            path += "v %f h %f " % (height / 2, -width / 2)
+        else:
+            r = bot_right
+            path += "v %f c %f,%f %f,%f %f,%f h %f " % (
+                height / 2 - r,
+                0,
+                k * r,
+                r * (k - 1),
+                r,
+                -r,
+                r,
+                -(width / 2 - r),
+            )
+        if bot_left == 0:
+            path += "h %f v %f " % (-width / 2, -height / 2)
+        else:
+            r = bot_left
+            path += "h %f c %f,%f %f,%f %f,%f v %f " % (
+                -(width / 2 - r),
+                -k * r,
+                0,
+                -r,
+                r * (k - 1),
+                -r,
+                -r,
+                -(height / 2 - r),
+            )
+        path += "z"
     else:
         path = "m %f,%f h %f v %f h %f v %f z" % (
             -width / 2,

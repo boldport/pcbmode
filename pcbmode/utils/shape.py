@@ -122,7 +122,8 @@ class Shape:
         except KeyError:
             msg.error("A 'rect' shape requires a 'height' definition")
 
-        self._path = svg_path_create.rect(width, height, self._shape_dict.get("radii"))
+        border_radius = self._shape_dict.get("border-radius", [])
+        self._path = svg_path_create.rect(width, height, border_radius)
 
     def _process_circ(self):
         try:
