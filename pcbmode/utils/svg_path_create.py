@@ -59,10 +59,10 @@ def rect(width, height, bor_rad=[]):
         r3 = bor_rad[2]
         r4 = bor_rad[3]
 
-        # Calculate side lengths, top clockwise
+        # Calculate side lengths, top hirizontal, clockwise
         sl = [pn(w - r1 - r2), pn(h - r2 - r3), pn(w - r3 - r4), pn(h - r3 - r1)]
 
-        # Bezier arcs, clockwise from top right
+        # Cubic Bezier "arcs", clockwise from top left
         arcs = [
             f"c {0},{pn(-K * r1)} {pn(-r1 * (K - 1))},{pn(-r1)} {pn(r1)},{pn(-r1)} ",
             f"c {pn(K * r2)},{0} {pn(r2)},{pn(-r2 * (K - 1))} {pn(r2)},{pn(r2)} ",
@@ -70,7 +70,7 @@ def rect(width, height, bor_rad=[]):
             f"c {pn(-K * r4)},{0} {pn(-r4)},{pn(r4 * (K - 1))} {pn(-r4)},{pn(-r4)} ",
         ]
 
-        p = f"m {pn(-w/2)},{pn(-(h/2-r1))} " # go to top left 'below' arc, or cordner
+        p = f"m {pn(-w/2)},{pn(-(h/2-r1))} " # go to top left 'below' arc, or corner
         if r1 != 0:
             p += arcs[0]
         p += f"h {sl[0]} "
