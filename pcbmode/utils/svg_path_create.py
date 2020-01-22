@@ -54,10 +54,16 @@ def rect(width, height, bor_rad=[]):
 
     if bor_rad != []:
 
-        top_left = bor_rad[0]
-        top_right = bor_rad[1]
-        bot_right = bor_rad[2]
-        bot_left = bor_rad[3]
+        top_left = r1 = bor_rad[0]
+        top_right = r2 = bor_rad[1]
+        bot_right = r3 = bor_rad[2]
+        bot_left = r4 = bor_rad[3]
+
+        w = width
+        h = height
+
+        # Calculate side lengths, clockwise from top
+        sl = [w-r1-r1, h-r2-r3, w-r3-r4, h-r3-r1]
 
         path = f"m {round(-width / 2, sig_dig)},0 "
         if top_left == 0:
