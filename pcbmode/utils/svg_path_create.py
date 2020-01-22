@@ -70,7 +70,7 @@ def rect(width, height, bor_rad=[]):
             f"c {pn(-K * r4)},{0} {pn(-r4)},{pn(r4 * (K - 1))} {pn(-r4)},{pn(-r4)} ",
         ]
 
-        p = f"m {pn(-w/2)},{pn(-(h/2-r1))} "
+        p = f"m {pn(-w/2)},{pn(-(h/2-r1))} " # go to top left 'below' arc, or cordner
         if r1 != 0:
             p += arcs[0]
         p += f"h {sl[0]} "
@@ -86,6 +86,7 @@ def rect(width, height, bor_rad=[]):
         p += "z"
 
     else:
+        # No rounded corners
         p = f"m {pn(-w / 2)},{pn(-h / 2)} h {pn(w)} v {pn(h)} h {pn(-w)} v {pn(-h)} z"
 
     return p
