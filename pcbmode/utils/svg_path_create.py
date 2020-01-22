@@ -63,7 +63,6 @@ def rect(width, height, bor_rad=[]):
         sl = [pn(w - r1 - r2), pn(h - r2 - r3), pn(w - r3 - r4), pn(h - r3 - r1)]
 
         # Bezier arcs, clockwise from top right
-        #tmp = "c %f,%f %f,%f %f,%f "  # template
         arcs = [
             f"c {0},{pn(-K * r1)} {pn(-r1 * (K - 1))},{pn(-r1)} {pn(r1)},{pn(-r1)} ",
             f"c {pn(K * r2)},{0} {pn(r2)},{pn(-r2 * (K - 1))} {pn(r2)},{pn(r2)} ",
