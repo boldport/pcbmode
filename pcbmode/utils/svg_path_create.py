@@ -19,6 +19,7 @@
 
 from pcbmode.config import config
 from pcbmode.utils.point import Point
+from pcbmode.utils.utils import pn
 
 
 def rect(width, height, bor_rad=[]):
@@ -32,14 +33,12 @@ def rect(width, height, bor_rad=[]):
     # http://itc.ktu.lt/itc354/Riskus354.pdf
     # "APPROXIMATION OF A CUBIC BEZIER CURVE BY CIRCULAR ARCS AND VICE VERSA"
     # by Aleksas Riskus
-    k = 0.5522847498
+    K = 0.5522847498
 
-    sig_dig = config.cfg["params"]["significant-digits"]
+    w = float(width)
+    h = float(height)
 
-    width = float(width)
-    height = float(height)
-
-    # Condition the array
+    # Condition the array according to CSS expansion rules for 'border-radius'
     if all(br == 0 for br in bor_rad):
         bor_rad = []
     elif len(bor_rad) == 1:
@@ -50,95 +49,47 @@ def rect(width, height, bor_rad=[]):
     elif len(bor_rad) == 3:
         bor_rad.append(bor_rad[1])
 
-    bor_rad = [float(i) for i in bor_rad]
-
     if bor_rad != []:
 
-        top_left = r1 = bor_rad[0]
-        top_right = r2 = bor_rad[1]
-        bot_right = r3 = bor_rad[2]
-        bot_left = r4 = bor_rad[3]
+        bor_rad = [float(i) for i in bor_rad]
 
-        w = width
-        h = height
+        # Top left corner, clockwise
+        r1 = bor_rad[0]
+        r2 = bor_rad[1]
+        r3 = bor_rad[2]
+        r4 = bor_rad[3]
 
-        # Calculate side lengths, clockwise from top
-        sl = [w-r1-r1, h-r2-r3, w-r3-r4, h-r3-r1]
+        # Calculate side lengths, top clockwise
+        sl = [pn(w - r1 - r2), pn(h - r2 - r3), pn(w - r3 - r4), pn(h - r3 - r1)]
 
-        path = f"m {round(-width / 2, sig_dig)},0 "
-        if top_left == 0:
-            path += "v %f h %f " % (-height / 2, width / 2)
-        else:
-            r = top_left
-            round_r = round(r, sig_dig)
-            path += "v %f c %f,%f %f,%f %f,%f h %f " % (
-                round(-(height / 2 - r), sig_dig),
-                0,
-                round(-k * r, sig_dig),
-                round(-r * (k - 1), sig_dig),
-                -round_r,
-                round_r,
-                -round_r,
-                round(width / 2 - r, sig_dig),
-            )
-        if top_right == 0:
-            path += "h %f v %f " % (width / 2, height / 2)
-        else:
-            r = top_right
-            round_r = round(r, sig_dig)
-            path += "h %f c %f,%f %f,%f %f,%f v %f " % (
-                round(width / 2 - r, sig_dig),
-                round(k * r, sig_dig),
-                0,
-                round_r,
-                round(-r * (k - 1), sig_dig),
-                round_r,
-                round_r,
-                round(height / 2 - r, sig_dig),
-            )
-        if bot_right == 0:
-            path += "v %f h %f " % (height / 2, -width / 2)
-        else:
-            r = bot_right
-            round_r = round(r, sig_dig)
-            path += "v %f c %f,%f %f,%f %f,%f h %f " % (
-                round(height / 2 - r, sig_dig),
-                0,
-                round(k * r, sig_dig),
-                round(r * (k - 1), sig_dig),
-                round_r,
-                -round_r,
-                round_r,
-                round(-(width / 2 - r), sig_dig),
-            )
-        if bot_left == 0:
-            path += "h %f v %f " % (-width / 2, -height / 2)
-        else:
-            r = bot_left
-            round_r = round(r, sig_dig)
-            path += "h %f c %f,%f %f,%f %f,%f v %f " % (
-                round(-(width / 2 - r), sig_dig),
-                round(-k * r, sig_dig),
-                0,
-                -round_r,
-                round(r * (k - 1), sig_dig),
-                -round_r,
-                -round_r,
-                round(-(height / 2 - r), sig_dig),
-            )
-        path += "z"
+        # Bezier arcs, clockwise from top right
+        #tmp = "c %f,%f %f,%f %f,%f "  # template
+        arcs = [
+            f"c {0},{pn(-K * r1)} {pn(-r1 * (K - 1))},{pn(-r1)} {pn(r1)},{pn(-r1)} ",
+            f"c {pn(K * r2)},{0} {pn(r2)},{pn(-r2 * (K - 1))} {pn(r2)},{pn(r2)} ",
+            f"c {0},{pn(K * r3)} {pn(r3 * (K - 1))},{pn(r3)} {pn(-r3)},{pn(r3)} ",
+            f"c {pn(-K * r4)},{0} {pn(-r4)},{pn(r4 * (K - 1))} {pn(-r4)},{pn(-r4)} ",
+        ]
+
+        p = f"m {pn(-w/2)},{pn(-(h/2-r1))} "
+        if r1 != 0:
+            p += arcs[0]
+        p += f"h {sl[0]} "
+        if r2 != 0:
+            p += arcs[1]
+        p += f"v {sl[1]} "
+        if r3 != 0:
+            p += arcs[2]
+        p += f"h {-sl[2]} "
+        if r4 != 0:
+            p += arcs[3]
+        p += f"v {-sl[3]} "
+        p += "z"
 
     else:
-        path = "m %f,%f h %f v %f h %f v %f z" % (
-            round(-width / 2, sig_dig),
-            round(-height / 2, sig_dig),
-            round(width, sig_dig),
-            round(height, sig_dig),
-            round(-width, sig_dig),
-            round(-height, sig_dig),
-        )
+        p = f"m {pn(-w / 2)},{pn(-h / 2)} h {pn(w)} v {pn(h)} h {pn(-w)} v {pn(-h)} z"
 
-    return path
+    return p
 
 
 def ring(d1, d2):
