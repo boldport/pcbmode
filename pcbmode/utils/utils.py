@@ -63,25 +63,6 @@ def open_board_svg():
     return data
 
 
-# def to_Point(coord=[0, 0]):
-#     """
-#     Takes a coordinate in the form of [x,y] and
-#     returns a Point type
-#     """
-#     return Point(coord[0], coord[1])
-
-
-# def to_point(coord=[0, 0]):
-#     """
-#     Takes a coordinate in the form of [x,y] and
-#     returns a Point type
-#     """
-#     if coord == None:
-#         return None
-#     else:
-#         return Point(coord)
-
-
 def makePngs():
     """
     Creates a PNG of the board using Inkscape
