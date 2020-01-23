@@ -61,20 +61,13 @@ class SvgPath:
 
             self._bbox() # create width, height
 
-            self._first_point = [
-                self._p_r_path[0][1][0],
-                self._p_r_path[0][1][1],
-            ]
-
             config.pth[digest] = {}
-            config.pth[digest]["first-point"] = self._first_point
             config.pth[digest]["relative"] = self._r_path
             config.pth[digest]["relative-parsed"] = self._p_r_path
             config.pth[digest]["width"] = self._width
             config.pth[digest]["height"] = self._height
             self._cache_record = config.pth[digest]
         else:
-            self._first_point = self._cache_record["first-point"]
             self._r_path = self._cache_record["relative"]
             self._p_r_path = self._cache_record["relative-parsed"]
             self._width = self._cache_record["width"]
@@ -109,8 +102,15 @@ class SvgPath:
     def get_input_path(self):
         return self._path_in
 
-    def getFirstPoint(self):
-        return self._first_point
+    def get_first_point(self):
+        try:
+            return self._first_point
+        except:
+            self._first_point = [
+                self._p_r_path[0][1][0],
+                self._p_r_path[0][1][1],
+            ]
+            return self._first_point
 
     def getTransformed(self):
         return self._transformed

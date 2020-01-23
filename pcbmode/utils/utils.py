@@ -541,7 +541,7 @@ def textToPath(font_data, text, letter_spacing, line_height, scale_factor):
                 glyph_width = float(glyph.get("horiz-adv-x") or font_horiz_adv_x)
                 if symbol != " ":
                     glyph_path = SvgPath(glyph.get("d"))
-                    first_point = glyph_path.getFirstPoint()
+                    first_point = glyph_path.get_first_point()
                     offset_x = float(first_point[0])
                     offset_y = float(first_point[1])
                     path = glyph_path.get_relative()
