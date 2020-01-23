@@ -48,15 +48,15 @@ class SvgPath:
 
         if self._cache_record == None:
             self._p_path = self._parsed_to_list(self._grammar.parseString(self._path_in))
-            self._first_point = [
-                self._p_path[0][1][0],
-                self._p_path[0][1][1],
-            ]
             self._r_path = self._p_path_to_relative(self._p_path)
-
             self._p_r_path = self._parsed_to_list(self._grammar.parseString(self._r_path))
 
             self._width, self._height = self._get_dimensions(self._p_r_path)
+
+            self._first_point = [
+                self._p_r_path[0][1][0],
+                self._p_r_path[0][1][1],
+            ]
 
             config.pth[digest] = {}
             config.pth[digest]["first-point"] = self._first_point
