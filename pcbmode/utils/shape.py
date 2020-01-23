@@ -270,7 +270,7 @@ class Shape:
         self._rotate = rotate
 
     def getOriginalPath(self):
-        return self._path.getOriginal()
+        return self._path.get_input_path()
 
     def getTransformedPath(self, mirrored=False):
         if mirrored == True:

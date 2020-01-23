@@ -33,24 +33,26 @@ class SvgPath:
     """
 
     def __init__(self, path, gerber_lp=None):
-
+  
+        self._path_input = path
         self._gerber_lp = gerber_lp
 
-        self._original = path
-        digest = utils.digest(path)
-        self._record = config.pth.get(digest)
+        self._grammar = svg_path_grammar.get_grammar()
 
-        self._svgGrammar = svg_path_grammar.get_grammar()
+ 
+        digest = utils.digest(path) # later
+        self._record = config.pth.get(digest) #later
+
 
         if self._record == None:
-            self._original_parsed = self._svgGrammar.parseString(self._original)
+            self._original_parsed = self._grammar.parseString(self._path_input)
             self._original_parsed = self._parseResultsToList(self._original_parsed)
             self._first_point = [
                 self._original_parsed[0][1][0],
                 self._original_parsed[0][1][1],
             ]
             self._relative = self._makeRelative(self._original_parsed)
-            self._relative_parsed = self._svgGrammar.parseString(self._relative)
+            self._relative_parsed = self._grammar.parseString(self._relative)
             self._relative_parsed = self._parseResultsToList(self._relative_parsed)
             self._width, self._height = self._get_dimensions(self._relative_parsed)
             config.pth[digest] = {}
@@ -93,8 +95,8 @@ class SvgPath:
     def getRelativeParsed(self):
         return self._relative_parsed
 
-    def getOriginal(self):
-        return self._original
+    def get_input_path(self):
+        return self._path_input
 
     def getFirstPoint(self):
         return self._first_point
@@ -664,7 +666,7 @@ class SvgPath:
                         tmpp.mult(scale)
                         new_p += f"{str(tmpp.px())},{str(tmpp.py())} "
 
-            parsed = self._svgGrammar.parseString(new_p)
+            parsed = self._grammar.parseString(new_p)
             mirrored = self._mirrorHorizontally(parsed)
 
             if mirror == False:
