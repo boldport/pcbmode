@@ -66,19 +66,19 @@ class Shape:
             self._style = "stroke:none;"
 
         # Create the SVG path for the shape
-        self._get_path_from_shape_type()
+        self._define_path_from_shape_type()
 
         # Convert the path to an object
-        self._path = SvgPath(self._path, self._gerber_lp)
+        self._path_obj = SvgPath(self._path)
 
-        self._path.transform(
+        self._path_obj.transform(
             scale=self._scale,
             rotate_angle=self._rotate,
             rotate_point=self._rotate_point,
             mirror=self._place_mirrored,
         )
 
-    def _get_path_from_shape_type(self):
+    def _define_path_from_shape_type(self):
         """
         There are various shape types. Here we create an SVG path from the shape type
         and parameters provided by the shape dict.
@@ -227,7 +227,7 @@ class Shape:
         if add == False:
             self._path.transform(scale, rotate * self._inv_rotate, rotate_point, mirror)
         else:
-            self._path.transform(
+            self._path_obj.transform(
                 scale * self._scale,
                 rotate * self._inv_rotate + self._rotate,
                 rotate_point + self._rotate_point,
@@ -270,19 +270,19 @@ class Shape:
         self._rotate = rotate
 
     def getOriginalPath(self):
-        return self._path.get_input_path()
+        return self._path_obj.get_input_path()
 
     def getTransformedPath(self, mirrored=False):
         if mirrored == True:
-            return self._path.getTransformedMirrored()
+            return self._path_obj.getTransformedMirrored()
         else:
-            return self._path.getTransformed()
+            return self._path_obj.getTransformed()
 
     def get_width(self):
-        return self._path.get_width()
+        return self._path_obj.get_width()
 
     def get_height(self):
-        return self._path.get_height()
+        return self._path_obj.get_height()
 
     def getGerberLP(self):
         return self._gerber_lp

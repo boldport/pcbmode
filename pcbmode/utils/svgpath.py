@@ -34,10 +34,9 @@ class SvgPath:
     'r_' prefix means relative path
     """
 
-    def __init__(self, path, gerber_lp=None):
+    def __init__(self, path):
 
         self._path_in = path
-        self._gerber_lp = gerber_lp
 
         # Find record in cache
         digest = utils.digest(path)
@@ -49,7 +48,9 @@ class SvgPath:
         if self._cache_record == None:
 
             # Parse input path
-            self._p_path = self._parsed_to_list(self._grammar.parseString(self._path_in))
+            self._p_path = self._parsed_to_list(
+                self._grammar.parseString(self._path_in)
+            )
 
             # Convert to a relative path if needed, or use the input path
             if self._is_relative(self._p_path):
@@ -57,9 +58,11 @@ class SvgPath:
                 self._p_r_path = self._p_path
             else:
                 self._r_path = self._p_path_to_relative(self._p_path)
-                self._p_r_path = self._parsed_to_list(self._grammar.parseString(self._r_path))
+                self._p_r_path = self._parsed_to_list(
+                    self._grammar.parseString(self._r_path)
+                )
 
-            self._bbox() # create width, height
+            self._bbox()  # create width, height
 
             config.pth[digest] = {}
             config.pth[digest]["relative"] = self._r_path
@@ -103,6 +106,9 @@ class SvgPath:
         return self._path_in
 
     def get_first_point(self):
+        """
+        Return the first point of the path
+        """
         try:
             return self._first_point
         except:
@@ -126,10 +132,10 @@ class SvgPath:
 
     def _is_relative(self, path):
         """
-        Check if a parsed path is relative or not
+        Check if a parsed path is relative or not by looking for absolute path commands
         """
         for p in path:
-            if p[0] in ['M','C','Q','T','L','V','H','S','A']:
+            if p[0] in ["M", "C", "Q", "T", "L", "V", "H", "S", "A"]:
                 return False
         else:
             return True
@@ -609,7 +615,6 @@ class SvgPath:
         self._width = bbox_bot_right.x - bbox_top_left.x
         self._height = abs(bbox_bot_right.y - bbox_top_left.y)
 
-
     def transform(
         self, scale=1, rotate_angle=0, rotate_point=None, mirror=False, center=True
     ):
@@ -639,10 +644,10 @@ class SvgPath:
             self._width = record["width"]
             self._height = record["height"]
         else:
-            # TODO: this needs to be fixed so that the correct path is in 
+            # TODO: this needs to be fixed so that the correct path is in
             # p_r_path when invoking the following function
             self._bbox()
-            #width, height = self._get_dimensions(path)
+            # width, height = self._get_dimensions(path)
 
             # first point of path
             first_point = Point(path[0][1])
@@ -704,12 +709,12 @@ class SvgPath:
                 self._transformed_mirrored = new_p
                 self._transformed = mirrored
 
-            # TODO: this needs to be fixed so that the correct path is in 
+            # TODO: this needs to be fixed so that the correct path is in
             # p_r_path when invoking the following function
             self._bbox()
-            #width, height = self._get_dimensions(parsed)            
-            #self._width = width
-            #self._height = height
+            # width, height = self._get_dimensions(parsed)
+            # self._width = width
+            # self._height = height
 
             self._cache_record[digest] = {}
 
@@ -720,7 +725,6 @@ class SvgPath:
             self._cache_record[digest]["height"] = self._height
 
         return
-
 
     def _linearizeCubicBezier(self, p, steps):
         """
