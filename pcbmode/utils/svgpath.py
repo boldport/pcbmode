@@ -30,46 +30,49 @@ from pcbmode.utils import svg_path_grammar
 
 class SvgPath:
     """
+    'p_' prefix means parsed
+    'r_' prefix means relative path
     """
 
     def __init__(self, path, gerber_lp=None):
-  
-        self._path_input = path
+
+        self._path_in = path
         self._gerber_lp = gerber_lp
 
+        # Find record in cache
+        digest = utils.digest(path)
+        self._cache_record = config.pth.get(digest)
+
+        # PyParsing SVG path grammar
         self._grammar = svg_path_grammar.get_grammar()
 
- 
-        digest = utils.digest(path) # later
-        self._record = config.pth.get(digest) #later
-
-
-        if self._record == None:
-            self._original_parsed = self._grammar.parseString(self._path_input)
-            self._original_parsed = self._parseResultsToList(self._original_parsed)
+        if self._cache_record == None:
+            self._p_path = self._parsed_to_list(self._grammar.parseString(self._path_in))
             self._first_point = [
-                self._original_parsed[0][1][0],
-                self._original_parsed[0][1][1],
+                self._p_path[0][1][0],
+                self._p_path[0][1][1],
             ]
-            self._relative = self._makeRelative(self._original_parsed)
-            self._relative_parsed = self._grammar.parseString(self._relative)
-            self._relative_parsed = self._parseResultsToList(self._relative_parsed)
-            self._width, self._height = self._get_dimensions(self._relative_parsed)
+            self._r_path = self._p_path_to_relative(self._p_path)
+
+            self._p_r_path = self._parsed_to_list(self._grammar.parseString(self._r_path))
+
+            self._width, self._height = self._get_dimensions(self._p_r_path)
+
             config.pth[digest] = {}
             config.pth[digest]["first-point"] = self._first_point
-            config.pth[digest]["relative"] = self._relative
-            config.pth[digest]["relative-parsed"] = self._relative_parsed
+            config.pth[digest]["relative"] = self._r_path
+            config.pth[digest]["relative-parsed"] = self._p_r_path
             config.pth[digest]["width"] = self._width
             config.pth[digest]["height"] = self._height
-            self._record = config.pth[digest]
+            self._cache_record = config.pth[digest]
         else:
-            self._first_point = self._record["first-point"]
-            self._relative = self._record["relative"]
-            self._relative_parsed = self._record["relative-parsed"]
-            self._width = self._record["width"]
-            self._height = self._record["height"]
+            self._first_point = self._cache_record["first-point"]
+            self._r_path = self._cache_record["relative"]
+            self._p_r_path = self._cache_record["relative-parsed"]
+            self._width = self._cache_record["width"]
+            self._height = self._cache_record["height"]
 
-    def _parseResultsToList(self, parsed):
+    def _parsed_to_list(self, parsed):
         """
         PyParsing returnd an object that looks like a list, but itsn't
         quite. For that reason it cannot be serialised and stored in a
@@ -89,14 +92,14 @@ class SvgPath:
 
         return nl
 
-    def getRelative(self):
-        return self._relative
+    def get_relative(self):
+        return self._r_path
 
-    def getRelativeParsed(self):
-        return self._relative_parsed
+    def get_relative_parsed(self):
+        return self._p_r_path
 
     def get_input_path(self):
-        return self._path_input
+        return self._path_in
 
     def getFirstPoint(self):
         return self._first_point
@@ -113,8 +116,9 @@ class SvgPath:
     def get_height(self):
         return self._height
 
-    def _makeRelative(self, path):
+    def _p_path_to_relative(self, path):
         """
+        Convert a parsed path to a relative path string
         """
 
         def add_xy(c):
@@ -595,7 +599,7 @@ class SvgPath:
         if rotate_point is None:
             rotate_point = Point()
 
-        path = self._relative_parsed
+        path = self._p_r_path
 
         string = "%s%s%s%s%s%s" % (
             path,
@@ -607,7 +611,7 @@ class SvgPath:
         )
         digest = utils.digest(string)
 
-        record = self._record.get(digest)
+        record = self._cache_record.get(digest)
         if record != None:
             self._transformed = record["path"]
             self._transformed_mirrored = record["mirrored"]
@@ -680,13 +684,13 @@ class SvgPath:
             self._width = width
             self._height = height
 
-            self._record[digest] = {}
+            self._cache_record[digest] = {}
 
-            self._record[digest]["path"] = self._transformed
-            self._record[digest]["mirrored"] = self._transformed_mirrored
+            self._cache_record[digest]["path"] = self._transformed
+            self._cache_record[digest]["mirrored"] = self._transformed_mirrored
 
-            self._record[digest]["width"] = self._width
-            self._record[digest]["height"] = self._height
+            self._cache_record[digest]["width"] = self._width
+            self._cache_record[digest]["height"] = self._height
 
         return
 
@@ -983,4 +987,4 @@ class SvgPath:
     def getNumberOfSegments(self):
         """
         """
-        return self._relative.lower().count("m")
+        return self._r_path.lower().count("m")

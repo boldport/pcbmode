@@ -544,7 +544,7 @@ def textToPath(font_data, text, letter_spacing, line_height, scale_factor):
                     first_point = glyph_path.getFirstPoint()
                     offset_x = float(first_point[0])
                     offset_y = float(first_point[1])
-                    path = glyph_path.getRelative()
+                    path = glyph_path.get_relative()
                     path = re.sub(
                         "^(m\s?[-\d\.]+\s?,\s?[-\d\.]+)",
                         f"M {str(text_width + offset_x)},{str(offset_y - text_height)}",
