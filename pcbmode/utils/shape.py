@@ -68,9 +68,8 @@ class Shape:
         # Create the SVG path for the shape
         self._define_path_from_shape_type()
 
-        # Convert the path to an object
+        # Convert the path to an object and transform
         self._path_obj = SvgPath(self._path)
-
         self._path_obj.transform(
             scale=self._scale,
             rotate_angle=self._rotate,

@@ -34,7 +34,7 @@ class SvgPath:
     'r_' prefix means relative path
     """
 
-    def __init__(self, path):
+    def __init__(self, path, scale=1, rotate=0, rotate_point=None, mirror=False):
 
         self._path_in = path
 
@@ -61,6 +61,9 @@ class SvgPath:
                 self._p_r_path = self._parsed_to_list(
                     self._grammar.parseString(self._r_path)
                 )
+
+            # Apply transform
+             
 
             self._bbox()  # create width, height
 
@@ -619,7 +622,7 @@ class SvgPath:
         self, scale=1, rotate_angle=0, rotate_point=None, mirror=False, center=True
     ):
         """
-        Transforms a path
+        Transforms a parsed path 
         """
 
         if rotate_point is None:
