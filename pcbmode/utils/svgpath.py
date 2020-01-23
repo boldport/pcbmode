@@ -51,7 +51,9 @@ class SvgPath:
             self._r_path = self._p_path_to_relative(self._p_path)
             self._p_r_path = self._parsed_to_list(self._grammar.parseString(self._r_path))
 
-            self._width, self._height = self._get_dimensions(self._p_r_path)
+            self._bbox() # create width, height
+
+#            self._width, self._height = self._make_width_height(self._p_r_path)
 
             self._first_point = [
                 self._p_r_path[0][1][0],
@@ -352,9 +354,13 @@ class SvgPath:
 
         return p
 
-    def _get_dimensions(self, path):
+    def _bbox(self):
         """
+        Measure the bounding box of the parsed relative path and create the two
+        points and width and height
         """
+
+        path = self._p_r_path
 
         last_point = Point()
         abs_point = Point()
@@ -584,10 +590,9 @@ class SvgPath:
         self._bbox_top_left = bbox_top_left
         self._bbox_bot_right = bbox_bot_right
 
-        return (
-            (bbox_bot_right.x - bbox_top_left.x),
-            abs(bbox_bot_right.y - bbox_top_left.y),
-        )
+        self._width = bbox_bot_right.x - bbox_top_left.x
+        self._height = abs(bbox_bot_right.y - bbox_top_left.y)
+
 
     def transform(
         self, scale=1, rotate_angle=0, rotate_point=None, mirror=False, center=True
@@ -618,7 +623,10 @@ class SvgPath:
             self._width = record["width"]
             self._height = record["height"]
         else:
-            width, height = self._get_dimensions(path)
+            # TODO: this needs to be fixed so that the correct path is in 
+            # p_r_path when invoking the following function
+            self._bbox()
+            #width, height = self._get_dimensions(path)
 
             # first point of path
             first_point = Point(path[0][1])
@@ -627,8 +635,8 @@ class SvgPath:
                 # center point of path
                 origin_point = Point(
                     [
-                        self._bbox_top_left.x + width / 2,
-                        self._bbox_top_left.y - height / 2,
+                        self._bbox_top_left.x + self._width / 2,
+                        self._bbox_top_left.y - self._height / 2,
                     ]
                 )
                 # caluclate what's the new starting point of path based on the new origin
@@ -680,9 +688,12 @@ class SvgPath:
                 self._transformed_mirrored = new_p
                 self._transformed = mirrored
 
-            width, height = self._get_dimensions(parsed)
-            self._width = width
-            self._height = height
+            # TODO: this needs to be fixed so that the correct path is in 
+            # p_r_path when invoking the following function
+            self._bbox()
+            #width, height = self._get_dimensions(parsed)            
+            #self._width = width
+            #self._height = height
 
             self._cache_record[digest] = {}
 
@@ -693,6 +704,7 @@ class SvgPath:
             self._cache_record[digest]["height"] = self._height
 
         return
+
 
     def _linearizeCubicBezier(self, p, steps):
         """
