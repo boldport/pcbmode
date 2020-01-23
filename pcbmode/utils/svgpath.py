@@ -47,13 +47,19 @@ class SvgPath:
         self._grammar = svg_path_grammar.get_grammar()
 
         if self._cache_record == None:
+
+            # Parse input path
             self._p_path = self._parsed_to_list(self._grammar.parseString(self._path_in))
-            self._r_path = self._p_path_to_relative(self._p_path)
-            self._p_r_path = self._parsed_to_list(self._grammar.parseString(self._r_path))
+
+            # Convert to a relative path if needed, or use the input path
+            if self._is_relative(self._p_path):
+                self._r_path = self._path_in
+                self._p_r_path = self._p_path
+            else:
+                self._r_path = self._p_path_to_relative(self._p_path)
+                self._p_r_path = self._parsed_to_list(self._grammar.parseString(self._r_path))
 
             self._bbox() # create width, height
-
-#            self._width, self._height = self._make_width_height(self._p_r_path)
 
             self._first_point = [
                 self._p_r_path[0][1][0],
@@ -117,6 +123,16 @@ class SvgPath:
 
     def get_height(self):
         return self._height
+
+    def _is_relative(self, path):
+        """
+        Check if a parsed path is relative or not
+        """
+        for p in path:
+            if p[0] in ['M','C','Q','T','L','V','H','S','A']:
+                return False
+        else:
+            return True
 
     def _p_path_to_relative(self, path):
         """
