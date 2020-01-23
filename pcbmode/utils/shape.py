@@ -45,11 +45,11 @@ class Shape:
         self._label_style_class = shape.get("label_style_class", None)
         self._shape_dict = shape
         self._gerber_lp = shape.get("gerber-lp") or shape.get("gerber_lp") or None
-        self._place_mirrored = shape.get("mirror") or False
-        self._rotate = shape.get("rotate") or 0
+        self._place_mirrored = shape.get("mirror", False)
+        self._rotate = shape.get("rotate", 0)
         self._rotate *= self._inv_rotate
-        self._rotate_point = shape.get("rotate-point") or Point([0, 0])
-        self._scale = shape.get("scale") or 1
+        self._rotate_point = shape.get("rotate-point", Point([0, 0]))
+        self._scale = shape.get("scale", 1)
         self._pour_buffer = shape.get("buffer-to-pour")
         self._location = shape.get("location", Point())
 
