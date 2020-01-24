@@ -158,10 +158,10 @@ class SvgPath:
 
         for i in range(0, len(path)):
 
-            # 'move to' command
-            if re.match("M", path[i][0], re.I):
+            cmd_type = path[i][0]
 
-                # TODO: write this code more concisely
+            # 'move to' command
+            if re.match("M", cmd_type, re.I):
 
                 coord = path[i][1]
                 p += "m "
@@ -193,7 +193,7 @@ class SvgPath:
                         abspos.assign(coord.x, coord.y)
 
             # cubic Bezier (PCCP) curve command
-            elif re.match("C", path[i][0], re.I):
+            elif re.match("C", cmd_type, re.I):
                 p += f"{path[i][0].lower()} "
 
                 if path[i][0] == "c":
@@ -214,7 +214,7 @@ class SvgPath:
                         abspos.assign(coord.x, coord.y)
 
             # quadratic Bezier (PCP) curve command
-            elif re.match("Q", path[i][0], re.I):
+            elif re.match("Q", cmd_type, re.I):
                 p += f"{path[i][0].lower()} "
 
                 if path[i][0] == "q":
@@ -235,7 +235,7 @@ class SvgPath:
                         abspos.assign(coord.x, coord.y)
 
             # simple cubic Bezier curve command
-            elif re.match("T", path[i][0], re.I):
+            elif re.match("T", cmd_type, re.I):
                 p += f"{path[i][0].lower()} "
 
                 if path[i][0] == "t":
@@ -258,7 +258,7 @@ class SvgPath:
                         )
                     abspos.assign(coord.x, coord.y)
 
-            elif re.match("S", path[i][0], re.I):
+            elif re.match("S", cmd_type, re.I):
                 p += f"{path[i][0].lower()} "
 
                 if path[i][0] == "s":
@@ -274,7 +274,7 @@ class SvgPath:
                     abspos.assign(coord.x, coord.y)
 
             # 'line to'  command
-            elif re.match("L", path[i][0], re.I):
+            elif re.match("L", cmd_type, re.I):
                 p += f"{path[i][0].lower()} "
 
                 if path[i][0] == "l":
@@ -290,7 +290,7 @@ class SvgPath:
                         abspos.assign(coord.x, coord.y)
 
             # 'horizontal line' command
-            elif re.match("H", path[i][0], re.I):
+            elif re.match("H", cmd_type, re.I):
                 p += f"{path[i][0].lower()} "
 
                 if path[i][0] == "h":
@@ -306,7 +306,7 @@ class SvgPath:
                         abspos.x = coord.x
 
             # 'vertical line' command
-            elif re.match("V", path[i][0], re.I):
+            elif re.match("V", cmd_type, re.I):
                 p += f"{path[i][0].lower()} "
 
                 if path[i][0] == "v":
@@ -322,7 +322,7 @@ class SvgPath:
                         abspos.y = coord.y
 
             # 'close shape' command
-            elif re.match("Z", path[i][0], re.I):
+            elif re.match("Z", cmd_type, re.I):
                 p += f"{path[i][0].lower()} "
                 abspos = abspos + (patho - abspos)
 
