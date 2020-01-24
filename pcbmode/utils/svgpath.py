@@ -151,6 +151,9 @@ class SvgPath:
 
         p = ""
 
+        # Sore relative path here
+        r_path = []
+
         # This variable stores the absolute coordinates as the path is converted
         abspos = Point([0,0])
 
@@ -163,21 +166,27 @@ class SvgPath:
             # 'move to' command
             if re.match("M", cmd_type, re.I):
 
+                # Relative coords
+                r_coords = []
+
                 coord = path[seg][1]
                 p += "m "
 
                 # The first M/m coordinate is always absolute
                 if seg == 0:
                     abspos = coord
+                    r_coords.append(abspos)
                     p += add_xy(abspos)
                     patho = coord
                 else:
                     if cmd_type == "m":
                         p += add_xy(coord)
+                        r_coords.append(coord)
                         abspos += coord
                         patho = abspos
                     else:
                         p += add_xy(coord - abspos)
+                        r_coords.append(coord-abspos)
                         abspos = coord
                         patho.x = coord.x
 
@@ -186,40 +195,54 @@ class SvgPath:
                     # coord.assign(coord_tmp[0], coord_tmp[1])
                     if cmd_type == "m":
                         p += add_xy(coord)
+                        r_coords.append(coord)
                         abspos += coord
                     else:
                         p += add_xy(coord - abspos)
+                        r_coords.append(coord-abspos)
                         abspos = coord
+
+                r_path.append(['m'].append(r_coords))
 
             # cubic Bezier (PCCP) curve command
             elif re.match("C", cmd_type, re.I):
                 p += f"{cmd_type.lower()} "
 
+                r_coords = []
+
                 if cmd_type == "c":
                     for coord in path[seg][1:]:
                         # coord.assign(coord_tmp[0], coord_tmp[1])
                         p += add_xy(coord)
+                        r_coords.append(coord)
                     # for keeping track of the absolute position, we need to add up every
                     # *third* coordinate of the cubic Bezier curve
                     for coord in path[seg][3::3]:
                         # coord.assign(coord_tmp[0], coord_tmp[1])
                         abspos += coord
+                        r_coords.append(coord) # TODO: check this
 
                 if cmd_type == "C":
                     for n in range(1, len(path[seg]) - 1, 3):
                         for m in range(0, 3):
                             # coord.assign(path[i][n + m][0], path[i][n + m][1])
                             p += add_xy(coord - abspos)
+                            r_coords.append(coord-abspos)
                         abspos = coord
+
+                r_path.append(['c'].append(r_coords))
 
             # quadratic Bezier (PCP) curve command
             elif re.match("Q", cmd_type, re.I):
                 p += f"{cmd_type.lower()} "
 
+                r_coords = []
+
                 if cmd_type == "q":
                     for coord in path[seg][1:]:
                         # coord.assign(coord_tmp[0], coord_tmp[1])
                         p += add_xy(coord)
+                        r_coords.append(coord)
                     # for keeping track of the absolute position, we need to add up every
                     # *third* coordinate of the cubic Bezier curve
                     for coord in path[seg][2::2]:
@@ -231,16 +254,23 @@ class SvgPath:
                         for coord in path[seg][j : j + 2]:
                             # coord.assign(coord_tmp[0], coord_tmp[1])
                             p += add_xy(coord - abspos)
+                            r_coords.append(coord-abspos)
                         abspos = coord
+
+                r_path.append(['q'].append(r_coords))
+
 
             # simple cubic Bezier curve command
             elif re.match("T", cmd_type, re.I):
                 p += f"{cmd_type.lower()} "
 
+                r_coords = []
+
                 if cmd_type == "t":
                     for coord in path[seg][1:]:
                         # coord.assign(coord_tmp[0], coord_tmp[1])
                         p += add_xy(coord)
+                        r_coords.append(coord)
                         # for keeping track of the absolute position, we need to add up every
                         # *third* coordinate of the cubic Bezier curve
                         # for coord in path[i][2::2]:
@@ -255,75 +285,105 @@ class SvgPath:
                             + str(float(coord[1]) - abspos["y"])
                             + " "
                         )
+                        r_coords.append(coord-abspos)
                     abspos = coord
+
+                r_path.append(['t'].append(r_coords))
 
             elif re.match("S", cmd_type, re.I):
                 p += f"{cmd_type.lower()} "
+
+                r_coords = []
 
                 if cmd_type == "s":
                     for coord in path[seg][1:]:
                         # coord.assign(coord_tmp[0], coord_tmp[1])
                         p += add_xy(coord)
+                        r_coords.append(coord)
                         abspos += coord
 
                 if cmd_type == "S":
                     for coord in path[seg][1:]:
                         # coord.assign(coord_tmp[0], coord_tmp[1])
                         p += add_xy(coord - abspos)
+                        r_coords.append(coord-abspos)
                     abspos = coord
+
+                r_path.append(['s'].append(r_coords))
 
             # 'line to'  command
             elif re.match("L", cmd_type, re.I):
                 p += f"{cmd_type.lower()} "
 
+                r_coords = []
+
                 if cmd_type == "l":
                     for coord in path[seg][1:]:
                         # coord.assign(coord_tmp[0], coord_tmp[1])
                         p += add_xy(coord)
+                        r_coords.append(coord)
                         abspos += coord
 
                 if cmd_type == "L":
                     for coord in path[seg][1:]:
                         # coord.assign(coord_tmp[0], coord_tmp[1])
                         p += add_xy(coord - abspos)
+                        r_coords.append(coord-abspos)
                         abspos = coord
+
+                r_path.append(['l'].append(r_coords))
 
             # 'horizontal line' command
             elif re.match("H", cmd_type, re.I):
                 p += f"{cmd_type.lower()} "
 
+                r_coords = []
+
                 if cmd_type == "h":
                     for coord in path[seg][1:]:
                         # coord.assign(coord_tmp[0], 0)
                         p += f"{coord.px()} "
+                        r_coords.append(coord.x)
                     abspos.x += coord.x
 
                 if cmd_type == "H":
                     for coord in path[seg][1:]:
                         # coord.assign(coord_tmp[0], 0)
                         p += f"{(coord.x - abspos.x).px()} "
+                        r_coords.append(coord.x-abspos.x)
                         abspos.x = coord.x
+
+                r_path.append(['h'].append(r_coords))
 
             # 'vertical line' command
             elif re.match("V", cmd_type, re.I):
                 p += f"{cmd_type.lower()} "
 
+                r_coords = []
+
                 if cmd_type == "v":
                     for coord in path[seg][1:]:
                         # coord.assign(0, coord_tmp[0])
                         p += f"{coord.py()} "
+                        r_coords.append(coord.y)
                         abspos.y += coord.y
 
                 if cmd_type == "V":
                     for coord in path[seg][1:]:
                         # coord.assign(0, coord_tmp[0])
                         p += f"{(coord.y - abspos.y).py()} "
+                        r_coords.append(coord.y-abspos.y)
                         abspos.y = coord.y
+
+                r_path.append(['v'].append(r_coords))
 
             # 'close shape' command
             elif re.match("Z", cmd_type, re.I):
                 p += f"{cmd_type.lower()} "
                 abspos = abspos + (patho - abspos)
+
+                r_path.append(['z'])
+
 
             else:
                 msg.error("Found an unsupported SVG path command '%s'" % path[i][0])
