@@ -152,9 +152,9 @@ class SvgPath:
         p = ""
 
         # This variable stores the absolute coordinates as the path is converted
-        abspos = Point()
+        abspos = Point([0,0])
 
-        patho = Point()
+        patho = Point([0,0])
 
         for seg in range(0, len(path)):
 
@@ -176,11 +176,10 @@ class SvgPath:
                         p += add_xy(coord)
                         abspos += coord
                         patho = abspos
-
                     else:
                         p += add_xy(coord - abspos)
-                        abspos.assign(coord.x, coord.y)
-                        patho.assign(coord.x, coord.y)
+                        abspos = coord
+                        patho.x = coord.x
 
                 # For the rest of the coordinates
                 for coord in path[seg][2:]:
@@ -190,7 +189,7 @@ class SvgPath:
                         abspos += coord
                     else:
                         p += add_xy(coord - abspos)
-                        abspos.assign(coord.x, coord.y)
+                        abspos = coord
 
             # cubic Bezier (PCCP) curve command
             elif re.match("C", cmd_type, re.I):
@@ -211,7 +210,7 @@ class SvgPath:
                         for m in range(0, 3):
                             # coord.assign(path[i][n + m][0], path[i][n + m][1])
                             p += add_xy(coord - abspos)
-                        abspos.assign(coord.x, coord.y)
+                        abspos = coord
 
             # quadratic Bezier (PCP) curve command
             elif re.match("Q", cmd_type, re.I):
@@ -232,7 +231,7 @@ class SvgPath:
                         for coord in path[seg][j : j + 2]:
                             # coord.assign(coord_tmp[0], coord_tmp[1])
                             p += add_xy(coord - abspos)
-                        abspos.assign(coord.x, coord.y)
+                        abspos = coord
 
             # simple cubic Bezier curve command
             elif re.match("T", cmd_type, re.I):
@@ -256,7 +255,7 @@ class SvgPath:
                             + str(float(coord[1]) - abspos["y"])
                             + " "
                         )
-                    abspos.assign(coord.x, coord.y)
+                    abspos = coord
 
             elif re.match("S", cmd_type, re.I):
                 p += f"{cmd_type.lower()} "
@@ -271,7 +270,7 @@ class SvgPath:
                     for coord in path[seg][1:]:
                         # coord.assign(coord_tmp[0], coord_tmp[1])
                         p += add_xy(coord - abspos)
-                    abspos.assign(coord.x, coord.y)
+                    abspos = coord
 
             # 'line to'  command
             elif re.match("L", cmd_type, re.I):
@@ -287,7 +286,7 @@ class SvgPath:
                     for coord in path[seg][1:]:
                         # coord.assign(coord_tmp[0], coord_tmp[1])
                         p += add_xy(coord - abspos)
-                        abspos.assign(coord.x, coord.y)
+                        abspos = coord
 
             # 'horizontal line' command
             elif re.match("H", cmd_type, re.I):
