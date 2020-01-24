@@ -553,7 +553,7 @@ def textToPath(font_data, text, letter_spacing, line_height, scale_factor):
                     gerber_lp += (
                         glyph.get("gerber-lp")
                         or glyph.get("gerber_lp")
-                        or "%s" % "d" * glyph_path.getNumberOfSegments()
+                        or "%s" % "d" * glyph_path.get_num_of_segments()
                     )
                     text_path += "%s " % (path)
 
