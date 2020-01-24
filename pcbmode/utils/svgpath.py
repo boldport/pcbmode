@@ -86,7 +86,6 @@ class SvgPath:
         """
         nl = []
 
-        print(parsed)
         for cmd in parsed:
             lst = []
             lst.append(cmd[0])
@@ -382,6 +381,20 @@ class SvgPath:
 
         return p
 
+    def _bbox_update(self, p):
+        """
+        Updates top-left and bottom-right coords with input point
+        """    
+        if p.x > self._bbox_br.x:
+            self._bbox_br.x = p.x
+        if p.x < self._bbox_tl.x:
+            self._bbox_tl.x = p.x
+        if p.y > self._bbox_tl.y:
+            self._bbox_tl.y = p.y
+        if p.y < self._bbox_br.y:
+            self._bbox_br.y = p.y
+    
+
     def _bbox(self):
         """
         Measure the bounding box of the parsed relative path and create the two
@@ -393,12 +406,14 @@ class SvgPath:
         last_point = Point()
         abs_point = Point()
 
-        bbox_top_left = Point()
-        bbox_bot_right = Point()
+        bbox_tl = Point()
+        bbox_br = Point()
 
         # for the t/T (shorthand bezier) command, we need to keep track
         # of the last bezier control point from previous Q/q/T/t command
         last_bezier_control_point = Point()
+
+        print(path)
 
         for i in range(0, len(path)):
 
@@ -408,22 +423,18 @@ class SvgPath:
                 if i == 0:
                     # the first coordinate is the start of both top left and bottom right
                     abs_point.assign(path[i][1][0], path[i][1][1])
-                    bbox_top_left.assign(path[i][1][0], path[i][1][1])
-                    bbox_bot_right.assign(path[i][1][0], path[i][1][1])
+                    bbox_tl.assign(path[i][1][0], path[i][1][1])
+                    bbox_br.assign(path[i][1][0], path[i][1][1])
                 else:
                     new_point = Point(path[i][1])
                     abs_point += new_point
-                    bbox_top_left, bbox_bot_right = svg.boundary_box_check(
-                        bbox_top_left, bbox_bot_right, abs_point
-                    )
+                    self._bbox_update(abs_point)
 
                 # for the rest of the coordinates
                 for coord in path[i][2:]:
                     new_point = Point(coord)
                     abs_point += new_point
-                    bbox_top_left, bbox_bot_right = svg.boundary_box_check(
-                        bbox_top_left, bbox_bot_right, abs_point
-                    )
+                    self._bbox_update(abs_point)
 
             # cubic Bezier curve command
             elif re.match("c", path[i][0]):
@@ -468,9 +479,7 @@ class SvgPath:
 
                     # check each point if it extends the boundary box
                     for n in range(0, len(bezier_point_array)):
-                        bbox_top_left, bbox_bot_right = svg.boundary_box_check(
-                            bbox_top_left, bbox_bot_right, bezier_point_array[n]
-                        )
+                        self._bbox_update(bezier_point_array[n])
 
             # quadratic Bezier curve command
             elif re.match("q", path[i][0]):
@@ -521,9 +530,7 @@ class SvgPath:
 
                     # check each point if it extends the boundary box
                     for n in range(0, len(bezier_point_array)):
-                        bbox_top_left, bbox_bot_right = svg.boundary_box_check(
-                            bbox_top_left, bbox_bot_right, bezier_point_array[n]
-                        )
+                        self._bbox_update(bezier_point_array[n])
 
             # simple cubic Bezier curve command
             elif re.match("t", path[i][0]):
@@ -577,36 +584,28 @@ class SvgPath:
 
                     # check each point if it extends the boundary box
                     for m in range(0, len(bezier_point_array)):
-                        bbox_top_left, bbox_bot_right = svg.boundary_box_check(
-                            bbox_top_left, bbox_bot_right, bezier_point_array[m]
-                        )
+                        self._bbox_update(bezier_point_array[m])
 
             # 'line to'  command
             elif re.match("l", path[i][0]):
                 for coord in path[i][1:]:
                     new_point = Point(coord)
                     abs_point += new_point
-                    bbox_top_left, bbox_bot_right = svg.boundary_box_check(
-                        bbox_top_left, bbox_bot_right, abs_point
-                    )
+                    self._bbox_update(abs_point)
 
             # 'horizontal line' command
             elif re.match("h", path[i][0]):
                 for coord in path[i][1:]:
                     new_point = Point([coord[0], 0])
                     abs_point += new_point
-                    bbox_top_left, bbox_bot_right = svg.boundary_box_check(
-                        bbox_top_left, bbox_bot_right, abs_point
-                    )
+                    self._bbox_update(abs_point)
 
             # 'vertical line' command
             elif re.match("v", path[i][0]):
                 for coord in path[i][1:]:
                     new_point = Point([0, coord[0]])
                     abs_point += new_point
-                    bbox_top_left, bbox_bot_right = svg.boundary_box_check(
-                        bbox_top_left, bbox_bot_right, abs_point
-                    )
+                    self._bbox_update(abs_point)
 
             # 'close shape' command
             elif re.match("Z", path[i][0], re.I):
@@ -615,11 +614,9 @@ class SvgPath:
             else:
                 print("ERROR: found an unsupported SVG path command " + str(path[i][0]))
 
-        self._bbox_top_left = bbox_top_left
-        self._bbox_bot_right = bbox_bot_right
+        self._width = self._bbox_br.x - self._bbox_tl.x
+        self._height = abs(self._bbox_br.y - self._bbox_tl.y)
 
-        self._width = bbox_bot_right.x - bbox_top_left.x
-        self._height = abs(bbox_bot_right.y - bbox_top_left.y)
 
     def transform(
         self, scale=1, rotate_angle=0, rotate_point=None, mirror=False, center=True
@@ -662,8 +659,8 @@ class SvgPath:
                 # center point of path
                 origin_point = Point(
                     [
-                        self._bbox_top_left.x + self._width / 2,
-                        self._bbox_top_left.y - self._height / 2,
+                        self._bbox_tl.x + self._width / 2,
+                        self._bbox_tl.y - self._height / 2,
                     ]
                 )
                 # caluclate what's the new starting point of path based on the new origin
