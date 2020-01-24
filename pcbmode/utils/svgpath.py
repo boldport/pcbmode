@@ -87,13 +87,15 @@ class SvgPath:
         nl = []
 
         for cmd in parsed:
+            cmd_type = cmd[0] # m,v,c, etc.
             lst = []
-            lst.append(cmd[0])
+            lst.append(cmd_type)
             for coord in cmd[1:]:
                 if len(coord) == 1:
-                    if cmd.lower() == 'h':
+                    # 'v' and 'h' have only one coordinate
+                    if cmd_type.lower() == 'h':
                         lst.append(Point([coord[0],0]))
-                    elif cmd.lower() == 'v':
+                    elif cmd_type.lower() == 'v':
                         lst.append(Point([0,coord[0]]))
                 else:
                     lst.append(Point([coord[0], coord[1]]))
@@ -403,17 +405,15 @@ class SvgPath:
 
         path = self._p_r_path
 
-        last_point = Point()
-        abs_point = Point()
+        #last_point = Point([0,0])
+        #abs_point = Point([0,0])
 
-        bbox_tl = Point()
-        bbox_br = Point()
+        #self._bbox_tl = Point([0,0])
+        #self._bbox_br = Point([0,0])
 
         # for the t/T (shorthand bezier) command, we need to keep track
         # of the last bezier control point from previous Q/q/T/t command
-        last_bezier_control_point = Point()
-
-        print(path)
+        last_bezier_control_point = Point([0,0])
 
         for i in range(0, len(path)):
 
@@ -422,12 +422,16 @@ class SvgPath:
 
                 if i == 0:
                     # the first coordinate is the start of both top left and bottom right
-                    abs_point.assign(path[i][1][0], path[i][1][1])
-                    bbox_tl.assign(path[i][1][0], path[i][1][1])
-                    bbox_br.assign(path[i][1][0], path[i][1][1])
+                    abs_point = path[i][1]
+                    self._bbox_tl = path[i][1]
+                    self._bbox_br = path[i][1]
+                    #abs_point.assign(path[i][1][0], path[i][1][1])
+                    #self._bbox_tl.assign(path[i][1][0], path[i][1][1])
+                    #self._bbox_br.assign(path[i][1][0], path[i][1][1])
                 else:
-                    new_point = Point(path[i][1])
-                    abs_point += new_point
+#                    new_point = Point(path[i][1])
+#                    abs_point += new_point
+                    abs_point += path[i][1]
                     self._bbox_update(abs_point)
 
                 # for the rest of the coordinates
@@ -445,9 +449,9 @@ class SvgPath:
                     bezier_curve_path.append(abs_point)
                     for m in range(0, 3):
                         coord = path[i][n + m]
-                        point = Point(coord)
-                        bezier_curve_path.append(abs_point + point)
-                    new_point = Point(path[i][n + m])
+                        #point = Point(coord)
+                        bezier_curve_path.append(abs_point + coord)
+                    new_point = path[i][n + m]
                     abs_point += new_point
 
                 for n in range(0, len(bezier_curve_path), 4):
@@ -653,7 +657,7 @@ class SvgPath:
             # width, height = self._get_dimensions(path)
 
             # first point of path
-            first_point = Point(path[0][1])
+            first_point = path[0][1]
 
             if center is True:
                 # center point of path
@@ -696,7 +700,12 @@ class SvgPath:
                         elif path[n][0] == "v":
                             tmpp.assign(0, path[n][m][0])
                         else:
-                            tmpp.assign(path[n][m][0], path[n][m][1])
+                            print('XXXXXXXXXXXXXXXXXXXXX')
+                            print(path[n][m].x)
+                            tmpp.assign(path[n][m].x, path[n][m].y)
+                            print()
+                            print(tmpp)
+                            print()
 
                         tmpp.rotate(rotate_angle, rotate_point)
                         tmpp.mult(scale)
