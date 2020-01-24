@@ -47,18 +47,24 @@ class SvgPath:
 
         # Parse input path
         self._p_path = self._parsed_to_list(self._grammar.parseString(self._path_in))
-
-        # Convert to a relative path if needed, or use the input path
         if self._is_relative(self._p_path):
-            self._r_path = self._path_in
             self._p_r_path = self._p_path
         else:
-            self._r_path = self._p_path_to_relative(self._p_path)
-            self._p_r_path = self._parsed_to_list(
-                self._grammar.parseString(self._r_path)
-            )
+            self._p_r_path = self._p_path_to_relative(self._p_path)
 
         self._bbox()  # create width, height
+
+
+        # # Convert to a relative path if needed, or use the input path
+        # if self._is_relative(self._p_path):
+        #     self._r_path = self._path_in
+        #     self._p_r_path = self._p_path
+        # else:
+        #     self._r_path = self._p_path_to_relative(self._p_path)
+        #     self._p_r_path = self._parsed_to_list(
+        #         self._grammar.parseString(self._r_path)
+        #     )
+
 
         # if self._cache_record == None:
         #     config.pth[digest] = {}
@@ -143,15 +149,12 @@ class SvgPath:
 
     def _p_path_to_relative(self, path):
         """
-        Convert a parsed path to a relative path string
+        Convert a parsed path to a relative parsed path
         """
 
-        def add_xy(c):
-            return f"{c.px()},{c.py()} "
+        print(path)
 
-        #p = ""
-
-        # Sore relative path here
+        # Store relative path here
         r_path = []
 
         # This variable stores the absolute coordinates as the path is converted
@@ -202,7 +205,7 @@ class SvgPath:
                         r_coords.append(coord-abspos)
                         abspos = coord
 
-                r_path.append(['m'].append(r_coords))
+                r_path.append(['m']+r_coords)
 
             # cubic Bezier (PCCP) curve command
             elif re.match("C", cmd_type, re.I):
@@ -230,7 +233,7 @@ class SvgPath:
                             r_coords.append(coord-abspos)
                         abspos = coord
 
-                r_path.append(['c'].append(r_coords))
+                r_path.append(['c']+r_coords)
 
             # quadratic Bezier (PCP) curve command
             elif re.match("Q", cmd_type, re.I):
@@ -257,7 +260,7 @@ class SvgPath:
                             r_coords.append(coord-abspos)
                         abspos = coord
 
-                r_path.append(['q'].append(r_coords))
+                r_path.append(['q']+r_coords)
 
 
             # simple cubic Bezier curve command
@@ -288,7 +291,7 @@ class SvgPath:
                         r_coords.append(coord-abspos)
                     abspos = coord
 
-                r_path.append(['t'].append(r_coords))
+                r_path.append(['t']+r_coords)
 
             elif re.match("S", cmd_type, re.I):
                 #p += f"{cmd_type.lower()} "
@@ -309,7 +312,7 @@ class SvgPath:
                         r_coords.append(coord-abspos)
                     abspos = coord
 
-                r_path.append(['s'].append(r_coords))
+                r_path.append(['s']+r_coords)
 
             # 'line to'  command
             elif re.match("L", cmd_type, re.I):
@@ -331,7 +334,7 @@ class SvgPath:
                         r_coords.append(coord-abspos)
                         abspos = coord
 
-                r_path.append(['l'].append(r_coords))
+                r_path.append(['l']+r_coords)
 
             # 'horizontal line' command
             elif re.match("H", cmd_type, re.I):
@@ -353,7 +356,7 @@ class SvgPath:
                         r_coords.append(coord.x-abspos.x)
                         abspos.x = coord.x
 
-                r_path.append(['h'].append(r_coords))
+                r_path.append(['h']+r_coords)
 
             # 'vertical line' command
             elif re.match("V", cmd_type, re.I):
@@ -375,7 +378,7 @@ class SvgPath:
                         r_coords.append(coord.y-abspos.y)
                         abspos.y = coord.y
 
-                r_path.append(['v'].append(r_coords))
+                r_path.append(['v']+r_coords)
 
             # 'close shape' command
             elif re.match("Z", cmd_type, re.I):
@@ -386,6 +389,9 @@ class SvgPath:
 
             else:
                 msg.error(f"Found an unsupported SVG path command '{cmd_type}'")
+
+        print(r_path)
+        print()
 
         return r_path
 
