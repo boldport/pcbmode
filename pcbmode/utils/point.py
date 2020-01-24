@@ -27,10 +27,10 @@ DEG2RAD = 2 * pi / 360
 
 
 class Point:
-    def __init__(self, xy_list=[0,0]):
+    def __init__(self, xy=[0,0]):
         self.set_sig_dig(config.cfg["params"].get("significant-digits", 8))
-        self.x = float(xy_list[0])
-        self.y = float(xy_list[1])
+        self.x = float(xy[0])
+        self.y = float(xy[1])
 
     def __add__(self, p):
         """ add point 'p' of type Point to current point"""
