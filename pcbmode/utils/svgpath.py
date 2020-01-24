@@ -81,20 +81,23 @@ class SvgPath:
 
     def _parsed_to_list(self, parsed):
         """
-        PyParsing returnd an object that looks like a list, but itsn't
-        quite. For that reason it cannot be serialised and stored in a
-        JSON file. This function converts it to a Python list
+        Convery the output of PyParsing to a Python list, and coordinates to Point
+        objects. 
         """
         nl = []
 
+        print(parsed)
         for cmd in parsed:
             lst = []
             lst.append(cmd[0])
             for coord in cmd[1:]:
                 if len(coord) == 1:
-                    lst.append([coord[0]])
+                    if cmd.lower() == 'h':
+                        lst.append(Point([coord[0],0]))
+                    elif cmd.lower() == 'v':
+                        lst.append(Point([0,coord[0]]))
                 else:
-                    lst.append([coord[0], coord[1]])
+                    lst.append(Point([coord[0], coord[1]]))
             nl.append(lst)
 
         return nl
