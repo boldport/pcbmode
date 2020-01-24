@@ -91,12 +91,10 @@ class SvgPath:
             lst = []
             lst.append(cmd_type)
             for coord in cmd[1:]:
-                if len(coord) == 1:
-                    # 'v' and 'h' have only one coordinate
-                    if cmd_type.lower() == "h":
-                        lst.append(Point([coord[0], 0]))
-                    elif cmd_type.lower() == "v":
-                        lst.append(Point([0, coord[0]]))
+                if cmd_type.lower() == "h": # only x
+                    lst.append(Point([coord[0], 0]))
+                elif cmd_type.lower() == "v": # only y
+                    lst.append(Point([0, coord[0]]))
                 else:
                     lst.append(Point([coord[0], coord[1]]))
             nl.append(lst)
@@ -151,8 +149,6 @@ class SvgPath:
         """
         Convert a parsed path to a relative parsed path
         """
-
-        print(path)
 
         # Store relative path here
         r_path = []
@@ -390,8 +386,8 @@ class SvgPath:
             else:
                 msg.error(f"Found an unsupported SVG path command '{cmd_type}'")
 
-        print(r_path)
-        print()
+        #print(r_path)
+        #print()
 
         return r_path
 
@@ -657,14 +653,14 @@ class SvgPath:
             elif re.match("h", path[i][0]):
                 for coord in path[i][1:]:
                     # new_point = Point([coord[0], 0])
-                    abs_point += coord  # new_point
+                    abs_point.x += coord.x  # new_point
                     self._bbox_update(abs_point)
 
             # 'vertical line' command
             elif re.match("v", path[i][0]):
                 for coord in path[i][1:]:
                     # new_point = Point([0, coord[0]])
-                    abs_point += coord  # new_point
+                    abs_point.y += coord.y  # new_point
                     self._bbox_update(abs_point)
 
             # 'close shape' command
