@@ -60,7 +60,6 @@ class SvgPath:
 
         self._bbox()  # create width, height
 
-
         # if self._cache_record == None:
         #     config.pth[digest] = {}
         #     config.pth[digest]["relative"] = self._r_path
@@ -152,7 +151,7 @@ class SvgPath:
 
         p = ""
 
-        # This variable stores the absolute coordinates as the path is converted;
+        # This variable stores the absolute coordinates as the path is converted
         abspos = Point()
 
         patho = Point()
@@ -169,9 +168,9 @@ class SvgPath:
 
                 # The first M/m coordinate is always absolute
                 if i == 0:
-                    abspos.assign(coord.x, coord.y)
+                    abspos = coord
                     p += add_xy(abspos)
-                    patho.assign(coord.x, coord.y)
+                    patho = coord
                 else:
                     if path[i][0] == "m":
                         p += add_xy(coord)
@@ -636,94 +635,81 @@ class SvgPath:
         )
         digest = utils.digest(string)
 
-        record = self._cache_record.get(digest)
-        if record != None:
-            self._transformed = record["path"]
-            self._transformed_mirrored = record["mirrored"]
-            self._width = record["width"]
-            self._height = record["height"]
+        #        record = self._cache_record.get(digest)
+        #        if record != None:
+        #            pass
+        # self._transformed = record["path"]
+        # self._transformed_mirrored = record["mirrored"]
+        # self._width = record["width"]
+        # self._height = record["height"]
+        #        else:
+
+        # TODO: this needs to be fixed so that the correct path is in
+        # p_r_path when invoking the following function
+        self._bbox()
+        # width, height = self._get_dimensions(path)
+        # first point of path
+        first_point = path[0][1]
+        if center is True:
+            # center point of path
+            origin_point = Point(
+                [self._bbox_tl.x + self._width / 2, self._bbox_tl.y - self._height / 2,]
+            )
+            # caluclate what's the new starting point of path based on the new origin
+            new_first_point = Point(
+                [first_point.x - origin_point.x, first_point.y - origin_point.y]
+            )
         else:
-            # TODO: this needs to be fixed so that the correct path is in
-            # p_r_path when invoking the following function
-            self._bbox()
-            # width, height = self._get_dimensions(path)
-
-            # first point of path
-            first_point = path[0][1]
-
-            if center is True:
-                # center point of path
-                origin_point = Point(
-                    [
-                        self._bbox_tl.x + self._width / 2,
-                        self._bbox_tl.y - self._height / 2,
-                    ]
-                )
-                # caluclate what's the new starting point of path based on the new origin
-                new_first_point = Point(
-                    [first_point.x - origin_point.x, first_point.y - origin_point.y]
-                )
+            new_first_point = Point([first_point.x, first_point.y])
+        new_first_point.rotate(rotate_angle, rotate_point)
+        new_first_point.mult(scale)
+        new_p = f"m {new_first_point.px()},{new_first_point.py()} "
+        tmpp = Point()
+        origin = Point()
+        for n in range(0, len(path)):
+            if path[n][0] == "m" and n == 0:
+                for m in range(2, len(path[n])):
+                    tmpp = path[n][m]
+                    tmpp.rotate(rotate_angle, rotate_point)
+                    tmpp.mult(scale)
+                    new_p += f"{str(tmpp.px())},{str(tmpp.py())} "
             else:
-                new_first_point = Point([first_point.x, first_point.y])
-
-            new_first_point.rotate(rotate_angle, rotate_point)
-            new_first_point.mult(scale)
-            new_p = f"m {new_first_point.px()},{new_first_point.py()} "
-
-            tmpp = Point()
-            origin = Point()
-
-            for n in range(0, len(path)):
-                if path[n][0] == "m" and n == 0:
-                    for m in range(2, len(path[n])):
-                        tmpp = path[n][m]
-                        tmpp.rotate(rotate_angle, rotate_point)
-                        tmpp.mult(scale)
-                        new_p += f"{str(tmpp.px())},{str(tmpp.py())} "
+                if path[n][0] == "h" or path[n][0] == "v":
+                    new_p += "l "
                 else:
-                    if path[n][0] == "h" or path[n][0] == "v":
-                        new_p += "l "
+                    new_p += path[n][0] + " "
+                for m in range(1, len(path[n])):
+                    if path[n][0] == "h":
+                        tmpp.assign(path[n][m].x, 0)
+                    elif path[n][0] == "v":
+                        tmpp.assign(0, path[n][m].y)
                     else:
-                        new_p += path[n][0] + " "
-
-                    for m in range(1, len(path[n])):
-                        if path[n][0] == "h":
-                            tmpp.assign(path[n][m].x, 0)
-                        elif path[n][0] == "v":
-                            tmpp.assign(0, path[n][m].y)
-                        else:
-                            tmpp = path[n][m]
-
-                        tmpp.rotate(rotate_angle, rotate_point)
-                        tmpp.mult(scale)
-                        new_p += f"{str(tmpp.px())},{str(tmpp.py())} "
-
-            parsed = self._grammar.parseString(new_p)
-            mirrored = self._mirrorHorizontally(parsed)
-
-            if mirror == False:
-                self._transformed_mirrored = mirrored
-                self._transformed = new_p
-            else:
-                self._transformed_mirrored = new_p
-                self._transformed = mirrored
-
-            # TODO: this needs to be fixed so that the correct path is in
-            # p_r_path when invoking the following function
-            self._bbox()
-            # width, height = self._get_dimensions(parsed)
-            # self._width = width
-            # self._height = height
-
-            self._cache_record[digest] = {}
-
-            self._cache_record[digest]["path"] = self._transformed
-            self._cache_record[digest]["mirrored"] = self._transformed_mirrored
-
-            self._cache_record[digest]["width"] = self._width
-            self._cache_record[digest]["height"] = self._height
+                        tmpp = path[n][m]
+                    tmpp.rotate(rotate_angle, rotate_point)
+                    tmpp.mult(scale)
+                    new_p += f"{str(tmpp.px())},{str(tmpp.py())} "
+        parsed = self._grammar.parseString(new_p)
+        mirrored = self._mirrorHorizontally(parsed)
+        if mirror == False:
+            self._transformed_mirrored = mirrored
+            self._transformed = new_p
+        else:
+            self._transformed_mirrored = new_p
+            self._transformed = mirrored
+        # TODO: this needs to be fixed so that the correct path is in
+        # p_r_path when invoking the following function
+        self._bbox()
+        # width, height = self._get_dimensions(parsed)
+        # self._width = width
+        # self._height = height
+        # self._cache_record[digest] = {}
+        # self._cache_record[digest]["path"] = self._transformed
+        # self._cache_record[digest]["mirrored"] = self._transformed_mirrored
+        # self._cache_record[digest]["width"] = self._width
+        # self._cache_record[digest]["height"] = self._height
 
         return
+
 
     def _linearizeCubicBezier(self, p, steps):
         """
