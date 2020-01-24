@@ -542,23 +542,6 @@ def mirror_path_over_axis(path, axis, width):
     return p
 
 
-def boundary_box_check(tl, br, p):
-
-    new_tl = Point([tl.x, tl.y])
-    new_br = Point([br.x, br.y])
-
-    if p.x > br.x:
-        new_br.x = p.x
-    if p.x < tl.x:
-        new_tl.x = p.x
-    if p.y > tl.y:
-        new_tl.y = p.y
-    if p.y < br.y:
-        new_br.y = p.y
-
-    return new_tl, new_br
-
-
 def calculate_bounding_box_of_path(path):
     """
     Calculates the bounding box of an SVG path
