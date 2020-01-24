@@ -120,8 +120,8 @@ class SvgPath:
             return self._first_point
         except:
             self._first_point = [
-                self._p_r_path[0][1][0],
-                self._p_r_path[0][1][1],
+                self._p_r_path[0][1].x,
+                self._p_r_path[0][1].y,
             ]
             return self._first_point
 
@@ -169,7 +169,7 @@ class SvgPath:
 
                 # TODO: write this code more concisely
 
-                coord = Point(path[i][1])
+                coord = path[i][1]
                 p += "m "
 
                 # if this is the start of the path, the first M/m coordinate is
@@ -189,9 +189,9 @@ class SvgPath:
                         abspos.assign(coord.x, coord.y)
                         patho.assign(coord.x, coord.y)
 
-                # do the rest of the coordinates
-                for coord_tmp in path[i][2:]:
-                    coord.assign(coord_tmp[0], coord_tmp[1])
+                # For the rest of the coordinates
+                for coord in path[i][2:]:
+                    #coord.assign(coord_tmp[0], coord_tmp[1])
                     if path[i][0] == "m":
                         p += add_xy(coord)
                         abspos += coord
@@ -204,19 +204,19 @@ class SvgPath:
                 p += f"{path[i][0].lower()} "
 
                 if path[i][0] == "c":
-                    for coord_tmp in path[i][1:]:
-                        coord.assign(coord_tmp[0], coord_tmp[1])
+                    for coord in path[i][1:]:
+                        #coord.assign(coord_tmp[0], coord_tmp[1])
                         p += add_xy(coord)
                     # for keeping track of the absolute position, we need to add up every
                     # *third* coordinate of the cubic Bezier curve
-                    for coord_tmp in path[i][3::3]:
-                        coord.assign(coord_tmp[0], coord_tmp[1])
+                    for coord in path[i][3::3]:
+                        #coord.assign(coord_tmp[0], coord_tmp[1])
                         abspos += coord
 
                 if path[i][0] == "C":
                     for n in range(1, len(path[i]) - 1, 3):
                         for m in range(0, 3):
-                            coord.assign(path[i][n + m][0], path[i][n + m][1])
+                            #coord.assign(path[i][n + m][0], path[i][n + m][1])
                             p += add_xy(coord - abspos)
                         abspos.assign(coord.x, coord.y)
 
@@ -225,19 +225,19 @@ class SvgPath:
                 p += f"{path[i][0].lower()} "
 
                 if path[i][0] == "q":
-                    for coord_tmp in path[i][1:]:
-                        coord.assign(coord_tmp[0], coord_tmp[1])
+                    for coord in path[i][1:]:
+                        #coord.assign(coord_tmp[0], coord_tmp[1])
                         p += add_xy(coord)
                     # for keeping track of the absolute position, we need to add up every
                     # *third* coordinate of the cubic Bezier curve
-                    for coord_tmp in path[i][2::2]:
-                        coord.assign(coord_tmp[0], coord_tmp[1])
+                    for coord in path[i][2::2]:
+                        #coord.assign(coord_tmp[0], coord_tmp[1])
                         abspos += coord
 
                 if path[i][0] == "Q":
                     for j in range(1, len(path[i]) + 1, 2):
-                        for coord_tmp in path[i][j : j + 2]:
-                            coord.assign(coord_tmp[0], coord_tmp[1])
+                        for coord in path[i][j : j + 2]:
+                            #coord.assign(coord_tmp[0], coord_tmp[1])
                             p += add_xy(coord - abspos)
                         abspos.assign(coord.x, coord.y)
 
@@ -246,8 +246,8 @@ class SvgPath:
                 p += f"{path[i][0].lower()} "
 
                 if path[i][0] == "t":
-                    for coord_tmp in path[i][1:]:
-                        coord.assign(coord_tmp[0], coord_tmp[1])
+                    for coord in path[i][1:]:
+                        #coord.assign(coord_tmp[0], coord_tmp[1])
                         p += add_xy(coord)
                         # for keeping track of the absolute position, we need to add up every
                         # *third* coordinate of the cubic Bezier curve
@@ -255,8 +255,8 @@ class SvgPath:
                         abspos += coord
 
                 if path[i][0] == "T":
-                    for coord_tmp in path[i][1:]:
-                        coord.assign(coord_tmp[0], coord_tmp[1])
+                    for coord in path[i][1:]:
+                        #coord.assign(coord_tmp[0], coord_tmp[1])
                         p += (
                             str(float(coord[0]) - abspos["x"])  # why like this?
                             + ","
@@ -269,14 +269,14 @@ class SvgPath:
                 p += f"{path[i][0].lower()} "
 
                 if path[i][0] == "s":
-                    for coord_tmp in path[i][1:]:
-                        coord.assign(coord_tmp[0], coord_tmp[1])
+                    for coord in path[i][1:]:
+                        #coord.assign(coord_tmp[0], coord_tmp[1])
                         p += add_xy(coord)
                         abspos += coord
 
                 if path[i][0] == "S":
-                    for coord_tmp in path[i][1:]:
-                        coord.assign(coord_tmp[0], coord_tmp[1])
+                    for coord in path[i][1:]:
+                        #coord.assign(coord_tmp[0], coord_tmp[1])
                         p += add_xy(coord - abspos)
                     abspos.assign(coord.x, coord.y)
 
@@ -285,14 +285,14 @@ class SvgPath:
                 p += f"{path[i][0].lower()} "
 
                 if path[i][0] == "l":
-                    for coord_tmp in path[i][1:]:
-                        coord.assign(coord_tmp[0], coord_tmp[1])
+                    for coord in path[i][1:]:
+                        #coord.assign(coord_tmp[0], coord_tmp[1])
                         p += add_xy(coord)
                         abspos += coord
 
                 if path[i][0] == "L":
-                    for coord_tmp in path[i][1:]:
-                        coord.assign(coord_tmp[0], coord_tmp[1])
+                    for coord in path[i][1:]:
+                        #coord.assign(coord_tmp[0], coord_tmp[1])
                         p += add_xy(coord - abspos)
                         abspos.assign(coord.x, coord.y)
 
@@ -301,14 +301,14 @@ class SvgPath:
                 p += f"{path[i][0].lower()} "
 
                 if path[i][0] == "h":
-                    for coord_tmp in path[i][1:]:
-                        coord.assign(coord_tmp[0], 0)
+                    for coord in path[i][1:]:
+                        #coord.assign(coord_tmp[0], 0)
                         p += f"{coord.px()} "
                     abspos.x += coord.x
 
                 if path[i][0] == "H":
-                    for coord_tmp in path[i][1:]:
-                        coord.assign(coord_tmp[0], 0)
+                    for coord in path[i][1:]:
+                        #coord.assign(coord_tmp[0], 0)
                         p += f"{(coord.x - abspos.x).px()} "
                         abspos.x = coord.x
 
@@ -317,14 +317,14 @@ class SvgPath:
                 p += f"{path[i][0].lower()} "
 
                 if path[i][0] == "v":
-                    for coord_tmp in path[i][1:]:
-                        coord.assign(0, coord_tmp[0])
+                    for coord in path[i][1:]:
+                        #coord.assign(0, coord_tmp[0])
                         p += f"{coord.py()} "
                         abspos.y += coord.y
 
                 if path[i][0] == "V":
-                    for coord_tmp in path[i][1:]:
-                        coord.assign(0, coord_tmp[0])
+                    for coord in path[i][1:]:
+                        #coord.assign(0, coord_tmp[0])
                         p += f"{(coord.y - abspos.y).py()} "
                         abspos.y = coord.y
 
@@ -436,8 +436,8 @@ class SvgPath:
 
                 # for the rest of the coordinates
                 for coord in path[i][2:]:
-                    new_point = Point(coord)
-                    abs_point += new_point
+                    #new_point = Point(coord)
+                    abs_point += coord
                     self._bbox_update(abs_point)
 
             # cubic Bezier curve command
@@ -494,16 +494,16 @@ class SvgPath:
                     bezier_curve_path.append(abs_point)
                     for m in range(0, 2):
                         coord = path[i][n + m]
-                        point = Point(coord)
-                        bezier_curve_path.append(abs_point + point)
+                        #point = Point(coord)
+                        bezier_curve_path.append(abs_point + coord)
                         # inject a second, identical control point so this quadratic
                         # bezier looks like a cubic one
                         if m == 1:
-                            bezier_curve_path.append(abs_point + point)
+                            bezier_curve_path.append(abs_point + coord)
                         if m == 0:
-                            last_bezier_control_point = abs_point + point
-                    new_point = Point(path[i][n + m])
-                    abs_point += new_point
+                            last_bezier_control_point = abs_point + coord
+                    #new_point = Point(path[i][n + m])
+                    abs_point += path[i][n + m] #new_point
 
                 for n in range(0, len(bezier_curve_path), 4):
 
@@ -543,8 +543,8 @@ class SvgPath:
                 for n in range(1, len(path[i])):
                     bezier_curve_path.append(abs_point)
                     coord = path[i][n]
-                    point = Point(coord)
-                    end_point = abs_point + point
+                    #point = Point(coord)
+                    end_point = abs_point + coord
                     diff = Point(
                         [
                             abs_point.x - last_bezier_control_point.x,
@@ -556,8 +556,8 @@ class SvgPath:
                     bezier_curve_path.append(end_point)
                     bezier_curve_path.append(end_point)
                     last_bezier_control_point = control_point
-                    new_point = Point(path[i][n])
-                    abs_point += new_point
+                    #new_point = Point(path[i][n])
+                    abs_point += coord
 
                 for n in range(0, len(bezier_curve_path), 4):
 
@@ -590,25 +590,25 @@ class SvgPath:
                     for m in range(0, len(bezier_point_array)):
                         self._bbox_update(bezier_point_array[m])
 
-            # 'line to'  command
+            # 'line to' command
             elif re.match("l", path[i][0]):
                 for coord in path[i][1:]:
-                    new_point = Point(coord)
-                    abs_point += new_point
+                    #new_point = Point(coord)
+                    abs_point += coord #new_point
                     self._bbox_update(abs_point)
 
             # 'horizontal line' command
             elif re.match("h", path[i][0]):
                 for coord in path[i][1:]:
-                    new_point = Point([coord[0], 0])
-                    abs_point += new_point
+                    #new_point = Point([coord[0], 0])
+                    abs_point += coord #new_point
                     self._bbox_update(abs_point)
 
             # 'vertical line' command
             elif re.match("v", path[i][0]):
                 for coord in path[i][1:]:
-                    new_point = Point([0, coord[0]])
-                    abs_point += new_point
+                    #new_point = Point([0, coord[0]])
+                    abs_point += coord #new_point
                     self._bbox_update(abs_point)
 
             # 'close shape' command
@@ -684,7 +684,7 @@ class SvgPath:
             for n in range(0, len(path)):
                 if path[n][0] == "m" and n == 0:
                     for m in range(2, len(path[n])):
-                        tmpp.assign(path[n][m][0], path[n][m][1])
+                        tmpp = path[n][m]
                         tmpp.rotate(rotate_angle, rotate_point)
                         tmpp.mult(scale)
                         new_p += f"{str(tmpp.px())},{str(tmpp.py())} "
@@ -696,16 +696,11 @@ class SvgPath:
 
                     for m in range(1, len(path[n])):
                         if path[n][0] == "h":
-                            tmpp.assign(path[n][m][0], 0)
+                            tmpp.assign(path[n][m].x, 0)
                         elif path[n][0] == "v":
-                            tmpp.assign(0, path[n][m][0])
+                            tmpp.assign(0, path[n][m].y)
                         else:
-                            print('XXXXXXXXXXXXXXXXXXXXX')
-                            print(path[n][m].x)
-                            tmpp.assign(path[n][m].x, path[n][m].y)
-                            print()
-                            print(tmpp)
-                            print()
+                            tmpp = path[n][m]
 
                         tmpp.rotate(rotate_angle, rotate_point)
                         tmpp.mult(scale)
