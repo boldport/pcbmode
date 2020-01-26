@@ -27,10 +27,10 @@ from pcbmode.utils import svg
 from pcbmode.utils.point import Point
 from pcbmode.utils import svg_path_grammar
 
-
 class SvgPath:
+
     """
-    'p_' prefix means parsed
+    'p_' xor 's_' prefixes mean parsed xor stringed
     'r_' prefix means relative path
     """
 
@@ -46,13 +46,19 @@ class SvgPath:
         self._grammar = svg_path_grammar.get_grammar()
 
         # Parse input path
-        self._p_path = self._parsed_to_list(self._grammar.parseString(self._path_in))
+#        self._p_path = self._parsed_to_list(self._grammar.parseString(self._path_in))
+#        print(self._p_path)
+
+        self._parse_path()
+
         if self._is_relative(self._p_path):
             self._p_r_path = self._p_path
         else:
             self._p_r_path = self._p_path_to_relative(self._p_path)
 
         self._bbox()  # create width, height
+
+
 
         # # Convert to a relative path if needed, or use the input path
         # if self._is_relative(self._p_path):
@@ -77,12 +83,58 @@ class SvgPath:
         #     self._width = self._cache_record["width"]
         #     self._height = self._cache_record["height"]
 
+
+    def _parse_path(self):
+        """
+        Parse the SVG path into PCBmodE list structure
+        """
+        self._p_path = []
+
+        svg_path_cmds = "MmCcQqTtLlVvHhSsAaZz"
+        svg_path_nums = "\s\+\-0-9eE\.,"
+        svg_coord = "[+-]?[\d+\.]*\d*[Ee]?[+-]?\d+"
+        
+        print()
+        # Split path into segments
+        segs = re.findall(f"([{svg_path_cmds}])([{svg_path_nums}]*)?", self._path_in)
+
+        self._num_of_segments = 0
+
+        print(self._path_in)
+        for seg in segs:
+            seg_cmd = seg[0]
+            seg_list = [seg_cmd]
+
+            if seg_cmd.lower() == 'm': # keep track of number of segments
+                self._num_of_segments += 1
+
+            if seg_cmd.lower in ['h','v']: # these only have x or y, respectively
+                coords = re.findall(f"{svg_coord}", seg[1])
+            else:
+                coords = re.findall(f"{svg_coord},{svg_coord}", seg[1])
+
+            for coord in coords:
+                if seg_cmd.lower == "h":
+                    seg_list.append(Point(coord,0))
+                elif seg_cmd.lower == "v":
+                    seg_list.append(Point(0,coord))
+                else:
+                    seg_list.append(Point(coord.split(',')))
+
+            self._p_path.append(seg_list)
+
+        print(self._num_of_segments)
+        print(self._p_path)
+        
+
+
     def _parsed_to_list(self, parsed):
         """
         Convery the output of PyParsing to a Python list, and coordinates to Point
         objects. 
         """
         nl = []
+        #print(parsed)
         for cmd in parsed:
             cmd_type = cmd[0]  # m,v,c, etc.
             lst = []
@@ -95,10 +147,34 @@ class SvgPath:
                 else:
                     lst.append(Point([coord[0], coord[1]]))
             nl.append(lst)
+        #print(nl)
         return nl
 
+    def _stringify_path(self):
+        """
+        Creates an SVG path string from the parsed list of the relative path
+        """
+        s_path = ""
+        for seg in self._p_r_path:
+            cmd_type = seg[0]
+            s = ""
+            for coord in seg[1:]:
+                if cmd_type == 'v':
+                    s += f"{coord.py()} "
+                elif cmd_type == 'h':
+                    s += f"{coord.px()} "
+                else:
+                    s += f"{coord.px()},{coord.py()} "
+            s_path += f"{cmd_type} {s}"
+        self._s_r_path  = s_path
+
+
     def get_relative(self):
-        return self._r_path
+        try:
+            return self._s_r_path
+        except:
+            self._stringify_path()
+            return self._s_r_path
 
     def get_relative_parsed(self):
         return self._p_r_path
@@ -458,10 +534,17 @@ class SvgPath:
         # of the last bezier control point from previous Q/q/T/t command
         last_bezier_control_point = Point([0, 0])
 
+        # print()
+        # print(self._path_in)
+        # print(self._p_path)
+        # print(self._p_r_path)
+
         for i in range(0, len(path)):
 
+            cmd_type = path[i][0]
+
             # 'move to' command
-            if re.match("m", path[i][0]):
+            if re.match("m", cmd_type):
 
                 if i == 0:
                     # the first coordinate is the start of both top left and bottom right
@@ -484,7 +567,7 @@ class SvgPath:
                     self._bbox_update(abs_point)
 
             # cubic Bezier curve command
-            elif re.match("c", path[i][0]):
+            elif re.match("c", cmd_type):
 
                 bezier_curve_path = []
 
@@ -529,7 +612,7 @@ class SvgPath:
                         self._bbox_update(bezier_point_array[n])
 
             # quadratic Bezier curve command
-            elif re.match("q", path[i][0]):
+            elif re.match("q", cmd_type):
 
                 bezier_curve_path = []
 
@@ -580,7 +663,7 @@ class SvgPath:
                         self._bbox_update(bezier_point_array[n])
 
             # simple cubic Bezier curve command
-            elif re.match("t", path[i][0]):
+            elif re.match("t", cmd_type):
                 bezier_curve_path = []
 
                 for n in range(1, len(path[i])):
@@ -634,28 +717,28 @@ class SvgPath:
                         self._bbox_update(bezier_point_array[m])
 
             # 'line to' command
-            elif re.match("l", path[i][0]):
+            elif re.match("l", cmd_type):
                 for coord in path[i][1:]:
                     # new_point = Point(coord)
                     abs_point += coord  # new_point
                     self._bbox_update(abs_point)
 
             # 'horizontal line' command
-            elif re.match("h", path[i][0]):
+            elif re.match("h", cmd_type):
                 for coord in path[i][1:]:
                     # new_point = Point([coord[0], 0])
                     abs_point.x += coord.x  # new_point
                     self._bbox_update(abs_point)
 
             # 'vertical line' command
-            elif re.match("v", path[i][0]):
+            elif re.match("v", cmd_type):
                 for coord in path[i][1:]:
                     # new_point = Point([0, coord[0]])
                     abs_point.y += coord.y  # new_point
                     self._bbox_update(abs_point)
 
             # 'close shape' command
-            elif re.match("Z", path[i][0], re.I):
+            elif re.match("Z", cmd_type, re.I):
                 pass
 
             else:
@@ -739,8 +822,10 @@ class SvgPath:
                     tmpp.rotate(rotate_angle, rotate_point)
                     tmpp.mult(scale)
                     new_p += f"{str(tmpp.px())},{str(tmpp.py())} "
+
         parsed = self._grammar.parseString(new_p)
         mirrored = self._mirrorHorizontally(parsed)
+
         if mirror == False:
             self._transformed_mirrored = mirrored
             self._transformed = new_p
@@ -1051,7 +1136,7 @@ class SvgPath:
 
         return points
 
-    def getNumberOfSegments(self):
+    def get_num_of_segments(self):
         """
         """
-        return self._r_path.lower().count("m")
+        return self._num_of_segments
