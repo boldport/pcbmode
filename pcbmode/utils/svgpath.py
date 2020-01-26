@@ -27,6 +27,7 @@ from pcbmode.utils import svg
 from pcbmode.utils.point import Point
 from pcbmode.utils import svg_path_grammar
 
+
 class SvgPath:
 
     """
@@ -38,95 +39,56 @@ class SvgPath:
 
         self._path_in = path
 
-        # Find record in cache
-        digest = utils.digest(path)
-        self._cache_record = config.pth.get(digest)
-
         # PyParsing SVG path grammar
+        # TODO: remove this when transform is fixed
         self._grammar = svg_path_grammar.get_grammar()
 
-        # Parse input path
-#        self._p_path = self._parsed_to_list(self._grammar.parseString(self._path_in))
-#        print(self._p_path)
-
-        self._parse_path()
-
-        if self._is_relative(self._p_path):
-            self._p_r_path = self._p_path
-        else:
-            self._p_r_path = self._p_path_to_relative(self._p_path)
-
+        self._p_path = self._parse_path(self._path_in)  # to PCBmodE formatting
+        self._p_r_path = self._p_path_to_relative(self._p_path)  # make path relative
+        self._num_of_segs = self._get_num_of_segs(self._p_r_path)
         self._bbox()  # create width, height
 
+    def _get_num_of_segs(self, r_p_path):
+        """ Return the number of segments of a relative parsed path """
+        num = 0
+        for seg in r_p_path:
+            if seg[0] == "m":  # keep track of number of segments
+                num += 1
+        return num
 
-
-        # # Convert to a relative path if needed, or use the input path
-        # if self._is_relative(self._p_path):
-        #     self._r_path = self._path_in
-        #     self._p_r_path = self._p_path
-        # else:
-        #     self._r_path = self._p_path_to_relative(self._p_path)
-        #     self._p_r_path = self._parsed_to_list(
-        #         self._grammar.parseString(self._r_path)
-        #     )
-
-        # if self._cache_record == None:
-        #     config.pth[digest] = {}
-        #     config.pth[digest]["relative"] = self._r_path
-        #     config.pth[digest]["relative-parsed"] = self._p_r_path
-        #     config.pth[digest]["width"] = self._width
-        #     config.pth[digest]["height"] = self._height
-        #     self._cache_record = config.pth[digest]
-        # else:
-        #     self._r_path = self._cache_record["relative"]
-        #     self._p_r_path = self._cache_record["relative-parsed"]
-        #     self._width = self._cache_record["width"]
-        #     self._height = self._cache_record["height"]
-
-
-    def _parse_path(self):
+    def _parse_path(self, path_in):
         """
         Parse the SVG path into PCBmodE list structure
         """
-        self._p_path = []
+        p_path = []
 
         svg_path_cmds = "MmCcQqTtLlVvHhSsAaZz"
         svg_path_nums = "\s\+\-0-9eE\.,"
         svg_coord = "[+-]?[\d+\.]*\d*[Ee]?[+-]?\d+"
-        
-        print()
+
         # Split path into segments
-        segs = re.findall(f"([{svg_path_cmds}])([{svg_path_nums}]*)?", self._path_in)
+        segs = re.findall(f"([{svg_path_cmds}])([{svg_path_nums}]*)?", path_in)
 
-        self._num_of_segments = 0
-
-        print(self._path_in)
         for seg in segs:
             seg_cmd = seg[0]
             seg_list = [seg_cmd]
 
-            if seg_cmd.lower() == 'm': # keep track of number of segments
-                self._num_of_segments += 1
-
-            if seg_cmd.lower in ['h','v']: # these only have x or y, respectively
+            if seg_cmd.lower in ["h", "v"]:  # these only have x or y, respectively
                 coords = re.findall(f"{svg_coord}", seg[1])
             else:
-                coords = re.findall(f"{svg_coord},{svg_coord}", seg[1])
+                coords = re.findall(f"{svg_coord}[,\s]{svg_coord}", seg[1])
 
             for coord in coords:
                 if seg_cmd.lower == "h":
-                    seg_list.append(Point(coord,0))
+                    seg_list.append(Point(coord, 0))
                 elif seg_cmd.lower == "v":
-                    seg_list.append(Point(0,coord))
+                    seg_list.append(Point(0, coord))
                 else:
-                    seg_list.append(Point(coord.split(',')))
+                    seg_list.append(Point(re.split(",| ", coord)))
 
-            self._p_path.append(seg_list)
+            p_path.append(seg_list)
 
-        print(self._num_of_segments)
-        print(self._p_path)
-        
-
+        return p_path
 
     def _parsed_to_list(self, parsed):
         """
@@ -134,7 +96,6 @@ class SvgPath:
         objects. 
         """
         nl = []
-        #print(parsed)
         for cmd in parsed:
             cmd_type = cmd[0]  # m,v,c, etc.
             lst = []
@@ -147,7 +108,6 @@ class SvgPath:
                 else:
                     lst.append(Point([coord[0], coord[1]]))
             nl.append(lst)
-        #print(nl)
         return nl
 
     def _stringify_path(self):
@@ -159,15 +119,14 @@ class SvgPath:
             cmd_type = seg[0]
             s = ""
             for coord in seg[1:]:
-                if cmd_type == 'v':
+                if cmd_type == "v":
                     s += f"{coord.py()} "
-                elif cmd_type == 'h':
+                elif cmd_type == "h":
                     s += f"{coord.px()} "
                 else:
                     s += f"{coord.px()},{coord.py()} "
             s_path += f"{cmd_type} {s}"
-        self._s_r_path  = s_path
-
+        self._s_r_path = s_path
 
     def get_relative(self):
         try:
@@ -207,249 +166,148 @@ class SvgPath:
     def get_height(self):
         return self._height
 
-    def _is_relative(self, path):
-        """
-        Check if a parsed path is relative or not by looking for absolute path commands
-        """
-        for p in path:
-            if p[0] in ["M", "C", "Q", "T", "L", "V", "H", "S", "A"]:
-                return False
-        else:
-            return True
-
     def _p_path_to_relative(self, path):
         """
         Convert a parsed path to a relative parsed path
         """
 
-        # Store relative path here
+        # Check if already relative
+        for p in path:
+            if p[0] in ["M", "C", "Q", "T", "L", "V", "H", "S", "A"]:
+                break
+        else:
+            return path
+
         r_path = []
 
-        # This variable stores the absolute coordinates as the path is converted
-        abspos = Point([0, 0])
-
+        abspos = Point([0, 0])  # absolute coordinates as the path is converted
         patho = Point([0, 0])
 
         for seg in range(0, len(path)):
 
             cmd_type = path[seg][0]
 
-            # 'move to' command
-            if re.match("M", cmd_type, re.I):
-
-                # Relative coords
-                r_coords = []
-
+            if re.match("M", cmd_type, re.I):  # 'move to'
+                r_coords = []  # relative coords
                 coord = path[seg][1]
-                # p += "m "
-
-                # The first M/m coordinate is always absolute
-                if seg == 0:
+                if seg == 0:  # first M/m coord is always absolute
                     abspos = coord
                     r_coords.append(abspos)
-                    # p += add_xy(abspos)
                     patho = coord
                 else:
                     if cmd_type == "m":
-                        # p += add_xy(coord)
                         r_coords.append(coord)
                         abspos += coord
                         patho = abspos
                     else:
-                        # p += add_xy(coord - abspos)
                         r_coords.append(coord - abspos)
                         abspos = coord
                         patho.x = coord.x
-
-                # For the rest of the coordinates
-                for coord in path[seg][2:]:
-                    # coord.assign(coord_tmp[0], coord_tmp[1])
+                for coord in path[seg][2:]:  # the rest of the coordinates
                     if cmd_type == "m":
-                        # p += add_xy(coord)
                         r_coords.append(coord)
                         abspos += coord
                     else:
-                        # p += add_xy(coord - abspos)
                         r_coords.append(coord - abspos)
                         abspos = coord
-
                 r_path.append(["m"] + r_coords)
 
-            # cubic Bezier (PCCP) curve command
-            elif re.match("C", cmd_type, re.I):
-                # p += f"{cmd_type.lower()} "
-
+            elif re.match("C", cmd_type, re.I):  # cubic Bezier (PCCP)
                 r_coords = []
-
                 if cmd_type == "c":
                     for coord in path[seg][1:]:
-                        # coord.assign(coord_tmp[0], coord_tmp[1])
-                        # p += add_xy(coord)
                         r_coords.append(coord)
-                    # for keeping track of the absolute position, we need to add up every
+                    # To keep track of the absolute position, we need to add up every
                     # *third* coordinate of the cubic Bezier curve
                     for coord in path[seg][3::3]:
-                        # coord.assign(coord_tmp[0], coord_tmp[1])
                         abspos += coord
-                        r_coords.append(coord)  # TODO: check this
-
                 if cmd_type == "C":
                     for n in range(1, len(path[seg]) - 1, 3):
                         for m in range(0, 3):
-                            # coord.assign(path[i][n + m][0], path[i][n + m][1])
-                            # p += add_xy(coord - abspos)
+                            coord = path[seg][n + m]
                             r_coords.append(coord - abspos)
                         abspos = coord
-
                 r_path.append(["c"] + r_coords)
 
-            # quadratic Bezier (PCP) curve command
-            elif re.match("Q", cmd_type, re.I):
-                # p += f"{cmd_type.lower()} "
-
+            elif re.match("Q", cmd_type, re.I):  # quadratic Bezier (PCP)
                 r_coords = []
-
                 if cmd_type == "q":
                     for coord in path[seg][1:]:
-                        # coord.assign(coord_tmp[0], coord_tmp[1])
-                        # p += add_xy(coord)
                         r_coords.append(coord)
-                    # for keeping track of the absolute position, we need to add up every
+                    # To keep track of the absolute position, we need to add up every
                     # *third* coordinate of the cubic Bezier curve
                     for coord in path[seg][2::2]:
-                        # coord.assign(coord_tmp[0], coord_tmp[1])
                         abspos += coord
-
                 if cmd_type == "Q":
                     for j in range(1, len(path[seg]) + 1, 2):
                         for coord in path[seg][j : j + 2]:
-                            # coord.assign(coord_tmp[0], coord_tmp[1])
-                            # p += add_xy(coord - abspos)
                             r_coords.append(coord - abspos)
                         abspos = coord
-
                 r_path.append(["q"] + r_coords)
 
-            # simple cubic Bezier curve command
-            elif re.match("T", cmd_type, re.I):
-                # p += f"{cmd_type.lower()} "
-
+            elif re.match("T", cmd_type, re.I):  # simple cubic bezier
                 r_coords = []
-
                 if cmd_type == "t":
                     for coord in path[seg][1:]:
-                        # coord.assign(coord_tmp[0], coord_tmp[1])
-                        # p += add_xy(coord)
                         r_coords.append(coord)
-                        # for keeping track of the absolute position, we need to add up every
-                        # *third* coordinate of the cubic Bezier curve
-                        # for coord in path[i][2::2]:
+                        # to keep track of the absolute position, we need to add up
+                        # every *third* coordinate of the cubic Bezier curve
                         abspos += coord
-
                 if cmd_type == "T":
                     for coord in path[seg][1:]:
-                        # coord.assign(coord_tmp[0], coord_tmp[1])
-                        # p += (
-                        #    str(float(coord[0]) - abspos["x"])  # why like this?
-                        #    + ","
-                        #    + str(float(coord[1]) - abspos["y"])
-                        #    + " "
-                        # )
                         r_coords.append(coord - abspos)
                     abspos = coord
-
                 r_path.append(["t"] + r_coords)
 
             elif re.match("S", cmd_type, re.I):
-                # p += f"{cmd_type.lower()} "
-
                 r_coords = []
-
                 if cmd_type == "s":
                     for coord in path[seg][1:]:
-                        # coord.assign(coord_tmp[0], coord_tmp[1])
-                        # p += add_xy(coord)
                         r_coords.append(coord)
                         abspos += coord
-
                 if cmd_type == "S":
                     for coord in path[seg][1:]:
-                        # coord.assign(coord_tmp[0], coord_tmp[1])
-                        # p += add_xy(coord - abspos)
                         r_coords.append(coord - abspos)
                     abspos = coord
-
                 r_path.append(["s"] + r_coords)
 
-            # 'line to'  command
-            elif re.match("L", cmd_type, re.I):
-                # p += f"{cmd_type.lower()} "
-
+            elif re.match("L", cmd_type, re.I):  # line to
                 r_coords = []
-
                 if cmd_type == "l":
                     for coord in path[seg][1:]:
-                        # coord.assign(coord_tmp[0], coord_tmp[1])
-                        # p += add_xy(coord)
                         r_coords.append(coord)
                         abspos += coord
-
                 if cmd_type == "L":
                     for coord in path[seg][1:]:
-                        # coord.assign(coord_tmp[0], coord_tmp[1])
-                        # p += add_xy(coord - abspos)
                         r_coords.append(coord - abspos)
                         abspos = coord
-
                 r_path.append(["l"] + r_coords)
 
-            # 'horizontal line' command
-            elif re.match("H", cmd_type, re.I):
-                # p += f"{cmd_type.lower()} "
-
+            elif re.match("H", cmd_type, re.I):  # hotizontal line
                 r_coords = []
-
                 if cmd_type == "h":
                     for coord in path[seg][1:]:
-                        # coord.assign(coord_tmp[0], 0)
-                        # p += f"{coord.px()} "
                         r_coords.append(coord)
                     abspos += coord
-
                 if cmd_type == "H":
                     for coord in path[seg][1:]:
-                        # coord.assign(coord_tmp[0], 0)
-                        # p += f"{(coord.x - abspos.x).px()} "
                         r_coords.append(coord - abspos)
                         abspos = coord
-
                 r_path.append(["h"] + r_coords)
 
-            # 'vertical line' command
-            elif re.match("V", cmd_type, re.I):
-                # p += f"{cmd_type.lower()} "
-
+            elif re.match("V", cmd_type, re.I):  # vertical line
                 r_coords = []
-
                 if cmd_type == "v":
                     for coord in path[seg][1:]:
-                        # coord.assign(0, coord_tmp[0])
-                        # p += f"{coord.py()} "
                         r_coords.append(coord)
                         abspos += coord
-
                 if cmd_type == "V":
                     for coord in path[seg][1:]:
-                        # coord.assign(0, coord_tmp[0])
-                        # p += f"{(coord.y - abspos.y).py()} "
                         r_coords.append(coord - abspos)
                         abspos = coord
-
                 r_path.append(["v"] + r_coords)
 
-            # 'close shape' command
-            elif re.match("Z", cmd_type, re.I):
-                # p += f"{cmd_type.lower()} "
+            elif re.match("Z", cmd_type, re.I):  # close shape
                 abspos = abspos + (patho - abspos)
                 r_path.append(["z"])
 
@@ -523,75 +381,44 @@ class SvgPath:
         """
 
         path = self._p_r_path
-
-        # last_point = Point([0,0])
-        # abs_point = Point([0,0])
-
-        # self._bbox_tl = Point([0,0])
-        # self._bbox_br = Point([0,0])
-
         # for the t/T (shorthand bezier) command, we need to keep track
         # of the last bezier control point from previous Q/q/T/t command
         last_bezier_control_point = Point([0, 0])
 
-        # print()
-        # print(self._path_in)
-        # print(self._p_path)
-        # print(self._p_r_path)
-
         for i in range(0, len(path)):
-
             cmd_type = path[i][0]
-
-            # 'move to' command
-            if re.match("m", cmd_type):
-
+            if re.match("m", cmd_type):  # move to
                 if i == 0:
-                    # the first coordinate is the start of both top left and bottom right
                     abs_point = path[i][1]
                     self._bbox_tl = path[i][1]
                     self._bbox_br = path[i][1]
-                    # abs_point.assign(path[i][1][0], path[i][1][1])
-                    # self._bbox_tl.assign(path[i][1][0], path[i][1][1])
-                    # self._bbox_br.assign(path[i][1][0], path[i][1][1])
                 else:
-                    #                    new_point = Point(path[i][1])
-                    #                    abs_point += new_point
                     abs_point += path[i][1]
                     self._bbox_update(abs_point)
 
-                # for the rest of the coordinates
                 for coord in path[i][2:]:
-                    # new_point = Point(coord)
                     abs_point += coord
                     self._bbox_update(abs_point)
 
-            # cubic Bezier curve command
-            elif re.match("c", cmd_type):
-
+            elif re.match("c", cmd_type):  # cubic bezier
                 bezier_curve_path = []
 
                 for n in range(1, len(path[i]) - 1, 3):
                     bezier_curve_path.append(abs_point)
                     for m in range(0, 3):
                         coord = path[i][n + m]
-                        # point = Point(coord)
                         bezier_curve_path.append(abs_point + coord)
                     new_point = path[i][n + m]
                     abs_point += new_point
 
                 for n in range(0, len(bezier_curve_path), 4):
-
-                    # clear bezier point arrays
                     bezier_points_x = []
                     bezier_points_y = []
-
                     # split points of bezier into 'x' and 'y' coordinate arrays
                     # as this is what the point array function expects
                     for m in range(0, 4):
                         bezier_points_x.append(bezier_curve_path[n + m].x)
                         bezier_points_y.append(bezier_curve_path[n + m].y)
-
                     # caluclate the individual points along the bezier curve for 'x'
                     # and 'y'
                     points_x = svg.calculate_points_of_cubic_bezier(
@@ -600,27 +427,20 @@ class SvgPath:
                     points_y = svg.calculate_points_of_cubic_bezier(
                         bezier_points_y, 100
                     )
-
                     bezier_point_array = []
-
-                    # put those points back into a Point type array
+                    # Put those points back into a Point type array
                     for n in range(0, len(points_x)):
                         bezier_point_array.append(Point([points_x[n], points_y[n]]))
-
-                    # check each point if it extends the boundary box
+                    # Check each point if it extends the boundary box
                     for n in range(0, len(bezier_point_array)):
                         self._bbox_update(bezier_point_array[n])
 
-            # quadratic Bezier curve command
-            elif re.match("q", cmd_type):
-
+            elif re.match("q", cmd_type):  # quadratic bezier
                 bezier_curve_path = []
-
                 for n in range(1, len(path[i]) - 1, 2):
                     bezier_curve_path.append(abs_point)
                     for m in range(0, 2):
                         coord = path[i][n + m]
-                        # point = Point(coord)
                         bezier_curve_path.append(abs_point + coord)
                         # inject a second, identical control point so this quadratic
                         # bezier looks like a cubic one
@@ -628,21 +448,16 @@ class SvgPath:
                             bezier_curve_path.append(abs_point + coord)
                         if m == 0:
                             last_bezier_control_point = abs_point + coord
-                    # new_point = Point(path[i][n + m])
-                    abs_point += path[i][n + m]  # new_point
+                    abs_point += path[i][n + m]
 
                 for n in range(0, len(bezier_curve_path), 4):
-
-                    # clear bezier point arrays
                     bezier_points_x = []
                     bezier_points_y = []
-
                     # split points of bezier into 'x' and 'y' coordinate arrays
                     # as this is what the point array function expects
                     for m in range(0, 4):
                         bezier_points_x.append(bezier_curve_path[n + m].x)
                         bezier_points_y.append(bezier_curve_path[n + m].y)
-
                     # caluclate the individual points along the bezier curve for 'x'
                     # and 'y'
                     points_x = svg.calculate_points_of_cubic_bezier(
@@ -651,25 +466,19 @@ class SvgPath:
                     points_y = svg.calculate_points_of_cubic_bezier(
                         bezier_points_y, 100
                     )
-
                     bezier_point_array = []
-
-                    # put those points back into a Point type array
+                    # Put those points back into a Point type array
                     for n in range(0, len(points_x)):
                         bezier_point_array.append(Point([points_x[n], points_y[n]]))
-
-                    # check each point if it extends the boundary box
+                    # Check each point if it extends the boundary box
                     for n in range(0, len(bezier_point_array)):
                         self._bbox_update(bezier_point_array[n])
 
-            # simple cubic Bezier curve command
-            elif re.match("t", cmd_type):
+            elif re.match("t", cmd_type):  # simple cubic bezier
                 bezier_curve_path = []
-
                 for n in range(1, len(path[i])):
                     bezier_curve_path.append(abs_point)
                     coord = path[i][n]
-                    # point = Point(coord)
                     end_point = abs_point + coord
                     diff = Point(
                         [
@@ -682,22 +491,17 @@ class SvgPath:
                     bezier_curve_path.append(end_point)
                     bezier_curve_path.append(end_point)
                     last_bezier_control_point = control_point
-                    # new_point = Point(path[i][n])
                     abs_point += coord
 
                 for n in range(0, len(bezier_curve_path), 4):
-
-                    # clear bezier point arrays
                     bezier_points_x = []
                     bezier_points_y = []
-
-                    # split points of bezier into 'x' and 'y' coordinate arrays
+                    # Split points of bezier into 'x' and 'y' coordinate arrays
                     # as this is what the point array function expects
                     for m in range(0, 4):
                         bezier_points_x.append(bezier_curve_path[n + m].x)
                         bezier_points_y.append(bezier_curve_path[n + m].y)
-
-                    # caluclate the individual points along the bezier curve for 'x'
+                    # Caluclate the individual points along the bezier curve for 'x'
                     # and 'y'
                     points_x = svg.calculate_points_of_cubic_bezier(
                         bezier_points_x, 100
@@ -705,40 +509,30 @@ class SvgPath:
                     points_y = svg.calculate_points_of_cubic_bezier(
                         bezier_points_y, 100
                     )
-
                     bezier_point_array = []
-
-                    # put those points back into a Point type array
+                    # Put those points back into a Point type array
                     for n in range(0, len(points_x)):
                         bezier_point_array.append(Point([points_x[n], points_y[n]]))
-
-                    # check each point if it extends the boundary box
+                    # Check each point if it extends the boundary box
                     for m in range(0, len(bezier_point_array)):
                         self._bbox_update(bezier_point_array[m])
 
-            # 'line to' command
-            elif re.match("l", cmd_type):
+            elif re.match("l", cmd_type):  # line to
                 for coord in path[i][1:]:
-                    # new_point = Point(coord)
-                    abs_point += coord  # new_point
+                    abs_point += coord
                     self._bbox_update(abs_point)
 
-            # 'horizontal line' command
-            elif re.match("h", cmd_type):
+            elif re.match("h", cmd_type):  # horizontal line
                 for coord in path[i][1:]:
-                    # new_point = Point([coord[0], 0])
-                    abs_point.x += coord.x  # new_point
+                    abs_point.x += coord.x
                     self._bbox_update(abs_point)
 
-            # 'vertical line' command
-            elif re.match("v", cmd_type):
+            elif re.match("v", cmd_type):  # vertical line
                 for coord in path[i][1:]:
-                    # new_point = Point([0, coord[0]])
-                    abs_point.y += coord.y  # new_point
+                    abs_point.y += coord.y
                     self._bbox_update(abs_point)
 
-            # 'close shape' command
-            elif re.match("Z", cmd_type, re.I):
+            elif re.match("Z", cmd_type, re.I):  # close shape
                 pass
 
             else:
@@ -768,15 +562,6 @@ class SvgPath:
             center,
         )
         digest = utils.digest(string)
-
-        #        record = self._cache_record.get(digest)
-        #        if record != None:
-        #            pass
-        # self._transformed = record["path"]
-        # self._transformed_mirrored = record["mirrored"]
-        # self._width = record["width"]
-        # self._height = record["height"]
-        #        else:
 
         # TODO: this needs to be fixed so that the correct path is in
         # p_r_path when invoking the following function
@@ -823,6 +608,7 @@ class SvgPath:
                     tmpp.mult(scale)
                     new_p += f"{str(tmpp.px())},{str(tmpp.py())} "
 
+        # parsed = self._parse_path(new_p)
         parsed = self._grammar.parseString(new_p)
         mirrored = self._mirrorHorizontally(parsed)
 
@@ -835,14 +621,6 @@ class SvgPath:
         # TODO: this needs to be fixed so that the correct path is in
         # p_r_path when invoking the following function
         self._bbox()
-        # width, height = self._get_dimensions(parsed)
-        # self._width = width
-        # self._height = height
-        # self._cache_record[digest] = {}
-        # self._cache_record[digest]["path"] = self._transformed
-        # self._cache_record[digest]["mirrored"] = self._transformed_mirrored
-        # self._cache_record[digest]["width"] = self._width
-        # self._cache_record[digest]["height"] = self._height
 
         return
 
@@ -1139,4 +917,4 @@ class SvgPath:
     def get_num_of_segments(self):
         """
         """
-        return self._num_of_segments
+        return self._num_of_segs
