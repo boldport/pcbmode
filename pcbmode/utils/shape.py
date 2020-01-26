@@ -105,6 +105,7 @@ class Shape:
         elif self._type in ["text", "string"]:
             self._type == "text"
             self._process_text()
+            self._path = "m 0,0"
         elif self._type == "path":
             self._process_path()
         else:
