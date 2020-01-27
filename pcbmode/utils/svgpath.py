@@ -360,21 +360,22 @@ class SvgPath:
 
     def _bbox(self, p_path):
         """
-        Measure the bounding box of a parsed path 
+        Measure the bounding box of a parsed relative path 
         """
 
         path = p_path
+
         print(f"ORIGIN: {self._path_in}")
         print(f"PARSED: {p_path}")
+
         # For the t/T (shorthand bezier) command, we need to keep track
         # of the last bezier control point from previous Q/q/T/t command
         last_bezier_control_point = Point([0, 0])
 
-        # abs_point = Point([0,0])
-
-        for i in range(0, len(path)):
-            cmd_type = path[i][0]
-            if re.match("m", cmd_type):  # move to
+ 
+        for i, seg in enumerate(path):
+            cmd_type = seg[0]
+            if cmd_type == 'm':  # move to
                 if i == 0:
                     abs_point = path[i][1]
                     tl = path[i][1]
@@ -387,7 +388,7 @@ class SvgPath:
                     abs_point += coord
                     tl, br = self._bbox_update(tl, br, abs_point)
 
-            elif re.match("c", cmd_type):  # cubic bezier
+            elif cmd_type == "c":  # cubic bezier
                 bezier_curve_path = []
 
                 for n in range(1, len(path[i]) - 1, 3):
@@ -419,7 +420,7 @@ class SvgPath:
                         tl, br = self._bbox_update(tl, br, bezier_point_array[n])
             #                        self._bbox_update(bezier_point_array[n])
 
-            elif re.match("q", cmd_type):  # quadratic bezier
+            elif cmd_type == "q":  # quadratic bezier
                 bezier_curve_path = []
                 for n in range(1, len(path[i]) - 1, 2):
                     bezier_curve_path.append(abs_point)
@@ -453,9 +454,8 @@ class SvgPath:
                     # Check each point if it extends the boundary box
                     for n in range(0, len(bezier_point_array)):
                         tl, br = self._bbox_update(tl, br, bezier_point_array[n])
-            #                        self._bbox_update(bezier_point_array[n])
 
-            elif re.match("t", cmd_type):  # simple cubic bezier
+            elif cmd_type == "t":  # simple cubic bezier
                 bezier_curve_path = []
                 for n in range(1, len(path[i])):
                     bezier_curve_path.append(abs_point)
@@ -493,27 +493,23 @@ class SvgPath:
                     # Check each point if it extends the boundary box
                     for m in range(0, len(bezier_point_array)):
                         tl, br = self._bbox_update(tl, br, bezier_point_array[m])
-            #                        self._bbox_update(bezier_point_array[m])
 
-            elif re.match("l", cmd_type):  # line to
+            elif cmd_type == 'l':  # line to
                 for coord in path[i][1:]:
                     abs_point += coord
                     tl, br = self._bbox_update(tl, br, abs_point)
-                    # self._bbox_update(abs_point)
 
-            elif re.match("h", cmd_type):  # horizontal line
+            elif cmd_type == 'h':  # horizontal line
                 for coord in path[i][1:]:
                     abs_point.x += coord.x
                     tl, br = self._bbox_update(tl, br, abs_point)
-                    # self._bbox_update(abs_point)
 
-            elif re.match("v", cmd_type):  # vertical line
+            elif cmd_type == 'v':  # vertical line
                 for coord in path[i][1:]:
                     abs_point.y += coord.y
                     tl, br = self._bbox_update(tl, br, abs_point)
-                    # self._bbox_update(abs_point)
 
-            elif re.match("Z", cmd_type, re.I):  # close shape
+            elif cmd_type.lower() == 'z':  # close shape
                 pass
 
             else:
