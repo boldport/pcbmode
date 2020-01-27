@@ -43,10 +43,10 @@ class SvgPath:
         # TODO: remove this when transform is fixed
         self._grammar = svg_path_grammar.get_grammar()
 
-        self._p_path = self._parse_path(self._path_in)  # to PCBmodE formatting
-        self._p_r_path = self._p_path_to_relative(self._p_path)  # make path relative
+        self._p_path = self._parse_path(self._path_in)
+        self._p_r_path = self._p_path_to_relative(self._p_path)
+        self._width, self._height = self._bbox(self._p_r_path)
         self._num_of_segs = self._get_num_of_segs(self._p_r_path)
-        self._bbox()  # create width, height
 
     def _get_num_of_segs(self, r_p_path):
         """ Return the number of segments of a relative parsed path """
@@ -354,16 +354,19 @@ class SvgPath:
         if p.y < self._bbox_br.y:
             self._bbox_br.y = p.y
 
-    def _bbox(self):
+    def _bbox(self, p_path):
         """
-        Measure the bounding box of the parsed relative path and create the two
-        points and width and height
+        Measure the bounding box of a parsed path 
         """
 
-        path = self._p_r_path
-        # for the t/T (shorthand bezier) command, we need to keep track
+        path = p_path
+        print(f"ORIGIN: {self._path_in}")
+        print(f"PARSED: {p_path}")
+        # For the t/T (shorthand bezier) command, we need to keep track
         # of the last bezier control point from previous Q/q/T/t command
         last_bezier_control_point = Point([0, 0])
+
+        #abs_point = Point([0,0])
 
         for i in range(0, len(path)):
             cmd_type = path[i][0]
@@ -401,12 +404,8 @@ class SvgPath:
                         bezier_points_y.append(bezier_curve_path[n + m].y)
                     # caluclate the individual points along the bezier curve for 'x'
                     # and 'y'
-                    points_x = svg.calculate_points_of_cubic_bezier(
-                        bezier_points_x, 100
-                    )
-                    points_y = svg.calculate_points_of_cubic_bezier(
-                        bezier_points_y, 100
-                    )
+                    points_x = self._flatten_cubic(bezier_points_x, 100)
+                    points_y = self._flatten_cubic(bezier_points_y, 100)
                     bezier_point_array = []
                     # Put those points back into a Point type array
                     for n in range(0, len(points_x)):
@@ -440,12 +439,8 @@ class SvgPath:
                         bezier_points_y.append(bezier_curve_path[n + m].y)
                     # caluclate the individual points along the bezier curve for 'x'
                     # and 'y'
-                    points_x = svg.calculate_points_of_cubic_bezier(
-                        bezier_points_x, 100
-                    )
-                    points_y = svg.calculate_points_of_cubic_bezier(
-                        bezier_points_y, 100
-                    )
+                    points_x = self._flatten_cubic(bezier_points_x, 100)
+                    points_y = self._flatten_cubic(bezier_points_y, 100)
                     bezier_point_array = []
                     # Put those points back into a Point type array
                     for n in range(0, len(points_x)):
@@ -483,12 +478,8 @@ class SvgPath:
                         bezier_points_y.append(bezier_curve_path[n + m].y)
                     # Caluclate the individual points along the bezier curve for 'x'
                     # and 'y'
-                    points_x = svg.calculate_points_of_cubic_bezier(
-                        bezier_points_x, 100
-                    )
-                    points_y = svg.calculate_points_of_cubic_bezier(
-                        bezier_points_y, 100
-                    )
+                    points_x = self._flatten_cubic(bezier_points_x, 100)
+                    points_y = self._flatten_cubic(bezier_points_y, 100)
                     bezier_point_array = []
                     # Put those points back into a Point type array
                     for n in range(0, len(points_x)):
@@ -516,10 +507,16 @@ class SvgPath:
                 pass
 
             else:
-                print("ERROR: found an unsupported SVG path command " + str(path[i][0]))
+                print("BBOX... ERROR: found an unsupported SVG path command " + str(path[i][0]))
 
-        self._width = self._bbox_br.x - self._bbox_tl.x
-        self._height = abs(self._bbox_br.y - self._bbox_tl.y)
+        width = self._bbox_br.x - self._bbox_tl.x
+        height = abs(self._bbox_br.y - self._bbox_tl.y)
+
+        print(f"W,H: {width},{height}")
+
+        return (width, height)
+
+
 
     def transform(
         self, scale=1, rotate_angle=0, rotate_point=None, mirror=False, center=True
@@ -545,7 +542,7 @@ class SvgPath:
 
         # TODO: this needs to be fixed so that the correct path is in
         # p_r_path when invoking the following function
-        self._bbox()
+        #self._bbox(path)
         # width, height = self._get_dimensions(path)
         # first point of path
         first_point = path[0][1]
@@ -600,11 +597,11 @@ class SvgPath:
             self._transformed = mirrored
         # TODO: this needs to be fixed so that the correct path is in
         # p_r_path when invoking the following function
-        self._bbox()
+        #self._bbox(self._transformed)
 
         return
 
-    def _linearizeCubicBezier(self, p, steps):
+    def _flatten_cubic(self, cp, steps):
         """
         This function receives four points [start, control, control, end]
         and returns points on the cubic Bezier curve that they define. As
@@ -614,30 +611,32 @@ class SvgPath:
         The code for this function was adapted/copied from:
         http://www.niksula.cs.hut.fi/~hkankaan/Homepages/bezierfast.html
         http://www.pygame.org/wiki/BezierCurve
+
+        cp: list of four cubuc bezier points
         """
 
         t = 1.0 / steps
         temp = t * t
 
-        f = p[0]
-        fd = 3 * (p[1] - p[0]) * t
-        fdd_per_2 = 3 * (p[0] - 2 * p[1] + p[2]) * temp
-        fddd_per_2 = 3 * (3 * (p[1] - p[2]) + p[3] - p[0]) * temp * t
+        f = cp[0]
+        fd = 3 * (cp[1] - cp[0]) * t
+        fdd_per_2 = 3 * (cp[0] - 2 * cp[1] + cp[2]) * temp
+        fddd_per_2 = 3 * (3 * (cp[1] - cp[2]) + cp[3] - cp[0]) * temp * t
 
         fddd = 2 * fddd_per_2
         fdd = 2 * fdd_per_2
         fddd_per_6 = fddd_per_2 / 3.0
 
-        points = []
+        fcp = [] # flattened cubic points
         for x in range(steps):
-            points.append(f)
+            fcp.append(f)
             f += fd + fdd_per_2 + fddd_per_6
             fd += fdd + fddd_per_2
             fdd += fddd
             fdd_per_2 += fddd_per_2
-        points.append(f)
+        fcp.append(f)
 
-        return points
+        return fcp
 
     def _getCubicBezierLength(self, px, py):
         """
@@ -898,3 +897,4 @@ class SvgPath:
         """
         """
         return self._num_of_segs
+
