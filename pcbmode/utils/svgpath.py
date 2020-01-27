@@ -358,12 +358,12 @@ class SvgPath:
 
         path = p_path
 
-#        print(f"ORIGIN: {self._path_in}")
-#        print(f"PARSED: {p_path}")
+        print(f"ORIGIN: {self._path_in}")
+        print(f"PARSED: {p_path}")
 
         # For the t/T (shorthand bezier) command, we need to keep track
         # of the last bezier control point from previous Q/q/T/t command
-        last_bezier_control_point = Point([0, 0])
+        last_control_point = Point([0, 0])
 
  
         for i, seg in enumerate(path):
@@ -423,7 +423,7 @@ class SvgPath:
                         if m == 1:
                             bezier_curve_path.append(abs_point + coord)
                         if m == 0:
-                            last_bezier_control_point = abs_point + coord
+                            last_control_point = abs_point + coord
                     abs_point += seg[n + m]
 
                 for n in range(0, len(bezier_curve_path), 4):
@@ -452,17 +452,12 @@ class SvgPath:
                     bezier_curve_path.append(abs_point)
                     coord = path[i][n]
                     end_point = abs_point + coord
-                    diff = Point(
-                        [
-                            abs_point.x - last_bezier_control_point.x,
-                            abs_point.y - last_bezier_control_point.y,
-                        ]
-                    )
+                    diff = abs_point - last_control_point
                     control_point = abs_point + diff
                     bezier_curve_path.append(control_point)
                     bezier_curve_path.append(end_point)
                     bezier_curve_path.append(end_point)
-                    last_bezier_control_point = control_point
+                    last_control_point = control_point
                     abs_point += coord
 
                 for n in range(0, len(bezier_curve_path), 4):
@@ -490,11 +485,11 @@ class SvgPath:
                     abs_point += coord
                     tl, br = self._bbox_update(tl, br, abs_point)
 
+            elif cmd_type.lower() == 'z': # close shape, needed to doesn't error below
+                pass
+
             else:
-                print(
-                    "BBOX... ERROR: found an unsupported SVG path command "
-                    + str(cmd_type)
-                )
+                print(f"ERROR: found an unsupported SVG path command {cmd_type}")
 
         width = br.x - tl.x
         height = abs(br.y - tl.y)
