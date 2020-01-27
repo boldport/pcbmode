@@ -347,16 +347,9 @@ class SvgPath:
         """
         Updates top-left and bottom-right coords with input point
         """
-        if p.x > br.x:
-            br.x = p.x
-        if p.x < tl.x:
-            tl.x = p.x
-        if p.y > tl.y:
-            tl.y = p.y
-        if p.y < br.y:
-            br.y = p.y
-
-        return tl, br
+        tl_new = Point([min(p.x, tl.x), max(p.y,tl.y)]) 
+        br_new = Point([max(p.x, br.x), min(p.y,br.y)]) 
+        return tl_new, br_new
 
     def _bbox(self, p_path):
         """
@@ -365,8 +358,8 @@ class SvgPath:
 
         path = p_path
 
-        print(f"ORIGIN: {self._path_in}")
-        print(f"PARSED: {p_path}")
+#        print(f"ORIGIN: {self._path_in}")
+#        print(f"PARSED: {p_path}")
 
         # For the t/T (shorthand bezier) command, we need to keep track
         # of the last bezier control point from previous Q/q/T/t command
@@ -376,38 +369,37 @@ class SvgPath:
         for i, seg in enumerate(path):
             cmd_type = seg[0]
             if cmd_type == 'm':  # move to
-                if i == 0:
-                    abs_point = path[i][1]
-                    tl = path[i][1]
-                    br = path[i][1]
+                if i == 0: # first segment special case
+                    abs_point = seg[1]
+                    tl = seg[1] # first point
+                    br = seg[1] # tl, br are equal
                 else:
-                    abs_point += path[i][1]
+                    abs_point += seg[1]
                     tl, br = self._bbox_update(tl, br, abs_point)
 
-                for coord in path[i][2:]:
+                for coord in seg[2:]:
                     abs_point += coord
                     tl, br = self._bbox_update(tl, br, abs_point)
 
             elif cmd_type == "c":  # cubic bezier
                 bezier_curve_path = []
 
-                for n in range(1, len(path[i]) - 1, 3):
+                for n in range(1, len(seg) - 1, 3):
                     bezier_curve_path.append(abs_point)
                     for m in range(0, 3):
-                        coord = path[i][n + m]
+                        coord = seg[n + m]
                         bezier_curve_path.append(abs_point + coord)
-                    new_point = path[i][n + m]
-                    abs_point += new_point
+                    abs_point += seg[n + m]
 
                 for n in range(0, len(bezier_curve_path), 4):
                     bezier_points_x = []
                     bezier_points_y = []
-                    # split points of bezier into 'x' and 'y' coordinate arrays
+                    # Split points of bezier into 'x' and 'y' coordinate arrays
                     # as this is what the point array function expects
                     for m in range(0, 4):
                         bezier_points_x.append(bezier_curve_path[n + m].x)
                         bezier_points_y.append(bezier_curve_path[n + m].y)
-                    # caluclate the individual points along the bezier curve for 'x'
+                    # Caluclate the individual points along the bezier curve for 'x'
                     # and 'y'
                     points_x = self._flatten_cubic(bezier_points_x, 100)
                     points_y = self._flatten_cubic(bezier_points_y, 100)
@@ -418,14 +410,13 @@ class SvgPath:
                     # Check each point if it extends the boundary box
                     for n in range(0, len(bezier_point_array)):
                         tl, br = self._bbox_update(tl, br, bezier_point_array[n])
-            #                        self._bbox_update(bezier_point_array[n])
 
             elif cmd_type == "q":  # quadratic bezier
                 bezier_curve_path = []
                 for n in range(1, len(path[i]) - 1, 2):
                     bezier_curve_path.append(abs_point)
                     for m in range(0, 2):
-                        coord = path[i][n + m]
+                        coord = seg[n + m]
                         bezier_curve_path.append(abs_point + coord)
                         # inject a second, identical control point so this quadratic
                         # bezier looks like a cubic one
@@ -433,7 +424,7 @@ class SvgPath:
                             bezier_curve_path.append(abs_point + coord)
                         if m == 0:
                             last_bezier_control_point = abs_point + coord
-                    abs_point += path[i][n + m]
+                    abs_point += seg[n + m]
 
                 for n in range(0, len(bezier_curve_path), 4):
                     bezier_points_x = []
@@ -494,28 +485,15 @@ class SvgPath:
                     for m in range(0, len(bezier_point_array)):
                         tl, br = self._bbox_update(tl, br, bezier_point_array[m])
 
-            elif cmd_type == 'l':  # line to
-                for coord in path[i][1:]:
+            elif cmd_type in ['l', 'h', 'v']:  # line to, horizontal, vertical
+                for coord in seg[1:]:
                     abs_point += coord
                     tl, br = self._bbox_update(tl, br, abs_point)
-
-            elif cmd_type == 'h':  # horizontal line
-                for coord in path[i][1:]:
-                    abs_point.x += coord.x
-                    tl, br = self._bbox_update(tl, br, abs_point)
-
-            elif cmd_type == 'v':  # vertical line
-                for coord in path[i][1:]:
-                    abs_point.y += coord.y
-                    tl, br = self._bbox_update(tl, br, abs_point)
-
-            elif cmd_type.lower() == 'z':  # close shape
-                pass
 
             else:
                 print(
                     "BBOX... ERROR: found an unsupported SVG path command "
-                    + str(path[i][0])
+                    + str(cmd_type)
                 )
 
         width = br.x - tl.x
