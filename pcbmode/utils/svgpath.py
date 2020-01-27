@@ -62,9 +62,9 @@ class SvgPath:
         """
         p_path = []
 
-        svg_path_cmds = "MmCcQqTtLlVvHhSsAaZz"
-        svg_path_nums = "\s\+\-0-9eE\.,"
-        svg_coord = "[+-]?[\d+\.]*\d*[Ee]?[+-]?\d+"
+        svg_path_cmds = r"MmCcQqTtLlVvHhSsAaZz"
+        svg_path_nums = r"\s\+\-0-9eE\.,"
+        svg_coord = r"[+-]?[\d+\.]*\d*[Ee]?[+-]?\d+"
 
         # Split path into segments
         segs = re.findall(f"([{svg_path_cmds}])([{svg_path_nums}]*)?", path_in)
@@ -73,42 +73,22 @@ class SvgPath:
             seg_cmd = seg[0]
             seg_list = [seg_cmd]
 
-            if seg_cmd.lower in ["h", "v"]:  # these only have x or y, respectively
+            if seg_cmd.lower() in ["h", "v"]:  # these only have x or y, respectively
                 coords = re.findall(f"{svg_coord}", seg[1])
             else:
                 coords = re.findall(f"{svg_coord}[,\s]{svg_coord}", seg[1])
 
             for coord in coords:
-                if seg_cmd.lower == "h":
-                    seg_list.append(Point(coord, 0))
-                elif seg_cmd.lower == "v":
-                    seg_list.append(Point(0, coord))
+                if seg_cmd.lower() == "h":
+                    seg_list.append(Point([coord, 0]))
+                elif seg_cmd.lower() == "v":
+                    seg_list.append(Point([0, coord]))
                 else:
                     seg_list.append(Point(re.split(",| ", coord)))
 
             p_path.append(seg_list)
 
         return p_path
-
-    def _parsed_to_list(self, parsed):
-        """
-        Convery the output of PyParsing to a Python list, and coordinates to Point
-        objects. 
-        """
-        nl = []
-        for cmd in parsed:
-            cmd_type = cmd[0]  # m,v,c, etc.
-            lst = []
-            lst.append(cmd_type)
-            for coord in cmd[1:]:
-                if cmd_type.lower() == "h":  # only x
-                    lst.append(Point([coord[0], 0]))
-                elif cmd_type.lower() == "v":  # only y
-                    lst.append(Point([0, coord[0]]))
-                else:
-                    lst.append(Point([coord[0], coord[1]]))
-            nl.append(lst)
-        return nl
 
     def _stringify_path(self):
         """
