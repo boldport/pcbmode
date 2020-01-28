@@ -60,17 +60,17 @@ def rect(width, height, bor_rad=[]):
         r4 = bor_rad[3]
 
         # Calculate side lengths, top hirizontal, clockwise
-        sl = [pn(w - r1 - r2), pn(h - r2 - r3), pn(w - r3 - r4), pn(h - r3 - r1)]
+        sl = [w - r1 - r2, h - r2 - r3, w - r3 - r4, h - r3 - r1]
 
         # Cubic Bezier "arcs", clockwise from top left
         arcs = [
-            f"c {0},{pn(-K * r1)} {pn(-r1 * (K - 1))},{pn(-r1)} {pn(r1)},{pn(-r1)} ",
-            f"c {pn(K * r2)},{0} {pn(r2)},{pn(-r2 * (K - 1))} {pn(r2)},{pn(r2)} ",
-            f"c {0},{pn(K * r3)} {pn(r3 * (K - 1))},{pn(r3)} {pn(-r3)},{pn(r3)} ",
-            f"c {pn(-K * r4)},{0} {pn(-r4)},{pn(r4 * (K - 1))} {pn(-r4)},{pn(-r4)} ",
+            f"c {0},{-K * r1} {-r1 * (K - 1)},{-r1} {r1},{-r1} ",
+            f"c {K * r2},{0} {r2},{-r2 * (K - 1)} {r2},{r2} ",
+            f"c {0},{K * r3} {r3 * (K - 1)},{pn(r3)} {-r3},{r3} ",
+            f"c {-K * r4},{0} {-r4},{r4 * (K - 1)} {-r4},{-r4} ",
         ]
 
-        p = f"m {pn(-w/2)},{pn(-(h/2-r1))} " # go to top left 'below' arc, or corner
+        p = f"m {-w/2},{-(h/2-r1)} "  # go to top left 'below' arc, or corner
         if r1 != 0:
             p += arcs[0]
         p += f"h {sl[0]} "
@@ -87,7 +87,7 @@ def rect(width, height, bor_rad=[]):
 
     else:
         # No rounded corners
-        p = f"m {pn(-w / 2)},{pn(-h / 2)} h {pn(w)} v {pn(h)} h {pn(-w)} v {pn(-h)} z"
+        p = f"m {-w / 2},{-h / 2} h {w} v {h} h {-w} v {-h} z"
 
     return p
 
