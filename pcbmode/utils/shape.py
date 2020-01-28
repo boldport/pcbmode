@@ -65,17 +65,16 @@ class Shape:
         else:
             self._style = "stroke:none;"
 
-        # Create the SVG path for the shape
-        self._define_path_from_shape_type()
+        self._path_str = self._define_path_from_shape_type()
+        self._path_obj = SvgPath(self._path_str) # create path object
 
-        # Convert the path to an object and transform
-        self._path_obj = SvgPath(self._path)
-        self._path_obj.transform(
-            scale=self._scale,
-            rotate_angle=self._rotate,
-            rotate_point=self._rotate_point,
-            mirror=self._place_mirrored,
-        )
+        # TODO: Move to SvgPath object creation  
+        # self._path_obj.transform(
+        #     scale=self._scale,
+        #     rotate_angle=self._rotate,
+        #     rotate_point=self._rotate_point,
+        #     mirror=self._place_mirrored,
+        # )
 
     def _define_path_from_shape_type(self):
         """
@@ -96,20 +95,23 @@ class Shape:
 
         if self._type in ["rect", "rectangle"]:
             self._type = "rect"
-            self._process_rect()
+            path  = self._process_rect()
         elif self._type in ["circ", "circle", "round"]:
             self._type = "circ"
-            self._process_circ()
+            path = self._process_circ()
         elif self._type == "drill":
-            self._process_drill()
+            path = self._process_drill()
         elif self._type in ["text", "string"]:
             self._type == "text"
-            self._process_text()
-            self._path = "m 0,0"
+            path = self._process_text()
+            # TODO: remove when dealing with text properly
+            path = "m 0,0"
         elif self._type == "path":
-            self._process_path()
+            path = self._process_path()
         else:
             msg.error("'%s' is not a recongnised shape type" % self._type)
+
+        return path
 
     def _process_rect(self):
         try:
@@ -123,14 +125,14 @@ class Shape:
             msg.error("A 'rect' shape requires a 'height' definition")
 
         border_radius = self._shape_dict.get("border-radius", [])
-        self._path = svg_path_create.rect(width, height, border_radius)
+        return svg_path_create.rect(width, height, border_radius)
 
     def _process_circ(self):
         try:
             self._diameter = self._shape_dict["diameter"]
         except KeyError:
             msg.error("A 'circle' shape requires a 'diameter' definition")
-        self._path = svg_path_create.circle(self._diameter)
+        return svg_path_create.circle(self._diameter)
 
     def _process_drill(self):
         try:
@@ -144,7 +146,7 @@ class Shape:
         except:
             config.tmp["drill-count"] = [self._diameter]
 
-        self._path = svg_path_create.drill(self._diameter)
+        return svg_path_create.drill(self._diameter)
 
     def _process_text(self):
         try:
@@ -199,7 +201,7 @@ class Shape:
         # Get the path to use. This returns the path without
         # scaling, which will be applied later, in the same manner
         # as to the other shape types
-        self._path, self._gerber_lp = utils.textToPath(
+        path, self._gerber_lp = utils.textToPath(
             font_data, self._text, letter_spacing, line_height, self._scale
         )
         # In the case where the text is an outline/stroke instead
@@ -210,9 +212,11 @@ class Shape:
         # For some reason SVG fonts are rotated by 180 degrees. This undos that
         self._rotate += 180
 
+        return path
+
     def _process_path(self):
         try:
-            self._path = self._shape_dict.get("value") or self._shape_dict.get("d")
+            return self._shape_dict.get("value") or self._shape_dict.get("d")
         except KeyError:
             msg.error(
                 "A 'path' shape requires a 'value' or 'd' definition with a valid SVG path."
@@ -272,11 +276,8 @@ class Shape:
     def getOriginalPath(self):
         return self._path_obj.get_input_path()
 
-    def getTransformedPath(self, mirrored=False):
-        if mirrored == True:
-            return self._path_obj.getTransformedMirrored()
-        else:
-            return self._path_obj.getTransformed()
+    def get_path_str(self):
+        return self._path_obj.get_path_str()
 
     def get_width(self):
         return self._path_obj.get_width()

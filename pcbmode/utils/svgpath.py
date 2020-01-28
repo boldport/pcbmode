@@ -48,7 +48,18 @@ class SvgPath:
         self._width, self._height, self._bbox_tl, self._bbox_br = self._bbox(
             self._p_r_path
         )
+        self._p_r_path = self._center_path(self._p_r_path)
         self._num_of_segs = self._get_num_of_segs(self._p_r_path)
+
+    def _center_path(self, r_p_path):
+        """
+        """
+        # op = Point([self._width/2, self._height/2]) # new origin point
+        # fp = r_p_path[0][1] # first move point
+        # print(r_p_path[0][1])
+        # r_p_path[0][1] = fp + fp - op
+
+        return r_p_path
 
     def _get_num_of_segs(self, r_p_path):
         """ Return the number of segments of a relative parsed path """
@@ -110,7 +121,7 @@ class SvgPath:
             s_path += f"{cmd_type} {s}"
         self._s_r_path = s_path
 
-    def get_relative(self):
+    def get_path_str(self):
         try:
             return self._s_r_path
         except:
@@ -365,7 +376,6 @@ class SvgPath:
         # of the last bezier control point from previous Q/q/T/t command
         last_control_point = Point([0, 0])
 
- 
         for i, seg in enumerate(path):
             cmd_type = seg[0]
             if cmd_type == 'm':  # move to

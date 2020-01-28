@@ -46,13 +46,16 @@ def placeShape(shape, svg_layer, invert=False, original=False):
     else:
         transform = None
 
+
+    # TODO: Sort out mirroring (currently returning the same path
+    # TODO: is 'original' being used at all?
     if invert == True:
-        path = shape.getTransformedPath(True)
+        path = shape.get_path_str()
     else:
         if original == True:
-            path = shape.getOriginalPath()
+            path = shape.get_path_str()
         else:
-            path = shape.getTransformedPath()
+            path = shape.get_path_str()
 
     el = et.SubElement(svg_layer, "path", d=path)
 
