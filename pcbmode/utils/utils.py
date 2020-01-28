@@ -574,22 +574,19 @@ def digest(string):
     return hashlib.md5(string.encode()).hexdigest()[: digits - 1]
 
 
-def pn(num, sd=None):
+def pn(num_in, sd=None):
     """
     Create a pretty number from a float.
     'round()' returns '0.0' and that's ugly. So this takes care of that.
-    Converting to float before checking if it's an integer is because an int doesn't
-    have 'is_integer()'...
     If the amount of digits isn't defined then use the global settings. 
     """
-    if float(num).is_integer():
-        return int(num)
+    if sd is None:
+        num = round(num_in, config.cfg["params"]["significant-digits"])
     else:
-        if sd is None:
-            return round(num, config.cfg["params"]["significant-digits"])
-        else:
-            return round(num, sd)
-
+        num = round(num_in, sd)
+    if float(num).is_integer():
+        num = int(num)
+    return num
 
 def parseTransform(transform):
     """
