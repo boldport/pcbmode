@@ -48,7 +48,8 @@ class SvgPath:
         self._width, self._height, self._bbox_tl, self._bbox_br = self._bbox(
             self._p_r_path
         )
-        self._p_r_path = self._center_path(self._p_r_path)
+        print(f"RELATV: {self._p_r_path}")
+        #self._p_r_path = self._center_path(self._p_r_path)
         self._num_of_segs = self._get_num_of_segs(self._p_r_path)
 
     def _center_path(self, r_p_path):
@@ -107,6 +108,11 @@ class SvgPath:
         """
         Creates an SVG path string from the parsed list of the relative path
         """
+
+        print(f"PATHIN: {self._path_in}")
+        print(f"PATHP : {self._p_path}")
+        print(f"PATHPR: {self._p_r_path}")
+
         s_path = ""
         for seg in self._p_r_path:
             cmd_type = seg[0]
@@ -120,6 +126,8 @@ class SvgPath:
                     s += f"{coord.px()},{coord.py()} "
             s_path += f"{cmd_type} {s}"
         self._s_r_path = s_path
+        print(f"STRING: {self._s_r_path}")
+
 
     def get_path_str(self):
         try:
@@ -146,12 +154,6 @@ class SvgPath:
                 self._p_r_path[0][1].y,
             ]
             return self._first_point
-
-    def getTransformed(self):
-        return self._transformed
-
-    def getTransformedMirrored(self):
-        return self._transformed_mirrored
 
     def get_width(self):
         return self._width
@@ -516,84 +518,84 @@ class SvgPath:
         Transforms a parsed path 
         """
 
-        if rotate_point is None:
-            rotate_point = Point()
+        # if rotate_point is None:
+        #     rotate_point = Point()
 
-        path = self._p_r_path
+        # path = self._p_r_path
 
-        string = "%s%s%s%s%s%s" % (
-            path,
-            scale,
-            rotate_angle,
-            rotate_point,
-            mirror,
-            center,
-        )
-        digest = utils.digest(string)
+        # string = "%s%s%s%s%s%s" % (
+        #     path,
+        #     scale,
+        #     rotate_angle,
+        #     rotate_point,
+        #     mirror,
+        #     center,
+        # )
+        # digest = utils.digest(string)
 
-        # TODO: this needs to be fixed so that the correct path is in
-        # p_r_path when invoking the following function
-        # self._bbox(path)
-        # width, height = self._get_dimensions(path)
-        # first point of path
-        first_point = path[0][1]
-        if center is True:
-            # center point of path
+        # # TODO: this needs to be fixed so that the correct path is in
+        # # p_r_path when invoking the following function
+        # # self._bbox(path)
+        # # width, height = self._get_dimensions(path)
+        # # first point of path
+        # first_point = path[0][1]
+        # if center is True:
+        #     # center point of path
 
-            origin_point = Point(
-                [self._bbox_tl.x + self._width / 2, self._bbox_tl.y - self._height / 2,]
-            )
+        #     origin_point = Point(
+        #         [self._bbox_tl.x + self._width / 2, self._bbox_tl.y - self._height / 2,]
+        #     )
 
-            # caluclate what's the new starting point of path based on the new origin
-            new_first_point = Point(
-                [first_point.x - origin_point.x, first_point.y - origin_point.y]
-            )
+        #     # caluclate what's the new starting point of path based on the new origin
+        #     new_first_point = Point(
+        #         [first_point.x - origin_point.x, first_point.y - origin_point.y]
+        #     )
 
-        else:
-            new_first_point = Point([first_point.x, first_point.y])
-        new_first_point.rotate(rotate_angle, rotate_point)
-        new_first_point.mult(scale)
-        new_p = f"m {new_first_point.px()},{new_first_point.py()} "
-        tmpp = Point()
-        origin = Point()
-        for n in range(0, len(path)):
-            if path[n][0] == "m" and n == 0:
-                for m in range(2, len(path[n])):
-                    tmpp = path[n][m]
-                    tmpp.rotate(rotate_angle, rotate_point)
-                    tmpp.mult(scale)
-                    new_p += f"{str(tmpp.px())},{str(tmpp.py())} "
-            else:
-                if path[n][0] == "h" or path[n][0] == "v":
-                    new_p += "l "
-                else:
-                    new_p += path[n][0] + " "
-                for m in range(1, len(path[n])):
-                    if path[n][0] == "h":
-                        tmpp.assign(path[n][m].x, 0)
-                    elif path[n][0] == "v":
-                        tmpp.assign(0, path[n][m].y)
-                    else:
-                        tmpp = path[n][m]
-                    tmpp.rotate(rotate_angle, rotate_point)
-                    tmpp.mult(scale)
-                    new_p += f"{str(tmpp.px())},{str(tmpp.py())} "
+        # else:
+        #     new_first_point = Point([first_point.x, first_point.y])
+        # new_first_point.rotate(rotate_angle, rotate_point)
+        # new_first_point.mult(scale)
+        # new_p = f"m {new_first_point.px()},{new_first_point.py()} "
+        # tmpp = Point()
+        # origin = Point()
+        # for n in range(0, len(path)):
+        #     if path[n][0] == "m" and n == 0:
+        #         for m in range(2, len(path[n])):
+        #             tmpp = path[n][m]
+        #             tmpp.rotate(rotate_angle, rotate_point)
+        #             tmpp.mult(scale)
+        #             new_p += f"{str(tmpp.px())},{str(tmpp.py())} "
+        #     else:
+        #         if path[n][0] == "h" or path[n][0] == "v":
+        #             new_p += "l "
+        #         else:
+        #             new_p += path[n][0] + " "
+        #         for m in range(1, len(path[n])):
+        #             if path[n][0] == "h":
+        #                 tmpp.assign(path[n][m].x, 0)
+        #             elif path[n][0] == "v":
+        #                 tmpp.assign(0, path[n][m].y)
+        #             else:
+        #                 tmpp = path[n][m]
+        #             tmpp.rotate(rotate_angle, rotate_point)
+        #             tmpp.mult(scale)
+        #             new_p += f"{str(tmpp.px())},{str(tmpp.py())} "
 
-        # parsed = self._parse_path(new_p)
-        parsed = self._grammar.parseString(new_p)
-        mirrored = self._mirrorHorizontally(parsed)
+        # # parsed = self._parse_path(new_p)
+        # parsed = self._grammar.parseString(new_p)
+        # mirrored = self._mirrorHorizontally(parsed)
 
-        if mirror == False:
-            self._transformed_mirrored = mirrored
-            self._transformed = new_p
-        else:
-            self._transformed_mirrored = new_p
-            self._transformed = mirrored
-        # TODO: this needs to be fixed so that the correct path is in
-        # p_r_path when invoking the following function
-        # self._bbox(self._transformed)
+        # if mirror == False:
+        #     self._transformed_mirrored = mirrored
+        #     self._transformed = new_p
+        # else:
+        #     self._transformed_mirrored = new_p
+        #     self._transformed = mirrored
+        # # TODO: this needs to be fixed so that the correct path is in
+        # # p_r_path when invoking the following function
+        # # self._bbox(self._transformed)
 
-        return
+        return 
 
     def _flatten_cubic(self, cp, steps):
         """
