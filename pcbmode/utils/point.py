@@ -75,20 +75,20 @@ class Point:
 
     def px(self, sd=None):
         """ Apply significant digits and int() floats """
-        if float(self.x).is_integer():
-            return int(self.x)
+        if sd == None:
+            num = round(self.x, self._sig_dig)
         else:
-            if sd is None:
-                return round(self.x, self._sig_dig)
-            else:
-                return round(self.x, sd)
+            num = round(self.x, sd)       
+        if float(num).is_integer():
+            num = int(self.x)
+        return num
 
     def py(self, sd=None):
         """ Apply significant digits and int() floats """
-        if float(self.y).is_integer():
-            return int(self.y)
+        if sd == None:
+            num = round(self.y, self._sig_dig)
         else:
-            if sd is None:
-                return round(self.y, self._sig_dig)
-            else:
-                return round(self.y, sd)
+            num = round(self.y, sd)       
+        if float(num).is_integer():
+            num = int(self.y)
+        return num
