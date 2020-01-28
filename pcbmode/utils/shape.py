@@ -66,7 +66,7 @@ class Shape:
             self._style = "stroke:none;"
 
         self._path_str = self._define_path_from_shape_type()
-        self._path_obj = SvgPath(self._path_str) # create path object
+        self._path_obj = SvgPath(path=self._path_str, scale=self._scale) # create path object
 
         # TODO: Move to SvgPath object creation  
         # self._path_obj.transform(
