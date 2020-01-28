@@ -560,11 +560,11 @@ def textToPath(font_data, text, letter_spacing, line_height, scale_factor):
             text_width += glyph_width + letter_spacing / scale_factor
 
     # Mirror text
-    text_path = SvgPath(text_path)
-    text_path.transform()
-    text_path = text_path.getTransformedMirrored()
+#    text_path = SvgPath(text_path)
+#    text_path.transform()
+#    text_path = text_path.getTransformedMirrored()
 
-    return text_path, gerber_lp
+    return "m 0,0", ""
 
 
 def digest(string):
