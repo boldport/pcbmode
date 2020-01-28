@@ -48,7 +48,6 @@ class SvgPath:
         self._width, self._height, self._bbox_tl, self._bbox_br = self._bbox(
             self._p_r_path
         )
-        print(f"RELATV: {self._p_r_path}")
         #self._p_r_path = self._center_path(self._p_r_path)
         self._num_of_segs = self._get_num_of_segs(self._p_r_path)
 
@@ -108,11 +107,6 @@ class SvgPath:
         """
         Creates an SVG path string from the parsed list of the relative path
         """
-
-        print(f"PATHIN: {self._path_in}")
-        print(f"PATHP : {self._p_path}")
-        print(f"PATHPR: {self._p_r_path}")
-
         s_path = ""
         for seg in self._p_r_path:
             cmd_type = seg[0]
@@ -126,8 +120,6 @@ class SvgPath:
                     s += f"{coord.px()},{coord.py()} "
             s_path += f"{cmd_type} {s}"
         self._s_r_path = s_path
-        print(f"STRING: {self._s_r_path}")
-
 
     def get_path_str(self):
         try:
@@ -368,11 +360,7 @@ class SvgPath:
         """
         Measure the bounding box of a parsed relative path 
         """
-
         path = p_path
-
-        print(f"ORIGIN: {self._path_in}")
-        print(f"PARSED: {p_path}")
 
         # For the t/T (shorthand bezier) command, we need to keep track
         # of the last bezier control point from previous Q/q/T/t command
@@ -505,9 +493,6 @@ class SvgPath:
 
         width = br.x - tl.x
         height = abs(br.y - tl.y)
-
-        print(f"TL, BR: {tl},{br}")
-        print(f"W,H: {width},{height}")
 
         return (width, height, tl, br)
 
