@@ -35,7 +35,7 @@ class SvgPath:
     'r_' prefix means relative path
     """
 
-    def __init__(self, path, scale=1, rotate=0, rotate_point=None, mirror=False):
+    def __init__(self, path, scale=1, rotate=0, pivot=None, mirror=False):
 
         self._path_in = path
 
@@ -48,8 +48,16 @@ class SvgPath:
         self._width, self._height, self._bbox_tl, self._bbox_br = self._bbox(
             self._p_r_path
         )
+        if scale != 1:
+            self._p_r_path = self._scale_path(scale, self._p_r_path)
         #self._p_r_path = self._center_path(self._p_r_path)
         self._num_of_segs = self._get_num_of_segs(self._p_r_path)
+
+    def _scale_path(self, scale, p_r_path):
+        """ Scale a parsed relative path """
+        for seg in p_r_path:
+            [x.mult(scale) for x in seg[1:]]
+        return p_r_path
 
     def _center_path(self, r_p_path):
         """
