@@ -35,7 +35,9 @@ class SvgPath:
     'r_' prefix means relative path
     """
 
-    def __init__(self, path, scale=1, rotate=0, pivot=None, mirror=False):
+    def __init__(
+        self, path, scale=1, rotate=0, pivot=None, mirror_y=False, mirror_x=False
+    ):
 
         self._path_in = path
 
@@ -48,15 +50,34 @@ class SvgPath:
         self._width, self._height, self._bbox_tl, self._bbox_br = self._bbox(
             self._p_r_path
         )
-        if scale != 1:
-            self._p_r_path = self._scale_path(scale, self._p_r_path)
-        #self._p_r_path = self._center_path(self._p_r_path)
+        # self._p_r_path = self._center_path(self._p_r_path)
+        self._p_r_path = self._scale_path(scale, self._p_r_path)
+        self._p_r_path = self._rotate_path(rotate, self._p_r_path)
+        self._p_r_path = self._mirror_path(mirror_y, mirror_x, self._p_r_path)
         self._num_of_segs = self._get_num_of_segs(self._p_r_path)
 
     def _scale_path(self, scale, p_r_path):
         """ Scale a parsed relative path """
-        for seg in p_r_path:
-            [x.mult(scale) for x in seg[1:]]
+        if scale != 1:
+            for seg in p_r_path:
+                [c.mult(scale) for c in seg[1:]]
+        return p_r_path
+
+    def _rotate_path(self, deg, p_r_path):
+        """ Rotate a parsed relative path """
+        if deg != 0:
+            for seg in p_r_path:
+                [c.rotate(deg) for c in seg[1:]]
+        return p_r_path
+
+    def _mirror_path(self, mirror_y, mirror_x, p_r_path):
+        """ Rotate a parsed relative path """
+        if mirror_y is True:
+            for seg in p_r_path:
+                [c.mirror("y") for c in seg[1:]]
+        if mirror_x is True:
+            for seg in p_r_path:
+                [c.mirror("x") for c in seg[1:]]
         return p_r_path
 
     def _center_path(self, r_p_path):
@@ -360,8 +381,8 @@ class SvgPath:
         """
         Updates top-left and bottom-right coords with input point
         """
-        tl_new = Point([min(p.x, tl.x), max(p.y,tl.y)]) 
-        br_new = Point([max(p.x, br.x), min(p.y,br.y)]) 
+        tl_new = Point([min(p.x, tl.x), max(p.y, tl.y)])
+        br_new = Point([max(p.x, br.x), min(p.y, br.y)])
         return tl_new, br_new
 
     def _bbox(self, p_path):
@@ -376,11 +397,11 @@ class SvgPath:
 
         for i, seg in enumerate(path):
             cmd_type = seg[0]
-            if cmd_type == 'm':  # move to
-                if i == 0: # first segment special case
+            if cmd_type == "m":  # move to
+                if i == 0:  # first segment special case
                     abs_point = seg[1]
-                    tl = seg[1] # first point
-                    br = seg[1] # tl, br are equal
+                    tl = seg[1]  # first point
+                    br = seg[1]  # tl, br are equal
                 else:
                     abs_point += seg[1]
                     tl, br = self._bbox_update(tl, br, abs_point)
@@ -488,12 +509,12 @@ class SvgPath:
                     for m in range(0, len(bezier_point_array)):
                         tl, br = self._bbox_update(tl, br, bezier_point_array[m])
 
-            elif cmd_type in ['l', 'h', 'v']:  # line to, horizontal, vertical
+            elif cmd_type in ["l", "h", "v"]:  # line to, horizontal, vertical
                 for coord in seg[1:]:
                     abs_point += coord
                     tl, br = self._bbox_update(tl, br, abs_point)
 
-            elif cmd_type.lower() == 'z': # close shape, needed to doesn't error below
+            elif cmd_type.lower() == "z":  # close shape, needed to doesn't error below
                 pass
 
             else:
@@ -588,7 +609,7 @@ class SvgPath:
         # # p_r_path when invoking the following function
         # # self._bbox(self._transformed)
 
-        return 
+        return
 
     def _flatten_cubic(self, cp, steps):
         """
