@@ -23,11 +23,8 @@ import decimal
 from pcbmode.config import config
 
 
-DEG2RAD = 2 * pi / 360
-
-
 class Point:
-    def __init__(self, xy=[0,0]):
+    def __init__(self, xy=[0, 0]):
         self.set_sig_dig(config.cfg["params"].get("significant-digits", 8))
         self.x = float(xy[0])
         self.y = float(xy[1])
@@ -41,7 +38,7 @@ class Point:
         return Point([self.x - p.x, self.y - p.y])
 
     def __repr__(self):
-        """ Printing """ 
+        """ Printing """
         return f"[{self.x},{self.y}]"
 
     def __eq__(self, p):
@@ -60,8 +57,9 @@ class Point:
         self.x = float(x)
         self.y = float(y)
 
-    def rotate(self, deg, p):
-        """ rotate the point in degrees around another point """
+    def rotate(self, deg):
+        """ Rotate the point in degrees """
+        DEG2RAD = 2 * pi / 360
         rad = deg * DEG2RAD
         x = self.x
         y = self.y
@@ -78,7 +76,7 @@ class Point:
         if sd == None:
             num = round(self.x, self._sig_dig)
         else:
-            num = round(self.x, sd)       
+            num = round(self.x, sd)
         if float(num).is_integer():
             num = int(self.x)
         return num
@@ -88,7 +86,7 @@ class Point:
         if sd == None:
             num = round(self.y, self._sig_dig)
         else:
-            num = round(self.y, sd)       
+            num = round(self.y, sd)
         if float(num).is_integer():
             num = int(self.y)
         return num
