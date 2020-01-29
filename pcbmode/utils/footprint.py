@@ -186,7 +186,7 @@ class Footprint:
                                 sdict["rotate"] = (sdict.get("rotate", 0)) + pin_rotate
 
                                 # Rotate location
-                                shape_loc.rotate(pin_rotate, Point())
+                                shape_loc.rotate(pin_rotate)
 
                                 sdict["location"] = [
                                     shape_loc.x + pin_location.x,

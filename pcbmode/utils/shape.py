@@ -262,10 +262,10 @@ class Shape:
     def get_label(self):
         return self._label
 
-    def rotate_location(self, angle, point=None):
-        if point is None:
-            point = Point()
-        self._location.rotate(angle, point)
+    def rotate_location(self, angle, pivot=None):
+        if pivot is None:
+            pivot = Point([0,0])
+        self._location.rotate(angle)
 
     def getRotation(self):
         return self._rotate
