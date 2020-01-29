@@ -46,21 +46,19 @@ class SvgPath:
         center=True,
     ):
 
+        # Parse and make relative
         self._path_in = path
-
-        # PyParsing SVG path grammar
-        # TODO: remove this when transform is fixed
-        self._grammar = svg_path_grammar.get_grammar()
-
         self._p_path = self._parse_path(self._path_in)
         self._p_r_path = self._p_path_to_relative(self._p_path)
-        self._width, self._height, self._bbox_tl, self._bbox_br = self._bbox(
-            self._p_r_path
-        )
-        self._p_r_path = self._center_path(center, self._p_r_path)
+
+        # Transform
         self._p_r_path = self._scale_path(scale, self._p_r_path)
         self._p_r_path = self._rotate_path(rotate, self._p_r_path)
         self._p_r_path = self._mirror_path(mirror_y, mirror_x, self._p_r_path)
+
+        # Measure and center 
+        self._dims, self._bbox_tl, self._bbox_br = self._bbox(self._p_r_path)
+        self._p_r_path = self._center_path(center, self._p_r_path)
         self._num_of_segs = self._get_num_of_segs(self._p_r_path)
 
     def _scale_path(self, scale, p_r_path):
@@ -91,7 +89,7 @@ class SvgPath:
         """ Make first move from center of shape """
         if center is True:
             op = Point(
-                [self._bbox_tl.x + self._width / 2, self._bbox_tl.y - self._height / 2]
+                [self._bbox_tl.x + self._dims.x / 2, self._bbox_tl.y - self._dims.y / 2]
             )  # new origin point
             r_p_path[0][1] = r_p_path[0][1] - op
         return r_p_path
@@ -183,10 +181,10 @@ class SvgPath:
             return self._first_point
 
     def get_width(self):
-        return self._width
+        return self._dims.x
 
     def get_height(self):
-        return self._height
+        return self._dims.y
 
     def _p_path_to_relative(self, path):
         """
@@ -526,10 +524,10 @@ class SvgPath:
             else:
                 print(f"ERROR: found an unsupported SVG path command {cmd_type}")
 
-        width = br.x - tl.x
-        height = abs(br.y - tl.y)
+        # Width and height as a Pont()
+        dims = Point([br.x - tl.x, abs(br.y - tl.y)])
 
-        return (width, height, tl, br)
+        return (dims, tl, br)
 
     def transform(
         self, scale=1, rotate_angle=0, rotate_point=None, mirror=False, center=True
