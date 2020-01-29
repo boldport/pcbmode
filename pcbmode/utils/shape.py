@@ -45,10 +45,11 @@ class Shape:
         self._label_style_class = shape.get("label_style_class", None)
         self._shape_dict = shape
         self._gerber_lp = shape.get("gerber-lp") or shape.get("gerber_lp") or None
-        self._place_mirrored = shape.get("mirror", False)
+        self._mirror_y = shape.get("mirror-y", False)
+        self._mirror_x = shape.get("mirror-x", False)
         self._rotate = shape.get("rotate", 0)
         self._rotate *= self._inv_rotate
-        self._rotate_point = shape.get("rotate-point", Point([0, 0]))
+        self._pivot = shape.get("pivot", Point([0, 0]))
         self._scale = shape.get("scale", 1)
         self._pour_buffer = shape.get("buffer-to-pour")
         self._location = shape.get("location", Point())
@@ -66,9 +67,16 @@ class Shape:
             self._style = "stroke:none;"
 
         self._path_str = self._define_path_from_shape_type()
-        self._path_obj = SvgPath(path=self._path_str, scale=self._scale) # create path object
+        self._path_obj = SvgPath(
+            path=self._path_str,
+            scale=self._scale,
+            rotate=self._rotate,
+            pivot=self._pivot,
+            mirror_y=self._mirror_y,
+            mirror_x=self._mirror_x,
+        )  # create path object
 
-        # TODO: Move to SvgPath object creation  
+        # TODO: Move to SvgPath object creation
         # self._path_obj.transform(
         #     scale=self._scale,
         #     rotate_angle=self._rotate,
@@ -95,7 +103,7 @@ class Shape:
 
         if self._type in ["rect", "rectangle"]:
             self._type = "rect"
-            path  = self._process_rect()
+            path = self._process_rect()
         elif self._type in ["circ", "circle", "round"]:
             self._type = "circ"
             path = self._process_circ()
@@ -234,7 +242,7 @@ class Shape:
             self._path_obj.transform(
                 scale * self._scale,
                 rotate * self._inv_rotate + self._rotate,
-                rotate_point + self._rotate_point,
+                rotate_point + self._pivot,
                 mirror,
             )
 
@@ -264,7 +272,7 @@ class Shape:
 
     def rotate_location(self, angle, pivot=None):
         if pivot is None:
-            pivot = Point([0,0])
+            pivot = Point([0, 0])
         self._location.rotate(angle)
 
     def getRotation(self):
@@ -313,4 +321,4 @@ class Shape:
         return self._diameter
 
     def getMirrorPlacement(self):
-        return self._place_mirrored
+        return self._mirror_y
