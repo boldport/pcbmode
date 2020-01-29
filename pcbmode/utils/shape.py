@@ -34,57 +34,55 @@ class Shape:
     """
     """
 
-    def __init__(self, shape):
+    def __init__(self, shape_dict):
 
+        self._shape_dict = self._process_shape_dict(shape_dict)
+
+        self._path_str = self._path_from_shape_type()
+
+        trans_dict = { # transform dictionary
+            'scale': self._shape_dict['scale'],
+            'rotate': self._shape_dict['rotate'],
+            'pivot': self._shape_dict['pivot'],
+            'mirror_y': self._shape_dict['mirror-y'],
+            'mirror_x': self._shape_dict['mirror-x'],
+            'center': True
+        }
+        self._path_obj = SvgPath(self._path_str, trans_dict)  # create path object
+
+    def _process_shape_dict(self, sd):
+        """ Set defaults """
         # Invert rotation so it's clock-wise. Inkscape is counter-clockwise and
         # it's unclear to me what's the "right" direction. clockwise makes more
         # sense to me. This should be the only place to make the change.
         self._inv_rotate = -1
 
-        self._label = shape.get("label", None)
-        self._label_style_class = shape.get("label_style_class", None)
-        self._shape_dict = shape
-        self._gerber_lp = shape.get("gerber-lp") or shape.get("gerber_lp") or None
-        self._mirror_y = shape.get("mirror-y", False)
-        self._mirror_x = shape.get("mirror-x", False)
-        self._rotate = shape.get("rotate", 0)
-        self._rotate *= self._inv_rotate
-        self._pivot = shape.get("pivot", Point([0, 0]))
-        self._scale = shape.get("scale", 1)
-        self._pour_buffer = shape.get("buffer-to-pour")
-        self._location = shape.get("location", Point())
+        sd['label'] = sd.get("label", None)
+        sd['label_style_class'] = sd.get("label-style-class", None)
+        sd['gerber-lp'] = sd.get("gerber-lp", None)
+        sd['mirror-y'] = sd.get("mirror-y", False)
+        sd['mirror-x'] = sd.get("mirror-x", False)
+        sd['rotate'] = (sd.get("rotate", 0) * self._inv_rotate)
+        sd['pivot'] = sd.get("pivot", Point([0, 0]))
+        sd['scale'] = sd.get("scale", 1)
+        sd['buffer-to-pour'] = sd.get("buffer-to-pour")
+        sd['location'] = sd.get("location", Point([0,0]))
 
         # Somewhere the location input isn't being converted to Point()
         # This checks... but needs to be removed eventually
-        if isinstance(self._location, Point) is False:
-            self._location = Point(self._location)
+        if isinstance(sd['location'], Point) is False:
+            sd['location'] = Point(sd['location'])
 
-        self._style_class = self._shape_dict.get("style_class", None)
-        self._style = self._shape_dict.get("style", None)
-        if self._style is not None:
-            self._style = utils.process_style(self._style)
+        sd['style-class'] = sd.get("style_class", None)
+        sd['style'] = sd.get("style", None)
+        if sd['style'] is not None:
+            sd['style'] = utils.process_style(sd['style'])
         else:
-            self._style = "stroke:none;"
+            sd['style'] = "stroke:none;"
 
-        self._path_str = self._define_path_from_shape_type()
-        self._path_obj = SvgPath(
-            path=self._path_str,
-            scale=self._scale,
-            rotate=self._rotate,
-            pivot=self._pivot,
-            mirror_y=self._mirror_y,
-            mirror_x=self._mirror_x,
-        )  # create path object
+        return sd
 
-        # TODO: Move to SvgPath object creation
-        # self._path_obj.transform(
-        #     scale=self._scale,
-        #     rotate_angle=self._rotate,
-        #     rotate_point=self._rotate_point,
-        #     mirror=self._place_mirrored,
-        # )
-
-    def _define_path_from_shape_type(self):
+    def _path_from_shape_type(self):
         """
         There are various shape types. Here we create an SVG path from the shape type
         and parameters provided by the shape dict.
@@ -101,17 +99,14 @@ class Shape:
             self._shape_dict = config.brd["outline"].get("shape").copy()
             self._type = self._shape_dict.get("type")
 
-        if self._type in ["rect", "rectangle"]:
-            self._type = "rect"
+        if self._type == "rect":
             path = self._process_rect()
-        elif self._type in ["circ", "circle", "round"]:
-            self._type = "circ"
+        elif self._type == "circle":
             path = self._process_circ()
         elif self._type == "drill":
             path = self._process_drill()
-        elif self._type in ["text", "string"]:
-            self._type == "text"
-            path = self._process_text()
+        elif self._type == "text":
+            #path = self._process_text()
             # TODO: remove when dealing with text properly
             path = "m 0,0"
         elif self._type == "path":
@@ -239,47 +234,49 @@ class Shape:
         if add == False:
             self._path.transform(scale, rotate * self._inv_rotate, rotate_point, mirror)
         else:
-            self._path_obj.transform(
-                scale * self._scale,
-                rotate * self._inv_rotate + self._rotate,
-                rotate_point + self._pivot,
-                mirror,
-            )
+            path_str = self._path_obj.get_path_str()
+            t_dict = {
+                'scale': scale * self._shape_dict['scale'],
+                'rotate': rotate * self._inv_rotate + self._shape_dict['rotate'],
+                'pivot': rotate_point + self._shape_dict['pivot'],
+                'mirror_y': mirror
+            }
+            self._path_obj = SvgPath(path_str, t_dict)
 
     def get_style_class(self):
-        return self._style_class
+        return self._shape_dict['style-class']
 
     def set_style_class(self, new_class):
-        self._style_class = new_class
-
-    def set_style(self, new_style):
-        self._style = new_style
+        self._shape_dict['style-class'] = new_class
 
     def get_style(self):
-        return self._style
+        return self._shape_dict['style']
 
-    def set_label(self, label):
-        self._label = label
-
-    def set_label_style_class(self, new_style_class):
-        self._label_style_class = new_style_class
-
-    def get_label_style_class(self):
-        return self._label_style_class
+    def set_style(self, new_style):
+        self._shape_dict['style'] = new_style
 
     def get_label(self):
-        return self._label
+        return self._shape_dict['label']
+
+    def set_label(self, label):
+        self._shape_dict['label'] = label
+
+    def get_label_style_class(self):
+        return self._shape_dict['label-style-class']
+
+    def set_label_style_class(self, new_style_class):
+        self._shape_dict['label-style-class'] = new_style_class
 
     def rotate_location(self, angle, pivot=None):
         if pivot is None:
             pivot = Point([0, 0])
-        self._location.rotate(angle)
+        self._shape_dict['location'].rotate(angle)
 
-    def getRotation(self):
-        return self._rotate
+    def get_rotate(self):
+        return self._shape_dict['rotate']
 
-    def setRotation(self, rotate):
-        self._rotate = rotate
+    def set_rotate(self, rotate):
+       self._shape_dict['rotate'] = rotate
 
     def getOriginalPath(self):
         return self._path_obj.get_input_path()
@@ -294,31 +291,32 @@ class Shape:
         return self._path_obj.get_height()
 
     def getGerberLP(self):
-        return self._gerber_lp
+        return self._shape_dict['gerber-lp']
 
     def getScale(self):
-        return self._scale
+        return self._shape_dict['scale']
 
     def get_location(self):
-        return self._location
+        return self._shape_dict['location']
 
-    def set_location(self, location):
-        self._location = location
+    def set_location(self, location_point):
+        self._shape_dict['location'] = location_point
 
     def getParsedPath(self):
         return self._parsed
 
     def getPourBuffer(self):
-        return self._pour_buffer
+        return self._shape_dict['buffer-to-pour']
 
-    def getType(self):
-        return self._type
+    def get_type(self):
+        return self._shape_dict['type']
 
     def getText(self):
-        return self._text
+        # TODO: need to look into making this better
+        return self._shape_dict.get('text', "")
 
     def getDiameter(self):
         return self._diameter
 
     def getMirrorPlacement(self):
-        return self._mirror_y
+        return self._shape_dict['mirror-y']

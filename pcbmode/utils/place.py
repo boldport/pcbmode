@@ -81,7 +81,7 @@ def placeShape(shape, svg_layer, invert=False, original=False):
             x=coord_x,
             y=coord_y,
             # rotate against center, not x,y:
-            transform=f"rotate({shape.getRotation()},{coord_x},{coord_y})",
+            transform=f"rotate({shape.get_rotate()},{coord_x},{coord_y})",
         )
         label_el.text = label
         label_el.set("class", shape.get_label_style_class())
@@ -94,7 +94,7 @@ def placeShape(shape, svg_layer, invert=False, original=False):
     if gerber_lp != None:
         el.set(f"{{{ns_pcm}}}gerber-lp", gerber_lp)
 
-    if shape.getType() == "text":
+    if shape.get_type() == "text":
         el.set(f"{{{ns_pcm}}}text", shape.getText())
 
     return el

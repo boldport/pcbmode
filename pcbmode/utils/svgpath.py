@@ -25,73 +25,76 @@ from pcbmode.utils import messages as msg
 from pcbmode.utils import utils
 from pcbmode.utils import svg
 from pcbmode.utils.point import Point
-from pcbmode.utils import svg_path_grammar
 
 
 class SvgPath:
 
     """
+    Creates an object that processes, transforms, and outputs an SVG path string.
+    The object is immutable in the sense that it's not possible to transform it one
+    created. If a new transform on an existing object is required, a new object needs
+    to be created.
     'p_' xor 's_' prefixes mean parsed xor stringed
     'r_' prefix means relative path
     """
 
-    def __init__(
-        self,
-        path,
-        scale=1,
-        rotate=0,
-        pivot=None,
-        mirror_y=False,
-        mirror_x=False,
-        center=True,
-    ):
+    def __init__(self, path, trans_dict):
+        """ Process the input path according to the transform dict """
 
         # Parse and make relative
         self._path_in = path
         self._p_path = self._parse_path(self._path_in)
         self._p_r_path = self._p_path_to_relative(self._p_path)
 
-        # Transform
-        self._p_r_path = self._scale_path(scale, self._p_r_path)
-        self._p_r_path = self._rotate_path(rotate, self._p_r_path)
-        self._p_r_path = self._mirror_path(mirror_y, mirror_x, self._p_r_path)
+        # Transform path
+        self._t_dict = trans_dict
+        self._p_r_path = self._scale_path(self._p_r_path)
+        self._p_r_path = self._rotate_path(self._p_r_path)
+        self._p_r_path = self._mirror_path(self._p_r_path)
 
-        # Measure and center 
+        # Measure and center
         self._dims, self._bbox_tl, self._bbox_br = self._bbox(self._p_r_path)
-        self._p_r_path = self._center_path(center, self._p_r_path)
+        self._p_r_path = self._center_path(self._p_r_path)
         self._num_of_segs = self._get_num_of_segs(self._p_r_path)
 
-    def _scale_path(self, scale, p_r_path):
+    def _scale_path(self, p_r_path):
         """ Scale a parsed relative path """
+        scale = self._t_dict.get('scale', 1)
         if scale != 1:
             for seg in p_r_path:
                 [c.mult(scale) for c in seg[1:]]
         return p_r_path
 
-    def _rotate_path(self, deg, p_r_path):
+    def _rotate_path(self, p_r_path):
         """ Rotate a parsed relative path """
+        deg = self._t_dict.get('rotate', 0)
         if deg != 0:
             for seg in p_r_path:
                 [c.rotate(deg) for c in seg[1:]]
         return p_r_path
 
-    def _mirror_path(self, mirror_y, mirror_x, p_r_path):
-        """ Rotate a parsed relative path """
+    def _mirror_path(self, p_r_path):
+        """ Mirror a parsed relative path """
+        mirror_y = self._t_dict.get('mirror-y', False)
         if mirror_y is True:
             for seg in p_r_path:
                 [c.mirror("y") for c in seg[1:]]
+
+        mirror_x = self._t_dict.get('mirror-x', False)
         if mirror_x is True:
             for seg in p_r_path:
                 [c.mirror("x") for c in seg[1:]]
+
         return p_r_path
 
-    def _center_path(self, center, r_p_path):
-        """ Make first move from center of shape """
+    def _center_path(self, r_p_path):
+        """ Make first move from the center of the shape """
+        center = self._t_dict.get('center', True)
         if center is True:
-            op = Point(
-                [self._bbox_tl.x + self._dims.x / 2, self._bbox_tl.y - self._dims.y / 2]
-            )  # new origin point
-            r_p_path[0][1] = r_p_path[0][1] - op
+            op_x = self._bbox_tl.x + self._dims.x / 2
+            op_y = self._bbox_tl.y - self._dims.y / 2
+            op = Point([op_x, op_y])  # new origin point
+            r_p_path[0][1] = r_p_path[0][1] - op  # adjust
         return r_p_path
 
     def _get_num_of_segs(self, r_p_path):
@@ -381,18 +384,17 @@ class SvgPath:
 
         return p
 
-    def _bbox_update(self, tl, br, p):
-        """
-        Updates top-left and bottom-right coords with input point
-        """
-        tl_new = Point([min(p.x, tl.x), max(p.y, tl.y)])
-        br_new = Point([max(p.x, br.x), min(p.y, br.y)])
-        return tl_new, br_new
-
     def _bbox(self, p_path):
         """
         Measure the bounding box of a parsed relative path 
         """
+
+        def update(tl, br, p):
+            """ Updates top-left and bottom-right coords with a new input point """
+            tl_new = Point([min(p.x, tl.x), max(p.y, tl.y)])
+            br_new = Point([max(p.x, br.x), min(p.y, br.y)])
+            return tl_new, br_new
+
         path = p_path
 
         # For the t/T (shorthand bezier) command, we need to keep track
@@ -408,11 +410,11 @@ class SvgPath:
                     br = seg[1]  # tl, br are equal
                 else:
                     abs_point += seg[1]
-                    tl, br = self._bbox_update(tl, br, abs_point)
+                    tl, br = update(tl, br, abs_point)
 
                 for coord in seg[2:]:
                     abs_point += coord
-                    tl, br = self._bbox_update(tl, br, abs_point)
+                    tl, br = update(tl, br, abs_point)
 
             elif cmd_type == "c":  # cubic bezier
                 bezier_curve_path = []
@@ -442,7 +444,7 @@ class SvgPath:
                         bezier_point_array.append(Point([points_x[n], points_y[n]]))
                     # Check each point if it extends the boundary box
                     for n in range(0, len(bezier_point_array)):
-                        tl, br = self._bbox_update(tl, br, bezier_point_array[n])
+                        tl, br = update(tl, br, bezier_point_array[n])
 
             elif cmd_type == "q":  # quadratic bezier
                 bezier_curve_path = []
@@ -477,7 +479,7 @@ class SvgPath:
                         bezier_point_array.append(Point([points_x[n], points_y[n]]))
                     # Check each point if it extends the boundary box
                     for n in range(0, len(bezier_point_array)):
-                        tl, br = self._bbox_update(tl, br, bezier_point_array[n])
+                        tl, br = update(tl, br, bezier_point_array[n])
 
             elif cmd_type == "t":  # simple cubic bezier
                 bezier_curve_path = []
@@ -511,12 +513,12 @@ class SvgPath:
                         bezier_point_array.append(Point([points_x[n], points_y[n]]))
                     # Check each point if it extends the boundary box
                     for m in range(0, len(bezier_point_array)):
-                        tl, br = self._bbox_update(tl, br, bezier_point_array[m])
+                        tl, br = update(tl, br, bezier_point_array[m])
 
             elif cmd_type in ["l", "h", "v"]:  # line to, horizontal, vertical
                 for coord in seg[1:]:
                     abs_point += coord
-                    tl, br = self._bbox_update(tl, br, abs_point)
+                    tl, br = update(tl, br, abs_point)
 
             elif cmd_type.lower() == "z":  # close shape, needed to doesn't error below
                 pass
@@ -524,96 +526,10 @@ class SvgPath:
             else:
                 print(f"ERROR: found an unsupported SVG path command {cmd_type}")
 
-        # Width and height as a Pont()
+        # Width and height as a Point()
         dims = Point([br.x - tl.x, abs(br.y - tl.y)])
 
         return (dims, tl, br)
-
-    def transform(
-        self, scale=1, rotate_angle=0, rotate_point=None, mirror=False, center=True
-    ):
-        """
-        Transforms a parsed path 
-        """
-
-        # if rotate_point is None:
-        #     rotate_point = Point()
-
-        # path = self._p_r_path
-
-        # string = "%s%s%s%s%s%s" % (
-        #     path,
-        #     scale,
-        #     rotate_angle,
-        #     rotate_point,
-        #     mirror,
-        #     center,
-        # )
-        # digest = utils.digest(string)
-
-        # # TODO: this needs to be fixed so that the correct path is in
-        # # p_r_path when invoking the following function
-        # # self._bbox(path)
-        # # width, height = self._get_dimensions(path)
-        # # first point of path
-        # first_point = path[0][1]
-        # if center is True:
-        #     # center point of path
-
-        #     origin_point = Point(
-        #         [self._bbox_tl.x + self._width / 2, self._bbox_tl.y - self._height / 2,]
-        #     )
-
-        #     # caluclate what's the new starting point of path based on the new origin
-        #     new_first_point = Point(
-        #         [first_point.x - origin_point.x, first_point.y - origin_point.y]
-        #     )
-
-        # else:
-        #     new_first_point = Point([first_point.x, first_point.y])
-        # new_first_point.rotate(rotate_angle, rotate_point)
-        # new_first_point.mult(scale)
-        # new_p = f"m {new_first_point.px()},{new_first_point.py()} "
-        # tmpp = Point()
-        # origin = Point()
-        # for n in range(0, len(path)):
-        #     if path[n][0] == "m" and n == 0:
-        #         for m in range(2, len(path[n])):
-        #             tmpp = path[n][m]
-        #             tmpp.rotate(rotate_angle, rotate_point)
-        #             tmpp.mult(scale)
-        #             new_p += f"{str(tmpp.px())},{str(tmpp.py())} "
-        #     else:
-        #         if path[n][0] == "h" or path[n][0] == "v":
-        #             new_p += "l "
-        #         else:
-        #             new_p += path[n][0] + " "
-        #         for m in range(1, len(path[n])):
-        #             if path[n][0] == "h":
-        #                 tmpp.assign(path[n][m].x, 0)
-        #             elif path[n][0] == "v":
-        #                 tmpp.assign(0, path[n][m].y)
-        #             else:
-        #                 tmpp = path[n][m]
-        #             tmpp.rotate(rotate_angle, rotate_point)
-        #             tmpp.mult(scale)
-        #             new_p += f"{str(tmpp.px())},{str(tmpp.py())} "
-
-        # # parsed = self._parse_path(new_p)
-        # parsed = self._grammar.parseString(new_p)
-        # mirrored = self._mirrorHorizontally(parsed)
-
-        # if mirror == False:
-        #     self._transformed_mirrored = mirrored
-        #     self._transformed = new_p
-        # else:
-        #     self._transformed_mirrored = new_p
-        #     self._transformed = mirrored
-        # # TODO: this needs to be fixed so that the correct path is in
-        # # p_r_path when invoking the following function
-        # # self._bbox(self._transformed)
-
-        return
 
     def _flatten_cubic(self, cp, steps):
         """

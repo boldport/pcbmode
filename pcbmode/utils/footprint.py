@@ -132,7 +132,7 @@ class Footprint:
                             sdict = shape_dict.copy()
 
                             # Which shape type is the pad?
-                            shape_type = pad_shape.getType()
+                            shape_type = pad_shape.get_type()
 
                             # Apply modifier based on shape type
                             if shape_type == "path":
@@ -140,14 +140,14 @@ class Footprint:
                                     pad_shape.getScale()
                                     * config.cfg["distances"][stype]["path-scale"]
                                 )
-                            elif shape_type in ["rect", "rectangle"]:
+                            elif shape_type == "rect":
                                 sdict["width"] += config.cfg["distances"][stype][
                                     "rect-buffer"
                                 ]
                                 sdict["height"] += config.cfg["distances"][stype][
                                     "rect-buffer"
                                 ]
-                            elif shape_type in ["circ", "circle"]:
+                            elif shape_type == "circle":
                                 sdict["diameter"] += config.cfg["distances"][stype][
                                     "circle-buffer"
                                 ]
