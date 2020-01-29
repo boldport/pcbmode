@@ -57,7 +57,7 @@ class Point:
         self.x = float(x)
         self.y = float(y)
 
-    def rotate(self, deg):
+    def rotate(self, deg): # TODO: add 'pivot'
         """ Rotate the point in degrees """
         DEG2RAD = 2 * pi / 360
         rad = deg * DEG2RAD
@@ -90,3 +90,10 @@ class Point:
         if float(num).is_integer():
             num = int(self.y)
         return num
+
+    def mirror(self, axis):
+        """ Mirror over the an axis """
+        if axis == 'y':
+            self.x = -self.x
+        if axis == 'x':
+            self.y = -self.y
