@@ -36,7 +36,14 @@ class SvgPath:
     """
 
     def __init__(
-        self, path, scale=1, rotate=0, pivot=None, mirror_y=False, mirror_x=False
+        self,
+        path,
+        scale=1,
+        rotate=0,
+        pivot=None,
+        mirror_y=False,
+        mirror_x=False,
+        center=True,
     ):
 
         self._path_in = path
@@ -50,7 +57,7 @@ class SvgPath:
         self._width, self._height, self._bbox_tl, self._bbox_br = self._bbox(
             self._p_r_path
         )
-        # self._p_r_path = self._center_path(self._p_r_path)
+        self._p_r_path = self._center_path(center, self._p_r_path)
         self._p_r_path = self._scale_path(scale, self._p_r_path)
         self._p_r_path = self._rotate_path(rotate, self._p_r_path)
         self._p_r_path = self._mirror_path(mirror_y, mirror_x, self._p_r_path)
@@ -80,14 +87,13 @@ class SvgPath:
                 [c.mirror("x") for c in seg[1:]]
         return p_r_path
 
-    def _center_path(self, r_p_path):
-        """
-        """
-        # op = Point([self._width/2, self._height/2]) # new origin point
-        # fp = r_p_path[0][1] # first move point
-        # print(r_p_path[0][1])
-        # r_p_path[0][1] = fp + fp - op
-
+    def _center_path(self, center, r_p_path):
+        """ Make first move from center of shape """
+        if center is True:
+            op = Point(
+                [self._bbox_tl.x + self._width / 2, self._bbox_tl.y - self._height / 2]
+            )  # new origin point
+            r_p_path[0][1] = r_p_path[0][1] - op
         return r_p_path
 
     def _get_num_of_segs(self, r_p_path):
