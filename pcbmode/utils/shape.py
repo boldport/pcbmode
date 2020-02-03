@@ -284,6 +284,9 @@ class Shape:
     def get_path_str(self):
         return self._path_obj.get_path_str()
 
+    def get_dims(self):
+        return self._path_obj.get_dims()
+
     def get_width(self):
         return self._path_obj.get_width()
 

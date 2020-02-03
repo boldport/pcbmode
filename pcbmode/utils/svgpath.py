@@ -183,6 +183,9 @@ class SvgPath:
             ]
             return self._first_point
 
+    def get_dims(self):
+        return self._dims
+
     def get_width(self):
         return self._dims.x
 
