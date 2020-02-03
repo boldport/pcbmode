@@ -97,3 +97,6 @@ class Point:
             self.x = -self.x
         if axis == 'x':
             self.y = -self.y
+
+    def copy(self):
+        return Point([self.x, self.y])
