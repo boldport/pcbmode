@@ -79,10 +79,11 @@ class Shape:
 
         sd['style-class'] = sd.get("style_class", None)
         sd['style'] = sd.get("style", None)
-        if sd['style'] is not None:
-            sd['style'] = utils.process_style(sd['style'])
-        else:
+
+        if sd['style'] in [None, '']:
             sd['style'] = "stroke:none;"
+        else:
+            sd['style'] = utils.process_style(sd['style'])
 
         return sd
 
