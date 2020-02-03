@@ -99,4 +99,5 @@ class Point:
             self.y = -self.y
 
     def copy(self):
+        """ Return a copy of itself """
         return Point([self.x, self.y])
