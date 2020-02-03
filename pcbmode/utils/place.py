@@ -27,11 +27,11 @@ from pcbmode.utils import svg_path_create
 from pcbmode.utils.point import Point
 
 
-def place_shape(shape, svg_layer, invert=False, original=False):
+def place_shape(shape, svg_layer, mirror=False, orig_path=False):
     """
     Places a shape of type 'Shape' onto SVG layer 'svg_layer'.
-    'invert'  : placed path should be mirrored
-    'original': use the original path, not the transformed one
+    'mirror'  : placed path should be mirrored
+    'orig_path': use the original path, not the transformed one
     """
 
     ns_pcm = config.cfg["ns"]["pcbmode"]
@@ -40,24 +40,23 @@ def place_shape(shape, svg_layer, invert=False, original=False):
     gerber_lp = shape.getGerberLP()
     location = shape.get_location()
 
-    if original == False:
-        translate = f"translate({((1, -1)[invert]) * location.px()},{config.cfg['iya'] * location.py()})"
+    if orig_path == False:
+        translate = f"translate({((1, -1)[mirror]) * location.px()},{config.cfg['iya'] * location.py()})"
         transform = translate
     else:
         transform = None
 
-
     # TODO: Sort out mirroring (currently returning the same path
     # TODO: is 'original' being used at all?
-    if invert == True:
-        path = shape.get_path_str()
+    if mirror == True:
+        path_str = shape.get_path_str()
     else:
-        if original == True:
-            path = shape.get_path_str()
+        if orig_path == True:
+            path_str = shape.get_path_str()
         else:
-            path = shape.get_path_str()
+            path_str = shape.get_path_str()
 
-    el = et.SubElement(svg_layer, "path", d=path)
+    el = et.SubElement(svg_layer, "path", d=path_str)
 
     style_class = shape.get_style_class()
     if style_class is not None:
@@ -73,7 +72,7 @@ def place_shape(shape, svg_layer, invert=False, original=False):
 
     label = shape.get_label()
     if label is not None:
-        coord_x = f"{((1, -1)[invert]) * location.px()}"
+        coord_x = f"{((1, -1)[mirror]) * location.px()}"
         coord_y = f"{config.cfg['iya'] * location.py()}"
         label_el = et.SubElement(
             svg_layer,

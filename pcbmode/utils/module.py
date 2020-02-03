@@ -570,15 +570,10 @@ class Module:
                 shape_dict = routes[pcb_layer][route_key]
                 shape = Shape(shape_dict)
 
-                # Routes are a special case where they are used as-is
-                # counting on Inkscapes 'optimised' setting to modify
-                # the path such that placement is refleced in
-                # it. Therefor we use the original path, not the
-                # transformed one as usual
-                use_original_path = True
-                mirror_path = False
                 route_element = place.place_shape(
-                    shape, sheet, mirror_path, use_original_path
+                    shape=shape,
+                    svg_layer=sheet,
+                    orig_path=True
                 )
 
                 # Set the key as pcbmode:id of the route. This is used
@@ -595,7 +590,7 @@ class Module:
 
                 if (there_are_pours == True) and (custom_buffer != "0"):
                     self._place_mask(
-                        self._masks[pcb_layer], shape, "route", use_original_path
+                        self._masks[pcb_layer], shape, "route", True
                     )
 
     #                # Due to the limitation of the Gerber format, and the method chosen
