@@ -60,10 +60,10 @@ class Module:
         self._outline_shape = self._get_outline_shape()
 
         self._dims = self._outline_shape.get_dims()
-        
+
         # Center point
         self._center = self._dims.copy()
-        self._center.mult(0.5) 
+        self._center.mult(0.5)
 
         # Get dictionaries of component/via/shape definitions
         components_dict = self._module_dict.get("components", {})
@@ -301,15 +301,15 @@ class Module:
         htmlpar = HTMLParser.HTMLParser()
 
         for component in components:
-            shapes_dict = component.getShapes()
+            shapes_dict = component.get_shapes()
             location = component.get_location()
-            rotation = component.getRotation()
-            refdef = component.getRefdef()
+            rotation = component.get_rotate()
+            refdef = component.get_refdef()
 
             # If the component is placed on the bottom layer we need
             # to invert the shapes AND their 'x' coordinate.  This is
             # done using the 'invert' indicator set below
-            placement_layer = component.getPlacementLayer()
+            placement_layer = component.get_placement_layer()
             if placement_layer == "bottom":
                 invert = True
             else:
@@ -337,7 +337,7 @@ class Module:
                     # 'component'
                     if component_type == "component":
                         shape_group.set(
-                            f"{{{ns_pcm}}}refdef", component.getRefdef(),
+                            f"{{{ns_pcm}}}refdef", component.get_refdef(),
                         )
 
                     for shape in shapes:
@@ -575,9 +575,7 @@ class Module:
                 shape = Shape(shape_dict=shape_dict, rel_to_dim=self._dims)
 
                 route_element = place.place_shape(
-                    shape=shape,
-                    svg_layer=sheet,
-                    orig_path=True
+                    shape=shape, svg_layer=sheet, orig_path=True
                 )
 
                 # Set the key as pcbmode:id of the route. This is used
@@ -593,9 +591,7 @@ class Module:
                     )
 
                 if (there_are_pours == True) and (custom_buffer != "0"):
-                    self._place_mask(
-                        self._masks[pcb_layer], shape, "route", True
-                    )
+                    self._place_mask(self._masks[pcb_layer], shape, "route", True)
 
     #                # Due to the limitation of the Gerber format, and the method chosen
     #                # for applying masks onto pours, it is not possible to have copper

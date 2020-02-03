@@ -205,24 +205,20 @@ class Component:
 
         self._footprint_shapes = footprint_shapes
 
-    def getShapes(self):
-        """
-        """
+    def get_shapes(self):
         return self._footprint_shapes
 
     def get_location(self):
-        """
-        """
         return self._location
 
-    def getRefdef(self):
+    def get_refdef(self):
         return self._refdef
 
-    def getPlacementLayer(self):
+    def get_placement_layer(self):
         return self._layer
 
     def getFootprintName(self):
         return self._footprint_name
 
-    def getRotation(self):
+    def get_rotate(self):
         return self._rotate
