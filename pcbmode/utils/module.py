@@ -158,16 +158,12 @@ class Module:
         """
         Get the (optional) module's outline.
         """
-        outline_dict = self._module_dict.get("outline")
+        shape = None
+        outline_dict = self._module_dict.get("outline", None)
         if outline_dict != None:
-            shape_dict = outline_dict.get("shape")
+            shape_dict = outline_dict.get("shape", None)
             if shape_dict != None:
                 shape = Shape(shape_dict)
-            else:
-                shape = None
-        else:
-            shape = None
-
         return shape
 
     def _place_outline(self):
