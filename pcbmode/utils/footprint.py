@@ -62,44 +62,32 @@ class Footprint:
         """
 
         pins_dict = self._footprint.get("pins", {})
+        pads_dict = self._footprint.get("pads", {})
 
-        for pin in pins_dict:
+        for pin_name in pins_dict:
 
-            pin_loc = Point(pins_dict[pin]["layout"].get("location", [0, 0]))
-
-            try:
-                pad_name = pins_dict[pin]["layout"]["pad"]
-            except KeyError:
-                msg.error(
-                    "Each defined 'pin' must have a 'pad' name that is defined in the 'pads' section of the footprint."
-                )
-
-            try:
-                pad_dict = self._footprint["pads"][pad_name]
-            except KeyError:
-                msg.error(
-                    f"There doesn't seem to be a pad definition for pad '{pad_name}'."
-                )
-
-            # Get the pin's rotation, if any
-            pin_rotate = pins_dict[pin]["layout"].get("rotate", 0)
-
-            shapes = pad_dict.get("shapes") or []
+            pin_dict = pins_dict[pin_name]["layout"]
+            pin_loc_p = Point(pin_dict.get("location", [0, 0]))
+            pad_name = pin_dict["pad"]
+            pad_dict = pads_dict[pad_name]
+            pin_rotate = pin_dict.get("rotate", 0)
+            shapes = pad_dict.get("shapes", [])
 
             for shape_dict in shapes:
 
                 # Which layer(s) to place the shape on
-                try:
-                    layers = utils.getExtendedLayerList(shape_dict.get("layers"))
-                except:
-                    layers = ["top"]
+                layers = utils.getExtendedLayerList(shape_dict.get("layers", ["top"]))
 
                 # Add the pin's location to the pad's location
-                shape_loc = Point(shape_dict.get("location", [0, 0]))
-                shape_dict["location"] = [
-                    shape_loc.x + pin_loc.x,
-                    shape_loc.y + pin_loc.y,
-                ]
+                shape_loc = shape_dict.get("location", [0,0])
+
+                # TODO: NASTY hack, but can't continue without it for now
+                if isinstance(shape_loc, Point) is True:
+                    shape_loc_p = shape_loc
+                else:
+                    shape_loc_p = Point(shape_loc)
+
+                shape_dict["location"] = pin_loc_p + shape_loc_p
 
                 # Add the pin's rotation to the pad's rotation
                 shape_dict["rotate"] = (shape_dict.get("rotate", 0)) + pin_rotate
@@ -110,10 +98,9 @@ class Footprint:
 
                     # Add the label to the shape instance and not to the dict so
                     # theat is doesn't propegate to the other derived shapes later on
-                    show_label = pins[pin]["layout"].get("show-label", True)
-                    if show_label is True:
+                    if pin_dict.get("show-label", True) is True:
                         # Use 'label' or default to the pin name
-                        pad_shape.set_label(pins[pin]["layout"].get("label", pin))
+                        pad_shape.set_label(pin_dict.get("label", pin_name))
                         pad_shape.set_label_style_class("pad-labels")
 
                     # Add the exact shape to the conductor layer shapes
@@ -183,10 +170,7 @@ class Footprint:
                                 # Rotate location
                                 shape_loc.rotate(pin_rotate)
 
-                                sdict["location"] = [
-                                    shape_loc.x + pin_location.x,
-                                    shape_loc.y + pin_location.y,
-                                ]
+                                sdict["location"] = shape_loc_p + pin_loc_p
 
                                 # Create new shape
                                 sshape = Shape(sdict)
@@ -202,11 +186,8 @@ class Footprint:
             for drill_dict in drills:
                 drill_dict = drill_dict.copy()
                 drill_dict["type"] = drill_dict.get("type") or "drill"
-                drill_location = Point(drill_dict.get("location", [0, 0]))
-                drill_dict["location"] = [
-                    drill_location.x + pin_location.x,
-                    drill_location.y + pin_location.y,
-                ]
+                drill_loc_p = Point(drill_dict.get("location", [0, 0]))
+                drill_dict["location"] = drill_loc_p + pin_loc_p
                 shape = Shape(drill_dict)
 
                 if "top" in self._shapes["drills"]:
