@@ -35,23 +35,17 @@ def place_shape(shape, svg_layer, mirror=False, orig_path=False):
     """
 
     ns_pcm = config.cfg["ns"]["pcbmode"]
-    sig_dig = config.cfg["params"]["significant-digits"]
 
     gerber_lp = shape.getGerberLP()
     location = shape.get_location()
 
-    if orig_path == False:
+    if (orig_path == False) and (location != Point([0,0])):
         translate = f"translate({((1, -1)[mirror]) * location.px()},{config.cfg['iya'] * location.py()})"
         transform = translate
     else:
         transform = None
 
-#    if orig_path == True:
-#        path_str = shape.get_orig_path_str()
-#    else:
-
     path_str = shape.get_path_str()
-
     el = et.SubElement(svg_layer, "path", d=path_str)
 
     style_class = shape.get_style_class()
