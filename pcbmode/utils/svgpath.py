@@ -59,7 +59,7 @@ class SvgPath:
 
     def _scale_path(self, p_r_path):
         """ Scale a parsed relative path """
-        scale = self._t_dict.get('scale', 1)
+        scale = self._t_dict.get("scale", 1)
         if scale != 1:
             for seg in p_r_path:
                 [c.mult(scale) for c in seg[1:]]
@@ -67,7 +67,7 @@ class SvgPath:
 
     def _rotate_path(self, p_r_path):
         """ Rotate a parsed relative path """
-        deg = self._t_dict.get('rotate', 0)
+        deg = self._t_dict.get("rotate", 0)
         if deg != 0:
             for seg in p_r_path:
                 [c.rotate(deg) for c in seg[1:]]
@@ -75,12 +75,12 @@ class SvgPath:
 
     def _mirror_path(self, p_r_path):
         """ Mirror a parsed relative path """
-        mirror_y = self._t_dict.get('mirror-y', False)
+        mirror_y = self._t_dict.get("mirror-y", False)
         if mirror_y is True:
             for seg in p_r_path:
                 [c.mirror("y") for c in seg[1:]]
 
-        mirror_x = self._t_dict.get('mirror-x', False)
+        mirror_x = self._t_dict.get("mirror-x", False)
         if mirror_x is True:
             for seg in p_r_path:
                 [c.mirror("x") for c in seg[1:]]
@@ -89,7 +89,7 @@ class SvgPath:
 
     def _center_path(self, r_p_path):
         """ Make first move from the center of the shape """
-        center = self._t_dict.get('center', True)
+        center = self._t_dict.get("center", True)
         if center is True:
             op_x = self._bbox_tl.x + self._dims.x / 2
             op_y = self._bbox_tl.y - self._dims.y / 2
@@ -156,41 +156,6 @@ class SvgPath:
                     s += f"{coord.px()},{coord.py()} "
             s_path += f"{cmd_type} {s}"
         self._s_r_path = s_path
-
-    def get_path_str(self):
-        try:
-            return self._s_r_path
-        except:
-            self._stringify_path()
-            return self._s_r_path
-
-    def get_relative_parsed(self):
-        return self._p_r_path
-
-    def get_input_path(self):
-        return self._path_in
-
-    def get_first_point(self):
-        """
-        Return the first point of the path
-        """
-        try:
-            return self._first_point
-        except:
-            self._first_point = [
-                self._p_r_path[0][1].x,
-                self._p_r_path[0][1].y,
-            ]
-            return self._first_point
-
-    def get_dims(self):
-        return self._dims
-
-    def get_width(self):
-        return self._dims.x
-
-    def get_height(self):
-        return self._dims.y
 
     def _p_path_to_relative(self, path):
         """
@@ -831,3 +796,37 @@ class SvgPath:
         """
         return self._num_of_segs
 
+    def get_path_str(self):
+        try:
+            return self._s_r_path
+        except:
+            self._stringify_path()
+            return self._s_r_path
+
+    def get_relative_parsed(self):
+        return self._p_r_path
+
+    def get_input_path(self):
+        return self._path_in
+
+    def get_first_point(self):
+        """
+        Return the first point of the path
+        """
+        try:
+            return self._first_point
+        except:
+            self._first_point = [
+                self._p_r_path[0][1].x,
+                self._p_r_path[0][1].y,
+            ]
+            return self._first_point
+
+    def get_dims(self):
+        return self._dims
+
+    def get_width(self):
+        return self._dims.x
+
+    def get_height(self):
+        return self._dims.y
