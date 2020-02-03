@@ -59,8 +59,11 @@ class Module:
 
         self._outline_shape = self._get_outline_shape()
 
-        self._width = self._outline_shape.get_width()
-        self._height = self._outline_shape.get_height()
+        self._dims = self._outline_shape.get_dims()
+        
+        # Center point
+        self._center = self._dims.copy()
+        self._center.mult(0.5) 
 
         # Get dictionaries of component/via/shape definitions
         components_dict = self._module_dict.get("components", {})
@@ -70,11 +73,10 @@ class Module:
         shapes_dict = self._module_dict.get("shapes", {})
         self._shapes = self._get_components(shapes_dict)
 
-        sig_dig = config.cfg["params"]["significant-digits"]
-        self._transform = f"translate({round(self._width / 2, sig_dig)} {round(self._height / 2, sig_dig)})"
+        self._transform = f"translate({self._center.px()} {self._center.py()})"
 
         # Create the Inkscape SVG document
-        self._module = inkscape_svg.create(self._width, self._height)
+        self._module = inkscape_svg.create(self._dims.px(), self._dims.py())
         svg_doc = et.ElementTree(self._module)
 
         # Get a dictionary of SVG layers
@@ -107,9 +109,9 @@ class Module:
             documentation.place_docs(docs_layer)
         if config.cfg["create"]["drill-index"] == True:
             drills_layer = self._layers["drills"]["layer"]
-            drill_index.place(drills_layer, self._width, self._height)
+            drill_index.place(drills_layer, self._dims.px(), self._dims.py())
         if config.cfg["create"]["layer-index"] == True:
-            layer_index.place_index(self._layers, self._width, self._height)
+            layer_index.place_index(self._layers, self._dims.px(), self._dims.py())
 
         # This 'cover' "enables" the mask shapes defined in the mask are
         # shown. It *must* be the last element in the mask definition;
@@ -119,11 +121,16 @@ class Module:
                 mask_cover = et.SubElement(
                     self._masks[pcb_layer],
                     "rect",
-                    x=f"{str(-self._width / 2)}",
-                    y=f"{str(-self._height / 2)}",
-                    width=f"{self._width}",
-                    height=f"{self._height}",
+                    x=f"{-self._center.px()}",
+                    y=f"{-self._center.py()}",
+                    width=f"{self._dims.px()}",
+                    height=f"{self._dims.py()}",
                     style="fill:#fff;",
+                    # x=f"{str(-self._width / 2)}",
+                    # y=f"{str(-self._height / 2)}",
+                    # width=f"{self._width}",
+                    # height=f"{self._height}",
+                    # style="fill:#fff;",
                 )
                 # This tells the Gerber conversion to ignore this shape
                 mask_cover.set(f"{{{ns_pcm}}}type", "mask-cover")
@@ -227,18 +234,18 @@ class Module:
         arrow_height = 2.2  # height of arrow's head
         arrow_base = 1.2  # width of arrow's head
 
-        width_loc = [0, self._height / 2 + arrow_gap]
-        height_loc = [-(self._width / 2 + arrow_gap), 0]
+        width_loc = [0, self._center.py() + arrow_gap]
+        height_loc = [-(self._center.px() + arrow_gap), 0]
 
         # Width text
         width_text_dict = shape_dict.copy()
-        width_text_dict["value"] = f"{round(self._width, 2)} mm"
+        width_text_dict["value"] = f"{self._center.px()} mm"
         width_text_dict["location"] = width_loc
         width_text = Shape(width_text_dict)
 
         # Height text
         height_text_dict = shape_dict.copy()
-        height_text_dict["value"] = f"{round(self._height, 2)} mm"
+        height_text_dict["value"] = f"{self._center.py()} mm"
         height_text_dict["rotate"] = -90
         height_text_dict["location"] = height_loc
         height_text = Shape(height_text_dict)
@@ -247,7 +254,7 @@ class Module:
         shape_dict = {}
         shape_dict["type"] = "path"
         shape_dict["value"] = svg_path_create.arrow(
-            width=self._width,
+            width=self._dims.px(),
             height=arrow_height,
             base=arrow_base,
             bar=arrow_bar_length,
@@ -261,7 +268,7 @@ class Module:
         shape_dict = {}
         shape_dict["type"] = "path"
         shape_dict["value"] = svg_path_create.arrow(
-            width=self._height,
+            width=self._dims.py(),
             height=arrow_height,
             base=arrow_base,
             bar=arrow_bar_length,
