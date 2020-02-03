@@ -177,13 +177,13 @@ class Module:
 
         shape_group = et.SubElement(self._layers["outline"]["layer"], "g")
         shape_group.set(f"{{{ns_pcm}}}type", "module-shapes")
-        place.placeShape(self._outline_shape, shape_group)
+        place.place_shape(self._outline_shape, shape_group)
 
         pour_buffer = config.cfg["distances"]["from-pour-to"]["outline"]
 
         for pcb_layer in config.stk["layer-names"]:
             if utils.checkForPoursInLayer(pcb_layer) is True:
-                mask_element = place.placeShape(
+                mask_element = place.place_shape(
                     self._outline_shape, self._masks[pcb_layer]
                 )
                 # Override style so that we get the desired effect
@@ -279,10 +279,10 @@ class Module:
         svg_layer = self._layers["dimensions"]["layer"]
         group = et.SubElement(svg_layer, "g")
         group.set(f"{{{config.cfg['ns']['pcbmode']}}}type", "module-shapes")
-        place.placeShape(width_text, group)
-        place.placeShape(height_text, group)
-        place.placeShape(width_arrow, group)
-        place.placeShape(height_arrow, group)
+        place.place_shape(width_text, group)
+        place.place_shape(height_text, group)
+        place.place_shape(width_arrow, group)
+        place.place_shape(height_arrow, group)
 
     def _place_components(self, components, component_type):
         """
@@ -338,7 +338,7 @@ class Module:
                         )
 
                     for shape in shapes:
-                        place.placeShape(shape, shape_group, invert)
+                        place.place_shape(shape, shape_group, invert)
 
                         if there_are_pours == True:
                             mask_group = et.SubElement(
@@ -365,7 +365,7 @@ class Module:
                     group = et.SubElement(shape_group, "g", transform=transform)
                     group.set(f"{{{ns_pcm}}}type", "pours")
                     for shape in shapes:
-                        placed_element = place.placeShape(shape, group, invert)
+                        placed_element = place.place_shape(shape, group, invert)
 
                 # Soldermask
                 shapes = shapes_dict["soldermask"].get(pcb_layer, [])
@@ -381,7 +381,7 @@ class Module:
                     group = et.SubElement(svg_layer, "g", transform=transform)
                     group.set(f"{{{ns_pcm}}}type", "component-shapes")
                     for shape in shapes:
-                        placed_element = place.placeShape(shape, group, invert)
+                        placed_element = place.place_shape(shape, group, invert)
 
                 # Solderpaste
                 shapes = shapes_dict["solderpaste"].get(pcb_layer, [])
@@ -397,7 +397,7 @@ class Module:
                     group = et.SubElement(svg_layer, "g", transform=transform)
                     group.set(f"{{{ns_pcm}}}type", "component-shapes")
                     for shape in shapes:
-                        placed_element = place.placeShape(shape, group, invert)
+                        placed_element = place.place_shape(shape, group, invert)
 
                 # Silkscreen
                 shapes = shapes_dict["silkscreen"].get(pcb_layer, [])
@@ -430,11 +430,11 @@ class Module:
                                 )
                                 refdef_group.set(f"{{{ns_pcm}}}type", "refdef")
                                 refdef_group.set(f"{{{ns_pcm}}}refdef", refdef)
-                                placed_element = place.placeShape(
+                                placed_element = place.place_shape(
                                     shape, refdef_group, invert
                                 )
                         else:
-                            placed_element = place.placeShape(
+                            placed_element = place.place_shape(
                                 shape, shape_group, invert
                             )
 
@@ -451,7 +451,7 @@ class Module:
                     )
                     group = et.SubElement(svg_layer, "g", transform=transform)
                     for shape in shapes:
-                        placed_element = place.placeShape(shape, group, invert)
+                        placed_element = place.place_shape(shape, group, invert)
 
                 # Drills
                 shapes = shapes_dict["drills"].get(pcb_layer, [])
@@ -463,7 +463,7 @@ class Module:
                     group = et.SubElement(svg_layer, "g", transform=transform)
                     group.set(f"{{{ns_pcm}}}type", "component-shapes")
                     for shape in shapes:
-                        placed_element = place.placeShape(shape, group, invert)
+                        placed_element = place.place_shape(shape, group, invert)
                         placed_element.set(
                             f"{{{ns_pcm}}}diameter", str(shape.getDiameter())
                         )
@@ -577,7 +577,7 @@ class Module:
                 # transformed one as usual
                 use_original_path = True
                 mirror_path = False
-                route_element = place.placeShape(
+                route_element = place.place_shape(
                     shape, sheet, mirror_path, use_original_path
                 )
 
@@ -642,7 +642,7 @@ class Module:
         style = shape.get_style()
 
         if pour_buffer > 0:
-            mask_el = place.placeShape(shape, svg_layer, mirror, original)
+            mask_el = place.place_shape(shape, svg_layer, mirror, original)
 
             stroke_width = css_utils.get_style_value("stroke-width", style)
 

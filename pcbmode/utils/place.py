@@ -27,7 +27,7 @@ from pcbmode.utils import svg_path_create
 from pcbmode.utils.point import Point
 
 
-def placeShape(shape, svg_layer, invert=False, original=False):
+def place_shape(shape, svg_layer, invert=False, original=False):
     """
     Places a shape of type 'Shape' onto SVG layer 'svg_layer'.
     'invert'  : placed path should be mirrored
