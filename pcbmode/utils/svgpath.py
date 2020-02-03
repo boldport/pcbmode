@@ -89,12 +89,21 @@ class SvgPath:
 
     def _center_path(self, r_p_path):
         """ Make first move from the center of the shape """
-        center = self._t_dict.get("center", True)
-        if center is True:
+
+        # If a Point is given, use it. Otherwise use the dims of the shape
+        if isinstance(self._t_dict["rel_to_dim"], Point) is True:
+            # TODO: This might need to be fixed after finishing refactoring the
+            # extraction module
+            np = self._t_dict["rel_to_dim"]
+            op_x = np.x / 2
+            op_y = np.y / 2
+        else:
             op_x = self._bbox_tl.x + self._dims.x / 2
             op_y = self._bbox_tl.y - self._dims.y / 2
-            op = Point([op_x, op_y])  # new origin point
-            r_p_path[0][1] = r_p_path[0][1] - op  # adjust
+
+        op = Point([op_x, op_y])  # new origin point
+        r_p_path[0][1] = r_p_path[0][1] - op  # adjust
+
         return r_p_path
 
     def _get_num_of_segs(self, r_p_path):
@@ -802,6 +811,10 @@ class SvgPath:
         except:
             self._stringify_path()
             return self._s_r_path
+
+    def get_orig_path_str(self):
+        """ This is useful for routing that are used as-is """
+        return self._path_in
 
     def get_relative_parsed(self):
         return self._p_r_path

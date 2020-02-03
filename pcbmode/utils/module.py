@@ -571,7 +571,8 @@ class Module:
 
             for route_key in routes.get(pcb_layer, {}):
                 shape_dict = routes[pcb_layer][route_key]
-                shape = Shape(shape_dict)
+                # Make the shape relative to outline dims
+                shape = Shape(shape_dict=shape_dict, rel_to_dim=self._dims)
 
                 route_element = place.place_shape(
                     shape=shape,

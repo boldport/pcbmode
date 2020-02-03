@@ -34,19 +34,23 @@ class Shape:
     """
     """
 
-    def __init__(self, shape_dict):
+    def __init__(self, shape_dict, rel_to_dim='itself'):
+        """
+        'rel_to_dim': if a Point() is given, shape will be centered relative to the
+        dimensions specified. Otherwise it'll be centered around the dimentsions of the
+        shape itself (routing shapes are placed relative to the outline, not themselves) 
+        """
 
         self._shape_dict = self._process_shape_dict(shape_dict)
 
         self._path_str = self._path_from_shape_type()
-
         trans_dict = { # transform dictionary
             'scale': self._shape_dict['scale'],
             'rotate': self._shape_dict['rotate'],
             'pivot': self._shape_dict['pivot'],
             'mirror_y': self._shape_dict['mirror-y'],
             'mirror_x': self._shape_dict['mirror-x'],
-            'center': True
+            'rel_to_dim': rel_to_dim,
         }
         self._path_obj = SvgPath(self._path_str, trans_dict)  # create path object
 
@@ -239,7 +243,8 @@ class Shape:
                 'scale': scale * self._shape_dict['scale'],
                 'rotate': rotate * self._inv_rotate + self._shape_dict['rotate'],
                 'pivot': rotate_point + self._shape_dict['pivot'],
-                'mirror_y': mirror
+                'mirror_y': mirror,
+                'rel_to_dim': 'itself',
             }
             self._path_obj = SvgPath(path_str, t_dict)
 
@@ -283,6 +288,9 @@ class Shape:
 
     def get_path_str(self):
         return self._path_obj.get_path_str()
+
+    def get_orig_path_str(self):
+        return self._path_obj.get_orig_path_str()
 
     def get_dims(self):
         return self._path_obj.get_dims()
