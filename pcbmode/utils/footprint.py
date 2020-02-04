@@ -80,7 +80,7 @@ class Footprint:
                 shape_dict = shape_dict.copy()
 
                 # Add the pin's location to the pad's location
-                shape_loc = shape_dict.get("location", [0,0])
+                shape_loc = shape_dict.get("location", [0, 0])
                 # TODO: NASTY hack, but can't continue without it for now
                 if isinstance(shape_loc, Point) is True:
                     shape_loc_p = shape_loc
@@ -111,80 +111,7 @@ class Footprint:
                     else:
                         self._shapes["conductor"][layer] = [pad_shape]
 
-                    # We need to modify the shape for these sheets according to global
-                    # or custom rules / directives
-                    for sheet in ["soldermask", "solderpaste"]:
-
-                        # Get a custom shape specification if available
-                        sdict_list = shape_dict.get(sheet, None)
-
-                        # Not defined; default
-                        if sdict_list == None:
-                            # Use default settings for shape based on the pad shape
-                            sdict = shape_dict.copy()
-
-                            # Which shape type is the pad?
-                            shape_type = pad_shape.get_type()
-
-                            cfg_def = config.cfg["distances"][sheet]
-
-                            # Apply modifier based on shape type
-                            if shape_type == "path":
-                                sdict["scale"] = (
-                                    pad_shape.getScale() * cfg_def["path-scale"]
-                                )
-                            elif shape_type == "rect":
-                                sdict["width"] += cfg_def["rect-buffer"]
-                                sdict["height"] += cfg_def["rect-buffer"]
-                            elif shape_type == "circle":
-                                sdict["diameter"] += cfg_def["circle-buffer"]
-                            else:
-                                pass
-
-                            # Create shape based on new dictionary
-                            sshape = Shape(sdict)
-
-                            # Add shape to footprint's shape dictionary
-                            if layer in self._shapes[sheet]:
-                                self._shapes[sheet][layer].append(sshape)
-                            else:
-                                self._shapes[sheet][layer] = [sshape]
-
-                        # Do not place shape
-                        elif (sdict_list == {}) or (sdict_list == []):
-                            pass
-
-                        # Custom shape definition
-                        else:
-
-                            # If dict (as before support of multiple
-                            # shapes) then append to a single element
-                            # list
-                            if type(sdict_list) is dict:
-                                sdict_list = [sdict_list]
-
-                            # Process list of shapes
-                            for sdict_ in sdict_list:
-                                sdict = sdict_.copy()
-                                shape_loc = Point(sdict.get("location", [0, 0]))
-
-                                # Apply rotation
-                                sdict["rotate"] = (sdict.get("rotate", 0)) + pin_rotate
-
-                                # Rotate location
-                                shape_loc.rotate(pin_rotate)
-
-                                sdict["location"] = shape_loc_p + pin_loc_p
-
-                                # Create new shape
-                                sshape = Shape(sdict)
-
-                                # Add shape to footprint's shape dictionary
-                                # self._shapes[stype][layer].append(sshape)
-                                if layer in self._shapes[sheet]:
-                                    self._shapes[sheet][layer].append(sshape)
-                                else:
-                                    self._shapes[sheet][layer] = [sshape]
+                    self._add_sm_sp(pad_shape.copy())
 
             drills = pad_dict.get("drills", [])
             for drill_dict in drills:
@@ -198,6 +125,57 @@ class Footprint:
                     self._shapes["drills"]["top"].append(shape)
                 else:
                     self._shapes["drills"]["top"] = [shape]
+
+    def _add_sm_sp(self, pad_shape_dict):
+        """
+        Add soldermask and solderpaste to pin pad shape
+        """
+
+        sheets = ["soldermask", "solderpaste"]
+
+        for sheet in sheets:
+
+            # Get a custom shape list
+            shape_list = shape_dict.get(sheet, None)
+
+            shape_obj_list = []
+
+            if shape_list == "none":  # don't place shape at all
+                continue
+            elif shape_list == "same":  # place same as pin pad
+                shape_obj_list.append(Shape(pad_shape_dict))
+            elif shape_list is None:  # default behaviour
+                # Baseline on original shape
+                sdict = shape_dict.copy()
+                # Apply modifier based on shape type
+                shape_type = pad_shape_dict.get_type()
+                cfg_def = config.cfg["distances"][sheet]
+                if shape_type == "path":
+                    sdict["scale"] = pad_shape_dict.getScale() * cfg_def["path-scale"]
+                elif shape_type == "rect":
+                    sdict["width"] += cfg_def["rect-buffer"]
+                    sdict["height"] += cfg_def["rect-buffer"]
+                elif shape_type == "circle":
+                    sdict["diameter"] += cfg_def["circle-buffer"]
+                # Create shape based on new dictionary
+                shape_obj_list.append(Shape(sdict))
+            else:  # it's a list of shapes!
+                for shape_dict in shape_list:
+                    shape_dict = shape_dict.copy()
+                    shape_loc = Point(sdict.get("location", [0, 0]))
+                    # Apply rotation
+                    shape_dict["rotate"] = (sdict.get("rotate", 0)) + pin_rotate
+                    # Rotate location
+                    shape_loc.rotate(pin_rotate)
+                    shape_dict["location"] = shape_loc_p + pin_loc_p
+                    # Create new shape
+                    shape_obj_list.append(Shape(shape_dict))
+
+            # Add shape to footprint's shape dictionary
+            if layer in self._shapes[sheet]:
+                self._shapes[sheet][layer].append(shape_obj)
+            else:
+                self._shapes[sheet][layer] = [shape_obj]
 
     def _process_pours(self):
         """
