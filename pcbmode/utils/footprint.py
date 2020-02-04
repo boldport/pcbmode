@@ -66,21 +66,21 @@ class Footprint:
 
         for pin_name in pins_dict:
 
+            # Pin information
             pin_dict = pins_dict[pin_name]["layout"]
             pin_loc_p = Point(pin_dict.get("location", [0, 0]))
-            pad_name = pin_dict["pad"]
-            pad_dict = pads_dict[pad_name]
             pin_rotate = pin_dict.get("rotate", 0)
-            shapes = pad_dict.get("shapes", [])
 
-            for shape_dict in shapes:
+            pad_dict = pads_dict[pin_dict["pad"]]
+            pad_shapes = pad_dict.get("shapes", [])
 
-                # Which layer(s) to place the shape on
-                layers = utils.getExtendedLayerList(shape_dict.get("layers", ["top"]))
+            for shape_dict in pad_shapes:
+
+                # TODO: fully understand why this is needed!
+                shape_dict = shape_dict.copy()
 
                 # Add the pin's location to the pad's location
                 shape_loc = shape_dict.get("location", [0,0])
-
                 # TODO: NASTY hack, but can't continue without it for now
                 if isinstance(shape_loc, Point) is True:
                     shape_loc_p = shape_loc
@@ -88,16 +88,18 @@ class Footprint:
                     shape_loc_p = Point(shape_loc)
 
                 shape_dict["location"] = pin_loc_p + shape_loc_p
-
                 # Add the pin's rotation to the pad's rotation
                 shape_dict["rotate"] = (shape_dict.get("rotate", 0)) + pin_rotate
 
+                # Which layer(s) to place the shape on
+                layers = utils.getExtendedLayerList(shape_dict.get("layers", ["top"]))
+
                 for layer in layers:
 
-                    pad_shape = Shape(shape_dict)
+                    pad_shape = Shape(shape_dict.copy())
 
                     # Add the label to the shape instance and not to the dict so
-                    # theat is doesn't propegate to the other derived shapes later on
+                    # that is doesn't propagate to the other derived shapes later on
                     if pin_dict.get("show-label", True) is True:
                         # Use 'label' or default to the pin name
                         pad_shape.set_label(pin_dict.get("label", pin_name))
@@ -109,9 +111,11 @@ class Footprint:
                     else:
                         self._shapes["conductor"][layer] = [pad_shape]
 
+                    # We need to modify the shape for these sheets according to global
+                    # or custom rules / directives
                     for sheet in ["soldermask", "solderpaste"]:
 
-                        # Get a custom shape specification if it exists
+                        # Get a custom shape specification if available
                         sdict_list = shape_dict.get(sheet, None)
 
                         # Not defined; default
