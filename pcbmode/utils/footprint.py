@@ -188,22 +188,21 @@ class Footprint:
 
     def _process_pours(self):
         """
+        Add pour shapes to the object's shape list
         """
-
         try:
-            shapes = self._footprint["layout"]["pours"]["shapes"]
+            pour_shapes = self._footprint["layout"]["pours"]
         except:
-            return
-
-        for shape_dict in shapes:
+            return  # no pours
+        shapes_list = pour_shapes.get("shapes", [])
+        for shape_dict in shapes_list:
             layers = utils.getExtendedLayerList(shape_dict.get("layers") or ["top"])
             for layer in layers:
-                shape = Shape(shape_dict)
-
+                shape_obj = Shape(shape_dict)
                 if layer in self._shapes["pours"]:
-                    self._shapes["pours"][layer].append(shape)
+                    self._shapes["pours"][layer].append(shape_obj)
                 else:
-                    self._shapes["pours"][layer] = [shape]
+                    self._shapes["pours"][layer] = [shape_obj]
 
     def _process_shapes(self):
         """
