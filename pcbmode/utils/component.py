@@ -34,7 +34,7 @@ class Component:
     """
     """
 
-    def __init__(self, refdef, comp_dict):
+    def __init__(self, refdef, comp_dict, place_bot):
         """
         """
         self._refdef = refdef

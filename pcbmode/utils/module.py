@@ -136,21 +136,21 @@ class Module:
             et.tostring(svg_doc, encoding="unicode", pretty_print=True)
         )
 
-    def _get_comp_objs(self, components_dict):
-        """
-        Create the components for this module.
-        Return a list of items of class 'component'
-        """
-        components = []
-        for refdef in components_dict:
-            component_dict = components_dict[refdef]
-            show = component_dict.get("show", True)
-            place = component_dict.get("place", True)
+    def _get_comp_objs(self, comps_dict):
+        """ Returna a list of Component objects """
+        comp_objs = []
+        for refdef in comps_dict:
+            comp_dict = comps_dict[refdef]
+            show = comp_dict.get("show", True)
+            place = comp_dict.get("place", True)
+            if comp_dict == "bottom":
+                place_bot = True
+            else:
+                place_bot = False
             if (show == True) and (place == True):
-                component = Component(refdef, component_dict)
-                components.append(component)
-
-        return components
+                comp_obj = Component(refdef, comp_dict, place_bot)
+                comp_objs.append(comp_obj)
+        return comp_objs
 
     def _get_outline_shape(self):
         """
