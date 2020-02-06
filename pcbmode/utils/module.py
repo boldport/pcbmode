@@ -63,13 +63,13 @@ class Module:
         self._center.mult(0.5)  # Center point
 
         comps_dict = self._module_dict.get("components", {})
-        self._comp_objs = self._get_comp_objs(comps_dict)
+        self._comp_objs = self._get_comp_objs(comps_dict, "components")
 
         vias_dict = self._routing_dict.get("vias", {})
-        self._via_objs = self._get_comp_objs(vias_dict)
+        self._via_objs = self._get_comp_objs(vias_dict, "vias")
 
         shapes_dict = self._module_dict.get("shapes", {})
-        self._shape_objs = self._get_comp_objs(shapes_dict)
+        self._shape_objs = self._get_comp_objs(shapes_dict, "shapes")
 
         # Create the Inkscape SVG document
         self._module = inkscape_svg.create(self._dims.px(), self._dims.py())
@@ -136,19 +136,15 @@ class Module:
             et.tostring(svg_doc, encoding="unicode", pretty_print=True)
         )
 
-    def _get_comp_objs(self, comps_dict):
+    def _get_comp_objs(self, comps_dict, comp_type):
         """ Returna a list of Component objects """
         comp_objs = []
         for refdef in comps_dict:
             comp_dict = comps_dict[refdef]
             show = comp_dict.get("show", True)
             place = comp_dict.get("place", True)
-            if comp_dict == "bottom":
-                place_bot = True
-            else:
-                place_bot = False
             if (show == True) and (place == True):
-                comp_obj = Component(refdef, comp_dict, place_bot)
+                comp_obj = Component(refdef, comp_dict, comp_type)
                 comp_objs.append(comp_obj)
         return comp_objs
 

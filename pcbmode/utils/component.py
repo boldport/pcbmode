@@ -34,8 +34,9 @@ class Component:
     """
     """
 
-    def __init__(self, refdef, comp_dict, place_bot):
+    def __init__(self, refdef, comp_dict, comp_type):
         """
+        'comp_type': used to determine where to look for the footprint
         """
         self._refdef = refdef
         self._layer = comp_dict.get("layer", "top")
@@ -43,6 +44,10 @@ class Component:
         self._scale = comp_dict.get("scale", 1)
         self._rotate = comp_dict.get("rotate", 0)
         self._pivot = Point(comp_dict.get("pivot", [0, 0]))
+        if comp_dict["layer"] == "bottom":
+            self._place_bot = True
+        else:
+            self._place_bot = False
  
         if self._layer == "bottom":
             self._rotate *= -1  # TODO: is this needed?
@@ -50,36 +55,16 @@ class Component:
         else:
             self._mirror_shapes = False
 
-        # Get footprint definition and shapes
-        try:
-            self._footprint_name = comp_dict["footprint"]
-        except:
-            msg.error(f"Cannot find a 'footprint' name for refdef {refdef}.")
+        self._footprint_name = comp_dict["footprint"]
 
-        filename = f"{self._footprint_name}.json"
-
-        # Look for the files in both components and shapes paths.
-        paths = [
-            Path(config.tmp["project-path"] / config.cfg["components"]["path"]),
-            Path(config.tmp["project-path"] / config.cfg["shapes"]["path"]),
-        ]
-
-        footprint_dict = None
-        for path in paths:
-            if (path / filename).exists():
-                footprint_dict = utils.dictFromJsonFile(path / filename)
-                break
-
-        if footprint_dict == None:
-            fname_list = ""
-            for path in paths:
-                fname_list += " %s" % path
-            msg.error(
-                "Couldn't find shape file. Looked for it here:\n%s" % (fname_list)
-            )
-
-        footprint = Footprint(footprint_dict)
-        footprint_shapes = footprint.get_shapes()
+        # Look for the file in a path depending on the component type
+        if comp_type in ['components','vias']:
+            path = Path(config.tmp["project-path"] / config.cfg["components"]["path"])
+        elif comp_type == 'shapes':
+            path = Path(config.tmp["project-path"] / config.cfg["shapes"]["path"])
+        footprint_dict = utils.dictFromJsonFile(path / f"{self._footprint_name}.json")
+        footprint_obj = Footprint(footprint_dict)
+        footprint_shapes = footprint_obj.get_shapes()
 
         # ------------------------------------------------
         # Apply component-specific modifiers to footprint
