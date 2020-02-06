@@ -95,10 +95,10 @@ class Module:
 
         self._place_outline()
         self._place_outline_dims()
-        self._place_comps(components=self._comp_objs, component_type="component")
+        self._place_comps(comp_objs=self._comp_objs, comp_type="component")
         self._place_routing()
-        self._place_comps(components=self._via_objs, component_type="via")
-        self._place_comps(components=self._shape_objs, component_type="shape")
+        self._place_comps(comp_objs=self._via_objs, comp_type="via")
+        self._place_comps(comp_objs=self._shape_objs, comp_type="shape")
 
         if config.cfg["create"]["docs"] == True:
             docs_layer = self._layers["documentation"]["layer"]
@@ -278,7 +278,7 @@ class Module:
         place.place_shape(width_arrow, group)
         place.place_shape(height_arrow, group)
 
-    def _place_comps(self, components, component_type):
+    def _place_comps(self, comp_objs, comp_type):
         """
         Places the component on the board.
 
@@ -291,16 +291,16 @@ class Module:
 
         htmlpar = HTMLParser.HTMLParser()
 
-        for component in components:
-            shapes_dict = component.get_shapes()
-            location = component.get_location()
-            rotation = component.get_rotate()
-            refdef = component.get_refdef()
+        for comp_obj in comp_objs:
+            shapes_dict = comp_obj.get_shapes()
+            location = comp_obj.get_location()
+            rotation = comp_obj.get_rotate()
+            refdef = comp_obj.get_refdef()
 
             # If the component is placed on the bottom layer we need
             # to invert the shapes AND their 'x' coordinate.  This is
             # done using the 'invert' indicator set below
-            placement_layer = component.get_placement_layer()
+            placement_layer = comp_obj.get_placement_layer()
             if placement_layer == "bottom":
                 invert = True
             else:
@@ -323,12 +323,12 @@ class Module:
 
                     shape_group = et.SubElement(svg_layer, "g", transform=transform)
 
-                    shape_group.set(f"{{{ns_pcm}}}type", component_type)
+                    shape_group.set(f"{{{ns_pcm}}}type", comp_type)
                     # Add the reference designator as well if it's a
                     # 'component'
-                    if component_type == "component":
+                    if comp_type == "component":
                         shape_group.set(
-                            f"{{{ns_pcm}}}refdef", component.get_refdef(),
+                            f"{{{ns_pcm}}}refdef", comp_obj.get_refdef(),
                         )
 
                     for shape in shapes:
@@ -418,7 +418,7 @@ class Module:
                         if is_refdef == True:
                             # Shapes don't need to have silkscreen
                             # reference designators
-                            if component_type != "shape":
+                            if comp_type != "shape":
                                 refdef_group = et.SubElement(
                                     svg_layer, "g", transform=transform
                                 )
@@ -474,11 +474,11 @@ class Module:
                 return
 
             # Add PCBmodE information, useful for when extracting
-            group.set(f"{{{ns_pcm}}}type", component_type)
-            group.set(f"{{{ns_pcm}}}footprint", component.getFootprintName())
-            if (component_type == "component") or (component_type == "shape"):
+            group.set(f"{{{ns_pcm}}}type", comp_type)
+            group.set(f"{{{ns_pcm}}}footprint", comp_obj.getFootprintName())
+            if (comp_type == "component") or (comp_type == "shape"):
                 group.set(f"{{{ns_pcm}}}refdef", refdef)
-            elif component_type == "via":
+            elif comp_type == "via":
                 group.set(f"{{{ns_pcm}}}id", refdef)
             else:
                 pass
@@ -491,13 +491,13 @@ class Module:
             if placement_layer == "bottom":
                 rotation *= -1
 
-            marker_element = et.SubElement(
+            el_marker = et.SubElement(
                 group, "path", d=path, transform=f"rotate({rotation})"
             )
 
             # Place markers
             style_class = "placement-text"
-            if component_type == "component":
+            if comp_type == "component":
                 t = et.SubElement(group, "text", x="0", y="-0.17")
                 t.set("class", style_class)
                 ts = et.SubElement(t, "tspan", x="0", dy="0.1")
@@ -506,7 +506,7 @@ class Module:
                 ts.text = htmlpar.unescape("%s&#176;" % (rotation))
                 ts = et.SubElement(t, "tspan", x="0", dy="0.1")
                 ts.text = f"[{location.px(2)},{location.py(2)}]"
-            elif component_type == "shape":
+            elif comp_type == "shape":
                 t = et.SubElement(group, "text", x="0", y="-0.17")
                 t.set("class", style_class)
                 ts = et.SubElement(t, "tspan", x="0", dy="0.1")
@@ -515,7 +515,7 @@ class Module:
                 ts.text = htmlpar.unescape("%s&#176;" % (rotation))
                 ts = et.SubElement(t, "tspan", x="0", dy="0.1")
                 ts.text = f"[{location.px(2)},{location.py(2)}]"
-            elif component_type == "via":
+            elif comp_type == "via":
                 t = et.SubElement(group, "text", x="0", y="-0.11")
                 t.set("class", style_class)
                 ts = et.SubElement(t, "tspan", x="0", dy="0.1")
