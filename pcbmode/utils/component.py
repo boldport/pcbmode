@@ -39,11 +39,11 @@ class Component:
         """
 
         self._refdef = refdef
-        self._layer = comp_dict.get("layer") or "top"
+        self._layer = comp_dict.get("layer", "top")
 
-        self._rotate = comp_dict.get("rotate") or 0
+        self._rotate = comp_dict.get("rotate", 0)
         if self._layer == "bottom":
-            self._rotate *= -1
+            self._rotate *= -1  # TODO: is this needed?
 
         self._rotate_point = Point(comp_dict.get("rotate-point", [0, 0]))
         self._scale = comp_dict.get("scale", 1)
@@ -83,7 +83,7 @@ class Component:
         # ------------------------------------------------
         # Apply component-specific modifiers to footprint
         # ------------------------------------------------
-        for sheet in [
+        sheets = [
             "conductor",
             "soldermask",
             "solderpaste",
@@ -91,7 +91,8 @@ class Component:
             "silkscreen",
             "assembly",
             "drills",
-        ]:
+        ]
+        for sheet in sheets:
             for layer in config.stk["layer-names"]:
                 for shape in footprint_shapes[sheet].get(layer) or []:
 
@@ -183,14 +184,15 @@ class Component:
         if self._layer == "bottom":
             layers = config.stk["layer-names"]
 
-            for sheet in [
+            sheets = [
                 "conductor",
                 "pours",
                 "soldermask",
                 "solderpaste",
                 "silkscreen",
                 "assembly",
-            ]:
+            ]
+            for sheet in sheets:
                 sheet_dict = footprint_shapes[sheet]
                 sheet_dict_new = {}
                 for i, pcb_layer in enumerate(layers):
