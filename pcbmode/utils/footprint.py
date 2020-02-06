@@ -33,9 +33,10 @@ class Footprint:
     """
     """
 
-    def __init__(self, footprint):
+    def __init__(self, footprint, mirror=False):
 
         self._footprint = footprint
+        self._mirror = mirror  # all the shapes of the footprint
 
         # This is where the shapes for placement are stored, by layer
         self._shapes = {

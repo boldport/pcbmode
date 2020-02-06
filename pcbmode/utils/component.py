@@ -32,6 +32,7 @@ from pcbmode.utils import css_utils
 
 class Component:
     """
+    An object that applies modifications to a generic Footprint object
     """
 
     def __init__(self, refdef, comp_dict, comp_type):
@@ -63,7 +64,7 @@ class Component:
         elif comp_type == 'shapes':
             path = Path(config.tmp["project-path"] / config.cfg["shapes"]["path"])
         footprint_dict = utils.dictFromJsonFile(path / f"{self._footprint_name}.json")
-        footprint_obj = Footprint(footprint_dict)
+        footprint_obj = Footprint(footprint_dict, self._place_bot)
         footprint_shapes = footprint_obj.get_shapes()
 
         # ------------------------------------------------
