@@ -95,10 +95,10 @@ class Module:
 
         self._place_outline()
         self._place_outline_dims()
-        self._place_components(components=self._comp_objs, component_type="component")
+        self._place_comps(components=self._comp_objs, component_type="component")
         self._place_routing()
-        self._place_components(components=self._via_objs, component_type="via")
-        self._place_components(components=self._shape_objs, component_type="shape")
+        self._place_comps(components=self._via_objs, component_type="via")
+        self._place_comps(components=self._shape_objs, component_type="shape")
 
         if config.cfg["create"]["docs"] == True:
             docs_layer = self._layers["documentation"]["layer"]
@@ -122,11 +122,6 @@ class Module:
                     width=f"{self._dims.px()}",
                     height=f"{self._dims.py()}",
                     style="fill:#fff;",
-                    # x=f"{str(-self._width / 2)}",
-                    # y=f"{str(-self._height / 2)}",
-                    # width=f"{self._width}",
-                    # height=f"{self._height}",
-                    # style="fill:#fff;",
                 )
                 # This tells the Gerber conversion to ignore this shape
                 mask_cover.set(f"{{{ns_pcm}}}type", "mask-cover")
@@ -283,7 +278,7 @@ class Module:
         place.place_shape(width_arrow, group)
         place.place_shape(height_arrow, group)
 
-    def _place_components(self, components, component_type):
+    def _place_comps(self, components, component_type):
         """
         Places the component on the board.
 
@@ -511,7 +506,6 @@ class Module:
                 ts.text = htmlpar.unescape("%s&#176;" % (rotation))
                 ts = et.SubElement(t, "tspan", x="0", dy="0.1")
                 ts.text = f"[{location.px(2)},{location.py(2)}]"
-            #                ts.text = "[%.2f,%.2f]" % (location[0], location[1])
             elif component_type == "shape":
                 t = et.SubElement(group, "text", x="0", y="-0.17")
                 t.set("class", style_class)
@@ -521,7 +515,6 @@ class Module:
                 ts.text = htmlpar.unescape("%s&#176;" % (rotation))
                 ts = et.SubElement(t, "tspan", x="0", dy="0.1")
                 ts.text = f"[{location.px(2)},{location.py(2)}]"
-            #                ts.text = "[%.2f,%.2f]" % (location[0], location[1])
             elif component_type == "via":
                 t = et.SubElement(group, "text", x="0", y="-0.11")
                 t.set("class", style_class)
@@ -529,7 +522,6 @@ class Module:
                 ts.text = htmlpar.unescape("%s&#176;" % (rotation))
                 ts = et.SubElement(t, "tspan", x="0", dy="0.1")
                 ts.text = f"[{location.px(2)},{location.py(2)}]"
-            #                ts.text = "[%.2f,%.2f]" % (location[0], location[1])
             else:
                 continue
 
