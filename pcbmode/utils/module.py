@@ -66,10 +66,12 @@ class Module:
         self._center.mult(0.5)
 
         # Get dictionaries of component/via/shape definitions
-        components_dict = self._module_dict.get("components", {})
-        self._components = self._get_components(components_dict)
+        comps_dict = self._module_dict.get("components", {})
+        self._components = self._get_components(comps_dict)
+
         vias_dict = self._routing_dict.get("vias", {})
         self._vias = self._get_components(vias_dict)
+
         shapes_dict = self._module_dict.get("shapes", {})
         self._shapes = self._get_components(shapes_dict)
 

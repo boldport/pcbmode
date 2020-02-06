@@ -233,10 +233,10 @@ class Shape:
             )
 
     def transformPath(
-        self, scale=1, rotate=0, rotate_point=None, mirror=False, add=False
+        self, scale=1, rotate=0, pivot=None, mirror=False, add=False
     ):
-        if rotate_point is None:
-            rotate_point = Point()
+        if pivot is None:
+            pivot = Point()
 
         if add == False:
             self._path.transform(scale, rotate * self._inv_rotate, rotate_point, mirror)
@@ -245,7 +245,7 @@ class Shape:
             t_dict = {
                 "scale": scale * self._shape_dict["scale"],
                 "rotate": rotate * self._inv_rotate + self._shape_dict["rotate"],
-                "pivot": rotate_point + self._shape_dict["pivot"],
+                "pivot": pivot + self._shape_dict["pivot"],
                 "mirror_y": mirror,
                 "rel_to_dim": "itself",
             }

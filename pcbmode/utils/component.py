@@ -37,17 +37,18 @@ class Component:
     def __init__(self, refdef, comp_dict):
         """
         """
-
         self._refdef = refdef
         self._layer = comp_dict.get("layer", "top")
-
+        self._location = Point(comp_dict.get("location", [0, 0]))
+        self._scale = comp_dict.get("scale", 1)
         self._rotate = comp_dict.get("rotate", 0)
+        self._pivot = Point(comp_dict.get("pivot", [0, 0]))
+ 
         if self._layer == "bottom":
             self._rotate *= -1  # TODO: is this needed?
-
-        self._rotate_point = Point(comp_dict.get("rotate-point", [0, 0]))
-        self._scale = comp_dict.get("scale", 1)
-        self._location = Point(comp_dict.get("location", [0, 0]))
+            self._mirror_shapes = True
+        else:
+            self._mirror_shapes = False
 
         # Get footprint definition and shapes
         try:
@@ -97,12 +98,12 @@ class Component:
                 for shape in footprint_shapes[sheet].get(layer) or []:
 
                     # In order to apply the rotation we need to adust the location
-                    shape.rotate_location(self._rotate, self._rotate_point)
+                    shape.rotate_location(self._rotate, self._pivot)
 
                     shape.transformPath(
                         scale=self._scale,
                         rotate=self._rotate,
-                        rotate_point=self._rotate_point,
+                        pivot=self._pivot,
                         mirror=shape.getMirrorPlacement(),
                         add=True,
                     )
@@ -162,7 +163,7 @@ class Component:
 
                 refdef_shape = Shape(refdef_dict)
                 refdef_shape.is_refdef = True
-                refdef_shape.rotate_location(self._rotate, self._rotate_point)
+                refdef_shape.rotate_location(self._rotate, self._pivot)
 
                 # Add the refdef to the silkscreen/assembly list. It's
                 # important that this is added at the very end since the
