@@ -67,13 +67,13 @@ class Module:
 
         # Get dictionaries of component/via/shape definitions
         comps_dict = self._module_dict.get("components", {})
-        self._components = self._get_components(comps_dict)
+        self._comp_objs = self._get_components(comps_dict)
 
         vias_dict = self._routing_dict.get("vias", {})
-        self._vias = self._get_components(vias_dict)
+        self._via_objs = self._get_components(vias_dict)
 
         shapes_dict = self._module_dict.get("shapes", {})
-        self._shapes = self._get_components(shapes_dict)
+        self._shape_objs = self._get_components(shapes_dict)
 
         self._transform = f"translate({self._center.px()} {self._center.py()})"
 
@@ -101,10 +101,10 @@ class Module:
 
         self._place_outline()
         self._place_outline_dims()
-        self._place_components(components=self._components, component_type="component")
+        self._place_components(components=self._comp_objs, component_type="component")
         self._place_routing()
-        self._place_components(components=self._vias, component_type="via")
-        self._place_components(components=self._shapes, component_type="shape")
+        self._place_components(components=self._via_objs, component_type="via")
+        self._place_components(components=self._shape_objs, component_type="shape")
 
         if config.cfg["create"]["docs"] == True:
             docs_layer = self._layers["documentation"]["layer"]
