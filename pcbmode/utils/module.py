@@ -58,30 +58,24 @@ class Module:
         self._routing_dict = config.rte
 
         self._outline_shape = self._get_outline_shape()
-
         self._dims = self._outline_shape.get_dims()
-
-        # Center point
         self._center = self._dims.copy()
-        self._center.mult(0.5)
+        self._center.mult(0.5)  # Center point
 
-        # Get dictionaries of component/via/shape definitions
         comps_dict = self._module_dict.get("components", {})
-        self._comp_objs = self._get_components(comps_dict)
+        self._comp_objs = self._get_comp_objs(comps_dict)
 
         vias_dict = self._routing_dict.get("vias", {})
-        self._via_objs = self._get_components(vias_dict)
+        self._via_objs = self._get_comp_objs(vias_dict)
 
         shapes_dict = self._module_dict.get("shapes", {})
-        self._shape_objs = self._get_components(shapes_dict)
-
-        self._transform = f"translate({self._center.px()} {self._center.py()})"
+        self._shape_objs = self._get_comp_objs(shapes_dict)
 
         # Create the Inkscape SVG document
         self._module = inkscape_svg.create(self._dims.px(), self._dims.py())
         svg_doc = et.ElementTree(self._module)
-
-        # Get a dictionary of SVG layers
+        # Create a dictionary of SVG layers
+        self._transform = f"translate({self._center.px()} {self._center.py()})"
         self._layers = svg_layers.create_layers(self._module, self._transform)
 
         # Add a 'defs' element:
@@ -91,13 +85,13 @@ class Module:
         self._masks = {}
 
         for pcb_layer in config.stk["layer-names"]:
-            element = et.SubElement(
+            el = et.SubElement(
                 defs, "mask", id=f"mask-{pcb_layer}", transform=self._transform
             )
             # This will identify the masks for each PCB layer when
             # the layer is converted to Gerber
-            element.set(f"{{{ns_pcm}}}pcb-layer", pcb_layer)
-            self._masks[pcb_layer] = element
+            el.set(f"{{{ns_pcm}}}pcb-layer", pcb_layer)
+            self._masks[pcb_layer] = el
 
         self._place_outline()
         self._place_outline_dims()
@@ -147,7 +141,7 @@ class Module:
             et.tostring(svg_doc, encoding="unicode", pretty_print=True)
         )
 
-    def _get_components(self, components_dict):
+    def _get_comp_objs(self, components_dict):
         """
         Create the components for this module.
         Return a list of items of class 'component'
