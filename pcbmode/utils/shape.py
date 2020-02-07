@@ -321,6 +321,8 @@ class Shape:
     def getDiameter(self):
         return self._diameter
 
-    def getMirrorPlacement(self):
+    def get_mirror_y(self):
         return self._shape_dict["mirror-y"]
 
+    def get_mirror_x(self):
+        return self._shape_dict["mirror-x"]

@@ -81,11 +81,15 @@ class Component:
             for layer in config.stk["layer-names"]:
                 for shape in footprint_shapes[sheet].get(layer) or []:
                     shape.rotate_location(self._rotate, self._pivot)
+                    # If the component is placed on the bottom layer we need to mirror
+                    # all the shapes of the component. A mirror setting of the shape
+                    # itself negates this action, hence the XOR                    
+                    mirror_y = self._place_bot ^ shape.get_mirror_y()
                     t_dict = {  # transform dictionary
                         "scale": self._scale,
                         "rotate": self._rotate,
                         "pivot": self._pivot,
-                        "mirror": shape.getMirrorPlacement(),
+                        "mirror-y": mirror_y
                     }
                     shape.transform_path(t_dict)
 
