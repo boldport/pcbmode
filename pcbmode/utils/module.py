@@ -334,7 +334,11 @@ class Module:
                                 self._masks[pcb_layer], "g", transform=transform
                             )
                             self._place_mask(
-                                mask_group, shape, "pad", original=False, mirror=invert
+                                layer=mask_group,
+                                shape=shape,
+                                feature_kind="pad",
+                                original=False,
+                                mirror=invert,
                             )
 
                 # Pours
@@ -557,24 +561,27 @@ class Module:
                 # Make the shape relative to outline dims
                 shape = Shape(shape_dict=shape_dict, rel_to_dim=self._dims)
 
-                route_element = place.place_shape(
-                    shape=shape, svg_layer=sheet, orig_path=True
+                route_el = place.place_shape(
+                    shape=shape, svg_layer=sheet, orig_path=True,
                 )
-
                 # Set the key as pcbmode:id of the route. This is used
                 # when extracting routing to offset the location of a
                 # modified route
-                route_element.set(f"{{{ns_pcm}}}id", route_key)
+                route_el.set(f"{{{ns_pcm}}}id", route_key)
 
                 # Add a custom buffer definition if it exists
                 custom_buffer = shape_dict.get("buffer-to-pour")
                 if custom_buffer != None:
-                    route_element.set(
+                    route_el.set(
                         f"{{{ns_pcm}}}buffer-to-pour", str(custom_buffer),
                     )
-
                 if (there_are_pours == True) and (custom_buffer != "0"):
-                    self._place_mask(self._masks[pcb_layer], shape, "route", True)
+                    self._place_mask(
+                        layer=self._masks[pcb_layer],
+                        shape=shape,
+                        feature_kind="route",
+                        original=True,
+                    )
 
     #                # Due to the limitation of the Gerber format, and the method chosen
     #                # for applying masks onto pours, it is not possible to have copper
@@ -600,10 +607,10 @@ class Module:
     #
     #                            i += 1
 
-    def _place_mask(self, svg_layer, shape, kind, original=False, mirror=False):
+    def _place_mask(self, layer, shape, feature_kind, original=False, mirror=False):
         """
-        Places a mask of a shape of type 'Shape' on SVG layer 'svg_layer'.
-        'kind'    : type of shape; used to fetch the correct distance to pour
+        Places a mask of a shape of type 'Shape' on SVG layer 'layer'.
+        'feature_kind'    : type of shape; used to fetch the correct distance to pour
         'original': use the original path, not the transformed one
         """
 
@@ -613,14 +620,14 @@ class Module:
         # 'pad', 'route' unless 'pour_buffer' is specified
         pour_buffer = shape.getPourBuffer()
         if pour_buffer == None:
-            pour_buffer = config.cfg["distances"]["from-pour-to"][kind]
+            pour_buffer = config.cfg["distances"]["from-pour-to"][feature_kind]
 
         style_template = "fill:%s;stroke:#000;stroke-linejoin:round;stroke-width:%s;stroke-linecap:round;"
 
         style = shape.get_style()
 
         if pour_buffer > 0:
-            mask_el = place.place_shape(shape, svg_layer, mirror, original)
+            mask_el = place.place_shape(shape, layer, mirror, original)
 
             stroke_width = css_utils.get_style_value("stroke-width", style)
 
