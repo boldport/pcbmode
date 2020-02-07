@@ -183,13 +183,14 @@ class SvgPath:
         abspos = Point([0, 0])  # absolute coordinates as the path is converted
         patho = Point([0, 0])
 
-        for seg in range(0, len(path)):
+        for seg in path:
+        #for seg in range(0, len(path)):
 
-            cmd_type = path[seg][0]
+            cmd_type = seg[0]
 
-            if re.match("M", cmd_type, re.I):  # 'move to'
+            if cmd_type.lower() == "m":  # 'move to'
                 r_coords = []  # relative coords
-                coord = path[seg][1]
+                coord = seg[1]
                 if seg == 0:  # first M/m coord is always absolute
                     abspos = coord
                     r_coords.append(abspos)
@@ -203,7 +204,7 @@ class SvgPath:
                         r_coords.append(coord - abspos)
                         abspos = coord
                         patho.x = coord.x
-                for coord in path[seg][2:]:  # the rest of the coordinates
+                for coord in seg[2:]:  # the rest of the coordinates
                     if cmd_type == "m":
                         r_coords.append(coord)
                         abspos += coord
@@ -212,102 +213,101 @@ class SvgPath:
                         abspos = coord
                 r_path.append(["m"] + r_coords)
 
-            elif re.match("C", cmd_type, re.I):  # cubic Bezier (PCCP)
+            elif cmd_type.lower() == 'c':  # cubic Bezier (PCCP)
                 r_coords = []
                 if cmd_type == "c":
-                    for coord in path[seg][1:]:
+                    for coord in seg[1:]:
                         r_coords.append(coord)
                     # To keep track of the absolute position, we need to add up every
                     # *third* coordinate of the cubic Bezier curve
-                    for coord in path[seg][3::3]:
+                    for coord in seg[3::3]:
                         abspos += coord
                 if cmd_type == "C":
-                    for n in range(1, len(path[seg]) - 1, 3):
+                    for n in range(1, len(seg) - 1, 3):
                         for m in range(0, 3):
-                            coord = path[seg][n + m]
+                            coord = seg[n + m]
                             r_coords.append(coord - abspos)
                         abspos = coord
                 r_path.append(["c"] + r_coords)
 
-            elif re.match("Q", cmd_type, re.I):  # quadratic Bezier (PCP)
+            elif cmd_type.lower() == "q":  # quadratic Bezier (PCP)
                 r_coords = []
                 if cmd_type == "q":
-                    for coord in path[seg][1:]:
+                    for coord in seg[1:]:
                         r_coords.append(coord)
                     # To keep track of the absolute position, we need to add up every
                     # *third* coordinate of the cubic Bezier curve
-                    for coord in path[seg][2::2]:
+                    for coord in seg[2::2]:
                         abspos += coord
                 if cmd_type == "Q":
-                    for j in range(1, len(path[seg]) + 1, 2):
-                        for coord in path[seg][j : j + 2]:
+                    for j in range(1, len(seg) + 1, 2):
+                        for coord in seg[j : j + 2]:
                             r_coords.append(coord - abspos)
                         abspos = coord
                 r_path.append(["q"] + r_coords)
-
-            elif re.match("T", cmd_type, re.I):  # simple cubic bezier
+            elif cmd_type.lower() == "t":  # simple cubic bezier
                 r_coords = []
                 if cmd_type == "t":
-                    for coord in path[seg][1:]:
+                    for coord in seg[1:]:
                         r_coords.append(coord)
                         # to keep track of the absolute position, we need to add up
                         # every *third* coordinate of the cubic Bezier curve
                         abspos += coord
                 if cmd_type == "T":
-                    for coord in path[seg][1:]:
+                    for coord in seg[1:]:
                         r_coords.append(coord - abspos)
                     abspos = coord
                 r_path.append(["t"] + r_coords)
 
-            elif re.match("S", cmd_type, re.I):
+            elif cmd_type.lower() == "s":
                 r_coords = []
                 if cmd_type == "s":
-                    for coord in path[seg][1:]:
+                    for coord in seg[1:]:
                         r_coords.append(coord)
                         abspos += coord
                 if cmd_type == "S":
-                    for coord in path[seg][1:]:
+                    for coord in seg[1:]:
                         r_coords.append(coord - abspos)
                     abspos = coord
                 r_path.append(["s"] + r_coords)
 
-            elif re.match("L", cmd_type, re.I):  # line to
+            elif cmd_type.lower() == "l":  # line to
                 r_coords = []
                 if cmd_type == "l":
-                    for coord in path[seg][1:]:
+                    for coord in seg[1:]:
                         r_coords.append(coord)
                         abspos += coord
                 if cmd_type == "L":
-                    for coord in path[seg][1:]:
+                    for coord in seg[1:]:
                         r_coords.append(coord - abspos)
                         abspos = coord
                 r_path.append(["l"] + r_coords)
 
-            elif re.match("H", cmd_type, re.I):  # hotizontal line
+            elif cmd_type.lower() == "h":  # hotizontal line
                 r_coords = []
                 if cmd_type == "h":
-                    for coord in path[seg][1:]:
+                    for coord in seg[1:]:
                         r_coords.append(coord)
                     abspos += coord
                 if cmd_type == "H":
-                    for coord in path[seg][1:]:
+                    for coord in seg[1:]:
                         r_coords.append(coord - abspos)
                         abspos = coord
                 r_path.append(["h"] + r_coords)
 
-            elif re.match("V", cmd_type, re.I):  # vertical line
+            elif cmd_type.lower() == "v":  # vertical line
                 r_coords = []
                 if cmd_type == "v":
-                    for coord in path[seg][1:]:
+                    for coord in seg[1:]:
                         r_coords.append(coord)
                         abspos += coord
                 if cmd_type == "V":
-                    for coord in path[seg][1:]:
+                    for coord in seg[1:]:
                         r_coords.append(coord - abspos)
                         abspos = coord
                 r_path.append(["v"] + r_coords)
 
-            elif re.match("Z", cmd_type, re.I):  # close shape
+            elif cmd_type.lower() == "z":  # close shape
                 abspos = abspos + (patho - abspos)
                 r_path.append(["z"])
 
