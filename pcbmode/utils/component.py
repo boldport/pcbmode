@@ -106,60 +106,44 @@ class Component:
 
         # Add silkscreen and assembly reference designator (refdef)
         for sheet in ["silkscreen", "assembly"]:
-
-            try:
-                refdef_dict = comp_dict[sheet].get("refdef", {})
+            try: # check if the sheet layer exists
+                sheet_dict = comp_dict[sheet]
             except:
-                refdef_dict = {}
-
+                continue
+            refdef_dict = sheet_dict.get("refdef", {})
             if refdef_dict.get("show") != False:
-                layer = refdef_dict.get("layer") or "top"
-
-                # Rotate the refdef; if unspecified the rotation is the same as
-                # the rotation of the component
-                refdef_dict["rotate"] = refdef_dict.get("rotate") or 0
-
-                # Sometimes you'd want to keep all refdefs at the same angle
-                # and not rotated with the component
-                if refdef_dict.get("rotate-with-component") != False:
+                layer = refdef_dict.get("layer", "top")
+                refdef_dict["rotate"] = refdef_dict.get("rotate", 0)
+                # Don't rotate with component
+                if refdef_dict.get("rotate-with-component", True) != False:
                     refdef_dict["rotate"] += self._rotate
-
                 refdef_dict["location"] = Point(refdef_dict.get("location", [0, 0]))
                 refdef_dict["type"] = "text"
-                refdef_dict["value"] = refdef_dict.get("value") or refdef
-
+                refdef_dict["value"] = refdef_dict.get("value", refdef)
                 refdef_dict["font-family"] = css_utils.get_prop(
                     config.stl["layout"], f"{sheet}-refdef", "font-family"
                 )
-
                 refdef_dict["font-size"] = css_utils.get_prop(
                     config.stl["layout"], f"{sheet}-refdef", "font-size"
                 )
-
                 refdef_shape = Shape(refdef_dict)
                 refdef_shape.is_refdef = True
                 refdef_shape.rotate_location(self._rotate, self._pivot)
 
-                # Add the refdef to the silkscreen/assembly list. It's
-                # important that this is added at the very end since the
+                # Add the refdef to the silkscreen/assembly list. 
+                # NOTE: It's important that this is added at the very end since the
                 # placement process assumes the refdef is last
                 try:
-                    footprint_shapes[sheet][layer]
+                    footprint_shapes[sheet][layer].append(refdef_shape)
                 except:
-                    footprint_shapes[sheet][layer] = []
+                    footprint_shapes[sheet][layer] = [refdef_shape]
 
-                footprint_shapes[sheet][layer].append(refdef_shape)
-
-        # ------------------------------------------------------
         # Invert layers
-        # ------------------------------------------------------
         # If the placement is on the bottom of the baord then we need
         # to invert the placement of all components. This affects the
-        # surface laters but also internal layers
-
-        if self._layer == "bottom":
+        # surface layers but also internal layers
+        if self._place_bot is True:
             layers = config.stk["layer-names"]
-
             sheets = [
                 "conductor",
                 "pours",
@@ -178,7 +162,6 @@ class Component:
                         )
                     except:
                         continue
-
                 footprint_shapes[sheet] = copy.copy(sheet_dict_new)
 
         self._footprint_shapes = footprint_shapes
