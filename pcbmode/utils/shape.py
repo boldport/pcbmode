@@ -326,3 +326,6 @@ class Shape:
 
     def get_mirror_x(self):
         return self._shape_dict["mirror-x"]
+
+    def get_path_obj_num_of_segs(self):
+        return self._path_obj.get_num_of_segments()

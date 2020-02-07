@@ -622,6 +622,7 @@ class Module:
         if pour_buffer == None:
             pour_buffer = config.cfg["distances"]["from-pour-to"][feature_kind]
 
+        # TODO: replace this with a class... might not be possible!
         style_template = "fill:%s;stroke:#000;stroke-linejoin:round;stroke-width:%s;stroke-linecap:round;"
 
         style = shape.get_style()
@@ -639,6 +640,6 @@ class Module:
             else:
                 mask_el.set("style", style_template % ("#000", pour_buffer * 2))
 
-            path = shape.getOriginalPath().lower()
-            segments = path.count("m")
-            mask_el.set(f"{{{ns_pcm}}}gerber-lp", "c" * segments)
+            c_string = "c" * shape.get_path_obj_num_of_segs()
+            mask_el.set(f"{{{ns_pcm}}}gerber-lp", c_string)
+
