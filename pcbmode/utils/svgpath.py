@@ -186,7 +186,7 @@ class SvgPath:
         for i, seg in enumerate(path):
             cmd_type = seg[0]
             if cmd_type.lower() == "m":  # 'move to'
-                r_coords = []  # relative coords
+                r_coords = []  # relative coords list
                 coord = seg[1]
                 if i == 0:  # first M/m coord of a path is always absolute
                     abspos = coord
@@ -197,7 +197,7 @@ class SvgPath:
                         r_coords.append(coord)
                         abspos += coord
                         seg_fp = abspos
-                    else:
+                    else:  # M
                         r_coords.append(coord - abspos)
                         abspos = coord
                         seg_fp = coord
@@ -205,7 +205,7 @@ class SvgPath:
                     if cmd_type == "m":
                         r_coords.append(coord)
                         abspos += coord
-                    else:
+                    else:  # M
                         r_coords.append(coord - abspos)
                         abspos = coord
                 r_path.append(["m"] + r_coords)
@@ -219,7 +219,7 @@ class SvgPath:
                     # *third* coordinate of the cubic Bezier curve
                     for coord in seg[3::3]:
                         abspos += coord
-                if cmd_type == "C":
+                else:
                     for n in range(1, len(seg) - 1, 3):
                         for m in range(0, 3):
                             coord = seg[n + m]
@@ -236,21 +236,22 @@ class SvgPath:
                     # *third* coordinate of the cubic Bezier curve
                     for coord in seg[2::2]:
                         abspos += coord
-                if cmd_type == "Q":
+                else:
                     for j in range(1, len(seg) + 1, 2):
                         for coord in seg[j : j + 2]:
                             r_coords.append(coord - abspos)
                         abspos = coord
                 r_path.append(["q"] + r_coords)
+
             elif cmd_type.lower() == "t":  # simple cubic bezier
                 r_coords = []
                 if cmd_type == "t":
                     for coord in seg[1:]:
                         r_coords.append(coord)
-                        # to keep track of the absolute position, we need to add up
+                        # To keep track of the absolute position, we need to add up
                         # every *third* coordinate of the cubic Bezier curve
                         abspos += coord
-                if cmd_type == "T":
+                else:
                     for coord in seg[1:]:
                         r_coords.append(coord - abspos)
                     abspos = coord
@@ -262,7 +263,7 @@ class SvgPath:
                     for coord in seg[1:]:
                         r_coords.append(coord)
                         abspos += coord
-                if cmd_type == "S":
+                else:
                     for coord in seg[1:]:
                         r_coords.append(coord - abspos)
                     abspos = coord
@@ -274,7 +275,7 @@ class SvgPath:
                     for coord in seg[1:]:
                         r_coords.append(coord)
                         abspos += coord
-                if cmd_type == "L":
+                else:
                     for coord in seg[1:]:
                         r_coords.append(coord - abspos)
                         abspos = coord
@@ -286,7 +287,7 @@ class SvgPath:
                     for coord in seg[1:]:
                         r_coords.append(coord)
                     abspos += coord
-                if cmd_type == "H":
+                else:
                     for coord in seg[1:]:
                         r_coords.append(coord - abspos)
                         abspos = coord
@@ -298,15 +299,14 @@ class SvgPath:
                     for coord in seg[1:]:
                         r_coords.append(coord)
                         abspos += coord
-                if cmd_type == "V":
+                else:
                     for coord in seg[1:]:
                         r_coords.append(coord - abspos)
                         abspos = coord
                 r_path.append(["v"] + r_coords)
 
             elif cmd_type.lower() == "z":  # close shape
-                abspos = abspos + (seg_fp - abspos)
-                #r_path.append(["l"] + [patho])  # line to first point
+                abspos = seg_fp
                 r_path.append(["z"])
 
             else:
