@@ -93,28 +93,18 @@ class Component:
                     }
                     shape.transform_path(t_dict)
 
-        # --------------------------------------------------------------
         # Remove silkscreen and assembly shapes if instructed
-        # --------------------------------------------------------------
-        # If the 'show' flag is 'false then remove these items from the
-        # shapes dictionary
-        # --------------------------------------------------------------
         for sheet in ["silkscreen", "assembly"]:
-
-            try:
-                shapes_dict = comp_dict[sheet].get("shapes") or {}
+            try: # check if the sheet layer exists
+                sheet_dict = comp_dict[sheet]
             except:
-                shapes_dict = {}
-
-            # If the setting is to not show silkscreen shapes for the
-            # component, delete the shapes from the shapes' dictionary
-            if shapes_dict.get("show") == False:
+                continue
+            shapes_dict = sheet_dict.get("shapes", {})
+            if shapes_dict.get("show") == False: # delete shapes
                 for pcb_layer in utils.getSurfaceLayers():
                     footprint_shapes[sheet][pcb_layer] = []
 
-        # ----------------------------------------------------------
         # Add silkscreen and assembly reference designator (refdef)
-        # ----------------------------------------------------------
         for sheet in ["silkscreen", "assembly"]:
 
             try:
