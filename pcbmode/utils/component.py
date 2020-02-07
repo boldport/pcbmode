@@ -25,7 +25,6 @@ from pcbmode.utils import utils
 from pcbmode.utils import messages as msg
 from pcbmode.utils.shape import Shape
 from pcbmode.utils.point import Point
-from pcbmode.utils.style import Style
 from pcbmode.utils.footprint import Footprint
 from pcbmode.utils import css_utils
 
@@ -83,30 +82,30 @@ class Component:
                     shape.rotate_location(self._rotate, self._pivot)
                     # If the component is placed on the bottom layer we need to mirror
                     # all the shapes of the component. A mirror setting of the shape
-                    # itself negates this action, hence the XOR                    
+                    # itself negates this action, hence the XOR
                     mirror_y = self._place_bot ^ shape.get_mirror_y()
                     t_dict = {  # transform dictionary
                         "scale": self._scale,
                         "rotate": self._rotate,
                         "pivot": self._pivot,
-                        "mirror-y": mirror_y
+                        "mirror-y": mirror_y,
                     }
                     shape.transform_path(t_dict)
 
         # Remove silkscreen and assembly shapes if instructed
         for sheet in ["silkscreen", "assembly"]:
-            try: # check if the sheet layer exists
+            try:  # check if the sheet layer exists
                 sheet_dict = comp_dict[sheet]
             except:
                 continue
             shapes_dict = sheet_dict.get("shapes", {})
-            if shapes_dict.get("show") == False: # delete shapes
+            if shapes_dict.get("show") == False:  # delete shapes
                 for pcb_layer in utils.getSurfaceLayers():
                     footprint_shapes[sheet][pcb_layer] = []
 
         # Add silkscreen and assembly reference designator (refdef)
         for sheet in ["silkscreen", "assembly"]:
-            try: # check if the sheet layer exists
+            try:  # check if the sheet layer exists
                 sheet_dict = comp_dict[sheet]
             except:
                 continue
@@ -130,7 +129,7 @@ class Component:
                 refdef_shape.is_refdef = True
                 refdef_shape.rotate_location(self._rotate, self._pivot)
 
-                # Add the refdef to the silkscreen/assembly list. 
+                # Add the refdef to the silkscreen/assembly list.
                 # NOTE: It's important that this is added at the very end since the
                 # placement process assumes the refdef is last
                 try:

@@ -37,7 +37,6 @@ from pcbmode.utils import layer_index
 from pcbmode.utils import documentation
 from pcbmode.utils import svg_path_create
 from pcbmode.utils.shape import Shape
-from pcbmode.utils.style import Style
 from pcbmode.utils.component import Component
 from pcbmode.utils.point import Point
 
