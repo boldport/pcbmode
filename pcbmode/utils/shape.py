@@ -232,24 +232,13 @@ class Shape:
                 "A 'path' shape requires a 'value' or 'd' definition with a valid SVG path."
             )
 
-    def transformPath(
-        self, scale=1, rotate=0, pivot=None, mirror=False, add=False
-    ):
-        if pivot is None:
-            pivot = Point()
-
-        if add == False:
-            self._path.transform(scale, rotate * self._inv_rotate, rotate_point, mirror)
-        else:
-            path_str = self._path_obj.get_path_str()
-            t_dict = {
-                "scale": scale * self._shape_dict["scale"],
-                "rotate": rotate * self._inv_rotate + self._shape_dict["rotate"],
-                "pivot": pivot + self._shape_dict["pivot"],
-                "mirror_y": mirror,
-                "rel_to_dim": "itself",
-            }
-            self._path_obj = SvgPath(path_str, t_dict)
+    def transform_path(self, t_dict):
+        """ 
+        Transform the path of this object by taking the existing string'd path and
+        creating a new SvgPath object using the given 't_dict' transform dictionary
+        """
+        path_str = self._path_obj.get_path_str()
+        self._path_obj = SvgPath(path_str, t_dict)
 
     def get_style_class(self):
         return self._shape_dict["style-class"]

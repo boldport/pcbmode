@@ -90,11 +90,13 @@ class SvgPath:
     def _center_path(self, r_p_path):
         """ Make first move from the center of the shape """
 
+        relative_to = self._t_dict.get("rel_to_dim", "itself")
+
         # If a Point is given, use it. Otherwise use the dims of the shape
-        if isinstance(self._t_dict["rel_to_dim"], Point) is True:
+        if isinstance(relative_to, Point) is True:
             # TODO: This might need to be fixed after finishing refactoring the
             # extraction module
-            np = self._t_dict["rel_to_dim"]
+            np = relative_to
             op_x = np.x / 2
             op_y = np.y / 2
         else:

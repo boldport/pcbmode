@@ -49,7 +49,7 @@ class Component:
             self._place_bot = True
         else:
             self._place_bot = False
- 
+
         if self._layer == "bottom":
             self._rotate *= -1  # TODO: is this needed?
             self._mirror_shapes = True
@@ -59,17 +59,15 @@ class Component:
         self._footprint_name = comp_dict["footprint"]
 
         # Look for the file in a path depending on the component type
-        if comp_type in ['components','vias']:
+        if comp_type in ["components", "vias"]:
             path = Path(config.tmp["project-path"] / config.cfg["components"]["path"])
-        elif comp_type == 'shapes':
+        elif comp_type == "shapes":
             path = Path(config.tmp["project-path"] / config.cfg["shapes"]["path"])
         footprint_dict = utils.dictFromJsonFile(path / f"{self._footprint_name}.json")
         footprint_obj = Footprint(footprint_dict, self._place_bot)
         footprint_shapes = footprint_obj.get_shapes()
 
-        # ------------------------------------------------
-        # Apply component-specific modifiers to footprint
-        # ------------------------------------------------
+        # Apply *component-specific* modifiers to footprint
         sheets = [
             "conductor",
             "soldermask",
@@ -82,17 +80,14 @@ class Component:
         for sheet in sheets:
             for layer in config.stk["layer-names"]:
                 for shape in footprint_shapes[sheet].get(layer) or []:
-
-                    # In order to apply the rotation we need to adust the location
                     shape.rotate_location(self._rotate, self._pivot)
-
-                    shape.transformPath(
-                        scale=self._scale,
-                        rotate=self._rotate,
-                        pivot=self._pivot,
-                        mirror=shape.getMirrorPlacement(),
-                        add=True,
-                    )
+                    t_dict = {  # transform dictionary
+                        "scale": self._scale,
+                        "rotate": self._rotate,
+                        "pivot": self._pivot,
+                        "mirror": shape.getMirrorPlacement(),
+                    }
+                    shape.transform_path(t_dict)
 
         # --------------------------------------------------------------
         # Remove silkscreen and assembly shapes if instructed
