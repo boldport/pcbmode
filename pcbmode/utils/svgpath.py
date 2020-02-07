@@ -210,7 +210,7 @@ class SvgPath:
                         abspos = coord
                 r_path.append(["m"] + r_coords)
 
-            elif cmd_type.lower() == 'c':  # cubic Bezier (PCCP)
+            elif cmd_type.lower() == "c":  # cubic Bezier (PCCP)
                 r_coords = []
                 if cmd_type == "c":
                     for coord in seg[1:]:
