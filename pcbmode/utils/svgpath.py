@@ -181,29 +181,26 @@ class SvgPath:
         r_path = []
 
         abspos = Point([0, 0])  # absolute coordinates as the path is converted
-        patho = Point([0, 0])
+        seg_fp = Point([0, 0])  # segment's first point
 
-        for seg in path:
-        #for seg in range(0, len(path)):
-
+        for i, seg in enumerate(path):
             cmd_type = seg[0]
-
             if cmd_type.lower() == "m":  # 'move to'
                 r_coords = []  # relative coords
                 coord = seg[1]
-                if seg == 0:  # first M/m coord is always absolute
+                if i == 0:  # first M/m coord of a path is always absolute
                     abspos = coord
                     r_coords.append(abspos)
-                    patho = coord
+                    seg_fp = coord
                 else:
                     if cmd_type == "m":
                         r_coords.append(coord)
                         abspos += coord
-                        patho = abspos
+                        seg_fp = abspos
                     else:
                         r_coords.append(coord - abspos)
                         abspos = coord
-                        patho.x = coord.x
+                        seg_fp = coord
                 for coord in seg[2:]:  # the rest of the coordinates
                     if cmd_type == "m":
                         r_coords.append(coord)
@@ -308,7 +305,8 @@ class SvgPath:
                 r_path.append(["v"] + r_coords)
 
             elif cmd_type.lower() == "z":  # close shape
-                abspos = abspos + (patho - abspos)
+                abspos = abspos + (seg_fp - abspos)
+                #r_path.append(["l"] + [patho])  # line to first point
                 r_path.append(["z"])
 
             else:
