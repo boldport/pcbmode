@@ -289,6 +289,13 @@ class Module:
             rotation = comp_obj.get_rotate()
             refdef = comp_obj.get_refdef()
 
+            if location.is_not_00():
+                lx = location.px()
+                ly = location.py() * config.cfg["iya"]
+                transform = f"translate({lx},{ly})"
+            else:
+                transform = None
+
             # If the component is placed on the bottom layer we need
             # to invert the shapes AND their 'x' coordinate.  This is
             # done using the 'invert' indicator set below
@@ -309,11 +316,9 @@ class Module:
 
                     svg_layer = self._layers[pcb_layer]["conductor"]["pads"]["layer"]
 
-                    transform = (
-                        f"translate({location.px()},{config.cfg['iya']*location.py()})"
-                    )
-
-                    shape_group = et.SubElement(svg_layer, "g", transform=transform)
+                    shape_group = et.SubElement(svg_layer, "g")
+                    if transform != None:
+                        shape_group.set("transform", transform)
 
                     shape_group.set(f"{{{ns_pcm}}}type", comp_type)
                     # Add the reference designator as well if it's a
@@ -327,11 +332,11 @@ class Module:
                         place.place_shape(shape, shape_group, invert)
 
                         if there_are_pours == True:
-                            mask_group = et.SubElement(
-                                self._masks[pcb_layer], "g", transform=transform
-                            )
+                            mask_grp_el = et.SubElement(self._masks[pcb_layer], "g")
+                            if transform != None:
+                                mask_grp_el.set("transform", transform)
                             self._place_mask(
-                                layer=mask_group,
+                                layer=mask_grp_el,
                                 shape=shape,
                                 feature_kind="pad",
                                 original=False,
@@ -349,10 +354,10 @@ class Module:
                     shape_group = et.SubElement(
                         svg_layer, "g", mask=f"url(#mask-{pcb_layer})"
                     )
-                    transform = (
-                        f"translate({location.px()},{config.cfg['iya']*location.py()})"
-                    )
-                    group = et.SubElement(shape_group, "g", transform=transform)
+                    group = et.SubElement(shape_group, "g")
+                    if transform != None:
+                        group.set("transform", transform)
+
                     group.set(f"{{{ns_pcm}}}type", "pours")
                     for shape in shapes:
                         placed_element = place.place_shape(shape, group, invert)
@@ -365,10 +370,9 @@ class Module:
                     svg_layer = None
 
                 if len(shapes) > 0 and svg_layer != None:
-                    transform = (
-                        f"translate({location.px()},{config.cfg['iya']*location.py()})"
-                    )
-                    group = et.SubElement(svg_layer, "g", transform=transform)
+                    group = et.SubElement(svg_layer, "g")
+                    if transform != None:
+                        group.set("transform", transform)
                     group.set(f"{{{ns_pcm}}}type", "component-shapes")
                     for shape in shapes:
                         placed_element = place.place_shape(shape, group, invert)
@@ -381,10 +385,9 @@ class Module:
                     svg_layer = None
 
                 if len(shapes) > 0 and svg_layer != None:
-                    transform = (
-                        f"translate({location.px()},{config.cfg['iya']*location.py()})"
-                    )
-                    group = et.SubElement(svg_layer, "g", transform=transform)
+                    group = et.SubElement(svg_layer, "g")
+                    if transform != None:
+                        group.set("transform", transform)
                     group.set(f"{{{ns_pcm}}}type", "component-shapes")
                     for shape in shapes:
                         placed_element = place.place_shape(shape, group, invert)
@@ -397,11 +400,10 @@ class Module:
                     svg_layer = None
 
                 if len(shapes) > 0 and svg_layer != None:
-                    transform = (
-                        f"translate({location.px()},{config.cfg['iya']*location.py()})"
-                    )
-                    shape_group = et.SubElement(svg_layer, "g", transform=transform)
+                    shape_group = et.SubElement(svg_layer, "g")
                     shape_group.set(f"{{{ns_pcm}}}type", "component-shapes")
+                    if transform != None:
+                        shape_group.set("transform", transform)
 
                     for shape in shapes:
                         # Refdefs need to be in their own groups so that their
@@ -439,7 +441,9 @@ class Module:
                     transform = (
                         f"translate({location.px()},{config.cfg['iya']*location.py()})"
                     )
-                    group = et.SubElement(svg_layer, "g", transform=transform)
+                    group = et.SubElement(svg_layer, "g")
+                    if transform != None:
+                        group.set("transform", transform)
                     for shape in shapes:
                         placed_element = place.place_shape(shape, group, invert)
 
@@ -447,10 +451,9 @@ class Module:
                 shapes = shapes_dict["drills"].get(pcb_layer, [])
                 if len(shapes) > 0:
                     svg_layer = self._layers["drills"]["layer"]
-                    transform = (
-                        f"translate({location.px()},{config.cfg['iya']*location.py()})"
-                    )
-                    group = et.SubElement(svg_layer, "g", transform=transform)
+                    group = et.SubElement(svg_layer, "g")
+                    if transform != None:
+                        group.set("transform", transform)
                     group.set(f"{{{ns_pcm}}}type", "component-shapes")
                     for shape in shapes:
                         placed_element = place.place_shape(shape, group, invert)
@@ -465,9 +468,12 @@ class Module:
             # shapes for internal layers but only surface layers are
             # defined in the stackup
             try:
-                group = et.SubElement(svg_layer, "g", transform=transform)
+                group = et.SubElement(svg_layer, "g")
             except:
                 return
+
+            if transform != None:
+                group.set("transform", transform)
 
             # Add PCBmodE information, used when extracting
             group.set(f"{{{ns_pcm}}}type", comp_type)
