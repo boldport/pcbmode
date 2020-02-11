@@ -19,7 +19,7 @@
 
 from pcbmode.config import config
 from pcbmode.utils.point import Point
-from pcbmode.utils.utils import pn
+from pcbmode.utils.svgpath import SvgPath
 
 
 def rect(width, height, bor_rad=[]):
@@ -234,58 +234,29 @@ def drill(diameter):
     )
 
 
-def marker():
+def placement_marker(diameter=0.2):
     """
-    Returns a path for the placement marker
+    Returns an SvgPath object for a placement marker 
     """
-    diameter = 0.2
-
-    r = diameter / 2.0
-
     # The calculation to obtain the 'k' coefficient can be found here:
     # http://itc.ktu.lt/itc354/Riskus354.pdf
     # "APPROXIMATION OF A CUBIC BEZIER CURVE BY CIRCULAR ARCS AND VICE VERSA"
     # by Aleksas Riskus
     k = 0.5522847498
 
-    # Extension
+    r = diameter / 2.0
+
+    # Length of bar across circle
     b = r * 1.8
 
-    return (
-        "m %s,%s c %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s m %s,%s %s,%s z"
-        % (
-            0,
-            r,
-            k * r,
-            0,
-            r,
-            -r * (1 - k),
-            r,
-            -r,
-            0,
-            -r * k,
-            -r * (1 - k),
-            -r,
-            -r,
-            -r,
-            -r * k,
-            0,
-            -r,
-            r * (1 - k),
-            -r,
-            r,
-            0,
-            r * k,
-            r * (1 - k),
-            r,
-            r,
-            r,
-            -b,
-            -r,
-            2 * b,
-            0,
-        )
-    )
+    kr = k*r
+    r1k = r*(1-k)
+
+    path_str = f"m 0,{r} c {kr},0 {r},{-r1k} {r},{-r} 0,{-kr} {-r1k},{-r} {-r},{-r} {-kr},0 {-r},{r1k} {-r},{r} 0,{kr} {r1k},{r} {r},{r} m {-b},{-r} {2*b},0 z"
+
+    svgpath_obj = SvgPath(path_str)
+    return svgpath_obj
+
 
 
 def arrow(width, height, base, bar, gap):
