@@ -38,7 +38,7 @@ class SvgPath:
     'r_' prefix means relative path
     """
 
-    def __init__(self, path, trans_dict):
+    def __init__(self, path, trans_dict={}):
         """ Process the input path according to the transform dict """
 
         # Parse and make relative
