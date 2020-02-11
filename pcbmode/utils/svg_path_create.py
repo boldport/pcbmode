@@ -249,14 +249,13 @@ def placement_marker(diameter=0.2):
     # Length of bar across circle
     b = r * 1.8
 
-    kr = k*r
-    r1k = r*(1-k)
+    kr = k * r
+    r1k = r * (1 - k)
 
     path_str = f"m 0,{r} c {kr},0 {r},{-r1k} {r},{-r} 0,{-kr} {-r1k},{-r} {-r},{-r} {-kr},0 {-r},{r1k} {-r},{r} 0,{kr} {r1k},{r} {r},{r} m {-b},{-r} {2*b},0 z"
 
     svgpath_obj = SvgPath(path_str)
     return svgpath_obj
-
 
 
 def arrow(width, height, base, bar, gap):
