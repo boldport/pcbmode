@@ -22,7 +22,6 @@ import copy
 import sys
 from pathlib import Path
 from lxml import etree as et
-import html.parser as HTMLParser
 
 from pcbmode.config import config
 from pcbmode.utils import messages as msg
@@ -284,8 +283,6 @@ class Module:
 
         ns_pcm = config.cfg["ns"]["pcbmode"]
 
-        htmlpar = HTMLParser.HTMLParser()
-
         for comp_obj in comp_objs:
             shapes_dict = comp_obj.get_shapes()
             location = comp_obj.get_location()
@@ -472,57 +469,43 @@ class Module:
             except:
                 return
 
-            # Add PCBmodE information, useful for when extracting
+            # Add PCBmodE information, used when extracting
             group.set(f"{{{ns_pcm}}}type", comp_type)
             group.set(f"{{{ns_pcm}}}footprint", comp_obj.getFootprintName())
-            if (comp_type == "component") or (comp_type == "shape"):
+            if comp_type in ["component", "shape"]:
                 group.set(f"{{{ns_pcm}}}refdef", refdef)
             elif comp_type == "via":
                 group.set(f"{{{ns_pcm}}}id", refdef)
             else:
                 pass
 
-            path = svg_path_create.marker()
-            transform = (
-                f"translate({location.px()},{config.cfg['iya'] * location.py()})"
-            )
+            marker_obj = svg_path_create.placement_marker()
+            marker_el = et.SubElement(group, "path", d=marker_obj.get_path_str())
+            if rotation != 0:
+                if placement_layer == "bottom":
+                    rotation *= -1
+                marker_el.set("transform", f"rotate({rotation})")
 
-            if placement_layer == "bottom":
-                rotation *= -1
-
-            el_marker = et.SubElement(
-                group, "path", d=path, transform=f"rotate({rotation})"
-            )
-
-            # Place markers
+            # Place marker text
             style_class = "placement-text"
-            if comp_type == "component":
+            if comp_type in ["component", "shape"]:
                 t = et.SubElement(group, "text", x="0", y="-0.17")
                 t.set("class", style_class)
                 ts = et.SubElement(t, "tspan", x="0", dy="0.1")
                 ts.text = f"{refdef}"
                 ts = et.SubElement(t, "tspan", x="0", dy="0.1")
-                ts.text = htmlpar.unescape("%s&#176;" % (rotation))
-                ts = et.SubElement(t, "tspan", x="0", dy="0.1")
-                ts.text = f"[{location.px(2)},{location.py(2)}]"
-            elif comp_type == "shape":
-                t = et.SubElement(group, "text", x="0", y="-0.17")
-                t.set("class", style_class)
-                ts = et.SubElement(t, "tspan", x="0", dy="0.1")
-                ts.text = f"{refdef}"
-                ts = et.SubElement(t, "tspan", x="0", dy="0.1")
-                ts.text = htmlpar.unescape("%s&#176;" % (rotation))
+                ts.text = f"{rotation}\u00B0"
                 ts = et.SubElement(t, "tspan", x="0", dy="0.1")
                 ts.text = f"[{location.px(2)},{location.py(2)}]"
             elif comp_type == "via":
                 t = et.SubElement(group, "text", x="0", y="-0.11")
                 t.set("class", style_class)
                 ts = et.SubElement(t, "tspan", x="0", dy="0.1")
-                ts.text = htmlpar.unescape("%s&#176;" % (rotation))
+                ts.text = f"{rotation}\u00B0"
                 ts = et.SubElement(t, "tspan", x="0", dy="0.1")
                 ts.text = f"[{location.px(2)},{location.py(2)}]"
             else:
-                continue
+                pass
 
     def _place_routing(self):
         """
