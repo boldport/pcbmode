@@ -164,9 +164,10 @@ class SvgPath:
                 elif cmd_type == "h":
                     s += f"{coord.px()} "
                 else:
-                    s += f"{coord.px()},{coord.py()} "
+                    s += f"{coord.px()},{coord.py()} "                
             s_path += f"{cmd_type} {s}"
-        self._s_r_path = s_path
+
+        self._s_r_path = s_path.rstrip() # remove space after last 'z'
 
     def _p_path_to_relative(self, path):
         """
