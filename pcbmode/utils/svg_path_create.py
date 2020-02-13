@@ -86,32 +86,8 @@ def rect(width, height, bor_rad=[]):
         p.append(["v", P([0, -sl[3]])])
         # TODO: missing something?
         p.append(["z"])
-
-        # # Cubic Bezier "arcs", clockwise from top left
-        # arcs = [
-        #     f"c 0,{-K * r1} {-r1 * (K - 1)},{-r1} {r1},{-r1} ",
-        #     f"c {K * r2},0 {r2},{-r2 * (K - 1)} {r2},{r2} ",
-        #     f"c 0,{K * r3} {r3 * (K - 1)},{r3} {-r3},{r3} ",
-        #     f"c {-K * r4},0 {-r4},{r4 * (K - 1)} {-r4},{-r4} ",
-        # ]
-
-        # p = f"m {-w/2},{-(h/2-r1)} "  # go to top left 'below' arc, or corner
-        # if r1 != 0:
-        #     p += arcs[0]
-        # p += f"h {sl[0]} "
-        # if r2 != 0:
-        #     p += arcs[1]
-        # p += f"v {sl[1]} "
-        # if r3 != 0:
-        #     p += arcs[2]
-        # p += f"h {-sl[2]} "
-        # if r4 != 0:
-        #     p += arcs[3]
-        # p += f"v {-sl[3]} "
-        # p += "z"
-
-    else:
-        # No rounded corners
+    else: # No rounded corners
+        
         p = [
             ["m", P([-w / 2, -h / 2])],
             ["h", P([w, 0])],
@@ -120,7 +96,6 @@ def rect(width, height, bor_rad=[]):
             ["v", P([0, -h])],
             ["z"],
         ]
-        # p = f"m {-w / 2},{-h / 2} h {w} v {h} h {-w} v {-h} z"
 
     return p
 
@@ -188,38 +163,6 @@ def circle(d, offset=None):
 
     return c
 
-    # return (
-    #     "m %s,%s c %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s z"
-    #     % (
-    #         0,
-    #         r - offset.y,
-    #         k * r,
-    #         0,
-    #         r,
-    #         -r * (1 - k),
-    #         r,
-    #         -r,
-    #         0,
-    #         -r * k,
-    #         -r * (1 - k),
-    #         -r,
-    #         -r,
-    #         -r,
-    #         -r * k,
-    #         0,
-    #         -r,
-    #         r * (1 - k),
-    #         -r,
-    #         r,
-    #         0,
-    #         r * k,
-    #         r * (1 - k),
-    #         r,
-    #         r,
-    #         r,
-    #     )
-    # )
-
 
 def drill(diameter):
     """
@@ -265,59 +208,6 @@ def drill(diameter):
 
     return c
 
-    # return (
-    #     "m %s,%s c %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s z m %s,%s %s,%s c %s,%s %s,%s %s,%s l %s,%s %s,%s c %s,%s %s,%s %s,%s z"
-    #     % (
-    #         0,
-    #         r,
-    #         k * r,
-    #         0,
-    #         r,
-    #         -r * (1 - k),
-    #         r,
-    #         -r,
-    #         0,
-    #         -r * k,
-    #         -r * (1 - k),
-    #         -r,
-    #         -r,
-    #         -r,
-    #         -r * k,
-    #         0,
-    #         -r,
-    #         r * (1 - k),
-    #         -r,
-    #         r,
-    #         0,
-    #         r * k,
-    #         r * (1 - k),
-    #         r,
-    #         r,
-    #         r,
-    #         0,
-    #         -(r - b),
-    #         0,
-    #         -2 * b,
-    #         -b * k,
-    #         0,
-    #         -b,
-    #         b * (1 - k),
-    #         -b,
-    #         b,
-    #         b,
-    #         0,
-    #         b,
-    #         0,
-    #         0,
-    #         k * b,
-    #         -b * (1 - k),
-    #         b,
-    #         -b,
-    #         b,
-    #     )
-    # )
-
-
 def placement_marker(diameter=0.2):
     """
     Returns an SvgPath object for a placement marker 
@@ -358,7 +248,6 @@ def placement_marker(diameter=0.2):
     m.append(["m", P([-b, -r]), P([2 * b, 0])])
     m.append(["z"])
 
-    #    path_str = f"m 0,{r} c {kr},0 {r},{-r1k} {r},{-r} 0,{-kr} {-r1k},{-r} {-r},{-r} {-kr},0 {-r},{r1k} {-r},{r} 0,{kr} {r1k},{r} {r},{r} m {-b},{-r} {2*b},0 z"
     return SvgPath(m)
 
 
@@ -383,46 +272,3 @@ def arrow(width, height, base, bar, gap):
     a.append(["m", P([-height, base / 2]), P([height, -base / 2])])
 
     return a
-
-
-# path = (
-#     "m %s,%s %s,%s m %s,%s %s,%s m %s,%s %s,%s m %s,%s %s,%s m %s,%s m %s,%s %s,%s m %s,%s %s,%s m %s,%s %s,%s m %s,%s %s,%s"
-#     % (
-#         -gap / 2,
-#         0,
-#         -width / 2 + gap / 2,
-#         0,
-#         0,
-#         bar / 2,
-#         0,
-#         -bar,
-#         height,
-#         (bar - base) / 2,
-#         -height,
-#         base / 2,
-#         height,
-#         base / 2,
-#         -height,
-#         -base / 2,
-#         width / 2,
-#         0,
-#         gap / 2,
-#         0,
-#         width / 2 - gap / 2,
-#         0,
-#         0,
-#         bar / 2,
-#         0,
-#         -bar,
-#         -height,
-#         (bar - base) / 2,
-#         height,
-#         base / 2,
-#         -height,
-#         base / 2,
-#         height,
-#         -base / 2,
-#     )
-# )
-#   return path
-
