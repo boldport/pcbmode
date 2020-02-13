@@ -239,13 +239,15 @@ class Module:
         # Width arrow
         shape_dict = {}
         shape_dict["type"] = "path"
-        shape_dict["value"] = SvgPath(svg_path_create.arrow(
-            width=self._dims.px(),
-            height=arrow_height,
-            base=arrow_base,
-            bar=arrow_bar_length,
-            gap=width_text.get_width() * 1.5,
-        )).get_path_str()
+        shape_dict["value"] = SvgPath(
+            svg_path_create.arrow(
+                width=self._dims.px(),
+                height=arrow_height,
+                base=arrow_base,
+                bar=arrow_bar_length,
+                gap=width_text.get_width() * 1.5,
+            )
+        ).get_path_str()
         shape_dict["location"] = width_loc
         shape_dict["style"] = "stroke-width:0.2;"
         width_arrow = Shape(shape_dict)
@@ -253,13 +255,15 @@ class Module:
         # Height arrow
         shape_dict = {}
         shape_dict["type"] = "path"
-        shape_dict["value"] = SvgPath(svg_path_create.arrow(
-            width=self._dims.py(),
-            height=arrow_height,
-            base=arrow_base,
-            bar=arrow_bar_length,
-            gap=height_text.get_height() * 1.5,
-        )).get_path_str()
+        shape_dict["value"] = SvgPath(
+            svg_path_create.arrow(
+                width=self._dims.py(),
+                height=arrow_height,
+                base=arrow_base,
+                bar=arrow_bar_length,
+                gap=height_text.get_height() * 1.5,
+            )
+        ).get_path_str()
         shape_dict["rotate"] = -90
         shape_dict["location"] = height_loc
         shape_dict["style"] = "stroke-width:0.2;"
@@ -486,7 +490,7 @@ class Module:
             else:
                 pass
 
-            marker_obj = svg_path_create.placement_marker()
+            marker_obj = SvgPath(svg_path_create.placement_marker())
             marker_el = et.SubElement(group, "path", d=marker_obj.get_path_str())
             if rotation != 0:
                 if placement_layer == "bottom":

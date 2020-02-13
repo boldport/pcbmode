@@ -86,8 +86,7 @@ def rect(width, height, bor_rad=[]):
         p.append(["v", P([0, -sl[3]])])
         # TODO: missing something?
         p.append(["z"])
-    else: # No rounded corners
-        
+    else:  # No rounded corners
         p = [
             ["m", P([-w / 2, -h / 2])],
             ["h", P([w, 0])],
@@ -208,6 +207,7 @@ def drill(diameter):
 
     return c
 
+
 def placement_marker(diameter=0.2):
     """
     Returns an SvgPath object for a placement marker 
@@ -248,7 +248,7 @@ def placement_marker(diameter=0.2):
     m.append(["m", P([-b, -r]), P([2 * b, 0])])
     m.append(["z"])
 
-    return SvgPath(m)
+    return m
 
 
 def arrow(width, height, base, bar, gap):
