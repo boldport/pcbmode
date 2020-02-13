@@ -18,7 +18,7 @@
 
 
 from pcbmode.config import config
-from pcbmode.utils.point import Point
+from pcbmode.utils.point import Point as P
 from pcbmode.utils.svgpath import SvgPath
 
 
@@ -64,30 +64,63 @@ def rect(width, height, bor_rad=[]):
 
         # Cubic Bezier "arcs", clockwise from top left
         arcs = [
-            f"c 0,{-K * r1} {-r1 * (K - 1)},{-r1} {r1},{-r1} ",
-            f"c {K * r2},0 {r2},{-r2 * (K - 1)} {r2},{r2} ",
-            f"c 0,{K * r3} {r3 * (K - 1)},{r3} {-r3},{r3} ",
-            f"c {-K * r4},0 {-r4},{r4 * (K - 1)} {-r4},{-r4} ",
+            ["c", P([0, -K * r1]), P([-r1 * (K - 1), -r1]), P([r1, -r1])],
+            ["c", P([K * r2, 0]), P([r2, -r2 * (K - 1)]), P([r2, r2])],
+            ["c", P([0, K * r3]), P([r3 * (K - 1), r3]), P([-r3, r3])],
+            ["c", P([-K * r4, 0]), P([-r4, r4 * (K - 1)]), P([-r4, -r4])],
         ]
 
-        p = f"m {-w/2},{-(h/2-r1)} "  # go to top left 'below' arc, or corner
+        p = []
+        p.append(["m", P([-w / 2, -(h / 2 - r1)])])
         if r1 != 0:
-            p += arcs[0]
-        p += f"h {sl[0]} "
+            p.append(arcs[0])
+        p.append(["h", P([sl[0], 0])])
         if r2 != 0:
-            p += arcs[1]
-        p += f"v {sl[1]} "
+            p.append(arcs[1])
+        p.append(["v", P([0, sl[1]])])
         if r3 != 0:
-            p += arcs[2]
-        p += f"h {-sl[2]} "
+            p.append(arcs[2])
+        p.append(["h", P([-sl[2], 0])])
         if r4 != 0:
-            p += arcs[3]
-        p += f"v {-sl[3]} "
-        p += "z"
+            p.append(arcs[3])
+        p.append(["v", P(0, [-sl[3]])])
+        # TODO: missing something?
+        p.append(["z"])
+
+        # # Cubic Bezier "arcs", clockwise from top left
+        # arcs = [
+        #     f"c 0,{-K * r1} {-r1 * (K - 1)},{-r1} {r1},{-r1} ",
+        #     f"c {K * r2},0 {r2},{-r2 * (K - 1)} {r2},{r2} ",
+        #     f"c 0,{K * r3} {r3 * (K - 1)},{r3} {-r3},{r3} ",
+        #     f"c {-K * r4},0 {-r4},{r4 * (K - 1)} {-r4},{-r4} ",
+        # ]
+
+        # p = f"m {-w/2},{-(h/2-r1)} "  # go to top left 'below' arc, or corner
+        # if r1 != 0:
+        #     p += arcs[0]
+        # p += f"h {sl[0]} "
+        # if r2 != 0:
+        #     p += arcs[1]
+        # p += f"v {sl[1]} "
+        # if r3 != 0:
+        #     p += arcs[2]
+        # p += f"h {-sl[2]} "
+        # if r4 != 0:
+        #     p += arcs[3]
+        # p += f"v {-sl[3]} "
+        # p += "z"
 
     else:
         # No rounded corners
-        p = f"m {-w / 2},{-h / 2} h {w} v {h} h {-w} v {-h} z"
+        p = [
+            ["m", P([-w / 2, -h / 2])],
+            ["h", P([w, 0])],
+            ["v", P([0, h])],
+            ["h", P([-w, 0])],
+            ["v", P([0, -h])],
+            ["z"],
+        ]
+        # p = f"m {-w / 2},{-h / 2} h {w} v {h} h {-w} v {-h} z"
 
     return p
 
