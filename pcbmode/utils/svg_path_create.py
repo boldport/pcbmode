@@ -155,7 +155,7 @@ def circle(d, offset=None):
     """
 
     if offset is None:
-        offset = Point()
+        offset = P()
 
     r = d / 2.0
 
@@ -165,37 +165,60 @@ def circle(d, offset=None):
     # by Aleksas Riskus
     k = 0.5522847498
 
-    return (
-        "m %s,%s c %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s z"
-        % (
-            0,
-            r - offset.y,
-            k * r,
-            0,
-            r,
-            -r * (1 - k),
-            r,
-            -r,
-            0,
-            -r * k,
-            -r * (1 - k),
-            -r,
-            -r,
-            -r,
-            -r * k,
-            0,
-            -r,
-            r * (1 - k),
-            -r,
-            r,
-            0,
-            r * k,
-            r * (1 - k),
-            r,
-            r,
-            r,
-        )
+    c = []
+    c.append(["m", P([0, r - offset.y])])
+    c.append(
+        [
+            "c",
+            P([k * r, 0]),
+            P([r, -r * (1 - k)]),
+            P([r, -r]),
+            P([0, -r * k]),
+            P([-r * (1 - k), -r]),
+            P([-r, -r]),
+            P([-r * k, 0]),
+            P([-r, r * (1 - k)]),
+            P([-r, r]),
+            P([0, r * k]),
+            P([r * (1 - k), r]),
+            P([r, r]),
+        ]
     )
+    c.append(["z"])
+
+    return c
+
+    # return (
+    #     "m %s,%s c %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s z"
+    #     % (
+    #         0,
+    #         r - offset.y,
+    #         k * r,
+    #         0,
+    #         r,
+    #         -r * (1 - k),
+    #         r,
+    #         -r,
+    #         0,
+    #         -r * k,
+    #         -r * (1 - k),
+    #         -r,
+    #         -r,
+    #         -r,
+    #         -r * k,
+    #         0,
+    #         -r,
+    #         r * (1 - k),
+    #         -r,
+    #         r,
+    #         0,
+    #         r * k,
+    #         r * (1 - k),
+    #         r,
+    #         r,
+    #         r,
+    #     )
+    # )
 
 
 def drill(diameter):
