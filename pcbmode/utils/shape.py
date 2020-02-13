@@ -43,7 +43,7 @@ class Shape:
 
         self._shape_dict = self._process_shape_dict(shape_dict)
 
-        self._path_str = self._path_from_shape_type()
+        self._p_r_path = self._path_from_shape_type()
         trans_dict = {  # transform dictionary
             "scale": self._shape_dict["scale"],
             "rotate": self._shape_dict["rotate"],
@@ -52,7 +52,7 @@ class Shape:
             "mirror_x": self._shape_dict["mirror-x"],
             "rel_to_dim": rel_to_dim,
         }
-        self._path_obj = SvgPath(self._path_str, trans_dict)  # create path object
+        self._path_obj = SvgPath(self._p_r_path, trans_dict)  # create path object
 
     def _process_shape_dict(self, sd):
         """ Set defaults """
@@ -107,21 +107,21 @@ class Shape:
             self._type = self._shape_dict.get("type")
 
         if self._type == "rect":
-            path = self._process_rect()
+            p_r_path = self._process_rect()
         elif self._type == "circle":
-            path = self._process_circ()
+            p_r_path = self._process_circ()
         elif self._type == "drill":
-            path = self._process_drill()
+            p_r_path = self._process_drill()
         elif self._type == "text":
             # path = self._process_text()
             # TODO: remove when dealing with text properly
-            path = "m 0,0"
+            p_r_path = "m 0,0"
         elif self._type == "path":
-            path = self._process_path()
+            p_r_path = self._process_path()
         else:
             msg.error("'%s' is not a recongnised shape type" % self._type)
 
-        return path
+        return p_r_path
 
     def _process_rect(self):
         try:

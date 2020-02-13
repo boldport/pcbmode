@@ -23,6 +23,7 @@ from pcbmode.config import config
 from pcbmode.utils import utils
 from pcbmode.utils import svg
 from pcbmode.utils import svg_path_create
+from pcbmode.utils.svgpath import SvgPath
 from pcbmode.utils.point import Point
 
 
@@ -74,9 +75,10 @@ def place(layer, width, height):
     for diameter in reversed(sorted(drills_dict)):
         location.x = diameter / 2
         location.y += config.cfg["iya"] * max(diameter / 2, 2)
-        path = svg_path_create.drill(diameter)
+        path_obj = SvgPath(svg_path_create.drill(diameter))
+        path_str = path_obj.get_path_str()
         transform = f"translate({location.px()},{config.cfg['iya']*location.py()})"
-        symbol_el = et.SubElement(group, "path", d=path, transform=transform)
+        symbol_el = et.SubElement(group, "path", d=path_str, transform=transform)
         symbol_el.set("fill-rule", "evenodd")
         symbol_el.set("class", "drill-index-symbol")
 

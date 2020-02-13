@@ -83,7 +83,7 @@ def rect(width, height, bor_rad=[]):
         p.append(["h", P([-sl[2], 0])])
         if r4 != 0:
             p.append(arcs[3])
-        p.append(["v", P(0, [-sl[3]])])
+        p.append(["v", P([0, -sl[3]])])
         # TODO: missing something?
         p.append(["z"])
 
@@ -337,7 +337,7 @@ def placement_marker(diameter=0.2):
     r1k = r * (1 - k)
 
     m = []
-    m.append(["m", P(0, r)])
+    m.append(["m", P([0, r])])
     m.append(
         [
             "c",
