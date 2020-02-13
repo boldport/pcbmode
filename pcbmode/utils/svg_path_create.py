@@ -336,10 +336,30 @@ def placement_marker(diameter=0.2):
     kr = k * r
     r1k = r * (1 - k)
 
-    path_str = f"m 0,{r} c {kr},0 {r},{-r1k} {r},{-r} 0,{-kr} {-r1k},{-r} {-r},{-r} {-kr},0 {-r},{r1k} {-r},{r} 0,{kr} {r1k},{r} {r},{r} m {-b},{-r} {2*b},0 z"
+    m = []
+    m.append(["m", P(0, r)])
+    m.append(
+        [
+            "c",
+            P([kr, 0]),
+            P([r, -r1k]),
+            P([r, -r]),
+            P([0, -kr]),
+            P([-r1k, -r]),
+            P([-r, -r]),
+            P([-kr, 0]),
+            P([-r, r1k]),
+            P([-r, r]),
+            P([0, kr]),
+            P([r1k, r]),
+            P([r, r]),
+        ]
+    )
+    m.append(["m", P([-b, -r]), P([2 * b, 0])])
+    m.append(["z"])
 
-    svgpath_obj = SvgPath(path_str)
-    return svgpath_obj
+    #    path_str = f"m 0,{r} c {kr},0 {r},{-r1k} {r},{-r} 0,{-kr} {-r1k},{-r} {-r},{-r} {-kr},0 {-r},{r1k} {-r},{r} 0,{kr} {r1k},{r} {r},{r} m {-b},{-r} {2*b},0 z"
+    return SvgPath(m)
 
 
 def arrow(width, height, base, bar, gap):
