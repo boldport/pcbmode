@@ -237,57 +237,85 @@ def drill(diameter):
     # Internal circle
     b = r * 0.9
 
-    return (
-        "m %s,%s c %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s z m %s,%s %s,%s c %s,%s %s,%s %s,%s l %s,%s %s,%s c %s,%s %s,%s %s,%s z"
-        % (
-            0,
-            r,
-            k * r,
-            0,
-            r,
-            -r * (1 - k),
-            r,
-            -r,
-            0,
-            -r * k,
-            -r * (1 - k),
-            -r,
-            -r,
-            -r,
-            -r * k,
-            0,
-            -r,
-            r * (1 - k),
-            -r,
-            r,
-            0,
-            r * k,
-            r * (1 - k),
-            r,
-            r,
-            r,
-            0,
-            -(r - b),
-            0,
-            -2 * b,
-            -b * k,
-            0,
-            -b,
-            b * (1 - k),
-            -b,
-            b,
-            b,
-            0,
-            b,
-            0,
-            0,
-            k * b,
-            -b * (1 - k),
-            b,
-            -b,
-            b,
-        )
+    c = []
+    c.append(["m", P([0, r])])
+    c.append(
+        [
+            "c",
+            P([k * r, 0]),
+            P([r, -r * (1 - k)]),
+            P([r, -r]),
+            P([0, -r * k]),
+            P([-r * (1 - k), -r]),
+            P([-r, -r]),
+            P([-r * k, 0]),
+            P([-r, r * (1 - k)]),
+            P([-r, r]),
+            P([0, r * k]),
+            P([r * (1 - k), r]),
+            P([r, r]),
+        ]
     )
+    c.append(["z"])
+    c.append(["m", P([0, -(r - b)]), P([0, -2 * b])])
+    c.append(["c", P([-b * k, 0]), P([-b, b * (1 - k)]), P([-b, b])])
+    c.append(["l", P([b, 0]), P([b, 0])])
+    c.append(["c", P([0, k * b]), P([-b * (1 - k), b]), P([-b, b])])
+    c.append(["z"])
+
+    return c
+
+    # return (
+    #     "m %s,%s c %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s %s,%s z m %s,%s %s,%s c %s,%s %s,%s %s,%s l %s,%s %s,%s c %s,%s %s,%s %s,%s z"
+    #     % (
+    #         0,
+    #         r,
+    #         k * r,
+    #         0,
+    #         r,
+    #         -r * (1 - k),
+    #         r,
+    #         -r,
+    #         0,
+    #         -r * k,
+    #         -r * (1 - k),
+    #         -r,
+    #         -r,
+    #         -r,
+    #         -r * k,
+    #         0,
+    #         -r,
+    #         r * (1 - k),
+    #         -r,
+    #         r,
+    #         0,
+    #         r * k,
+    #         r * (1 - k),
+    #         r,
+    #         r,
+    #         r,
+    #         0,
+    #         -(r - b),
+    #         0,
+    #         -2 * b,
+    #         -b * k,
+    #         0,
+    #         -b,
+    #         b * (1 - k),
+    #         -b,
+    #         b,
+    #         b,
+    #         0,
+    #         b,
+    #         0,
+    #         0,
+    #         k * b,
+    #         -b * (1 - k),
+    #         b,
+    #         -b,
+    #         b,
+    #     )
+    # )
 
 
 def placement_marker(diameter=0.2):
