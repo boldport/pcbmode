@@ -78,7 +78,7 @@ class Component:
         ]
         for sheet in sheets:
             for layer in config.stk["layer-names"]:
-                for shape in footprint_shapes[sheet].get(layer) or []:
+                for shape in footprint_shapes[sheet].get(layer, []):
                     shape.rotate_location(self._rotate, self._pivot)
                     # If the component is placed on the bottom layer we need to mirror
                     # all the shapes of the component. A mirror setting of the shape

@@ -267,6 +267,7 @@ class Shape:
     def rotate_location(self, angle, pivot=None):
         if pivot is None:
             pivot = Point([0, 0])
+        # TODO: add pivot     
         self._shape_dict["location"].rotate(angle)
 
     def get_rotate(self):
