@@ -19,6 +19,7 @@
 
 from math import pi, sin, cos
 import decimal
+import copy
 
 from pcbmode.config import config
 

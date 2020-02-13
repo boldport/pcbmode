@@ -76,6 +76,17 @@ class SvgPath:
         if deg != 0:
             for seg in p_r_path:
                 [c.rotate(deg) for c in seg[1:]]
+                # The following deals with the case where we have a 'h' or 'v' but with
+                # the rotation they should now be 'l' or flipped h->v ot v-h. Here we
+                # simple change the command to 'l', but it could be done better by 
+                # consolidating consecutive 'l' commands and doing the h/v flipping
+                # to the degrees of rotation.
+                # TODO: more efficient length/command-wise
+                # Example of an inefficient (but working) result:
+                # m -0.55,2.15 c 0,0.165685 0.134315,0.3 0.3,0.3 l 0.5,0 c 0.165685,0 0.3,-0.134315 0.3,-0.3 l 0,-4.6 l -1.1,0 l 0,4.6 z
+                # The last two 'l's can be eliminated
+                if seg[0] in ["h", "v"]:
+                    seg[0] = 'l'
         return p_r_path
 
     def _mirror_path(self, p_r_path):
