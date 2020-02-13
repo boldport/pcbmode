@@ -371,43 +371,58 @@ def arrow(width, height, base, bar, gap):
     gap: the gap for where the text goes
     """
 
-    path = (
-        "m %s,%s %s,%s m %s,%s %s,%s m %s,%s %s,%s m %s,%s %s,%s m %s,%s m %s,%s %s,%s m %s,%s %s,%s m %s,%s %s,%s m %s,%s %s,%s"
-        % (
-            -gap / 2,
-            0,
-            -width / 2 + gap / 2,
-            0,
-            0,
-            bar / 2,
-            0,
-            -bar,
-            height,
-            (bar - base) / 2,
-            -height,
-            base / 2,
-            height,
-            base / 2,
-            -height,
-            -base / 2,
-            width / 2,
-            0,
-            gap / 2,
-            0,
-            width / 2 - gap / 2,
-            0,
-            0,
-            bar / 2,
-            0,
-            -bar,
-            -height,
-            (bar - base) / 2,
-            height,
-            base / 2,
-            -height,
-            base / 2,
-            height,
-            -base / 2,
-        )
-    )
-    return path
+    a = []
+    a.append(["m", P([-gap / 2, 0]), P([-width / 2 + gap / 2, 0])])
+    a.append(["m", P([0, bar / 2]), P([0, -bar])])
+    a.append(["m", P([height, (bar - base) / 2]), P([-height, base / 2])])
+    a.append(["m", P([height, base / 2]), P([-height, -base / 2])])
+    a.append(["m", P([width / 2, 0])])
+    a.append(["m", P([gap / 2, 0]), P([width / 2 - gap / 2, 0])])
+    a.append(["m", P([0, bar / 2]), P([0, -bar])])
+    a.append(["m", P([-height, (bar - base) / 2]), P([height, base / 2])])
+    a.append(["m", P([-height, base / 2]), P([height, -base / 2])])
+
+    return a
+
+
+# path = (
+#     "m %s,%s %s,%s m %s,%s %s,%s m %s,%s %s,%s m %s,%s %s,%s m %s,%s m %s,%s %s,%s m %s,%s %s,%s m %s,%s %s,%s m %s,%s %s,%s"
+#     % (
+#         -gap / 2,
+#         0,
+#         -width / 2 + gap / 2,
+#         0,
+#         0,
+#         bar / 2,
+#         0,
+#         -bar,
+#         height,
+#         (bar - base) / 2,
+#         -height,
+#         base / 2,
+#         height,
+#         base / 2,
+#         -height,
+#         -base / 2,
+#         width / 2,
+#         0,
+#         gap / 2,
+#         0,
+#         width / 2 - gap / 2,
+#         0,
+#         0,
+#         bar / 2,
+#         0,
+#         -bar,
+#         -height,
+#         (bar - base) / 2,
+#         height,
+#         base / 2,
+#         -height,
+#         base / 2,
+#         height,
+#         -base / 2,
+#     )
+# )
+#   return path
+
