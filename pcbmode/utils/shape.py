@@ -234,11 +234,11 @@ class Shape:
 
     def transform_path(self, t_dict):
         """ 
-        Transform the path of this object by taking the existing string'd path and
-        creating a new SvgPath object using the given 't_dict' transform dictionary
+        Transform the path of this object by taking the existing path and tranforming
+        it into a new SvgPath given 't_dict' transform dictionary
         """
-        path_str = self._path_obj.get_path_str()
-        self._path_obj = SvgPath(path_str, t_dict)
+        p_r_path = self._path_obj.get_relative_parsed()
+        self._path_obj = SvgPath(p_r_path, t_dict)
 
     def get_style_class(self):
         return self._shape_dict["style-class"]
