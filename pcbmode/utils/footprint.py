@@ -48,7 +48,6 @@ class Footprint:
             "solderpaste": {},
             "drills": {},
         }
-
         self._process_pins()
         self._process_pours()
         self._process_shapes()
@@ -59,26 +58,28 @@ class Footprint:
 
     def _process_pins(self):
         """
-        Converts pins into 'shapes'
+        Converts pin instantiation into Shapes.
+        A package 'pin' uses a 'pad' defined in the footprint file. Each 'pad' can have
+        multiple shapes, which are converted into Shape objects.
         """
-
-        pins_dict = self._footprint.get("pins", {})
-        pads_dict = self._footprint.get("pads", {})
+        pins_dict = self._footprint.get("pins", {}) # pin: instance of a pin
+        pads_dict = self._footprint.get("pads", {}) # pad: the shape/footprint of a pin
 
         for pin_name in pins_dict:
 
-            # Pin information
             pin_dict = pins_dict[pin_name]["layout"]
             pin_loc_p = Point(pin_dict.get("location", [0, 0]))
             pin_rotate = pin_dict.get("rotate", 0)
+            pin_pivot_p = Point(pin_dict.get("pivot", [0, 0]))
 
             pad_dict = pads_dict[pin_dict["pad"]]
             pad_shapes = pad_dict.get("shapes", [])
 
-            for shape_dict in pad_shapes:
+            # We need this copy in order to start fresh with each instance of the 'pad'
+            # since it is modified by the 'pin' parameters
+            pad_shapes_copy = copy.deepcopy(pad_shapes)
 
-                # TODO: fully understand why this is needed!
-                shape_dict = shape_dict.copy()
+            for shape_dict in pad_shapes_copy:
 
                 # Add the pin's location to the pad's location
                 shape_loc = shape_dict.get("location", [0, 0])
@@ -87,8 +88,8 @@ class Footprint:
                     shape_loc_p = shape_loc
                 else:
                     shape_loc_p = Point(shape_loc)
-
                 shape_dict["location"] = pin_loc_p + shape_loc_p
+                
                 # Add the pin's rotation to the pad's rotation
                 shape_dict["rotate"] = (shape_dict.get("rotate", 0)) + pin_rotate
 
