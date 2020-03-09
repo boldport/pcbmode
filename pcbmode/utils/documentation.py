@@ -46,4 +46,4 @@ def place_docs(layer):
         location = docs_dict[key]["location"]
         docs_dict[key]["location"] = Point() #[0, 0]
         shape = Shape(docs_dict[key])
-        place.placeShape(shape, shape_group)
+        place.place_shape(shape, shape_group)
