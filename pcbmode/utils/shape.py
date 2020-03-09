@@ -40,9 +40,7 @@ class Shape:
         dimensions specified. Otherwise it'll be centered around the dimentsions of the
         shape itself (routing shapes are placed relative to the outline, not themselves) 
         """
-
         self._shape_dict = self._process_shape_dict(shape_dict)
-
         self._p_r_path = self._path_from_shape_type()
         trans_dict = {  # transform dictionary
             "scale": self._shape_dict["scale"],
@@ -52,28 +50,26 @@ class Shape:
             "mirror_x": self._shape_dict["mirror-x"],
             "rel_to_dim": rel_to_dim,
         }
-        self._path_obj = SvgPath(self._p_r_path, trans_dict)  # create path object
+        self._path_obj = SvgPath(self._p_r_path, trans_dict)
 
     def _process_shape_dict(self, sd):
-        """ Set defaults """
-        # Invert rotation so it's clock-wise. Inkscape is counter-clockwise and
-        # it's unclear to me what's the "right" direction. clockwise makes more
-        # sense to me. This should be the only place to make the change.
-        self._inv_rotate = -1
-
+        """ 
+        Read in parameters and set defaults
+        """
         sd["label"] = sd.get("label", None)
         sd["label_style_class"] = sd.get("label-style-class", None)
         sd["gerber-lp"] = sd.get("gerber-lp", None)
         sd["mirror-y"] = sd.get("mirror-y", False)
         sd["mirror-x"] = sd.get("mirror-x", False)
-        sd["rotate"] = sd.get("rotate", 0) * self._inv_rotate
+        sd["rotate"] = sd.get("rotate", 0)
         sd["pivot"] = sd.get("pivot", Point([0, 0]))
         sd["scale"] = sd.get("scale", 1)
         sd["buffer-to-pour"] = sd.get("buffer-to-pour")
         sd["location"] = sd.get("location", Point([0, 0]))
 
         # Somewhere the location input isn't being converted to Point()
-        # This checks... but needs to be removed eventually
+        # This checks.
+        # TODO: remove this check eventually
         if isinstance(sd["location"], Point) is False:
             sd["location"] = Point(sd["location"])
 
@@ -126,13 +122,9 @@ class Shape:
     def _process_rect(self):
         try:
             width = self._shape_dict["width"]
-        except KeyError:
-            msg.error("A 'rect' shape requires a 'width' definition")
-
-        try:
             height = self._shape_dict["height"]
         except KeyError:
-            msg.error("A 'rect' shape requires a 'height' definition")
+            msg.error("A 'rect' shape requires 'width' and 'height' definitions")
 
         border_radius = self._shape_dict.get("border-radius", [])
         return svg_path_create.rect(width, height, border_radius)
@@ -142,6 +134,7 @@ class Shape:
             self._diameter = self._shape_dict["diameter"]
         except KeyError:
             msg.error("A 'circle' shape requires a 'diameter' definition")
+ 
         return svg_path_create.circle(self._diameter)
 
     def _process_drill(self):
@@ -267,7 +260,7 @@ class Shape:
     def rotate_location(self, angle, pivot=None):
         if pivot is None:
             pivot = Point([0, 0])
-        # TODO: add pivot     
+        # TODO: add pivot
         self._shape_dict["location"].rotate(angle)
 
     def get_rotate(self):
@@ -305,9 +298,6 @@ class Shape:
 
     def set_location(self, location_point):
         self._shape_dict["location"] = location_point
-
-    def getParsedPath(self):
-        return self._parsed
 
     def getPourBuffer(self):
         return self._shape_dict["buffer-to-pour"]
