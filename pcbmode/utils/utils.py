@@ -179,11 +179,10 @@ def getInternalLayers():
 
 def getExtendedLayerList(layers):
     """
-    For the list of layers we may get a list of all
-    internal layers ('internal-1', 'internal-2, etc.) or
-    simply 'internal', meaning that that shape is meant
-    to go into all internal layers, which is the most
-    common case. The following 'expands' the layer list
+    For the list of layers we may get a list of all internal layers ('internal-1', 
+    'internal-2, etc.) or simply 'internal', meaning that that shape is meant to go 
+    into all internal layers, which is the most common case. The following 'expands'
+    the layer list
     """
     if "internal" in layers:
         layers.remove("internal")
