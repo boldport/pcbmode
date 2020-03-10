@@ -97,7 +97,7 @@ class Footprint:
 
                 for layer in layers:
 
-                    s_d_c = s_d.copy()
+                    s_d_c = copy.deepcopy(s_d)  # must be deepcopy!
                     pad_s_o = Shape(s_d_c)
 
                     # Add the label to the shape instance and not to the dict so
