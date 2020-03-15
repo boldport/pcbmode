@@ -126,7 +126,7 @@
             "solderpaste": {"ext": "ger"}
           },
           "other":
-   	  {
+          {
             "documentation": {"ext": "ger"},
             "outline": {"ext": "ger"}
           }
@@ -137,7 +137,7 @@
           "non-plated": {"ext": "txt"}
         },
         "text":
-	{
+        {
           "readme": {"ext": "txt"}
         }
       }
@@ -167,7 +167,7 @@
             "solderpaste": {"ext": "GBP"}  
           },
           "other":
-   	  {
+          {
             "documentation": {"ext": "GBR"},
             "outline": {"ext": "GKO"}
           }
@@ -178,7 +178,7 @@
           "non-plated": {"end": "_NPTH", "ext": "drl"}
         },
         "text":
-	{
+        {
           "readme": {"ext": "txt"}
         }
       }
@@ -187,41 +187,82 @@
     {
       "filenames":
       {
-	"gerbers":
-	{
-	  "top":
-	  {
-	    "copper": {"ext": "gtl"},
-	    "soldermask": {"ext": "gts"},
-	    "silkscreen": {"ext": "gto"},
-	    "solderpaste": {"ext": "gtp"}
-	  },
+        "gerbers":
+        {
+          "top":
+          {
+            "conductor": {"ext": "gtl"},
+            "soldermask": {"ext": "gts"},
+            "silkscreen": {"ext": "gto"},
+            "solderpaste": {"ext": "gtp"}
+          },
           "internal":
           {
             "conductor": {"ext": "ger"}
           },
-	  "bottom":
-	  {
-	    "copper": {"ext": "gbl"},
-	    "soldermask": {"ext": "gbs"},
-	    "silkscreen": {"ext": "gbo"},
-	    "solderpaste": {"ext": "gbp"}
-	  },
-	  "other":
-	  {
-	    "documentation": {"ext": "ger"},
-	    "outline": {"ext": "gbr"}
-	  }
-	},
-	"drills":
-	{
-	  "plated": {"ext": "txt"},
-	  "non-plated": {"ext": "txt"}
-	},
-	"text":
-	{
-	  "readme": {"ext": "txt"}
-	}
+          "bottom":
+          {
+            "conductor": {"ext": "gbl"},
+            "soldermask": {"ext": "gbs"},
+            "silkscreen": {"ext": "gbo"},
+            "solderpaste": {"ext": "gbp"}
+          },
+          "other":
+          {
+            "documentation": {"ext": "ger"},
+            "outline": {"ext": "gbr"}
+          }
+        },
+        "drills":
+        {
+          "plated": {"ext": "txt"},
+          "non-plated": {"ext": "txt"}
+        },
+        "text":
+        {
+          "readme": {"ext": "txt"}
+        }
+      }
+    },
+    "jlcpcb":
+    {
+      "filenames":
+      {
+        "gerbers":
+        {
+          "top":
+          {
+            "conductor": {"ext": "GTL"},
+            "soldermask": {"ext": "GTS"},
+            "silkscreen": {"ext": "GTO"},
+            "solderpaste": {"ext": "GTP"}
+          },
+          "internal":
+          {
+            "conductor": {"ext": "GER"}
+          },
+          "bottom":
+          {
+            "conductor": {"ext": "GBL"},
+            "soldermask": {"ext": "GBS"},
+            "silkscreen": {"ext": "GBO"},
+            "solderpaste": {"ext": "GBP"}
+          },
+          "other":
+          {
+            "documentation": {"ext": "GER"},
+            "outline": {"ext": "GML"}
+          }
+        },
+        "drills":
+        {
+          "plated": {"ext": "TXT"},
+          "non-plated": {"ext": "TXT"}
+        },
+        "text":
+        {
+          "readme": {"ext": "TXT"}
+        }
       }
     }
   }
