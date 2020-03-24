@@ -31,12 +31,17 @@ def place(layer, width, height):
     """
     """
 
+    try:
+        drill_count_d = config.tmp["drill-count"]
+    except:
+        return
+
     ns_pcm = config.cfg["ns"]["pcbmode"]
 
     drills_dict = {}
     longest_text = 0
     largest_drill = 0
-    for diameter in config.tmp["drill-count"]:
+    for diameter in drill_count_d:
         if diameter not in drills_dict:
             drills_dict[diameter] = 1
         else:
@@ -57,7 +62,7 @@ def place(layer, width, height):
     group.set(f"{{{ns_pcm}}}type", "drill-index")
 
     # Headline text
-    drill_count = len(config.tmp["drill-count"])
+    drill_count = len(drill_count_d)
     if drill_count == 0:
         text = "No drills"
     elif drill_count == 1:
