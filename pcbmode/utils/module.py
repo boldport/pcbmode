@@ -185,7 +185,7 @@ class Module:
                 mask_element.set("style", style)
 
                 # Also override mask's gerber-lp and set to all clear
-                path = self._outline_shape.getOriginalPath().lower()
+                path = self._outline_shape.get_path_str()
                 segments = path.count("m")
                 mask_element.set(f"{{{ns_pcm}}}gerber-lp", "c" * segments)
 
