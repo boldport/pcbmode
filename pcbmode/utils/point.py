@@ -58,14 +58,18 @@ class Point:
         self.x = float(x)
         self.y = float(y)
 
-    def rotate(self, deg):  # TODO: add 'pivot'
-        """ Rotate the point in degrees """
+    def rotate(self, deg, cw=True):  # TODO: add 'pivot'
+        """ Rotate the point in degrees, with optional direction """
         DEG2RAD = 2 * pi / 360
         rad = deg * DEG2RAD
         x = self.x
         y = self.y
-        self.x = x * cos(rad) + y * sin(rad)
-        self.y = x * -sin(rad) + y * cos(rad)
+        if cw == True:
+            self.x = x * cos(rad) - y * sin(rad)
+            self.y = x * sin(rad) + y * cos(rad)
+        else:
+            self.x = x * cos(rad) + y * sin(rad)
+            self.y = x * -sin(rad) + y * cos(rad)
 
     def mult(self, scalar):
         """ multiply by scalar """
