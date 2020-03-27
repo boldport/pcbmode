@@ -58,18 +58,18 @@ class Point:
         self.x = float(x)
         self.y = float(y)
 
-    def rotate(self, deg, cw=True):  # TODO: add 'pivot'
+    def rotate(self, deg, pivot=None):  # TODO: add 'pivot'
         """ Rotate the point in degrees, with optional direction """
-        DEG2RAD = 2 * pi / 360
-        rad = deg * DEG2RAD
+        if pivot is None:
+            pivot = Point([0, 0])
+        rad = deg * pi / 180
         x = self.x
         y = self.y
-        if cw == True:
-            self.x = x * cos(rad) - y * sin(rad)
-            self.y = x * sin(rad) + y * cos(rad)
-        else:
-            self.x = x * cos(rad) + y * sin(rad)
-            self.y = x * -sin(rad) + y * cos(rad)
+        self.x = (x+pivot.x) * cos(rad) - (y+pivot.y) * sin(rad)
+        self.y = (x+pivot.x) * sin(rad) + (y+pivot.y) * cos(rad)
+        # rotate counter-clockwise
+        #self.x = (x * cos(rad) + y * sin(rad))
+        #self.y = x * -sin(rad) + y * cos(rad)
 
     def mult(self, scalar):
         """ multiply by scalar """
@@ -83,7 +83,7 @@ class Point:
         else:
             num = round(self.x, sd)
         if float(num).is_integer():
-            num = int(self.x)
+            num = int(num)
         return num
 
     def py(self, sd=None):
@@ -92,8 +92,9 @@ class Point:
             num = round(self.y, self._sig_dig)
         else:
             num = round(self.y, sd)
+        print(num)    
         if float(num).is_integer():
-            num = int(self.y)
+            num = int(num)
         return num
 
     def mirror(self, axis):
