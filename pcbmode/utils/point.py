@@ -65,11 +65,11 @@ class Point:
         rad = deg * pi / 180
         x = self.x
         y = self.y
-        self.x = (x+pivot.x) * cos(rad) - (y+pivot.y) * sin(rad)
-        self.y = (x+pivot.x) * sin(rad) + (y+pivot.y) * cos(rad)
+        self.x = (x + pivot.x) * cos(rad) - (y + pivot.y) * sin(rad)
+        self.y = (x + pivot.x) * sin(rad) + (y + pivot.y) * cos(rad)
         # rotate counter-clockwise
-        #self.x = (x * cos(rad) + y * sin(rad))
-        #self.y = x * -sin(rad) + y * cos(rad)
+        # self.x = (x * cos(rad) + y * sin(rad))
+        # self.y = x * -sin(rad) + y * cos(rad)
 
     def mult(self, scalar):
         """ multiply by scalar """
@@ -92,7 +92,6 @@ class Point:
             num = round(self.y, self._sig_dig)
         else:
             num = round(self.y, sd)
-        print(num)    
         if float(num).is_integer():
             num = int(num)
         return num
