@@ -50,6 +50,8 @@ class SvgPath:
             self._p_r_path = self._p_path_to_relative(self._p_path)
         else:
             self._p_r_path = path_in
+            self._stringify_path()
+            self._path_in = self._s_r_path
 
         # Transform path
         self._t_dict = trans_dict
