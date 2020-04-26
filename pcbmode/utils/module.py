@@ -494,11 +494,11 @@ class Module:
             # refdef (for components), rotation, location (2 sig digs) 
             marker_obj = SvgPath(svg_path_create.placement_marker())
             marker_el = et.SubElement(group, "path", d=marker_obj.get_path_str())
-            rotation = comp_obj.get_rotate()
-            if rotation != 0:
+            rotate = comp_obj.get_rotate()
+            if rotate != 0:
                 if placement_layer == "bottom":
-                    rotation *= -1
-                marker_el.set("transform", f"rotate({rotation})")  # rotate marker
+                    rotate *= -1
+                marker_el.set("transform", f"rotate({rotate})")  # rotate marker
 
             # Place marker text
             style_class = "placement-text"
@@ -508,14 +508,14 @@ class Module:
                 ts = et.SubElement(t, "tspan", x="0", dy="0.1")
                 ts.text = f"{refdef}"
                 ts = et.SubElement(t, "tspan", x="0", dy="0.1")
-                ts.text = f"{rotation}\u00B0"
+                ts.text = f"{rotate}\u00B0"
                 ts = et.SubElement(t, "tspan", x="0", dy="0.1")
                 ts.text = f"[{location.px(2)},{location.py(2)}]"
             elif comp_type == "via":
                 t = et.SubElement(group, "text", x="0", y="-0.11")
                 t.set("class", style_class)
                 ts = et.SubElement(t, "tspan", x="0", dy="0.1")
-                ts.text = f"{rotation}\u00B0"
+                ts.text = f"{rotate}\u00B0"
                 ts = et.SubElement(t, "tspan", x="0", dy="0.1")
                 ts.text = f"[{location.px(2)},{location.py(2)}]"
             else:
