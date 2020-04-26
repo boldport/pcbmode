@@ -257,11 +257,10 @@ class Shape:
     def set_label_style_class(self, new_style_class):
         self._shape_dict["label-style-class"] = new_style_class
 
-    def rotate_location(self, angle, pivot=None):
-        if pivot is None:
-            pivot = Point([0, 0])
-        # TODO: add pivot
-        self._shape_dict["location"].rotate(angle)
+    def rotate_location(self, deg, rotate_p=None):
+        if rotate_p is None:
+            rotate_p = Point([0, 0])
+        self._shape_dict["location"].rotate(deg, rotate_p)
 
     def get_rotate(self):
         return self._shape_dict["rotate"]
