@@ -58,15 +58,15 @@ class Point:
         self.x = float(x)
         self.y = float(y)
 
-    def rotate(self, deg, pivot=None):  # TODO: add 'pivot'
+    def rotate(self, deg, rotate_p=None):  # TODO: add 'pivot'
         """ Rotate the point in degrees, with optional direction """
-        if pivot is None:
-            pivot = Point([0, 0])
+        if rotate_p is None:
+            rotate_p = Point([0, 0])
         rad = deg * pi / 180
         x = self.x
         y = self.y
-        self.x = (x + pivot.x) * cos(rad) - (y + pivot.y) * sin(rad)
-        self.y = (x + pivot.x) * sin(rad) + (y + pivot.y) * cos(rad)
+        self.x = (x + rotate_p.x) * cos(rad) - (y + rotate_p.y) * sin(rad)
+        self.y = (x + rotate_p.x) * sin(rad) + (y + rotate_p.y) * cos(rad)
         # rotate counter-clockwise
         # self.x = (x * cos(rad) + y * sin(rad))
         # self.y = x * -sin(rad) + y * cos(rad)
