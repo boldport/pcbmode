@@ -43,7 +43,7 @@ class Component:
         self._location = Point(comp_dict.get("location", [0, 0]))
         self._scale = comp_dict.get("scale", 1)
         self._rotate = comp_dict.get("rotate", 0)
-        self._rotate_p = Point(comp_dict.get("rotate-point", [0, 0]))
+        self._rotate_p = Point(comp_dict.get("rotate-origin", [0, 0]))
         if comp_dict["layer"] == "bottom":
             self._place_bot = True
         else:

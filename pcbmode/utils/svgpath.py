@@ -73,7 +73,7 @@ class SvgPath:
     def _rotate_path(self, p_r_path):
         """ Rotate a parsed relative path """
         deg = self._t_dict.get("rotate", 0)
-        rotate_p = Point(self._t_dict.get("rotate-point", [0,0]))
+        rotate_p = Point(self._t_dict.get("rotate-origin", [0,0]))
         if deg != 0:
             for seg in p_r_path:
                 [c.rotate(deg, rotate_p) for c in seg[1:]]
