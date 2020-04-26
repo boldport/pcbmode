@@ -45,7 +45,7 @@ class Shape:
         trans_dict = {  # transform dictionary
             "scale": self._shape_dict["scale"],
             "rotate": self._shape_dict["rotate"],
-            "pivot": self._shape_dict["pivot"],
+            "rotate_p": self._shape_dict["rotate_p"],
             "mirror_y": self._shape_dict["mirror-y"],
             "mirror_x": self._shape_dict["mirror-x"],
             "rel_to_dim": rel_to_dim,
@@ -62,7 +62,7 @@ class Shape:
         sd["mirror-y"] = sd.get("mirror-y", False)
         sd["mirror-x"] = sd.get("mirror-x", False)
         sd["rotate"] = sd.get("rotate", 0)
-        sd["pivot"] = sd.get("pivot", Point([0, 0]))
+        sd["rotate_p"] = sd.get("rotate-origin", Point([0, 0]))
         sd["scale"] = sd.get("scale", 1)
         sd["buffer-to-pour"] = sd.get("buffer-to-pour")
         sd["location"] = sd.get("location", Point([0, 0]))

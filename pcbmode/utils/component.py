@@ -131,7 +131,7 @@ class Component:
                 )
                 refdef_shape = Shape(refdef_dict)
                 refdef_shape.is_refdef = True
-                refdef_shape.rotate_location(self._rotate, self._pivot)
+                refdef_shape.rotate_location(self._rotate, self._rotate_p)
 
                 # Add the refdef to the silkscreen/assembly list.
                 # NOTE: It's important that this is added at the very end since the

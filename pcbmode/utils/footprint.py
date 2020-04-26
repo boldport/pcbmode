@@ -70,7 +70,7 @@ class Footprint:
             pin_d = pins_d[pin_name]["layout"]
             pin_loc_p = Point(pin_d.get("location", [0, 0]))
             pin_rotate = pin_d.get("rotate", 0)
-            pin_pivot_p = Point(pin_d.get("rotate-pivot", [0, 0]))
+            pin_rotate_p = Point(pin_d.get("rotate-origin", [0, 0]))
 
             # We need this copy in order to start fresh with each instance of the 'pad'
             # since it is modified by the 'pin' parameters
@@ -96,7 +96,7 @@ class Footprint:
 
                 # We don't want to rotate the location if there's no new origin. When we
                 # don't, the shape is rotated around its center, and only then placed
-                # at its location. If we apply the pivot, the object is rotated
+                # at its location. If we apply the new origin, the object is rotated
                 # around that point, not around its center.
                 if s_d["rotate-origin"].is_not_00():
                     s_d["location"].rotate(
