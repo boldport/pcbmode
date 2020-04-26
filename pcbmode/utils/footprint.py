@@ -94,17 +94,13 @@ class Footprint:
 
                 s_d["rotate-point"] = Point(s_d.get("rotate-point", [0, 0]))
 
-                # We don't want to rotate the location is there's no pivot. When we
+                # We don't want to rotate the location if there's no new origin. When we
                 # don't, the shape is rotated around its center, and only then placed
                 # at its location. If we apply the pivot, the object is rotated
                 # around that point, not around its center.
-                #
-                # TODO: The '-' before s_d["rotate"] makes the shape roate in the right
-                # direction but I cannot quite understand why it's required. I'm leaving
-                # it in for now, but ideally we'll get rid of it, or explain it.
                 if s_d["rotate-point"].is_not_00():
                     s_d["location"].rotate(
-                        -s_d["rotate"], s_d["rotate-point"] + s_d["location"]
+                        s_d["rotate"], s_d["rotate-point"] + s_d["location"]
                     )
 
                 # Which layer(s) to place the shape on
