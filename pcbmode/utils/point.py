@@ -17,7 +17,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-from math import pi, sin, cos
+import math
 import decimal
 import copy
 
@@ -58,18 +58,22 @@ class Point:
         self.x = float(x)
         self.y = float(y)
 
-    def rotate(self, deg, rotate_p=None):  # TODO: add 'pivot'
-        """ Rotate the point in degrees, with optional direction """
-        if rotate_p is None:
-            rotate_p = Point([0, 0])
-        rad = deg * pi / 180
+    def rotate(self, deg, origin=None):
+        """ 
+        Rotate clockwise by 'deg' around 'origin'
+        Helpful:
+          https://stackoverflow.com/questions/34372480/rotate-point-about-another-point-in-degrees-python
+        """
+        deg = -deg  #  so to rotate clockwise
+        r = math.radians(deg)  # convert to radians
+        o = origin
+        if o is None:
+            o = Point([0, 0])
         x = self.x
         y = self.y
-        self.x = (x + rotate_p.x) * cos(rad) - (y + rotate_p.y) * sin(rad)
-        self.y = (x + rotate_p.x) * sin(rad) + (y + rotate_p.y) * cos(rad)
         # rotate counter-clockwise
-        # self.x = (x * cos(rad) + y * sin(rad))
-        # self.y = x * -sin(rad) + y * cos(rad)
+        self.x = o.x + math.cos(r) * (x - o.x) - math.sin(r) * (y - o.y)
+        self.y = o.y + math.sin(r) * (x - o.x) + math.cos(r) * (y - o.y)
 
     def mult(self, scalar):
         """ multiply by scalar """
