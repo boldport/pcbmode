@@ -62,7 +62,7 @@ class Shape:
         sd["mirror-y"] = sd.get("mirror-y", False)
         sd["mirror-x"] = sd.get("mirror-x", False)
         sd["rotate"] = sd.get("rotate", 0)
-        sd["rotate_p"] = sd.get("rotate-origin", Point([0, 0]))
+        sd["rotate_p"] = sd.get("rotate_p", Point([0, 0]))
         sd["scale"] = sd.get("scale", 1)
         sd["buffer-to-pour"] = sd.get("buffer-to-pour")
         sd["location"] = sd.get("location", Point([0, 0]))
@@ -134,7 +134,7 @@ class Shape:
             self._diameter = self._shape_dict["diameter"]
         except KeyError:
             msg.error("A 'circle' shape requires a 'diameter' definition")
- 
+
         return svg_path_create.circle(self._diameter)
 
     def _process_drill(self):

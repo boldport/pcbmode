@@ -92,15 +92,15 @@ class Footprint:
                 # Add the pin's rotation to the pad's rotation
                 s_d["rotate"] = (s_d.get("rotate", 0)) + pin_rotate
 
-                s_d["rotate-origin"] = Point(s_d.get("rotate-origin", [0, 0]))
+                s_d["rotate_p"] = Point(s_d.get("rotate-origin", [0, 0]))
 
                 # We don't want to rotate the location if there's no new origin. When we
                 # don't, the shape is rotated around its center, and only then placed
                 # at its location. If we apply the new origin, the object is rotated
                 # around that point, not around its center.
-                if s_d["rotate-origin"].is_not_00():
+                if s_d["rotate_p"].is_not_00():
                     s_d["location"].rotate(
-                        s_d["rotate"], s_d["rotate-origin"] + s_d["location"]
+                        s_d["rotate"], s_d["rotate_p"] + s_d["location"]
                     )
 
                 # Which layer(s) to place the shape on
