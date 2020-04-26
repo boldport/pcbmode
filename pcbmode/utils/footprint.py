@@ -70,7 +70,7 @@ class Footprint:
             pin_d = pins_d[pin_name]["layout"]
             pin_loc_p = Point(pin_d.get("location", [0, 0]))
             pin_rotate = pin_d.get("rotate", 0)
-            pin_pivot_p = Point(pin_d.get("pivot", [0, 0]))
+            pin_pivot_p = Point(pin_d.get("rotate-pivot", [0, 0]))
 
             # We need this copy in order to start fresh with each instance of the 'pad'
             # since it is modified by the 'pin' parameters
@@ -88,9 +88,24 @@ class Footprint:
                     s_loc_p = Point(s_loc)
 
                 s_d["location"] = pin_loc_p + s_loc_p
+
                 # Add the pin's rotation to the pad's rotation
                 s_d["rotate"] = (s_d.get("rotate", 0)) + pin_rotate
-                s_d["location"].rotate(s_d["rotate"])
+
+                s_d["rotate-point"] = Point(s_d.get("rotate-point", [0, 0]))
+
+                # We don't want to rotate the location is there's no pivot. When we
+                # don't, the shape is rotated around its center, and only then placed
+                # at its location. If we apply the pivot, the object is rotated
+                # around that point, not around its center.
+                #
+                # TODO: The '-' before s_d["rotate"] makes the shape roate in the right
+                # direction but I cannot quite understand why it's required. I'm leaving
+                # it in for now, but ideally we'll get rid of it, or explain it.
+                if s_d["rotate-point"].is_not_00():
+                    s_d["location"].rotate(
+                        -s_d["rotate"], s_d["rotate-point"] + s_d["location"]
+                    )
 
                 # Which layer(s) to place the shape on
                 layers = utils.getExtendedLayerList(s_d.get("layers", ["top"]))
