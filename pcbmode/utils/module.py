@@ -52,7 +52,7 @@ class Module:
         ns_pcm = config.cfg["ns"]["pcbmode"]
 
         # These two statement assume that there's a single module. When we start working
-        # on multiple modules per board those will need to be named and seperated
+        # on multiple modules per board/panel those will need to be named and seperated
         self._module_dict = config.brd
         self._routing_dict = config.rte
 
@@ -291,7 +291,6 @@ class Module:
         for comp_obj in comp_objs:
             shapes_dict = comp_obj.get_shapes()
             location = comp_obj.get_location()
-            rotation = comp_obj.get_rotate()
             refdef = comp_obj.get_refdef()
 
             if location.is_not_00():
@@ -490,12 +489,16 @@ class Module:
             else:
                 pass
 
+            # Place the placement marker
+            # The information included in the marker is:
+            # refdef (for components), rotation, location (2 sig digs) 
             marker_obj = SvgPath(svg_path_create.placement_marker())
             marker_el = et.SubElement(group, "path", d=marker_obj.get_path_str())
+            rotation = comp_obj.get_rotate()
             if rotation != 0:
                 if placement_layer == "bottom":
                     rotation *= -1
-                marker_el.set("transform", f"rotate({rotation})")
+                marker_el.set("transform", f"rotate({rotation})")  # rotate marker
 
             # Place marker text
             style_class = "placement-text"
@@ -636,4 +639,3 @@ class Module:
 
             c_string = "c" * shape.get_path_obj_num_of_segs()
             mask_el.set(f"{{{ns_pcm}}}gerber-lp", c_string)
-
