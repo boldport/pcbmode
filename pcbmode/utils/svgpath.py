@@ -44,18 +44,18 @@ class SvgPath:
         'path_in': can be a string or a parsed relative path
         """
 
-        if isinstance(path_in, str):
+        if isinstance(path_in, str):  # if an 'str' we need to parse first
             self._path_in = path_in
             self._p_path = self._parse_path(self._path_in)
             self._p_r_path = self._p_path_to_relative(self._p_path)
         else:
-            self._p_r_path = path_in
+            self._p_r_path = path_in  # if it's parsed, assume it's already relative
 
         # Transform path
         self._t_dict = trans_dict
         self._p_r_path = self._scale_path(self._p_r_path)
-        self._p_r_path = self._rotate_path(self._p_r_path)
         self._p_r_path = self._mirror_path(self._p_r_path)
+        self._p_r_path = self._rotate_path(self._p_r_path)
 
         # Measure and center
         self._dims, self._bbox_tl, self._bbox_br = self._bbox(self._p_r_path)
@@ -73,12 +73,13 @@ class SvgPath:
     def _rotate_path(self, p_r_path):
         """ Rotate a parsed relative path """
         deg = self._t_dict.get("rotate", 0)
+        rotate_p = Point(self._t_dict.get("rotate-point", [0,0]))
         if deg != 0:
             for seg in p_r_path:
-                [c.rotate(deg) for c in seg[1:]]
+                [c.rotate(deg, rotate_p) for c in seg[1:]]
                 # The following deals with the case where we have a 'h' or 'v' but with
                 # the rotation they should now be 'l' or flipped h->v ot v-h. Here we
-                # simple change the command to 'l', but it could be done better by 
+                # simple change the command to 'l', but it could be done better by
                 # consolidating consecutive 'l' commands and doing the h/v flipping
                 # to the degrees of rotation.
                 # TODO: more efficient length/command-wise
@@ -86,7 +87,7 @@ class SvgPath:
                 # m -0.55,2.15 c 0,0.165685 0.134315,0.3 0.3,0.3 l 0.5,0 c 0.165685,0 0.3,-0.134315 0.3,-0.3 l 0,-4.6 l -1.1,0 l 0,4.6 z
                 # The last two 'l's can be eliminated
                 if seg[0] in ["h", "v"]:
-                    seg[0] = 'l'
+                    seg[0] = "l"
         return p_r_path
 
     def _mirror_path(self, p_r_path):
@@ -180,10 +181,10 @@ class SvgPath:
                 elif cmd_type == "h":
                     s += f"{coord.px()} "
                 else:
-                    s += f"{coord.px()},{coord.py()} "                
+                    s += f"{coord.px()},{coord.py()} "
             s_path += f"{cmd_type} {s}"
 
-        self._s_r_path = s_path.rstrip() # remove space after last 'z'
+        self._s_r_path = s_path.rstrip()  # remove space after last 'z'
 
     def _p_path_to_relative(self, path):
         """
