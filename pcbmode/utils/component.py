@@ -43,7 +43,7 @@ class Component:
         self._location = Point(comp_dict.get("location", [0, 0]))
         self._scale = comp_dict.get("scale", 1)
         self._rotate = comp_dict.get("rotate", 0)
-        self._pivot = Point(comp_dict.get("pivot", [0, 0]))
+        self._rotate_p = Point(comp_dict.get("rotate-point", [0, 0]))
         if comp_dict["layer"] == "bottom":
             self._place_bot = True
         else:
@@ -62,6 +62,7 @@ class Component:
             path = Path(config.tmp["project-path"] / config.cfg["components"]["path"])
         elif comp_type == "shapes":
             path = Path(config.tmp["project-path"] / config.cfg["shapes"]["path"])
+
         footprint_dict = utils.dictFromJsonFile(path / f"{self._footprint_name}.json")
         footprint_obj = Footprint(footprint_dict, self._place_bot)
         footprint_shapes = footprint_obj.get_shapes()
@@ -79,15 +80,15 @@ class Component:
         for sheet in sheets:
             for layer in config.stk["layer-names"]:
                 for shape in footprint_shapes[sheet].get(layer, []):
-                    shape.rotate_location(self._rotate, self._pivot)
+                    shape.rotate_location(-self._rotate, self._rotate_p)
                     # If the component is placed on the bottom layer we need to mirror
                     # all the shapes of the component. A mirror setting of the shape
                     # itself negates this action, hence the XOR
                     mirror_y = self._place_bot ^ shape.get_mirror_y()
                     t_dict = {  # transform dictionary
                         "scale": self._scale,
-                        "rotate": self._rotate,
-                        "pivot": self._pivot,
+                        "Xrotate": self._rotate,
+                        "Xrotate-point": self._rotate_p,
                         "mirror-y": mirror_y,
                     }
                     shape.transform_path(t_dict)
