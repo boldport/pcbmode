@@ -87,11 +87,9 @@ class Component:
                     mirror_y = self._place_bot ^ shape.get_mirror_y()
                     t_dict = {  # transform dictionary
                         "scale": self._scale,
-
-                        # TODO: bring this back
-                        #"rotate": self._rotate,
-                        #"rotate-point": self._rotate_p,
-
+                        # TODO: This causes an issue when the component has a 'rotate'
+                        "rotate": self._rotate,
+                        "rotate-point": self._rotate_p,
                         "mirror-y": mirror_y,
                     }
                     shape.transform_path(t_dict)
