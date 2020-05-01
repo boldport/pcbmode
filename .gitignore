@@ -21,6 +21,7 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
+.eggs
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -53,3 +54,6 @@ docs/source/_build/
 
 # PyBuilder
 target/
+
+# VSCode
+.vscode
