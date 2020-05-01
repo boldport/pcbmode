@@ -34,6 +34,7 @@ from pcbmode.utils import messages as msg
 from pcbmode.utils import bom
 from pcbmode.utils import coord_file
 from pcbmode.utils import css_utils
+from pcbmode.utils import create_svg
 from pcbmode.utils.board import Board
 
 
@@ -147,15 +148,6 @@ def apply_overrides(cli_args):
         config.cfg["create"]["flashes"] = cli_args.show_layer_index
 
 
-def create_svg():
-    """ Create the SVG from the inpit files """
-    board = Board()
-
-    # TODO: implement:
-    # 1. Process json files; return dict
-    # 2. Create SVG 
-
-
 def main():
     # License information
     print("PCBmodE, Copyright (C) 2020 Saar Drimer")
@@ -218,9 +210,9 @@ def main():
         # Load the cache file
         if cmdline_args.no_cache is False:
             load_cache()
-        # Make the board
+        # Create the SVG for the input files
         if cmdline_args.make is True:
-            create_svg()
+            create_svg.create()
         # Create production files (Gerbers, Excellon, etc.)
         if cmdline_args.fab is not False:
             if cmdline_args.fab is None:
