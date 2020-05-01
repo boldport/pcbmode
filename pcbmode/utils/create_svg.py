@@ -27,15 +27,18 @@ from pcbmode.utils import utils
 from pcbmode.utils.shape import Shape
 
 
-def process_input_files():
+def create_shapes():
     """
     """
+    shapes_d = {}
 
-    # The definition of what we'll convert to SVG sits here
-    create_d = {}
-    create_d["outline"] = get_outline_d()
+    # Outline
+    shapes_o_l = []  # shape object list
+    for shape_d in get_outline_d():
+        shapes_o_l.append(Shape(shape_d))
+    shapes_d["outline"] = shapes_o_l
 
-    return create_d
+    return shapes_d
 
 
 def get_outline_d():
@@ -51,17 +54,7 @@ def get_outline_d():
     return outline_shapes_l
 
 
-def convert_to_shapes(create_d):
-    """
-    """
-    shapes_d_l = []
-    for shape_d in create_d["outline"]:
-        shapes_d_l.append(Shape(shape_d))
-    create_d["outline"] = shapes_d_l  # replace list of dicts with list of Shapes
-    return create_d
-
-
-def create_svg_data(create_d):
+def create_svg(create_d):
     """
     """
 
@@ -123,14 +116,10 @@ def save_svg(doc):
     """
     """
     output_file = Path(
-        config.tmp["project-path"]
-        / config.brd["project-params"]["output"]["svg-file"]
+        config.tmp["project-path"] / config.brd["project-params"]["output"]["svg-file"]
     )
     output_file.parent.mkdir(parents=True, exist_ok=True)
-    output_file.write_text(
-        et.tostring(doc, encoding="unicode", pretty_print=True)
-    )
-
+    output_file.write_text(et.tostring(doc, encoding="unicode", pretty_print=True))
 
 
 def create():
@@ -141,7 +130,6 @@ def create():
     3. Create the SVG
     """
 
-    to_create_d = process_input_files()
-    to_create_d_s = convert_to_shapes(to_create_d)
-    svg_doc = create_svg_data(to_create_d_s)
+    shapes_d = create_shapes()
+    svg_doc = create_svg(shapes_d)
     save_svg(svg_doc)
