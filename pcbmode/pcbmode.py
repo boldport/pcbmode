@@ -147,6 +147,15 @@ def apply_overrides(cli_args):
         config.cfg["create"]["flashes"] = cli_args.show_layer_index
 
 
+def create_svg():
+    """ Create the SVG from the inpit files """
+    board = Board()
+
+    # TODO: implement:
+    # 1. Process json files; return dict
+    # 2. Create SVG 
+
+
 def main():
     # License information
     print("PCBmodE, Copyright (C) 2020 Saar Drimer")
@@ -206,15 +215,12 @@ def main():
         coord_file.makeCoordFile(cmdline_args.coord_file)
 
     else:
-
         # Load the cache file
         if cmdline_args.no_cache is False:
             load_cache()
-
         # Make the board
         if cmdline_args.make is True:
-            board = Board()
-
+            create_svg()
         # Create production files (Gerbers, Excellon, etc.)
         if cmdline_args.fab is not False:
             if cmdline_args.fab is None:
