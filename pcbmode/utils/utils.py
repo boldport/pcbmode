@@ -294,40 +294,6 @@ def checkForPoursInLayer(layer):
     return True
 
 
-def interpret_svg_matrix(matrix_data):
-    """
-    Takes an array for six SVG parameters and returns angle, scale 
-    and placement coordinate
-
-    This SO answer was helpful here:
-      http://stackoverflow.com/questions/15546273/svg-matrix-to-rotation-degrees
-    """
-
-    # apply float() to all elements, just in case
-    matrix_data = [float(x) for x in matrix_data]
-
-    coord = Point(matrix_data[4], -matrix_data[5])
-    if matrix_data[0] == 0:
-        angle = math.degrees(0)
-    else:
-        angle = math.atan(matrix_data[2] / matrix_data[0])
-
-    scale = Point(
-        math.fabs(matrix_data[0] / math.cos(angle)),
-        math.fabs(matrix_data[3] / math.cos(angle)),
-    )
-
-    # convert angle to degrees
-    angle = math.degrees(angle)
-
-    # Inkscape rotates anti-clockwise, PCBmodE "thinks" clockwise. The following
-    # adjusts these two views, although at some point we'd
-    # need to have the same view, or make it configurable
-    angle = -angle
-
-    return coord, angle, scale
-
-
 def parse_refdef(refdef):
     """
     Parses a reference designator and returns the refdef categoty,
@@ -559,9 +525,9 @@ def textToPath(font_data, text, letter_spacing, line_height, scale_factor):
             text_width += glyph_width + letter_spacing / scale_factor
 
     # Mirror text
-#    text_path = SvgPath(text_path)
-#    text_path.transform()
-#    text_path = text_path.getTransformedMirrored()
+    #    text_path = SvgPath(text_path)
+    #    text_path.transform()
+    #    text_path = text_path.getTransformedMirrored()
 
     return "m 0,0", ""
 
@@ -587,40 +553,6 @@ def pn(num_in, sd=None):
         num = int(num)
     return num
 
-def parseTransform(transform):
-    """
-    Returns a Point() for the input transform
-    """
-    data = {}
-
-    if transform == None:
-        data["type"] = "translate"
-        data["location"] = Point()
-    elif "translate" in transform.lower():
-        regex = r".*?translate\s?\(\s?(?P<x>[+-]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)(\s?[\s,]\s?)?(?P<y>[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)?\s?\).*"
-        coord = re.match(regex, transform)
-        data["type"] = "translate"
-        x = coord.group("x")
-        y = coord.group("y")
-        if coord.group("y") != None:
-            y = coord.group("y")
-        else:
-            y = 0
-        data["location"] = Point(x, y)
-    elif "matrix" in transform.lower():
-        data["type"] = "matrix"
-        data["location"], data["rotate"], data["scale"] = parseSvgMatrix(transform)
-    elif "rotate" in transform.lower():
-        data["type"] = "rotate"
-        data["location"], data["rotate"] = parseSvgRotate(transform)
-    else:
-        msg.error(
-            "Found a path transform that cannot be handled, %s. SVG stansforms should be in the form of 'translate(num,num)' or 'matrix(num,num,num,num,num,num)"
-            % transform
-        )
-
-    return data
-
 
 def parseSvgRotate(rotate):
     """
@@ -638,6 +570,141 @@ def parseSvgRotate(rotate):
     angle = rotate[0]
 
     return location, angle
+
+
+def process_style(style):
+    """
+    Keep only relevant style properties. Plus, add 'fill:none' if a
+    'stroke-width' is captured, otherwise Inkscape still displays the
+    shape as a stroke+fill. This means that we don't require an additional
+    'fill:none' after every 'stroke-width' in the shape definitions.
+    """
+
+    keep = ["stroke-width"]
+    add_if_stroke = "fill:none;"
+
+    pattern = "^\s*?%s\s*:\s*(.*?)\s*;?\s*$"
+
+    new_style = ""
+    for k in keep:
+        result = re.findall(pattern % k, style)
+        if result != []:
+            new_style += f"{k}:{result[0]};"
+            if k == "stroke-width":
+                new_style += add_if_stroke
+
+    return new_style
+
+
+def parse_transform(t):
+    """
+    """
+    t_p = []  # _t_ransform _p_arsed
+
+    # Here we have (?:...) to indicate a non-capturing group so that it doesn't
+    # interfere with the group numbering. This was helpful:
+    # https://stackoverflow.com/questions/2703029/why-isnt-the-regular-expressions-non-capturing-group-working
+    num = "[-+]?[0-9]*\.?[0-9]+(?:[eE][-+]?[0-9]+)?"
+    types = "matrix|translate|rotate|scale|skewX|skewY"
+
+    # Capture up to 6 parameters. Variable names aren't possible:
+    # https://stackoverflow.com/questions/61565226/python-regex-named-result-with-variable
+    regex = f"({types})\((?P<arg1>{num})(?:,?(?P<arg2>{num}))?(?:,?(?P<arg3>{num}))?(?:,?(?P<arg4>{num}))?(?:,?(?P<arg5>{num}))?(?:,?(?P<arg6>{num}))?\)"
+    matches = re.finditer(regex, t)
+
+    for match in re.finditer(regex, t):
+        cmd = match.group(1)
+        args = {k:float(v) for k,v in match.groupdict().items() if v is not None}
+        an = len(args)  # number of arguments
+        if cmd == 'translate':
+            inst = {cmd:[]}
+            if an > 2:
+                print("'translate' cannot have more than two arguments")
+            elif an == 0:
+                inst[cmd].append(0)
+                inst[cmd].append(0)
+            elif an == 1:
+                inst[cmd].append(args['arg1'])
+                inst[cmd].append(0)
+            else:
+                inst[cmd].append(args['arg1'])
+                inst[cmd].append(args['arg2'])
+            t_p.append(inst)
+        elif cmd == 'scale':
+            inst = {cmd:[]}
+            if an > 2:
+                print("'scale' cannot have more than two arguments")
+            elif an == 0:
+                inst[cmd].append(1)
+                inst[cmd].append(1)
+            elif an == 1:
+                inst[cmd].append(args['arg1'])
+                inst[cmd].append(args['arg1'])
+            else:
+                inst[cmd].append(args['arg1'])
+                inst[cmd].append(args['arg2'])
+            t_p.append(inst)
+        elif cmd == 'rotate':
+            inst = {cmd:[]}
+            if (an > 3) or (an == 2):
+                print("'rotate' can only have 1 or 3 arguments")
+            elif an == 0:
+                inst[cmd].append(0)
+            elif an == 1:
+                inst[cmd].append(args['arg1'])
+            else:
+                inst[cmd].append(args['arg1'])
+                inst[cmd].append(args['arg2'])
+                inst[cmd].append(args['arg3'])
+            t_p.append(inst)
+        elif cmd == 'matrix':
+            inst = {cmd:[]}
+            if an != 6:
+                print("'matrix' must have 6 arguments")
+            else:
+                for i in range(1,7):
+                    inst[cmd].append(args[f"arg{i}"])
+            t_p.append(inst)
+        elif cmd.lower() in ['skewx', 'skewy']:
+            print(f"PCBmodE doesn't support '{cmd}'")
+        else:
+            print(f"Don't recognise '{cmd}'")
+
+    return t_p
+
+
+def interpret_svg_matrix(matrix_data):
+    """
+    Takes an array for six SVG parameters and returns angle, scale 
+    and placement coordinate
+
+    This SO answer was helpful here:
+      http://stackoverflow.com/questions/15546273/svg-matrix-to-rotation-degrees
+    """
+
+    # apply float() to all elements, just in case
+    matrix_data = [float(x) for x in matrix_data]
+
+    coord = Point(matrix_data[4], -matrix_data[5])
+    if matrix_data[0] == 0:
+        angle = math.degrees(0)
+    else:
+        angle = math.atan(matrix_data[2] / matrix_data[0])
+
+    scale = Point(
+        math.fabs(matrix_data[0] / math.cos(angle)),
+        math.fabs(matrix_data[3] / math.cos(angle)),
+    )
+
+    # convert angle to degrees
+    angle = math.degrees(angle)
+
+    # Inkscape rotates anti-clockwise, PCBmodE "thinks" clockwise. The following
+    # adjusts these two views, although at some point we'd
+    # need to have the same view, or make it configurable
+    angle = -angle
+
+    return coord, angle, scale
 
 
 def parseSvgMatrix(matrix):
@@ -676,27 +743,3 @@ def parseSvgMatrix(matrix):
     angle = -angle
 
     return coord, angle, scale
-
-
-def process_style(style):
-    """
-    Keep only relevant style properties. Plus, add 'fill:none' if a
-    'stroke-width' is captured, otherwise Inkscape still displays the
-    shape as a stroke+fill. This means that we don't require an additional
-    'fill:none' after every 'stroke-width' in the shape definitions.
-    """
-
-    keep = ["stroke-width"]
-    add_if_stroke = "fill:none;"
-
-    pattern = "^\s*?%s\s*:\s*(.*?)\s*;?\s*$"
-
-    new_style = ""
-    for k in keep:
-        result = re.findall(pattern % k, style)
-        if result != []:
-            new_style += f"{k}:{result[0]};"
-            if k == "stroke-width":
-                new_style += add_if_stroke
-
-    return new_style
