@@ -610,7 +610,7 @@ def parse_transform(t):
 
     # Capture up to 6 parameters. Variable names aren't possible:
     # https://stackoverflow.com/questions/61565226/python-regex-named-result-with-variable
-    regex = f"({types})\((?P<arg1>{num})(?:,?(?P<arg2>{num}))?(?:,?(?P<arg3>{num}))?(?:,?(?P<arg4>{num}))?(?:,?(?P<arg5>{num}))?(?:,?(?P<arg6>{num}))?\)"
+    regex = f"({types})\((?P<a1>{num})(?:,?\s?(?P<a2>{num}))?(?:,?\s?(?P<a3>{num}))?(?:,?\s?(?P<a4>{num}))?(?:,?\s?(?P<a5>{num}))?(?:,?\s?(?P<a6>{num}))?\)"
 
     for match in re.finditer(regex, t):
         cmd = match.group(1)
@@ -620,97 +620,109 @@ def parse_transform(t):
             inst = {cmd: []}
             if an > 2:
                 logging.warning(
-                    f"In transform '{t}', 'translate' can only have 1 or 2 arguments; ignoring"
+                    f"In transform '{t}', '{cmd}' can only have 1 or 2 arguments; ignoring"
                 )
             elif an == 0:
                 inst[cmd].append(0)
                 inst[cmd].append(0)
             elif an == 1:
-                inst[cmd].append(args["arg1"])
+                inst[cmd].append(args["a1"])
                 inst[cmd].append(0)
             else:
-                inst[cmd].append(args["arg1"])
-                inst[cmd].append(args["arg2"])
+                inst[cmd].append(args["a1"])
+                inst[cmd].append(args["a2"])
             t_p.append(inst)
         elif cmd == "scale":
             inst = {cmd: []}
             if an > 2:
                 logging.warning(
-                    f"In transform '{t}', 'scale' can have only 1 or 2 arguments; ignoring"
+                    f"In transform '{t}', '{cmd}' can have only 1 or 2 arguments; ignoring"
                 )
             elif an == 0:
                 inst[cmd].append(1)
                 inst[cmd].append(1)
             elif an == 1:
-                inst[cmd].append(args["arg1"])
-                inst[cmd].append(args["arg1"])
+                inst[cmd].append(args["a1"])
+                inst[cmd].append(args["a1"])
             else:
-                inst[cmd].append(args["arg1"])
-                inst[cmd].append(args["arg2"])
+                inst[cmd].append(args["a1"])
+                inst[cmd].append(args["a2"])
             t_p.append(inst)
         elif cmd == "rotate":
             inst = {cmd: []}
             if (an > 3) or (an == 2):
                 logging.warning(
-                    f"In transform '{t}', 'rotate' can only have 1 or 3 arguments; ignoring"
+                    f"In transform '{t}', '{cmd}' can only have 1 or 3 arguments; ignoring"
                 )
             elif an == 0:
                 inst[cmd].append(0)
             elif an == 1:
-                inst[cmd].append(args["arg1"])
+                inst[cmd].append(args["a1"])
             else:
-                inst[cmd].append(args["arg1"])
-                inst[cmd].append(args["arg2"])
-                inst[cmd].append(args["arg3"])
+                inst[cmd].append(args["a1"])
+                inst[cmd].append(args["a2"])
+                inst[cmd].append(args["a3"])
             t_p.append(inst)
         elif cmd == "matrix":
             inst = {cmd: []}
             if an != 6:
                 logging.warning(
-                    f"In transform '{t}', 'matrix' must have 6 arguments; ignoring"
+                    f"In transform '{t}', '{cmd}' must have 6 arguments; ignoring"
                 )
             else:
                 for i in range(1, 7):
-                    inst[cmd].append(args[f"arg{i}"])
-            t_p.append(inst)
+                    inst[cmd].append(args[f"a{i}"])
+                cmd_l = svg_matrix_decomposition(inst[cmd])
+            t_p += cmd_l  # add the decomposed matrix elements
+        elif (cmd == "skewX") or (cmd == "skewY"):
+            if an != 1:
+                logging.warning(
+                    f"In transform '{t}', {cmd} must have only 1 arguments; ignoring"
+                )
+            else:
+                t_p.append({cmd: args["a1"]})
         else:
             logging.warning(f"In transform '{t}', '{cmd}' is not yet supported")
+
+    print(t_p)
 
     return t_p
 
 
-def interpret_svg_matrix(matrix_data):
+def svg_matrix_decomposition(matrix_l):
     """
-    Takes an array for six SVG parameters and returns angle, scale 
-    and placement coordinate
+    Decomposes an SVG transformation matrix into 'translate', 'rotate', and 'scale'.
+    
+    'matrix_l': list of 6 elements.
 
-    This SO answer was helpful here:
-      http://stackoverflow.com/questions/15546273/svg-matrix-to-rotation-degrees
+    The code below is based on the following resources:
+    https://stackoverflow.com/questions/5107134/find-the-rotation-and-skew-of-a-matrix-transformation
+    http://frederic-wang.fr/decomposition-of-2d-transform-matrices.html
+    https://stackoverflow.com/questions/4361242/extract-rotation-scale-values-from-2d-transformation-matrix/4361442#4361442
     """
 
-    # apply float() to all elements, just in case
-    matrix_data = [float(x) for x in matrix_data]
+    if len(matrix_l) != 6:
+        logging.warning(f"Matrix {matrix_l} must contain 6 elements; ignoring")
+        return
 
-    coord = Point(matrix_data[4], -matrix_data[5])
-    if matrix_data[0] == 0:
-        angle = math.degrees(0)
-    else:
-        angle = math.atan(matrix_data[2] / matrix_data[0])
+    a, b, c, d, e, f = matrix_l  # conventional variable naming
+    translate = [e, f]
+    radicand = math.pow(a, 2) + math.pow(b, 2)
+    sqrt = math.sqrt(radicand)
+    scale = [sqrt, (a * d - b * c) / sqrt]
+    rotate = [math.degrees(math.atan2(b, a))]
+    skewX = math.degrees(math.atan2(a * c + b * d, radicand))
+    skewY = 0  # QR-like decomposition
 
-    scale = Point(
-        math.fabs(matrix_data[0] / math.cos(angle)),
-        math.fabs(matrix_data[3] / math.cos(angle)),
-    )
+    cmd_l = [
+        {"translate": translate},
+        {"scale": scale},
+        {"rotate": rotate},
+        {"skewX": skewX},
+        {"skewY": skewY},
+    ]
 
-    # convert angle to degrees
-    angle = math.degrees(angle)
-
-    # Inkscape rotates anti-clockwise, PCBmodE "thinks" clockwise. The following
-    # adjusts these two views, although at some point we'd
-    # need to have the same view, or make it configurable
-    angle = -angle
-
-    return coord, angle, scale
+    return cmd_l
 
 
 def parseSvgMatrix(matrix):
