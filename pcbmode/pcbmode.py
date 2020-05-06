@@ -19,6 +19,7 @@
 
 import json
 import argparse
+import logging
 
 from pathlib import Path
 
@@ -149,6 +150,10 @@ def apply_overrides(cli_args):
 
 
 def main():
+
+    # Add logging mechanism
+    logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.DEBUG)
+
     # License information
     print("PCBmodE, Copyright (C) 2020 Saar Drimer")
     print("This program comes with ABSOLUTELY NO WARRANTY. This is free software,")
