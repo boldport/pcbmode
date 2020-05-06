@@ -26,6 +26,7 @@ import math
 from operator import itemgetter  # for sorting lists by dict value
 import html.parser as HTMLParser
 import hashlib
+import logging
 
 from pcbmode.config import config
 from pcbmode.utils import css_utils
@@ -610,65 +611,68 @@ def parse_transform(t):
     # Capture up to 6 parameters. Variable names aren't possible:
     # https://stackoverflow.com/questions/61565226/python-regex-named-result-with-variable
     regex = f"({types})\((?P<arg1>{num})(?:,?(?P<arg2>{num}))?(?:,?(?P<arg3>{num}))?(?:,?(?P<arg4>{num}))?(?:,?(?P<arg5>{num}))?(?:,?(?P<arg6>{num}))?\)"
-    matches = re.finditer(regex, t)
 
     for match in re.finditer(regex, t):
         cmd = match.group(1)
-        args = {k:float(v) for k,v in match.groupdict().items() if v is not None}
+        args = {k: float(v) for k, v in match.groupdict().items() if v is not None}
         an = len(args)  # number of arguments
-        if cmd == 'translate':
-            inst = {cmd:[]}
+        if cmd == "translate":
+            inst = {cmd: []}
             if an > 2:
-                print("'translate' cannot have more than two arguments")
+                logging.warning(
+                    f"In transform '{t}', 'translate' can only have 1 or 2 arguments"
+                )
             elif an == 0:
                 inst[cmd].append(0)
                 inst[cmd].append(0)
             elif an == 1:
-                inst[cmd].append(args['arg1'])
+                inst[cmd].append(args["arg1"])
                 inst[cmd].append(0)
             else:
-                inst[cmd].append(args['arg1'])
-                inst[cmd].append(args['arg2'])
+                inst[cmd].append(args["arg1"])
+                inst[cmd].append(args["arg2"])
             t_p.append(inst)
-        elif cmd == 'scale':
-            inst = {cmd:[]}
+        elif cmd == "scale":
+            inst = {cmd: []}
             if an > 2:
-                print("'scale' cannot have more than two arguments")
+                logging.warning(
+                    f"In transform '{t}', 'scale' can have only 1 or 2 arguments"
+                )
             elif an == 0:
                 inst[cmd].append(1)
                 inst[cmd].append(1)
             elif an == 1:
-                inst[cmd].append(args['arg1'])
-                inst[cmd].append(args['arg1'])
+                inst[cmd].append(args["arg1"])
+                inst[cmd].append(args["arg1"])
             else:
-                inst[cmd].append(args['arg1'])
-                inst[cmd].append(args['arg2'])
+                inst[cmd].append(args["arg1"])
+                inst[cmd].append(args["arg2"])
             t_p.append(inst)
-        elif cmd == 'rotate':
-            inst = {cmd:[]}
+        elif cmd == "rotate":
+            inst = {cmd: []}
             if (an > 3) or (an == 2):
-                print("'rotate' can only have 1 or 3 arguments")
+                logging.warning(
+                    f"In transform '{t}', 'rotate' can only have 1 or 3 arguments"
+                )
             elif an == 0:
                 inst[cmd].append(0)
             elif an == 1:
-                inst[cmd].append(args['arg1'])
+                inst[cmd].append(args["arg1"])
             else:
-                inst[cmd].append(args['arg1'])
-                inst[cmd].append(args['arg2'])
-                inst[cmd].append(args['arg3'])
+                inst[cmd].append(args["arg1"])
+                inst[cmd].append(args["arg2"])
+                inst[cmd].append(args["arg3"])
             t_p.append(inst)
-        elif cmd == 'matrix':
-            inst = {cmd:[]}
+        elif cmd == "matrix":
+            inst = {cmd: []}
             if an != 6:
-                print("'matrix' must have 6 arguments")
+                logging.warning(f"In transform '{t}', 'matrix' must have 6 arguments")
             else:
-                for i in range(1,7):
+                for i in range(1, 7):
                     inst[cmd].append(args[f"arg{i}"])
             t_p.append(inst)
-        elif cmd.lower() in ['skewx', 'skewy']:
-            print(f"PCBmodE doesn't support '{cmd}'")
         else:
-            print(f"Don't recognise '{cmd}'")
+            logging.warning(f"In transform '{t}', '{cmd}' is not yet supported")
 
     return t_p
 
