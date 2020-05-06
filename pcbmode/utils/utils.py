@@ -684,8 +684,6 @@ def parse_transform(t):
         else:
             logging.warning(f"In transform '{t}', '{cmd}' is not yet supported")
 
-    print(t_p)
-
     return t_p
 
 
@@ -714,13 +712,15 @@ def svg_matrix_decomposition(matrix_l):
     skewX = math.degrees(math.atan2(a * c + b * d, radicand))
     skewY = 0  # QR-like decomposition
 
-    cmd_l = [
-        {"translate": translate},
-        {"scale": scale},
-        {"rotate": rotate},
-        {"skewX": skewX},
-        {"skewY": skewY},
-    ]
+    cmd_l = []
+    if translate != [0,0]:
+        cmd_l.append({"translate": translate})
+    if scale != [1,1]:
+        cmd_l.append({"scale": scale})
+    if rotate != 0:
+        cmd_l.append({"rotate": rotate})
+    if skewX != 0:
+        cmd_l.append({"skewX": skewX})
 
     return cmd_l
 
