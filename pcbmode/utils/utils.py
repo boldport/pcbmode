@@ -620,7 +620,7 @@ def parse_transform(t):
             inst = {cmd: []}
             if an > 2:
                 logging.warning(
-                    f"In transform '{t}', 'translate' can only have 1 or 2 arguments"
+                    f"In transform '{t}', 'translate' can only have 1 or 2 arguments; ignoring"
                 )
             elif an == 0:
                 inst[cmd].append(0)
@@ -636,7 +636,7 @@ def parse_transform(t):
             inst = {cmd: []}
             if an > 2:
                 logging.warning(
-                    f"In transform '{t}', 'scale' can have only 1 or 2 arguments"
+                    f"In transform '{t}', 'scale' can have only 1 or 2 arguments; ignoring"
                 )
             elif an == 0:
                 inst[cmd].append(1)
@@ -652,7 +652,7 @@ def parse_transform(t):
             inst = {cmd: []}
             if (an > 3) or (an == 2):
                 logging.warning(
-                    f"In transform '{t}', 'rotate' can only have 1 or 3 arguments"
+                    f"In transform '{t}', 'rotate' can only have 1 or 3 arguments; ignoring"
                 )
             elif an == 0:
                 inst[cmd].append(0)
@@ -666,7 +666,9 @@ def parse_transform(t):
         elif cmd == "matrix":
             inst = {cmd: []}
             if an != 6:
-                logging.warning(f"In transform '{t}', 'matrix' must have 6 arguments")
+                logging.warning(
+                    f"In transform '{t}', 'matrix' must have 6 arguments; ignoring"
+                )
             else:
                 for i in range(1, 7):
                     inst[cmd].append(args[f"arg{i}"])
