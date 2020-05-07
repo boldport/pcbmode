@@ -27,18 +27,18 @@ def create_layers(parent_el, transform=None, refdef=None):
     Includes the default style definition from the stylesheet as a 'class'.
     Returns a dictionary of layer instantiations.
     """
-    layers = {}
+    layers_d = {}
 
     # Create layers for the PCB according to the stackup. We need to reverse the
     # order so that Inkscape shows them in the 'correct' order.
     for layer_dict in reversed(config.stk["layers-dict"]):
 
         layer_name = layer_dict["name"]
-        layers[layer_name] = {}
+        layers_d[layer_name] = {}
 
         # Create the primary layers ('top', 'bottom', etc.)
         # These have no 'style_class' or 'style'
-        layers[layer_name]["layer"] = create_layer(
+        layers_d[layer_name]["layer"] = create_layer(
             parent=parent_el,
             name=layer_dict["name"],
             transform=transform,
@@ -56,9 +56,9 @@ def create_layers(parent_el, transform=None, refdef=None):
         for sheet in reversed(sheets):
             sheet_type = sheet["type"]
 
-            layers[layer_name][sheet_type] = {}
-            layers[layer_name][sheet_type]["layer"] = create_layer(
-                parent=layers[layer_name]["layer"],
+            layers_d[layer_name][sheet_type] = {}
+            layers_d[layer_name][sheet_type]["layer"] = create_layer(
+                parent=layers_d[layer_name]["layer"],
                 name=sheet["name"],
                 transform=None,
                 style_class=f"{layer_name}-{sheet_type}",
@@ -73,9 +73,9 @@ def create_layers(parent_el, transform=None, refdef=None):
             if sheet_type == "conductor":
                 conductor_types = ["routing", "pads", "pours"]
                 for cond_type in conductor_types:
-                    layers[layer_name]["conductor"][cond_type] = {}
-                    layers[layer_name]["conductor"][cond_type]["layer"] = create_layer(
-                        parent=layers[layer_name]["conductor"]["layer"],
+                    layers_d[layer_name]["conductor"][cond_type] = {}
+                    layers_d[layer_name]["conductor"][cond_type]["layer"] = create_layer(
+                        parent=layers_d[layer_name]["conductor"]["layer"],
                         name=cond_type,
                         transform=None,
                         style_class=f"{layer_name}-{sheet_type}-{cond_type}",
@@ -92,8 +92,8 @@ def create_layers(parent_el, transform=None, refdef=None):
 
     info_layers = ["drills", "outline", "origin", "dimensions", "documentation"]
     for info_layer in info_layers:
-        layers[info_layer] = {}
-        layers[info_layer]["layer"] = create_layer(
+        layers_d[info_layer] = {}
+        layers_d[info_layer]["layer"] = create_layer(
             parent=parent_el,
             name=info_layer,
             transform=transform,
@@ -105,7 +105,7 @@ def create_layers(parent_el, transform=None, refdef=None):
             hide=config.cfg["layer-control"][info_layer].get("hide", False),
         )
 
-    return layers
+    return layers_d
 
 
 def create_layer(
