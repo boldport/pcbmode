@@ -50,7 +50,9 @@ def create(width, height):
     # CSS classes
     classes = config.stl.get("layout", None)
     if classes not in [None, ""]:
-        lxu.addch(parent=module, ns=ns_svg, name="style", id="pcbmode-classes", text=classes)
+        lxu.addch(
+            parent=module, ns=ns_svg, name="style", id="pcbmode-classes", text=classes
+        )
 
     # Title
     title = config.brd["metadata"].get("title", None)
