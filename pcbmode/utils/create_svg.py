@@ -24,6 +24,7 @@ from pcbmode.utils import inkscape_svg
 from pcbmode.utils import svg_layers
 from pcbmode.utils import place
 from pcbmode.utils import utils
+from pcbmode.utils import dims_arrows
 from pcbmode.utils.shape import Shape
 
 
@@ -100,6 +101,9 @@ def create_svg(create_d):
                 path = shape.get_path_str()
                 segments = path.count("m")
                 mask_element.set(f"{{{ns_pcm}}}gerber-lp", "c" * segments)
+
+    dims_arrows.create_and_place(layers_d, dims_p, center_p)
+
 
     return svg_doc
 
