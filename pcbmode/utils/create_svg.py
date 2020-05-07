@@ -73,7 +73,7 @@ def create_svg(create_d):
 
     # Create a dictionary of SVG layers
     transform = f"translate({center_p.px()} {center_p.py()})"
-    layers = svg_layers.create_layers(svg_data, transform)
+    layers_d = svg_layers.create_layers(svg_data, transform)
 
     # Add a 'defs' element:
     #   http://www.w3.org/TR/SVG/struct.html#Head
@@ -87,7 +87,7 @@ def create_svg(create_d):
         el.set(f"{{{ns_pcm}}}pcb-layer", pcb_layer)
         masks[pcb_layer] = el
 
-    shape_group = et.SubElement(layers["outline"]["layer"], "g")
+    shape_group = et.SubElement(layers_d["outline"]["layer"], "g")
     shape_group.set(f"{{{ns_pcm}}}type", "module-shapes")
     for shape in create_d["outline"]:
         place.place_shape(shape, shape_group)
