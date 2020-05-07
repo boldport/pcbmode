@@ -9,13 +9,13 @@ a ``path`` type looks like:
     {
       "type": "path", 
       "layers": ["top, "bottom"], 
-      "location": [3.1, -5.667],
-      "style": "stroke-width:1.2;", 
+      "transform": "translate(10,20) rotate(50) scale(1.2)",
+      "style": "stroke-width:1.2;",
       "d": "m -48.3,0 0,-5.75 c 0,-1.104569 0.895431,-2 2,-2 0,0 11.530272,-0.555504 17.300001,-0.5644445 10.235557,-0.015861 20.4577816,0.925558 30.6933324,0.9062128 C 10.767237,-7.4253814 19.826085,-8.3105055 28.900004,-8.3144445 34.703053,-8.3169636 46.3,-7.75 46.3,-7.75 c 1.103988,0.035813 2,0.895431 2,2 l 0,5.75 0,5.75 c 0,1.104569 -0.895431,2 -2,2 0,0 -11.596947,0.5669636 -17.399996,0.5644445 C 19.826085,8.3105055 10.767237,7.4253814 1.6933334,7.4082317 -8.5422174,7.3888865 -18.764442,8.3303051 -28.999999,8.3144445 -34.769728,8.305504 -46.3,7.75 -46.3,7.75 c -1.103982,-0.036019 -2,-0.895431 -2,-2 l 0,-5.75"
     }
 
-This will place the SVG path defined in ``d`` shown as stroke with width ``1.2 mm`` at
-location ``[3.1,5.667]``. The shape will be placed on the top and bottom layers of the PCB.
+This will place the rotated and scaled SVG path defined in ``d`` at
+location ``[10,20]`` with a stroke width of ``1.2mm``. The shape will be placed on the top and bottom layers of the PCB.
 
 Shape properties
 ================
@@ -41,19 +41,53 @@ Buffer to pour
 a pour. This overrides global settings defined in the board's JSON, or *PCBmodE*'s
 defaults if those are not defined locally.
 
-Location
---------
-
-Location is defined as an ``x``, ``y`` coordinate
+Transform
+---------
 
 .. code-block:: json
 
-     "location": [<x>m <y>]
+     "transform": "translate(3.5, 6.5) rotate(33.56) scale(1.22)"
 
-The location definition is relative to the hierarchy. So if you're defining a pad, the
-location is relative to the footprint's center.
+The ``transform`` command is used to manipulate the shape and is made of a series of transformations that are carried out in the order specified. It is identical to the ``transform`` `command from the SVG specifications <https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/transform>`_.
 
-Default: ``[0,0]``.
+**translate**
+
+| ``translate(x,<y>)``
+| default: ``translate(0,0)``
+
+Specifies where to put the shape. If ``y`` isn't specified it is set to ``0``.
+
+This location is in relation to the hierarchy. So you might place a component at location [x,y], but a shape within that component at [dx,dy], not [x+dx, y+dy].
+
+**rotate**
+
+| ``rotate(d,<x,y>)``
+| default: ``rotate(0)``
+
+Rotates the shape by ``d`` degrees clockwise with the oprional ``x,y`` coordinates as the rotation point.
+
+**scale**
+
+| ``scale(sx,<sy>)``
+| default: ``scale(1)``
+
+Scale the shape by ``sx`` in the ``x`` axis and ``sy`` in the ``y`` axis. If the optional ``y`` is omitted, it is set to equal ``x``. 
+
+**skewX and skewY**
+
+| ``skewX(d)``
+| default: ``skewX(0)``
+
+Skews the shape in the ``x`` axis for ``skewX`` and ``y`` axis for ``skewY`` by ``d`` degrees.
+
+.. warning:: ``skeyX`` and ``skewY`` are not yet implemented!
+
+**matrix**
+
+| ``matrix(a,b,c,d,e,f)``
+| default: ``matrix(1,0,0,1,0,0)``
+
+Matrix transforms the shape in a single command rather than using the individual commands above.
 
 Layers
 ------
@@ -71,17 +105,6 @@ Even if the shape is placed in a single layer, it needs to be defined as a list
      "layers": ["bottom"]
 
 Default: ``["top"]``.
-
-
-Rotation
---------
-
-Default: `0`.
-
-Scale
------
-
-Default: `1`.
 
 
 Shape types
