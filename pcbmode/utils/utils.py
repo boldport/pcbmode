@@ -713,9 +713,9 @@ def svg_matrix_decomposition(matrix_l):
     skewY = 0  # QR-like decomposition
 
     cmd_l = []
-    if translate != [0,0]:
+    if translate != [0, 0]:
         cmd_l.append({"translate": translate})
-    if scale != [1,1]:
+    if scale != [1, 1]:
         cmd_l.append({"scale": scale})
     if rotate != 0:
         cmd_l.append({"rotate": rotate})
@@ -723,41 +723,3 @@ def svg_matrix_decomposition(matrix_l):
         cmd_l.append({"skewX": skewX})
 
     return cmd_l
-
-
-def parseSvgMatrix(matrix):
-    """
-    Takes an array for six SVG parameters and returns angle, scale 
-    and placement coordinate
-
-    This SO answer was helpful here:
-      http://stackoverflow.com/questions/15546273/svg-matrix-to-rotation-degrees
-    """
-    regex = r".*?matrix\((?P<m>.*?)\).*"
-    matrix = re.match(regex, matrix)
-    matrix = matrix.group("m")
-    matrix = matrix.split(",")
-
-    # Apply float() to all elements
-    matrix = [float(x) for x in matrix]
-
-    coord = Point(matrix[4], matrix[5])
-    if matrix[0] == 0:
-        angle = math.degrees(0)
-    else:
-        angle = math.atan(matrix[2] / matrix[0])
-
-    scale_x = (math.sqrt(matrix[0] * matrix[0] + matrix[1] * matrix[1]),)
-    scale_y = (math.sqrt(matrix[2] * matrix[2] + matrix[3] * matrix[3]),)
-
-    scale = max(scale_x, scale_y)[0]
-
-    # convert angle to degrees
-    angle = math.degrees(angle)
-
-    # Inkscape rotates anti-clockwise, PCBmodE "thinks" clockwise. The following
-    # adjusts these two views, although at some point we'd
-    # need to have the same view, or make it configurable
-    angle = -angle
-
-    return coord, angle, scale
