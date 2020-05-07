@@ -61,7 +61,9 @@ def create_svg(create_d):
     ns_pcm = config.cfg["ns"]["pcbmode"]
 
     # We need the dimension of the outline shapes in order to create the SVG size based
-    # on their pverall bounding box
+    # on their overall bounding box
+    # TODO: make work with multiple shapes. Right now it'll only consider the last
+    # one (or the only one) for the abounding box calculation.
     for shape in create_d["outline"]:
         dims_p = shape.get_dims()
     center_p = dims_p.copy()
@@ -74,19 +76,9 @@ def create_svg(create_d):
     # Create a dictionary of SVG layers
     transform = f"translate({center_p.px()} {center_p.py()})"
     layers_d = svg_layers.create_layers(svg_data, transform)
+    masks_d = inkscape_svg.add_defs(svg_data, transform)
 
-    # Add a 'defs' element:
-    #   http://www.w3.org/TR/SVG/struct.html#Head
-    # This is where masking elements that are used for pours are stored
-    defs = et.SubElement(svg_data, "defs")
-    masks = {}
-    for pcb_layer in config.stk["layer-names"]:
-        el = et.SubElement(defs, "mask", id=f"mask-{pcb_layer}", transform=transform)
-        # This will identify the masks for each PCB layer when
-        # the layer is converted to Gerber
-        el.set(f"{{{ns_pcm}}}pcb-layer", pcb_layer)
-        masks[pcb_layer] = el
-
+    # Place outline
     shape_group = et.SubElement(layers_d["outline"]["layer"], "g")
     shape_group.set(f"{{{ns_pcm}}}type", "module-shapes")
     for shape in create_d["outline"]:
@@ -95,7 +87,7 @@ def create_svg(create_d):
     for pcb_layer in config.stk["layer-names"]:
         if utils.checkForPoursInLayer(pcb_layer) is True:
             for shape in create_d["outline"]:
-                mask_element = place.place_shape(shape, masks[pcb_layer])
+                mask_element = place.place_shape(shape, masks_d[pcb_layer])
                 # Override style so that we get the desired effect
                 # We stroke the outline with twice the size of the buffer, so
                 # we get the actual distance between the outline and board

@@ -142,3 +142,18 @@ def create(width, height):
         lxu.addch(work_el, ns_dc, "date", None, now)
 
     return module
+
+def add_defs(svg_data, transform):
+    """
+    Add a 'defs' element: http://www.w3.org/TR/SVG/struct.html#Head
+    where mask shapes are stored for later reference. Mask elements are used to create
+    the apperance of a copper pour.
+    """
+    ns_pcm = config.cfg["ns"]["pcbmode"]
+    defs = et.SubElement(svg_data, "defs")
+    masks_d = {}
+    for pcb_layer in config.stk["layer-names"]:
+        el = et.SubElement(defs, "mask", id=f"mask-{pcb_layer}", transform=transform)
+        el.set(f"{{{ns_pcm}}}pcb-layer", pcb_layer)
+        masks_d[pcb_layer] = el
+    return masks_d
