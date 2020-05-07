@@ -17,26 +17,13 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-import datetime
-import copy
-import sys
-from pathlib import Path
 from lxml import etree as et
 
 from pcbmode.config import config
-from pcbmode.utils import messages as msg
-from pcbmode.utils import svg
-from pcbmode.utils import utils
 from pcbmode.utils import place
-from pcbmode.utils import inkscape_svg
 from pcbmode.utils import css_utils
-from pcbmode.utils import svg_layers
-from pcbmode.utils import drill_index
-from pcbmode.utils import layer_index
-from pcbmode.utils import documentation
 from pcbmode.utils import svg_path_create
 from pcbmode.utils.shape import Shape
-from pcbmode.utils.component import Component
 from pcbmode.utils.svgpath import SvgPath
 from pcbmode.utils.point import Point
 
