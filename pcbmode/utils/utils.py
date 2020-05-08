@@ -107,13 +107,14 @@ def makePngs():
     return
 
 
-# get_json_data_from_file
-def dictFromJsonFile(filename, error=True):
+def json_to_dict(path_o):
     """
-    Open a json file and returns its content as a dict
+    Open a json file and returns its content as a dict if it has no duplicate keys
+
+    'path_o' is a pathlib Path object
     """
 
-    def checking_for_unique_keys(pairs):
+    def unique_keys_check(pairs):
         """
         Check if there are duplicate keys defined; this is useful
         for any hand-edited file
@@ -124,20 +125,21 @@ def dictFromJsonFile(filename, error=True):
         result = dict()
         for key, value in pairs:
             if key in result:
-                msg.error(f"duplicate key ('{key}') specified in {filename}", KeyError)
+                logging.error(f"Duplicate key '{key}' specified in input file")
             result[key] = value
         return result
 
-    try:
-        with open(filename, "r") as f:
-            json_data = json.load(f, object_pairs_hook=checking_for_unique_keys)
-    except ValueError as e:
-        msg.error("Couldn't parse JSON file %s:\n-- %s" % (filename, e), ValueError)
-    except (IOError, OSError):
-        if error == True:
-            msg.error("Couldn't open JSON file: %s" % filename, IOError)
-        else:
-            msg.info("Couldn't open JSON file: %s" % filename, IOError)
+    if path_o.exists():
+        try:
+            json_data = json.loads(
+                path_o.read_text(), object_pairs_hook=unique_keys_check
+            )
+        except ValueError as e:
+            logging.error(f"Couldn't parse JSON file {path_o}")
+            raise e
+    else:
+        logging.error(f"Cannot find file '{path_o}'")
+        exit()
 
     return json_data
 
