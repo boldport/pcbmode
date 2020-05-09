@@ -52,19 +52,36 @@ def create_shapes():
 
 def expand_instances(instances_d, definitions_d):
     """
+    Instances can be instantiated in three ways, which are mutually exclusive:
+    'definition-here': defined under this key
+    'definition-name': defined under this key in 'definitions'
+    'definition-file': defined in this file
+
+    Here we deal with two levels of instantiations. Firstly the 'components' at the 
+    top level and then the instantiations of 'pins' within those components.
+
+    If either 'definition-name' or 'definition-file' are specified, those are resolved
+    to 'definition-here'. If 'definition-here' is defined it's left as it is.
     """
 
     for name, inst_d in instances_d.items():
-        inst_d["definition-here"] = find_definition(name, inst_d, definitions_d)
+        inst_d["definition-here"] = resolve_definition(name, inst_d, definitions_d)
+        # Now we expand the definitions within the instance itself
+        instances_2_d = inst_d["definition-here"].get("instances", {})
+        definitions_2_d = inst_d["definition-here"].get("definitions", {})
+        for name_2, inst_2_d in instances_2_d.items():
+            inst_2_d["definition-here"] = resolve_definition(
+                name_2, inst_2_d, definitions_2_d
+            )
 
     return instances_d
 
 
-def find_definition(name, inst_d, definitions_d):
+def resolve_definition(name, inst_d, definitions_d):
     """
-    Instances can specify a file where the data for their footprint is. Here we read
-    in those files to 'source-data'. It's done in a way that should work also with
-    OSs that use a sifferent path hierarchy delimeter, like Windows.
+    Here we try to find where the instance information is with some error checking.
+    For files it's done in a way that should work also with OSs that use a different
+    path hierarchy delimeter, like Windows.
     """
 
     # Check if none, or more than one definition is specified
@@ -79,7 +96,7 @@ def find_definition(name, inst_d, definitions_d):
         logging.error(f"'{name}' has multiple definitions but should have only one")
         raise Exception  # TODO: is this the right one to raise?
 
-    # Get defintions. '-here' is implicitly already there if other are not
+    # Get defintions. ('-here' is implicitly already there if other are not)
     if def_file is not None:
         path_o = Path(config.tmp["project-path"])
         def_file = def_file.split("/")
