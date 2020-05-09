@@ -137,7 +137,7 @@ def json_to_dict(path_o):
             raise e
     else:
         logging.error(f"Cannot find file '{path_o}'")
-        exit()
+        raise FileNotFoundError
 
     return json_data
 
