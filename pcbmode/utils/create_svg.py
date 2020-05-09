@@ -52,40 +52,49 @@ def create_shapes():
 
 def expand_instances(instances_d, definitions_d):
     """
+    """
+
+    for name, inst_d in instances_d.items():
+        inst_d["definition-here"] = find_definition(name, inst_d, definitions_d)
+
+    return instances_d
+
+
+def find_definition(name, inst_d, definitions_d):
+    """
     Instances can specify a file where the data for their footprint is. Here we read
     in those files to 'source-data'. It's done in a way that should work also with
     OSs that use a sifferent path hierarchy delimeter, like Windows.
     """
-    for name, inst in instances_d.items():
 
-        # Check if none, or more than one definition is specified
-        def_here = inst.get("definition-here", None)
-        def_name = inst.get("definition-name", None)
-        def_file = inst.get("definition-file", None)
-        count = [def_here, def_name, def_file].count(None)
-        if count == 3:
-            logging.warning(f"'{name}' has no definition; proceeding with an empty one")
-            def_here = {}
-        elif count == 1:
-            logging.error(f"'{name}' has multiple definitions but should have only one")
+    # Check if none, or more than one definition is specified
+    def_here = inst_d.get("definition-here", None)
+    def_name = inst_d.get("definition-name", None)
+    def_file = inst_d.get("definition-file", None)
+    count = [def_here, def_name, def_file].count(None)
+    if count == 3:
+        logging.warning(f"'{name}' has no definition; proceeding with an empty one")
+        def_here = {}
+    elif count == 1:
+        logging.error(f"'{name}' has multiple definitions but should have only one")
+        raise Exception  # TODO: is this the right one to raise?
+
+    # Get defintions. '-here' is implicitly already there if other are not
+    if def_file is not None:
+        path_o = Path(config.tmp["project-path"])
+        def_file = def_file.split("/")
+        for s in def_file:  # TODO: check if works on Windows
+            path_o = Path(path_o / s)
+        inst_d["definition-here"] = utils.json_to_dict(path_o)
+        logging.info(f"Processed '{path_o}' for '{name}'")
+    elif def_name is not None:
+        try:
+            inst_d["definition-here"] = definitions_d[def_name]
+        except:
+            logging.error(f"'{def_name}' not found for '{name}'")
             raise Exception  # TODO: is this the right one to raise?
 
-        # Get defintions. '-here' is implicitly already there if other are not
-        if def_file is not None:
-            path_o = Path(config.tmp["project-path"])
-            def_file = def_file.split("/")
-            for s in def_file:  # TODO: check if works on Windows
-                path_o = Path(path_o / s)
-            inst["definition-here"] = utils.json_to_dict(path_o)
-            logging.info(f"Processed '{path_o}' for '{name}'")
-        elif def_name is not None:
-            try:
-                inst["definition-here"] = definitions_d[def_name]
-            except:
-                logging.error(f"'{def_name}' not found for '{name}'")
-                raise Exception  # TODO: is this the right one to raise?
-
-    return instances_d
+    return inst_d["definition-here"]
 
 
 def get_outline_d():
