@@ -64,14 +64,10 @@ def expand_instances(instances_d, definitions_d):
         def_file = inst.get("definition-file", None)
         count = [def_here, def_name, def_file].count(None)
         if count == 3:
-            logging.warning(
-                f"'{name}' has no definition; proceeding with an empty one"
-            )
+            logging.warning(f"'{name}' has no definition; proceeding with an empty one")
             def_here = {}
         elif count == 1:
-            logging.error(
-                f"'{name}' has multiple definitions but should have only one"
-            )
+            logging.error(f"'{name}' has multiple definitions but should have only one")
             raise Exception  # TODO: is this the right one to raise?
 
         # Get defintions. '-here' is implicitly already there if other are not
