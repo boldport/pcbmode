@@ -48,12 +48,12 @@ def load_pcbmode_config():
     config_filename = "pcbmode_config.json"
 
     config_file = config.tmp["pcbmode-path"] / config_path / config_filename
-    config.cfg = utils.dictFromJsonFile(config_file)
+    config.cfg = utils.json_to_dict(config_file)
 
     # Override with local settings, if any
     project_config_file = config.tmp["project-path"] / config_path / config_filename
     if project_config_file.exists():
-        project_config = utils.dictFromJsonFile(project_config_file)
+        project_config = utils.json_to_dict(project_config_file)
         for key in project_config:
             config.cfg[key] = {**config.cfg[key], **project_config[key]}
 
@@ -64,7 +64,7 @@ def load_board_file():
     """
 
     filename = config.tmp["project-path"] / config.tmp["project-file"]
-    config.brd = utils.dictFromJsonFile(filename)
+    config.brd = utils.json_to_dict(filename)
 
 
 def load_stylesheet():
@@ -89,9 +89,9 @@ def load_stackup():
     filename = Path(config.cfg["stackup"]["definition-file"])
 
     if (config.tmp["project-path"] / filename).exists():
-        config.stk = utils.dictFromJsonFile(config.tmp["project-path"] / filename)
+        config.stk = utils.json_to_dict(config.tmp["project-path"] / filename)
     else:
-        config.stk = utils.dictFromJsonFile(Path(__file__).parent / filename)
+        config.stk = utils.json_to_dict(Path(__file__).parent / filename)
 
     config.stk["layers-dict"], config.stk["layer-names"] = utils.getLayerList()
     config.stk["surface-layers"] = [
@@ -112,7 +112,7 @@ def load_cache():
     """
     filename = config.tmp["project-path"] / config.cfg["cache"]["file"]
     if filename.is_file():
-        config.pth = utils.dictFromJsonFile(filename)
+        config.pth = utils.json_to_dict(filename)
 
 
 def load_routing():
@@ -122,7 +122,7 @@ def load_routing():
         config.tmp["project-path"]
         / config.brd["project-params"]["input"]["routing-file"]
     )
-    config.rte = utils.dictFromJsonFile(filename)
+    config.rte = utils.json_to_dict(filename)
 
 
 def set_y_axis_invert():
@@ -165,9 +165,7 @@ def main():
     print("Important!")
     print("This version of PCBmodE ('cinco') is actively under development.")
     print("Support this project at https://github.com/sponsors/saardrimer")
-    print()
-
-    print("Running... ", end="", flush=True)
+    print("", flush=True)
 
     argp = cli_arg.setup()  # setup cli arguments
     cmdline_args = argp.parse_args()  # parse arguments
@@ -237,7 +235,7 @@ def main():
         filename.parent.mkdir(parents=True, exist_ok=True)
         filename.write_text(json.dumps(config.pth, sort_keys=True, indent=2))
 
-    print("done!")
+    print("Done!")
 
 
 if __name__ == "__main__":
