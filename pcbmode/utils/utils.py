@@ -116,9 +116,7 @@ def json_to_dict(path_o):
 
     def unique_keys_check(pairs):
         """
-        Check if there are duplicate keys defined; this is useful
-        for any hand-edited file
-  
+        Check if there are duplicate keys in the input json  
         This SO answer was useful here:
           http://stackoverflow.com/questions/16172011/json-in-python-receive-check-duplicate-key-error
         """
