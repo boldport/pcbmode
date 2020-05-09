@@ -19,6 +19,8 @@
 from lxml import etree as et
 from pathlib import Path
 
+import logging
+
 from pcbmode.config import config
 from pcbmode.utils import inkscape_svg
 from pcbmode.utils import svg_layers
@@ -39,7 +41,26 @@ def create_shapes():
         shapes_o_l.append(Shape(shape_d))
     shapes_d["outline"] = shapes_o_l
 
+    instances_d = expand_instances(config.brd.get("instances", {}))
+    print(instances_d)
+
     return shapes_d
+
+
+
+def expand_instances(instances_d):
+    """
+    Instances specify the file where the source for their footprint is. Here we read
+    in those files and replace the path of the file with the actual data.
+    It's done in a way that should work also with OSs that use a sifferent path
+    hierarchy delimeter, like Windows.
+    """
+    for refdef,inst in instances_d.items():
+        path_o = Path(config.tmp["project-path"])
+        for s in inst['source'].split('/'):  # TODO: check if works on Windows
+            path_o = Path(path_o / s)
+        inst['source'] = utils.json_to_dict(path_o)
+    return(instances_d)
 
 
 def get_outline_d():
