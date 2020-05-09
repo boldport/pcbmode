@@ -35,7 +35,10 @@ def create_shapes():
     """
     shapes_d = {}
 
-    instances_d = expand_instances(config.brd.get("instances", {}))
+    instances_d = config.brd.get("instances", {})
+    definitions_d = config.brd.get("definitions", {})
+    instances_d = expand_instances(instances_d, definitions_d)
+
     print(config.brd)
 
     # Outline
@@ -47,27 +50,44 @@ def create_shapes():
     return shapes_d
 
 
-def expand_instances(instances_d):
+def expand_instances(instances_d, definitions_d):
     """
     Instances can specify a file where the data for their footprint is. Here we read
-    in those files to 'source-data'. It's done in a way that should work also with OSs that use a sifferent path hierarchy delimeter, like Windows.
+    in those files to 'source-data'. It's done in a way that should work also with
+    OSs that use a sifferent path hierarchy delimeter, like Windows.
     """
     for refdef, inst in instances_d.items():
+
+        # Check if none, or more than one definition is specified
+        def_here = inst.get("definition-here", None)
+        def_name = inst.get("definition-name", None)
         def_file = inst.get("definition-file", None)
+        count = [def_here, def_name, def_file].count(None)
+        if count == 3:
+            logging.warning(
+                f"'{refdef}' has no definition; proceeding with an empty one"
+            )
+            def_here = {}
+        elif count == 1:
+            logging.error(
+                f"'{refdef}' has multiple definitions but should have only one"
+            )
+            raise Exception  # TODO: is this the right one to raise?
+
+        # Get defintions. '-here' is implicitly already there if other are not
         if def_file is not None:
             path_o = Path(config.tmp["project-path"])
             def_file = def_file.split("/")
             for s in def_file:  # TODO: check if works on Windows
                 path_o = Path(path_o / s)
-            inst["definition"] = utils.json_to_dict(path_o)
-            logging.info(f"Processed defintion file '{def_file}' for refdef '{refdef}'")
-
-        # Check for the case where no `definition-file` or `definition` were given
-        if inst.get("definition", None) is None:
-            logging.warning(
-                f"Couldn't find a definition for refdef '{refdef}'; continue with empty one"
-            )
-            inst["definition"] = {}
+            inst["definition-here"] = utils.json_to_dict(path_o)
+            logging.info(f"Processed '{path_o}' for refdef '{refdef}'")
+        elif def_name is not None:
+            try:
+                inst["definition-here"] = definitions_d[def_name]
+            except:
+                logging.error(f"'{def_name}' not found for '{refdef}'")
+                raise Exception  # TODO: is this the right one to raise?
 
     return instances_d
 
