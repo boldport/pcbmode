@@ -53,11 +53,20 @@ def expand_instances(instances_d):
     in those files to 'source-data'. It's done in a way that should work also with OSs that use a sifferent path hierarchy delimeter, like Windows.
     """
     for refdef, inst in instances_d.items():
-        path_o = Path(config.tmp["project-path"])
-        source_file = inst.get("source-file", "").split("/")
-        for s in source_file: # TODO: check if works on Windows
-            path_o = Path(path_o / s)
-        inst["source-data"] = utils.json_to_dict(path_o)
+        def_file = inst.get("definition-file", None)
+        if def_file is not None:
+            path_o = Path(config.tmp["project-path"])
+            def_file = def_file.split("/")
+            for s in def_file:  # TODO: check if works on Windows
+                path_o = Path(path_o / s)
+            inst["definition"] = utils.json_to_dict(path_o)
+            logging.info(f"Processed defintion file '{def_file}' for refdef '{refdef}'")
+
+        # Check for the case where no `definition-file` or `definition` were given
+        if inst.get("definition", None) is None:
+            logging.warning(f"Couldn't find a definition for refdef '{refdef}'")
+            inst["definition"] = {}
+
     return instances_d
 
 
