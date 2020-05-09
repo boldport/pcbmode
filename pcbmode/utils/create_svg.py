@@ -64,7 +64,9 @@ def expand_instances(instances_d):
 
         # Check for the case where no `definition-file` or `definition` were given
         if inst.get("definition", None) is None:
-            logging.warning(f"Couldn't find a definition for refdef '{refdef}'")
+            logging.warning(
+                f"Couldn't find a definition for refdef '{refdef}'; continue with empty one"
+            )
             inst["definition"] = {}
 
     return instances_d
