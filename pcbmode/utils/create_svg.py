@@ -56,7 +56,7 @@ def expand_instances(instances_d, definitions_d):
     in those files to 'source-data'. It's done in a way that should work also with
     OSs that use a sifferent path hierarchy delimeter, like Windows.
     """
-    for refdef, inst in instances_d.items():
+    for name, inst in instances_d.items():
 
         # Check if none, or more than one definition is specified
         def_here = inst.get("definition-here", None)
@@ -65,12 +65,12 @@ def expand_instances(instances_d, definitions_d):
         count = [def_here, def_name, def_file].count(None)
         if count == 3:
             logging.warning(
-                f"'{refdef}' has no definition; proceeding with an empty one"
+                f"'{name}' has no definition; proceeding with an empty one"
             )
             def_here = {}
         elif count == 1:
             logging.error(
-                f"'{refdef}' has multiple definitions but should have only one"
+                f"'{name}' has multiple definitions but should have only one"
             )
             raise Exception  # TODO: is this the right one to raise?
 
@@ -81,12 +81,12 @@ def expand_instances(instances_d, definitions_d):
             for s in def_file:  # TODO: check if works on Windows
                 path_o = Path(path_o / s)
             inst["definition-here"] = utils.json_to_dict(path_o)
-            logging.info(f"Processed '{path_o}' for refdef '{refdef}'")
+            logging.info(f"Processed '{path_o}' for '{name}'")
         elif def_name is not None:
             try:
                 inst["definition-here"] = definitions_d[def_name]
             except:
-                logging.error(f"'{def_name}' not found for '{refdef}'")
+                logging.error(f"'{def_name}' not found for '{name}'")
                 raise Exception  # TODO: is this the right one to raise?
 
     return instances_d
