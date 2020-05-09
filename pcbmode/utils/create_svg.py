@@ -35,32 +35,30 @@ def create_shapes():
     """
     shapes_d = {}
 
+    instances_d = expand_instances(config.brd.get("instances", {}))
+    print(config.brd)
+
     # Outline
     shapes_o_l = []  # shape object list
     for shape_d in get_outline_d():
         shapes_o_l.append(Shape(shape_d))
     shapes_d["outline"] = shapes_o_l
 
-    instances_d = expand_instances(config.brd.get("instances", {}))
-    print(instances_d)
-
     return shapes_d
-
 
 
 def expand_instances(instances_d):
     """
-    Instances specify the file where the source for their footprint is. Here we read
-    in those files and replace the path of the file with the actual data.
-    It's done in a way that should work also with OSs that use a sifferent path
-    hierarchy delimeter, like Windows.
+    Instances can specify a file where the data for their footprint is. Here we read
+    in those files to 'source-data'. It's done in a way that should work also with OSs that use a sifferent path hierarchy delimeter, like Windows.
     """
-    for refdef,inst in instances_d.items():
+    for refdef, inst in instances_d.items():
         path_o = Path(config.tmp["project-path"])
-        for s in inst['source'].split('/'):  # TODO: check if works on Windows
+        source_file = inst.get("source-file", "").split("/")
+        for s in source_file: # TODO: check if works on Windows
             path_o = Path(path_o / s)
-        inst['source'] = utils.json_to_dict(path_o)
-    return(instances_d)
+        inst["source-data"] = utils.json_to_dict(path_o)
+    return instances_d
 
 
 def get_outline_d():
@@ -124,7 +122,6 @@ def create_svg(create_d):
                 mask_element.set(f"{{{ns_pcm}}}gerber-lp", "c" * segments)
 
     dims_arrows.create_and_place(layers_d, dims_p, center_p)
-
 
     return svg_doc
 
