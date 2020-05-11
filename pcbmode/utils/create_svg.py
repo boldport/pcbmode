@@ -31,7 +31,7 @@ from pcbmode.utils import dims_arrows
 from pcbmode.utils.shape import Shape
 
 
-def expand_instances():
+def expand_instances(d):
     """
     Instances can be instantiated in three ways, which are mutually exclusive:
     'definition-here': defined under this key
@@ -44,19 +44,13 @@ def expand_instances():
     If either 'definition-name' or 'definition-file' are specified, those are resolved
     to 'definition-here'. If 'definition-here' is defined it's left as it is.
     """
-
-    definitions_d = config.brd.get("definitions", {})
-    instances_d = config.brd.get("instances", {})
-    for name, inst_d in instances_d.items():
-        inst_d["definition-here"] = resolve_definition(name, inst_d, definitions_d)
-        # We have a second level is it's a 'component'
-        if inst_d.get("instance-type", None) == "component":
-            instances_l2_d = inst_d["definition-here"].get("instances", {})
-            definitions_l2_d = inst_d["definition-here"].get("definitions", {})
-            for name_l2, inst_l2_d in instances_l2_d.items():
-                inst_l2_d["definition-here"] = resolve_definition(
-                    name_l2, inst_l2_d, definitions_l2_d
-                )
+    is_d = d.get("instances", None)
+    if is_d == None:
+        return
+    ds_d = d.get("definitions", None)
+    for n, i_d in is_d.items():
+        i_d["definition-here"] = resolve_definition(n, i_d, ds_d)
+        expand_instance(i_d["definition-here"])
 
 
 def resolve_definition(name, inst_d, definitions_d):
@@ -162,10 +156,10 @@ def create_shape_objects():
     instances_d = config.brd.get("instances", {})
 
     for name, inst_d in instances_d.items():
-        if inst_d["instance-type"] == "component":
-            shapes = inst_d["definition-here"]["shapes"]
-            for shape in shapes:
-                shape["object"] = Shape(shape)
+        shapes = inst_d["definition-here"].get('shapes', {})
+        for shape in shapes:
+            shape["object"] = Shape(shape)
+#        if inst_d["instance-type"] == "component":
 
 
 def save_svg(doc):
@@ -186,7 +180,7 @@ def create():
     3. Create the SVG
     """
 
-    expand_instances()
+    expand_instances(config.brd)
     print(json.dumps(config.brd, indent=2))
     # print(config.brd)
     create_shape_objects()
