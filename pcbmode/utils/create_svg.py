@@ -35,22 +35,19 @@ def create_shapes():
     """
     shapes_d = {}
 
-    instances_d = config.brd.get("instances", {})
-    definitions_d = config.brd.get("definitions", {})
-    instances_d = expand_instances(instances_d, definitions_d)
-
+    expand_instances()
     print(config.brd)
 
-    # Outline
-    shapes_o_l = []  # shape object list
-    for shape_d in get_outline_d():
-        shapes_o_l.append(Shape(shape_d))
-    shapes_d["outline"] = shapes_o_l
+    # # Outline
+    # shapes_o_l = []  # shape object list
+    # for shape_d in get_outline_d():
+    #     shapes_o_l.append(Shape(shape_d))
+    # shapes_d["outline"] = shapes_o_l
 
     return shapes_d
 
 
-def expand_instances(instances_d, definitions_d):
+def expand_instances():
     """
     Instances can be instantiated in three ways, which are mutually exclusive:
     'definition-here': defined under this key
@@ -64,6 +61,8 @@ def expand_instances(instances_d, definitions_d):
     to 'definition-here'. If 'definition-here' is defined it's left as it is.
     """
 
+    definitions_d = config.brd.get("definitions", {})
+    instances_d = config.brd.get("instances", {})
     for name, inst_d in instances_d.items():
         inst_d["definition-here"] = resolve_definition(name, inst_d, definitions_d)
         # Now we expand the definitions within the instance itself
