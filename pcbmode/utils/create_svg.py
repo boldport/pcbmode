@@ -101,12 +101,10 @@ def create_svg():
     # TODO: make work with multiple shapes. Right now it'll only consider the last
     # one (or the only one) for the abounding box calculation.
     for name, inst_d in instances_d.items():
-        print(inst_d)
         if inst_d["instance-type"] == "outline":
-            print("FFFF")
             shapes = inst_d["definition-here"]["shapes"]
             for shape in shapes:
-                dims_p = shape.get_dims()
+                dims_p = shape['shape-object'].get_dims()
                 center_p = dims_p.copy()
                 center_p.mult(0.5)  # center point
 
@@ -122,29 +120,54 @@ def create_svg():
     # Place outline
     shape_group = et.SubElement(layers_d["outline"]["layer"], "g")
     shape_group.set(f"{{{ns_pcm}}}type", "module-shapes")
-    for shape in create_d["outline"]:
-        place.place_shape(shape, shape_group)
-    pour_buffer = config.cfg["distances"]["from-pour-to"]["outline"]
-    for pcb_layer in config.stk["layer-names"]:
-        if utils.checkForPoursInLayer(pcb_layer) is True:
-            for shape in create_d["outline"]:
-                mask_element = place.place_shape(shape, masks_d[pcb_layer])
-                # Override style so that we get the desired effect
-                # We stroke the outline with twice the size of the buffer, so
-                # we get the actual distance between the outline and board
-                style = (
-                    "fill:none;stroke:#000;stroke-linejoin:round;stroke-width:%s;"
-                    % str(pour_buffer * 2)
-                )
-                mask_element.set("style", style)
-                # Also override mask's gerber-lp and set to all clear
-                path = shape.get_path_str()
-                segments = path.count("m")
-                mask_element.set(f"{{{ns_pcm}}}gerber-lp", "c" * segments)
 
-    dims_arrows.create_and_place(layers_d, dims_p, center_p)
+    place_shape_objects(config.brd, layers_d)
+
+    # for shape in create_d["outline"]:
+    #     place.place_shape(shape, shape_group)
+    # pour_buffer = config.cfg["distances"]["from-pour-to"]["outline"]
+    # for pcb_layer in config.stk["layer-names"]:
+    #     if utils.checkForPoursInLayer(pcb_layer) is True:
+    #         for shape in create_d["outline"]:
+    #             mask_element = place.place_shape(shape, masks_d[pcb_layer])
+    #             # Override style so that we get the desired effect
+    #             # We stroke the outline with twice the size of the buffer, so
+    #             # we get the actual distance between the outline and board
+    #             style = (
+    #                 "fill:none;stroke:#000;stroke-linejoin:round;stroke-width:%s;"
+    #                 % str(pour_buffer * 2)
+    #             )
+    #             mask_element.set("style", style)
+    #             # Also override mask's gerber-lp and set to all clear
+    #             path = shape.get_path_str()
+    #             segments = path.count("m")
+    #             mask_element.set(f"{{{ns_pcm}}}gerber-lp", "c" * segments)
+
+    # dims_arrows.create_and_place(layers_d, dims_p, center_p)
 
     return svg_doc
+
+
+def place_shape_objects(d, layers_d):
+    """
+    Recursively converts shape definitions into shape objects
+    """
+
+    ns_pcm = config.cfg["ns"]["pcbmode"]
+
+    shape_group = et.SubElement(layers_d["outline"]["layer"], "g")
+    shape_group.set(f"{{{ns_pcm}}}type", "module-shapes")
+
+    is_d = d.get("instances", None)
+    if is_d == None:
+        return
+    for n, i_d in is_d.items():
+        shapes = i_d["definition-here"].get('shapes', {})
+        for shape in shapes:
+            shape_o = shape["shape-object"]
+            place.place_shape(shape_o, shape_group)
+        place_shape_objects(i_d["definition-here"], layers_d)
+    return
 
 
 def create_shape_objects(d):
@@ -181,8 +204,8 @@ def create():
     """
 
     expand_instances(config.brd)
-    print(json.dumps(config.brd, indent=2))
+    #print(json.dumps(config.brd, indent=2))
     create_shape_objects(config.brd)
-    print(config.brd)
+    #print(config.brd)
     svg_doc = create_svg()
     save_svg(svg_doc)
