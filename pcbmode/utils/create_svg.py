@@ -20,6 +20,7 @@ from lxml import etree as et
 from pathlib import Path
 
 import logging
+import json
 
 from pcbmode.config import config
 from pcbmode.utils import inkscape_svg
@@ -48,13 +49,14 @@ def expand_instances():
     instances_d = config.brd.get("instances", {})
     for name, inst_d in instances_d.items():
         inst_d["definition-here"] = resolve_definition(name, inst_d, definitions_d)
-        # Now we expand the definitions within the instance itself
-        instances_2_d = inst_d["definition-here"].get("instances", {})
-        definitions_2_d = inst_d["definition-here"].get("definitions", {})
-        for name_2, inst_2_d in instances_2_d.items():
-            inst_2_d["definition-here"] = resolve_definition(
-                name_2, inst_2_d, definitions_2_d
-            )
+        # We have a second level is it's a 'component'
+        if inst_d.get("instance-type", None) == "component":
+            instances_l2_d = inst_d["definition-here"].get("instances", {})
+            definitions_l2_d = inst_d["definition-here"].get("definitions", {})
+            for name_l2, inst_l2_d in instances_l2_d.items():
+                inst_l2_d["definition-here"] = resolve_definition(
+                    name_l2, inst_l2_d, definitions_l2_d
+                )
 
 
 def resolve_definition(name, inst_d, definitions_d):
@@ -153,6 +155,19 @@ def create_svg():
     return svg_doc
 
 
+def create_shape_objects():
+    """
+    """
+    definitions_d = config.brd.get("definitions", {})
+    instances_d = config.brd.get("instances", {})
+
+    for name, inst_d in instances_d.items():
+        if inst_d["instance-type"] == "component":
+            shapes = inst_d["definition-here"]["shapes"]
+            for shape in shapes:
+                shape["object"] = Shape(shape)
+
+
 def save_svg(doc):
     """
     """
@@ -172,7 +187,8 @@ def create():
     """
 
     expand_instances()
-    print(config.brd)
+    print(json.dumps(config.brd, indent=2))
+    # print(config.brd)
     create_shape_objects()
     svg_doc = create_svg()
     save_svg(svg_doc)
