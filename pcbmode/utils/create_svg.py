@@ -33,16 +33,8 @@ from pcbmode.utils.shape import Shape
 
 def expand_instances(d):
     """
-    Instances can be instantiated in three ways, which are mutually exclusive:
-    'definition-here': defined under this key
-    'definition-name': defined under this key in 'definitions'
-    'definition-file': defined in this file
-
-    Here we deal with two levels of instantiations. Firstly the 'components' at the 
-    top level and then the instantiations of 'pins' within those components.
-
-    If either 'definition-name' or 'definition-file' are specified, those are resolved
-    to 'definition-here'. If 'definition-here' is defined it's left as it is.
+    Recursive function to fine and resolve all instantiation definitions that need
+    to be expanded.
     """
     is_d = d.get("instances", None)
     if is_d == None:
@@ -50,11 +42,17 @@ def expand_instances(d):
     ds_d = d.get("definitions", None)
     for n, i_d in is_d.items():
         i_d["definition-here"] = resolve_definition(n, i_d, ds_d)
-        expand_instance(i_d["definition-here"])
+        expand_instances(i_d["definition-here"])
+    return
 
 
 def resolve_definition(name, inst_d, definitions_d):
     """
+    Instances can be instantiated in three ways, which are mutually exclusive:
+    'definition-here': defined under this key
+    'definition-name': defined under this key in 'definitions'
+    'definition-file': defined in this file
+ 
     Here we try to find where the instance information is with some error checking.
     For files it's done in a way that should work also with OSs that use a different
     path hierarchy delimeter, like Windows.
