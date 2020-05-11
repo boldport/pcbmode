@@ -94,19 +94,6 @@ def resolve_definition(name, inst_d, definitions_d):
     return inst_d["definition-here"]
 
 
-def get_outline_d():
-    """
-    Get the (optional) outline.
-    There can be one or more shapes defined in the list under 'shapes' 
-    """
-    outline_d = config.brd.get("outline", None)
-    if outline_d is not None:
-        outline_shapes_l = outline_d.get("shapes", [])
-    else:
-        outline_shapes_l = []
-    return outline_shapes_l
-
-
 def create_svg():
     """
     """
@@ -115,16 +102,15 @@ def create_svg():
     definitions_d = config.brd.get("definitions", {})
     instances_d = config.brd.get("instances", {})
 
-
     # We need the dimension of the outline shapes in order to create the SVG size based
     # on their overall bounding box
     # TODO: make work with multiple shapes. Right now it'll only consider the last
     # one (or the only one) for the abounding box calculation.
     for name, inst_d in instances_d.items():
         print(inst_d)
-        if inst_d['instance-type'] == 'outline':
-            print('FFFF')
-            shapes = inst_d['definition-here']['shapes']
+        if inst_d["instance-type"] == "outline":
+            print("FFFF")
+            shapes = inst_d["definition-here"]["shapes"]
             for shape in shapes:
                 dims_p = shape.get_dims()
                 center_p = dims_p.copy()
