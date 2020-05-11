@@ -30,23 +30,6 @@ from pcbmode.utils import dims_arrows
 from pcbmode.utils.shape import Shape
 
 
-def create_shapes():
-    """
-    """
-    shapes_d = {}
-
-    expand_instances()
-    print(config.brd)
-
-    # # Outline
-    # shapes_o_l = []  # shape object list
-    # for shape_d in get_outline_d():
-    #     shapes_o_l.append(Shape(shape_d))
-    # shapes_d["outline"] = shapes_o_l
-
-    return shapes_d
-
-
 def expand_instances():
     """
     Instances can be instantiated in three ways, which are mutually exclusive:
@@ -72,8 +55,6 @@ def expand_instances():
             inst_2_d["definition-here"] = resolve_definition(
                 name_2, inst_2_d, definitions_2_d
             )
-
-    return instances_d
 
 
 def resolve_definition(name, inst_d, definitions_d):
@@ -126,20 +107,28 @@ def get_outline_d():
     return outline_shapes_l
 
 
-def create_svg(create_d):
+def create_svg():
     """
     """
 
     ns_pcm = config.cfg["ns"]["pcbmode"]
+    definitions_d = config.brd.get("definitions", {})
+    instances_d = config.brd.get("instances", {})
+
 
     # We need the dimension of the outline shapes in order to create the SVG size based
     # on their overall bounding box
     # TODO: make work with multiple shapes. Right now it'll only consider the last
     # one (or the only one) for the abounding box calculation.
-    for shape in create_d["outline"]:
-        dims_p = shape.get_dims()
-    center_p = dims_p.copy()
-    center_p.mult(0.5)  # center point
+    for name, inst_d in instances_d.items():
+        print(inst_d)
+        if inst_d['instance-type'] == 'outline':
+            print('FFFF')
+            shapes = inst_d['definition-here']['shapes']
+            for shape in shapes:
+                dims_p = shape.get_dims()
+                center_p = dims_p.copy()
+                center_p.mult(0.5)  # center point
 
     # Create the Inkscape SVG document
     svg_data = inkscape_svg.create(dims_p.px(), dims_p.py())
@@ -196,6 +185,8 @@ def create():
     3. Create the SVG
     """
 
-    shapes_d = create_shapes()
-    svg_doc = create_svg(shapes_d)
+    expand_instances()
+    print(config.brd)
+    create_shape_objects()
+    svg_doc = create_svg()
     save_svg(svg_doc)
