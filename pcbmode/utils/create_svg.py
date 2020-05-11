@@ -147,17 +147,19 @@ def create_svg():
     return svg_doc
 
 
-def create_shape_objects():
+def create_shape_objects(d):
     """
+    Recursively converts shape definitions into shape objects
     """
-    definitions_d = config.brd.get("definitions", {})
-    instances_d = config.brd.get("instances", {})
-
-    for name, inst_d in instances_d.items():
-        shapes = inst_d["definition-here"].get('shapes', {})
+    is_d = d.get("instances", None)
+    if is_d == None:
+        return
+    for n, i_d in is_d.items():
+        shapes = i_d["definition-here"].get('shapes', {})
         for shape in shapes:
-            shape["object"] = Shape(shape)
-#        if inst_d["instance-type"] == "component":
+            shape["shape-object"] = Shape(shape)
+        create_shape_objects(i_d["definition-here"])
+    return
 
 
 def save_svg(doc):
@@ -180,7 +182,7 @@ def create():
 
     expand_instances(config.brd)
     print(json.dumps(config.brd, indent=2))
-    # print(config.brd)
-    create_shape_objects()
+    create_shape_objects(config.brd)
+    print(config.brd)
     svg_doc = create_svg()
     save_svg(svg_doc)
