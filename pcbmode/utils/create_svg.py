@@ -99,22 +99,28 @@ def expand_shapes(d_d):
     This function copies the shape and adds it to the list of shapes after applying
     the needed modifiers.
     """
+    foils = ['soldermask', 'solderpaste']
     s_d_l = d_d.get("shapes", [])  # a list of shape dicts
     for s_d in s_d_l:  # get the shape dicts
         add_d = s_d.get("add", {})
-        for a in add_d:
-            if a == "soldermask":
-                s_d_copy = s_d.copy()
-                del s_d_copy["add"]
-                s_d_copy["foil"] = a  # assign to new foil
-                s_d_l.append(s_d_copy)
-            elif a == "solderpaste":
-                s_d_copy = s_d.copy()
-                del s_d_copy["add"]
-                s_d_copy["foil"] = a
-                s_d_l.append(s_d_copy)
-            else:
-                logging.warning(f"Can't recognise 'add' foil '{a}'; ignoring")
+        for foil in add_d:
+            if foil not in foils:
+                logging.warning(f"Can't recognise foil '{foil}' in 'add' shape attribute; ignoring")
+                continue
+            s_d_copy = s_d.copy()
+            del s_d_copy["add"]
+            s_d_copy["place-in-foil"] = foil  # assign to new foil
+            foil_dist = config.cfg['distances'][foil]
+            if s_d['shape-type'] == 'path':
+                # TODO: transform addition thing
+                pass
+            elif s_d['shape-type'] == 'circle':
+                s_d['diameter'] += foil_dist['circle']
+            elif s_d['shape-type'] == 'rect':
+                s_d['height'] += foil_dist['rect']
+                s_d['width'] += foil_dist['rect']
+
+            s_d_l.append(s_d_copy)
 
 
 def create_svg():
