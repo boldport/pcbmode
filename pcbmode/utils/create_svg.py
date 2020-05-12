@@ -38,6 +38,7 @@ def expand_instances(d):
     """
     is_d = d.get("instances", None)
     if is_d == None:
+        expand_shapes(d)
         return
     ds_d = d.get("definitions", None)
     for n, i_d in is_d.items():
@@ -88,6 +89,34 @@ def resolve_definition(name, inst_d, definitions_d):
     return inst_d["definition-here"]
 
 
+def expand_shapes(d_d):
+    """
+    Some shape definitions will have extra shape copies to 'add'. This is convinient
+    way to just add the same shape into another foil without defining the same shape
+    again in the list of shapes. This is mostly used for 'conductor' pads that also need the same shape applied to soldermask and solderpaste, but with a
+    globally-defined scale.
+
+    This function copies the shape and adds it to the list of shapes after applying
+    the needed modifiers.
+    """
+    s_d_l = d_d.get("shapes", [])  # a list of shape dicts
+    for s_d in s_d_l:  # get the shape dicts
+        add_d = s_d.get("add", {})
+        for a in add_d:
+            if a == "soldermask":
+                s_d_copy = s_d.copy()
+                del s_d_copy["add"]
+                s_d_copy["foil"] = a  # assign to new foil
+                s_d_l.append(s_d_copy)
+            elif a == "solderpaste":
+                s_d_copy = s_d.copy()
+                del s_d_copy["add"]
+                s_d_copy["foil"] = a
+                s_d_l.append(s_d_copy)
+            else:
+                logging.warning(f"Can't recognise 'add' foil '{a}'; ignoring")
+
+
 def create_svg():
     """
     """
@@ -104,7 +133,7 @@ def create_svg():
         if inst_d["instance-type"] == "outline":
             shapes = inst_d["definition-here"]["shapes"]
             for shape in shapes:
-                dims_p = shape['shape-object'].get_dims()
+                dims_p = shape["shape-object"].get_dims()
                 center_p = dims_p.copy()
                 center_p.mult(0.5)  # center point
 
@@ -162,7 +191,7 @@ def place_shape_objects(d, layers_d):
     if is_d == None:
         return
     for n, i_d in is_d.items():
-        shapes = i_d["definition-here"].get('shapes', {})
+        shapes = i_d["definition-here"].get("shapes", {})
         for shape in shapes:
             shape_o = shape["shape-object"]
             place.place_shape(shape_o, shape_group)
@@ -178,7 +207,7 @@ def create_shape_objects(d):
     if is_d == None:
         return
     for n, i_d in is_d.items():
-        shapes = i_d["definition-here"].get('shapes', {})
+        shapes = i_d["definition-here"].get("shapes", {})
         for shape in shapes:
             shape["shape-object"] = Shape(shape)
         create_shape_objects(i_d["definition-here"])
@@ -204,8 +233,8 @@ def create():
     """
 
     expand_instances(config.brd)
-    #print(json.dumps(config.brd, indent=2))
+    # print(json.dumps(config.brd, indent=2))
     create_shape_objects(config.brd)
-    #print(config.brd)
+    # print(config.brd)
     svg_doc = create_svg()
     save_svg(svg_doc)
