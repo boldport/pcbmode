@@ -17,6 +17,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+import logging
 import copy
 from pathlib import Path
 from lxml import etree as et
@@ -40,8 +41,14 @@ class Shape:
         dimensions specified. Otherwise it'll be centered around the dimentsions of the
         shape itself (routing shapes are placed relative to the outline, not themselves) 
         """
+
+        transform = shape_dict.get("transform", None)
+        if transform is not None:
+            utils.parse_transform(transform)
+
         self._shape_dict = self._process_shape_dict(shape_dict)
         self._p_r_path = self._path_from_shape_type()
+
         trans_dict = {  # transform dictionary
             "scale": self._shape_dict["scale"],
             "rotate": self._shape_dict["rotate"],
@@ -90,9 +97,10 @@ class Shape:
         """
 
         try:
-            self._type = self._shape_dict.get("type")
+            self._type = self._shape_dict["shape-type"]
         except:
-            msg.error("Shapes must have a 'type' definition.")
+            logging.error("A 'shape' definition must have a 'shape-type' property")
+            raise KeyError
 
         if self._type == "layer":
             # A 'layer' shape type is a shape that covers the entire board. So we copy
@@ -100,7 +108,7 @@ class Shape:
             # stroke
             self._shape_dict = config.brd["outline"].get("shape").copy()
             self._shape_dict["style"] = "stroke:none;"
-            self._type = self._shape_dict.get("type")
+            self._type = self._shape_dict.get["shape-type"]
 
         if self._type == "rect":
             p_r_path = self._process_rect()
@@ -115,7 +123,7 @@ class Shape:
         elif self._type == "path":
             p_r_path = self._process_path()
         else:
-            msg.error("'%s' is not a recongnised shape type" % self._type)
+            logging.error(f"Couldn't resolve shape 'shape-type' {self._type}")
 
         return p_r_path
 
@@ -302,7 +310,7 @@ class Shape:
         return self._shape_dict["buffer-to-pour"]
 
     def get_type(self):
-        return self._shape_dict["type"]
+        return self._shape_dict["shape-type"]
 
     def getText(self):
         # TODO: need to look into making this better
