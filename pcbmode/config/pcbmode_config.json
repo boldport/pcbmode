@@ -15,14 +15,8 @@
   "cache": {
     "file": "build/cache/temp.json"
   },
-  "shapes": {
-    "path": "shapes"
-  },
   "fonts": {
     "path": "fonts"
-  },
-  "components": {
-    "path": "components"
   },
   "create": {
     "docs": true,
@@ -45,14 +39,14 @@
       "route": 0.25
     },
     "soldermask": {
-      "path-scale": 1.05,
-      "rect-buffer": 0.05,
-      "circle-buffer": 0.05
+      "path": 1.05,
+      "rect": 0.05,
+      "circle": 0.05
     },
     "solderpaste": {
-      "path-scale": 0.9,
-      "rect-buffer": -0.1,
-      "circle-buffer": -0.1
+      "path": 0.9,
+      "rect": -0.1,
+      "circle": -0.1
     }
   },
   "gerber": {
