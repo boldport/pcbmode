@@ -29,6 +29,7 @@ from pcbmode.utils import place
 from pcbmode.utils import utils
 from pcbmode.utils import dims_arrows
 from pcbmode.utils.shape import Shape
+from pcbmode.utils.transform import Transform
 
 
 def expand_instances(d):
@@ -112,8 +113,15 @@ def expand_shapes(d_d):
             s_d_copy["place-in-foil"] = foil  # assign to new foil
             foil_dist = config.cfg['distances'][foil]
             if s_d['shape-type'] == 'path':
-                # TODO: transform addition thing
-                pass
+                t_add_o = Transform(f"scale({foil_dist['path']})")
+                t_shape_o = Transform(s_d.get('transform', ""))
+
+                print('RRRR')
+                print(f"ADD:   {t_add_o.get_str()}")
+                print(f"SHAPE: {t_shape_o.get_str()}")
+
+                s_d['transform'] = (t_add_o+t_shape_o).get_str()
+
             elif s_d['shape-type'] == 'circle':
                 s_d['diameter'] += foil_dist['circle']
             elif s_d['shape-type'] == 'rect':
