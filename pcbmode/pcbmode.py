@@ -50,7 +50,7 @@ def load_pcbmode_config():
     config_file = config.tmp["pcbmode-path"] / config_path / config_filename
     config.cfg = utils.json_to_dict(config_file)
 
-    # Override with local settings, if any
+    # Override with project's settings in a local config/pcbmode_config.json
     project_config_file = config.tmp["project-path"] / config_path / config_filename
     if project_config_file.exists():
         project_config = utils.json_to_dict(project_config_file)
