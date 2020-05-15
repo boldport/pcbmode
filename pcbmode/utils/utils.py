@@ -595,6 +595,3 @@ def process_style(style):
                 new_style += add_if_stroke
 
     return new_style
-
-
-
