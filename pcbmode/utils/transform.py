@@ -18,11 +18,27 @@
 
 import re
 import math
+import logging
 
 
 class Transform:
     def __init__(self, t=""):
         self._parse(t)
+
+    def __repr__(self):
+        """ Printing """
+        return self.get_str() 
+
+    def __add__(self, t_o):
+        """ 't_o': Transform object to add """
+        #for c,v in d.items():
+        for c_d in t_o.get_list():
+            print(c_d)
+            for c,v in c_d.items():
+                print(c,v)
+#            for key in project_config:
+#                config.cfg[key] = {**config.cfg[key], **project_config[key]}
+
 
     def _parse(self, t):
         """
@@ -39,6 +55,28 @@ class Transform:
         # https://stackoverflow.com/questions/61565226/    python-regex-named-result-with-variable
         regex = f"({types})\((?P<a1>{num})(?:,?\s?(?P<a2>{num}))?(?:,?\s?(?P<a3>{num}))?(?:,?\s?(?P<a4>{num}))?(?:,?\s?(?P<a5>{num}))?(?:,?\s?(?P<a6>{num}))?\)"
 
+        # Note to future self: doing this will prevent the second iteration from 
+        # working. I don't know why... :-/
+        #matches = re.finditer(regex, t)
+
+        # Check if there are duplicate commands. We don't want -- even though it 
+        # might still be 'legal' because it complicates the composition of 
+        # transforms later on. Better here to not allow than the user gets strange
+        # results that are hard to debug.
+        seen = []
+        for match in re.finditer(regex, t):
+            cmd = match.group(1)
+            if cmd not in seen:
+                seen.append(cmd)
+                if (cmd == 'matrix') and (len(seen) > 1):
+                    logging.error(f"In transform '{t}' there cannot be other transformation commands in addition to 'matrix()'")
+                    raise Exception
+            else:
+                logging.error(f"In transform '{t}' there cannot be multiple transformation commands of the same type")
+                raise Exception
+
+        # Expand the transformations so that all optional parameters are inserted. This
+        # will make transformation composition easier
         for match in re.finditer(regex, t):
             cmd = match.group(1)  # the command (translate, scale, etc.)
             args = {k: float(v) for k, v in match.groupdict().items() if v is not None}
@@ -156,7 +194,6 @@ class Transform:
 
     def get_str(self):
         t_str = ""
-        print(self._t_p_l)
         for cmd_d in self._t_p_l:
             for cmd,args in cmd_d.items():
                 arg_str = ",".join(str(x) for x in args)
