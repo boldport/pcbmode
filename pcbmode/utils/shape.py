@@ -43,10 +43,10 @@ class Shape:
         shape itself (routing shapes are placed relative to the outline, not themselves) 
         """
 
-        print(shape_dict.get("transform", None))
+#        print(shape_dict.get("transform", None))
         transform_o = Transform(shape_dict.get("transform", None))
-        print(transform_o.get_list())
-        print(transform_o.get_str())
+#        print(transform_o.get_list())
+#        print(transform_o.get_str())
 #        if transform is not None:
 #            utils.parse_transform(transform)
 
