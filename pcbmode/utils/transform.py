@@ -27,23 +27,28 @@ class Transform:
 
     def __repr__(self):
         """ Printing """
-        return self.get_str() 
+        return self.get_str()
 
     def __add__(self, t_o):
         """ 't_o': Transform object to add """
-        #for c,v in d.items():
-        for c_d in t_o.get_list():
+        for c_d in t_o.get_dict():  # iterate on command dicts
             print(c_d)
-            for c,v in c_d.items():
-                print(c,v)
-#            for key in project_config:
-#                config.cfg[key] = {**config.cfg[key], **project_config[key]}
 
+    #            for cmd, val in c_d.items():
+    #                for cmd2 in self._t_p_l:
+    #                    print(cmd2)
+    #                    if c2 == c:
+    #                        for i, p in enumerate(self._t_p_l[c2]):
+    #                            p[i] += v[i]
+    #        print(self._t_p_l)
+
+    #            for key in project_config:
+    #                config.cfg[key] = {**config.cfg[key], **project_config[key]}
 
     def _parse(self, t):
         """
         """
-        t_p_l = []  # _t_ransform _p_arsed
+        t_p_d = {}  # _t_ransform _p_arsed _d_ict
 
         # Here we have (?:...) to indicate a non-capturing group so that it doesn't
         # interfere with the group numbering. This was helpful:
@@ -55,12 +60,12 @@ class Transform:
         # https://stackoverflow.com/questions/61565226/    python-regex-named-result-with-variable
         regex = f"({types})\((?P<a1>{num})(?:,?\s?(?P<a2>{num}))?(?:,?\s?(?P<a3>{num}))?(?:,?\s?(?P<a4>{num}))?(?:,?\s?(?P<a5>{num}))?(?:,?\s?(?P<a6>{num}))?\)"
 
-        # Note to future self: doing this will prevent the second iteration from 
+        # Note to future self: doing this will prevent the second iteration from
         # working. I don't know why... :-/
-        #matches = re.finditer(regex, t)
+        # matches = re.finditer(regex, t)
 
-        # Check if there are duplicate commands. We don't want -- even though it 
-        # might still be 'legal' because it complicates the composition of 
+        # Check if there are duplicate commands. We don't want -- even though it
+        # might still be 'legal' because it complicates the composition of
         # transforms later on. Better here to not allow than the user gets strange
         # results that are hard to debug.
         seen = []
@@ -68,89 +73,87 @@ class Transform:
             cmd = match.group(1)
             if cmd not in seen:
                 seen.append(cmd)
-                if (cmd == 'matrix') and (len(seen) > 1):
-                    logging.error(f"In transform '{t}' there cannot be other transformation commands in addition to 'matrix()'")
+                if (cmd == "matrix") and (len(seen) > 1):
+                    logging.error(
+                        f"In transform '{t}' there cannot be other transformation commands in addition to 'matrix()'"
+                    )
                     raise Exception
             else:
-                logging.error(f"In transform '{t}' there cannot be multiple transformation commands of the same type")
+                logging.error(
+                    f"In transform '{t}' there cannot be multiple transformation commands of the same type"
+                )
                 raise Exception
 
         # Expand the transformations so that all optional parameters are inserted. This
         # will make transformation composition easier
         for match in re.finditer(regex, t):
             cmd = match.group(1)  # the command (translate, scale, etc.)
-            args = {k: float(v) for k, v in match.groupdict().items() if v is not None}
-            an = len(args)  # number of arguments
+            a_d = {k: float(v) for k, v in match.groupdict().items() if v is not None}
+            a_n = len(a_d)  # number of arguments
+            v_l = []  # _v_alue _l_ist
             if cmd == "translate":
-                inst = {cmd: []}
-                if an > 2:
+                if a_n > 2:
                     logging.warning(
                         f"In transform '{t}', '{cmd}' can only have 1 or 2 argument; ignoring"
                     )
-                elif an == 0:
-                    inst[cmd].append(0)
-                    inst[cmd].append(0)
-                elif an == 1:
-                    inst[cmd].append(args["a1"])
-                    inst[cmd].append(0)
+                elif a_n == 0:
+                    v_l.append(0)
+                    v_l.append(0)
+                elif a_n == 1:
+                    v_l.append(a_d["a1"])
+                    v_l.append(0)
                 else:
-                    inst[cmd].append(args["a1"])
-                    inst[cmd].append(args["a2"])
-                t_p_l.append(inst)
+                    v_l.append(a_d["a1"])
+                    v_l.append(a_d["a2"])
             elif cmd == "scale":
-                inst = {cmd: []}
-                if an > 2:
+                if a_n > 2:
                     logging.warning(
                         f"In transform '{t}', '{cmd}' can have only 1 or 2 arguments; ignoring"
                     )
-                elif an == 0:
-                    inst[cmd].append(1)
-                    inst[cmd].append(1)
-                elif an == 1:
-                    inst[cmd].append(args["a1"])
-                    inst[cmd].append(args["a1"])
+                elif a_n == 0:
+                    v_l.append(1)
+                    v_l.append(1)
+                elif a_n == 1:
+                    v_l.append(a_d["a1"])
+                    v_l.append(a_d["a1"])
                 else:
-                    inst[cmd].append(args["a1"])
-                    inst[cmd].append(args["a2"])
-                t_p_l.append(inst)
+                    v_l.append(a_d["a1"])
+                    v_l.append(a_d["a2"])
             elif cmd == "rotate":
-                inst = {cmd: []}
-                if (an > 3) or (an == 2):
+                if (a_n > 3) or (a_n == 2):
                     logging.warning(
                         f"In transform '{t}', '{cmd}' can only have 1 or 3 arguments; ignoring"
                     )
-                elif an == 0:
-                    inst[cmd].append(0)
-                elif an == 1:
-                    inst[cmd].append(args["a1"])
+                elif a_n == 0:
+                    v_l.append(0)
+                elif a_n == 1:
+                    v_l.append(a_d["a1"])
                 else:
-                    inst[cmd].append(args["a1"])
-                    inst[cmd].append(args["a2"])
-                    inst[cmd].append(args["a3"])
-                t_p_l.append(inst)
+                    v_l.append(a_d["a1"])
+                    v_l.append(a_d["a2"])
+                    v_l.append(a_d["a3"])
             elif cmd == "matrix":
-                inst = {cmd: []}
-                if an != 6:
+                if a_n != 6:
                     logging.warning(
                         f"In transform '{t}', '{cmd}' must have 6 arguments; ignoring"
                     )
                 else:
                     for i in range(1, 7):
-                        inst[cmd].append(args[f"a{i}"])
-                    cmd_l = self._decompose_matrix(inst[cmd])
-                t_p_l += cmd_l  # add the decomposed matrix elements
+                        v_l[cmd].append(a_d[f"a{i}"])
+                    v_l = self._decompose_matrix(v_l[cmd])
             elif (cmd == "skewX") or (cmd == "skewY"):
-                if an != 1:
+                if a_n != 1:
                     logging.warning(
                         f"In transform '{t}', {cmd} must have only 1 arguments; ignoring"
                     )
                 else:
-                    t_p_l.append({cmd: [args["a1"]]})
+                    v_l.append(a_d["a1"])
             else:
                 logging.warning(f"In transform '{t}', '{cmd}' is not yet supported")
 
-        self._t_p_l = t_p_l
+            t_p_d[cmd] = v_l
 
+        self._t_p_d = t_p_d
 
     def _decompose_matrix(self, matrix_l):
         """
@@ -189,13 +192,12 @@ class Transform:
 
         return cmd_l
 
-    def get_list(self):
-        return self._t_p_l
+    def get_dict(self):
+        return self._t_p_d
 
     def get_str(self):
         t_str = ""
-        for cmd_d in self._t_p_l:
-            for cmd,args in cmd_d.items():
-                arg_str = ",".join(str(x) for x in args)
-                t_str += f"{cmd}({arg_str}) "
+        for cmd, v_l in self._t_p_d.items():
+            arg_str = ",".join(str(x) for x in v_l)
+            t_str += f"{cmd}({arg_str}) "
         return t_str.rstrip()
