@@ -33,16 +33,24 @@ class Transform:
         """ 
         Add an input Transform object to self. It simple adds the arguments for each
         command, except for 'scale' where the factors are multiplied
-         
+
         't_o': add this Transform to self 
         """
+        new_t_o = Transform(self._t_p_d.get_str())
         for cmd, a_l in t_o.get_dict().items():  # get command and argument list
-            if cmd in self._t_p_d:
-                for i, a in enumerate(a_l):
+            for i, a in enumerate(a_l):
+                if cmd in self._t_p_d:
                     if cmd == "scale":
-                        self._t_p_d[cmd][i] *= a_l[i]
+                        tmp = self._t_p_d[cmd][i] * a_l[i]
                     else:
-                        self._t_p_d[cmd][i] += a_l[i]
+                        tmp = self._t_p_d[cmd][i] + a_l[i]
+                    new_t[cmd].append(tmp)
+            else:
+                new_t[cmd] = a_l
+        print(new_t)
+
+        return new_t
+
 
     def _parse(self, t):
         """
