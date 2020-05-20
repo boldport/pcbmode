@@ -115,19 +115,12 @@ def expand_shapes(d_d):
             if s_d['shape-type'] == 'path':
                 t_add_o = Transform(f"scale({foil_dist['path']})")
                 t_shape_o = Transform(s_d.get('transform', ""))
-
-                print('RRRR')
-                print(f"ADD:   {t_add_o.get_str()}")
-                print(f"SHAPE: {t_shape_o.get_str()}")
-
-                s_d['transform'] = (t_add_o+t_shape_o).get_str()
-
+                s_d['transform'] = (t_shape_o+t_add_o).get_str()
             elif s_d['shape-type'] == 'circle':
                 s_d['diameter'] += foil_dist['circle']
             elif s_d['shape-type'] == 'rect':
                 s_d['height'] += foil_dist['rect']
                 s_d['width'] += foil_dist['rect']
-
             s_d_l.append(s_d_copy)
 
 
