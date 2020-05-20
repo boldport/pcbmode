@@ -30,20 +30,19 @@ class Transform:
         return self.get_str()
 
     def __add__(self, t_o):
-        """ 't_o': Transform object to add """
-        for c_d in t_o.get_dict():  # iterate on command dicts
-            print(c_d)
-
-    #            for cmd, val in c_d.items():
-    #                for cmd2 in self._t_p_l:
-    #                    print(cmd2)
-    #                    if c2 == c:
-    #                        for i, p in enumerate(self._t_p_l[c2]):
-    #                            p[i] += v[i]
-    #        print(self._t_p_l)
-
-    #            for key in project_config:
-    #                config.cfg[key] = {**config.cfg[key], **project_config[key]}
+        """ 
+        Add an input Transform object to self. It simple adds the arguments for each
+        command, except for 'scale' where the factors are multiplied
+         
+        't_o': add this Transform to self 
+        """
+        for cmd, a_l in t_o.get_dict().items():  # get command and argument list
+            if cmd in self._t_p_d:
+                for i, a in enumerate(a_l):
+                    if cmd == "scale":
+                        self._t_p_d[cmd][i] *= a_l[i]
+                    else:
+                        self._t_p_d[cmd][i] += a_l[i]
 
     def _parse(self, t):
         """
