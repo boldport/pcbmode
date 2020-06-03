@@ -113,6 +113,8 @@ def expand_shapes(d_d):
             s_d_copy["place-in-foil"] = foil  # assign to new foil
             foil_dist = config.cfg['distances'][foil]
             if s_d['shape-type'] == 'path':
+                # We need to 'add' the Transforms in order to create a new shape that's
+                # only different by the scale defined in the global configuration 
                 t_add_o = Transform(f"scale({foil_dist['path']})")
                 t_shape_o = Transform(s_d.get('transform', ""))
                 s_d['transform'] = t_shape_o+t_add_o

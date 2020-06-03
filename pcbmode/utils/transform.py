@@ -18,10 +18,15 @@
 
 import re
 import math
+import copy
 import logging
 
 
 class Transform:
+    """
+    Immutable object for SVG Transform
+    """
+
     def __init__(self, t=""):
         self._parse(t)
 
@@ -31,26 +36,36 @@ class Transform:
 
     def __add__(self, t_o):
         """ 
-        Add an input Transform object to self. It simple adds the arguments for each
-        command, except for 'scale' where the factors are multiplied
+        Add the values of an input Transform object to the values of 'self' and return
+        a new Transform object. The command arguments are added, except for 'scale' where they are multiplied.
+
+        Note that order isn't preserved. Might need to be addressed at some point.
 
         't_o': add this Transform to self 
         """
-        new_t_o = Transform(self._t_p_d.get_str())
-        for cmd, a_l in t_o.get_dict().items():  # get command and argument list
-            for i, a in enumerate(a_l):
-                if cmd in self._t_p_d:
+        c1_d = copy.deepcopy(self._t_p_d)
+        c2_d = copy.deepcopy(t_o.get_dict())
+        new_t = ""
+
+        for cmd, a_l in c2_d.items():  # get command and _a_rgument _l_ist
+            if cmd in c1_d:  # if the command is on both
+                tmp_l = []
+                for i, arg in enumerate(a_l):
                     if cmd == "scale":
-                        tmp = self._t_p_d[cmd][i] * a_l[i]
+                        tmp = c1_d[cmd][i] * a_l[i]
                     else:
-                        tmp = self._t_p_d[cmd][i] + a_l[i]
-                    new_t[cmd].append(tmp)
+                        tmp = c1_d[cmd][i] + a_l[i]
+                    tmp_l.append(tmp)
+                new_t += f"{self._to_str({cmd:tmp_l})} "
+                del c1_d[cmd]
             else:
-                new_t[cmd] = a_l
-        print(new_t)
+                new_t += f"{self._to_str({cmd:a_l})} "
 
-        return new_t
+        # There may be remaining arguments that we didn't deal with yet
+        for cmd, a_l in c1_d.items():
+            new_t += f"{self._to_str({cmd:a_l})} "
 
+        return Transform(new_t)
 
     def _parse(self, t):
         """
@@ -199,12 +214,15 @@ class Transform:
 
         return cmd_l
 
+    def _to_str(self, d):
+        s = ""
+        for cmd, v_l in d.items():
+            arg_str = ",".join(str(x) for x in v_l)
+            s += f"{cmd}({arg_str}) "
+        return s.rstrip()
+
     def get_dict(self):
         return self._t_p_d
 
     def get_str(self):
-        t_str = ""
-        for cmd, v_l in self._t_p_d.items():
-            arg_str = ",".join(str(x) for x in v_l)
-            t_str += f"{cmd}({arg_str}) "
-        return t_str.rstrip()
+        return self._to_str(self._t_p_d)
