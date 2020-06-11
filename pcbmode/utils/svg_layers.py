@@ -74,7 +74,9 @@ def create_layers(parent_el, transform=None, refdef=None):
                 conductor_types = ["routing", "pads", "pours"]
                 for cond_type in conductor_types:
                     layers_d[layer_name]["conductor"][cond_type] = {}
-                    layers_d[layer_name]["conductor"][cond_type]["layer"] = create_layer(
+                    layers_d[layer_name]["conductor"][cond_type][
+                        "layer"
+                    ] = create_layer(
                         parent=layers_d[layer_name]["conductor"]["layer"],
                         name=cond_type,
                         transform=None,
