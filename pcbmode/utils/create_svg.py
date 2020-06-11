@@ -126,6 +126,43 @@ def expand_shapes(d_d):
             s_d_l.append(s_d_copy)
 
 
+def place_shape_objects(d, layers_d):
+    """
+    Recursively converts shape definitions into shape objects
+    """
+
+    ns_pcm = config.cfg["ns"]["pcbmode"]
+
+    shape_group = et.SubElement(layers_d["outline"]["layer"], "g")
+    shape_group.set(f"{{{ns_pcm}}}type", "module-shapes")
+
+    is_d = d.get("instances", None)
+    if is_d == None:
+        return
+    for n, i_d in is_d.items():
+        shapes = i_d["definition-here"].get("shapes", {})
+        for shape in shapes:
+            shape_o = shape["shape-object"]
+            place.place_shape(shape_o, shape_group)
+        place_shape_objects(i_d["definition-here"], layers_d)
+    return
+
+
+def create_shape_objects(d):
+    """
+    Recursively converts shape definition dicts into Shape objects
+    """
+    is_d = d.get("instances", None)
+    if is_d == None:
+        return
+    for n, i_d in is_d.items():
+        shapes = i_d["definition-here"].get("shapes", {})
+        for shape in shapes:
+            shape["shape-object"] = Shape(shape)
+        create_shape_objects(i_d["definition-here"])
+    return
+
+
 def create_svg():
     """
     """
@@ -186,43 +223,6 @@ def create_svg():
     return svg_doc
 
 
-def place_shape_objects(d, layers_d):
-    """
-    Recursively converts shape definitions into shape objects
-    """
-
-    ns_pcm = config.cfg["ns"]["pcbmode"]
-
-    shape_group = et.SubElement(layers_d["outline"]["layer"], "g")
-    shape_group.set(f"{{{ns_pcm}}}type", "module-shapes")
-
-    is_d = d.get("instances", None)
-    if is_d == None:
-        return
-    for n, i_d in is_d.items():
-        shapes = i_d["definition-here"].get("shapes", {})
-        for shape in shapes:
-            shape_o = shape["shape-object"]
-            place.place_shape(shape_o, shape_group)
-        place_shape_objects(i_d["definition-here"], layers_d)
-    return
-
-
-def create_shape_objects(d):
-    """
-    Recursively converts shape definitions into shape objects
-    """
-    is_d = d.get("instances", None)
-    if is_d == None:
-        return
-    for n, i_d in is_d.items():
-        shapes = i_d["definition-here"].get("shapes", {})
-        for shape in shapes:
-            shape["shape-object"] = Shape(shape)
-        create_shape_objects(i_d["definition-here"])
-    return
-
-
 def save_svg(doc):
     """
     """
@@ -241,9 +241,14 @@ def create():
     3. Create the SVG
     """
 
+    # Expand all the declarations of definitions from other files, and create new objects for soldermask and solderpaste
     expand_instances(config.brd)
-    # print(json.dumps(config.brd, indent=2))
+    print(json.dumps(config.brd, indent=2))
+
+    # Convert all the shape definitions in a dict to Shape objects
     create_shape_objects(config.brd)
     # print(config.brd)
-    svg_doc = create_svg()
+
+    svg_doc = create_svg(config.brd)
+
     save_svg(svg_doc)
