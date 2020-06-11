@@ -117,7 +117,7 @@ def expand_shapes(d_d):
                 # only different by the scale defined in the global configuration 
                 t_add_o = Transform(f"scale({foil_dist['path']})")
                 t_shape_o = Transform(s_d.get('transform', ""))
-                s_d['transform'] = t_shape_o+t_add_o
+                s_d['transform'] = (t_shape_o+t_add_o).get_str()
             elif s_d['shape-type'] == 'circle':
                 s_d['diameter'] += foil_dist['circle']
             elif s_d['shape-type'] == 'rect':
@@ -242,7 +242,7 @@ def create():
     """
 
     expand_instances(config.brd)
-    print(json.dumps(config.brd, indent=2))
+    # print(json.dumps(config.brd, indent=2))
     create_shape_objects(config.brd)
     # print(config.brd)
     svg_doc = create_svg()
