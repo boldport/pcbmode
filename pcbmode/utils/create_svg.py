@@ -163,20 +163,20 @@ def create_shape_objects(d):
     return
 
 
-def create_svg():
+def create_svg(d):
     """
     """
 
     ns_pcm = config.cfg["ns"]["pcbmode"]
-    definitions_d = config.brd.get("definitions", {})
-    instances_d = config.brd.get("instances", {})
+    definitions_d = d.get("definitions", {})
+    instances_d = d.get("instances", {})
 
     # We need the dimension of the outline shapes in order to create the SVG size based
     # on their overall bounding box
     # TODO: make work with multiple shapes. Right now it'll only consider the last
     # one (or the only one) for the abounding box calculation.
     for name, inst_d in instances_d.items():
-        if inst_d["instance-type"] == "outline":
+        if inst_d.get("place-in-foil", None) == "outline":
             shapes = inst_d["definition-here"]["shapes"]
             for shape in shapes:
                 dims_p = shape["shape-object"].get_dims()
@@ -196,7 +196,7 @@ def create_svg():
     shape_group = et.SubElement(layers_d["outline"]["layer"], "g")
     shape_group.set(f"{{{ns_pcm}}}type", "module-shapes")
 
-    place_shape_objects(config.brd, layers_d)
+    place_shape_objects(d, layers_d)
 
     # for shape in create_d["outline"]:
     #     place.place_shape(shape, shape_group)
