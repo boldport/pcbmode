@@ -126,6 +126,21 @@ def expand_shapes(d_d):
             s_d_l.append(s_d_copy)
 
 
+def create_shape_objects(d):
+    """
+    Recursively converts shape definition dicts into Shape objects
+    """
+    is_d = d.get("instances", None)
+    if is_d == None:
+        return
+    for n, i_d in is_d.items():
+        shapes = i_d["definition-here"].get("shapes", {})
+        for shape in shapes:
+            shape["shape-object"] = Shape(shape)
+        create_shape_objects(i_d["definition-here"])
+    return
+
+
 def place_shape_objects(d, layers_d):
     """
     Recursively converts shape definitions into shape objects
@@ -146,22 +161,7 @@ def place_shape_objects(d, layers_d):
             place.place_shape(shape_o, shape_group)
         place_shape_objects(i_d["definition-here"], layers_d)
     return
-
-
-def create_shape_objects(d):
-    """
-    Recursively converts shape definition dicts into Shape objects
-    """
-    is_d = d.get("instances", None)
-    if is_d == None:
-        return
-    for n, i_d in is_d.items():
-        shapes = i_d["definition-here"].get("shapes", {})
-        for shape in shapes:
-            shape["shape-object"] = Shape(shape)
-        create_shape_objects(i_d["definition-here"])
-    return
-
+    
 
 def create_svg(d):
     """
