@@ -142,7 +142,7 @@ def json_to_dict(path_o):
     return json_data
 
 
-def getLayerList():
+def get_all_layer_names():
     """
     """
     layer_list = []
@@ -160,7 +160,7 @@ def getLayerList():
     return layer_list, layer_names
 
 
-def getSurfaceLayers():
+def get_surface_layers():
     """
     Returns a list of surface layer names
     Only here until this function is purged from the
@@ -169,7 +169,7 @@ def getSurfaceLayers():
     return config.stk["surface-layer-names"]
 
 
-def getInternalLayers():
+def get_internal_layers():
     """
     Returns a list of internal layer names
     Only here until this function is purged from the
