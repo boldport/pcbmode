@@ -1,9 +1,9 @@
 {
   "stackup": [
     {
-      "name": "top",
-      "type": "signal-layer-surface",
-      "stack": [
+      "layer-name": "top",
+      "layer-type": "signal-layer-surface",
+      "foil-stack": [
         {
           "type": "placement",
           "name": "placement"
@@ -32,7 +32,7 @@
       ]
     },
     {
-      "name": "insulator",
+      "layer-name": "insulator",
       "type": "insulator",
       "stack": [
         {
@@ -41,9 +41,9 @@
       ]
     },
     {
-      "name": "bottom",
-      "type": "signal-layer-surface",
-      "stack": [
+      "layer-name": "bottom",
+      "layer-type": "signal-layer-surface",
+      "foil-stack": [
         {
           "type": "conductor",
           "name": "copper",
