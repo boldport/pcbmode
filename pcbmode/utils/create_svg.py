@@ -100,29 +100,31 @@ def expand_shapes(d_d):
     This function copies the shape and adds it to the list of shapes after applying
     the needed modifiers.
     """
-    foils = ['soldermask', 'solderpaste']
+    foils = ["soldermask", "solderpaste"]
     s_d_l = d_d.get("shapes", [])  # a list of shape dicts
     for s_d in s_d_l:  # get the shape dicts
         add_d = s_d.get("add", {})
         for foil in add_d:
             if foil not in foils:
-                logging.warning(f"Can't recognise foil '{foil}' in 'add' shape attribute; ignoring")
+                logging.warning(
+                    f"Can't recognise foil '{foil}' in 'add' shape attribute; ignoring"
+                )
                 continue
             s_d_copy = s_d.copy()
             del s_d_copy["add"]
-            s_d_copy["place-in-foil"] = foil  # assign to new foil
-            foil_dist = config.cfg['distances'][foil]
-            if s_d['shape-type'] == 'path':
+            s_d_copy["place-in-foils"] = [foil]  # assign to new foil
+            foil_dist = config.cfg["distances"][foil]
+            if s_d["shape-type"] == "path":
                 # We need to 'add' the Transforms in order to create a new shape that's
-                # only different by the scale defined in the global configuration 
+                # only different by the scale defined in the global configuration
                 t_add_o = Transform(f"scale({foil_dist['path']})")
-                t_shape_o = Transform(s_d.get('transform', ""))
-                s_d['transform'] = (t_shape_o+t_add_o).get_str()
-            elif s_d['shape-type'] == 'circle':
-                s_d['diameter'] += foil_dist['circle']
-            elif s_d['shape-type'] == 'rect':
-                s_d['height'] += foil_dist['rect']
-                s_d['width'] += foil_dist['rect']
+                t_shape_o = Transform(s_d.get("transform", ""))
+                s_d["transform"] = (t_shape_o + t_add_o).get_str()
+            elif s_d["shape-type"] == "circle":
+                s_d["diameter"] += foil_dist["circle"]
+            elif s_d["shape-type"] == "rect":
+                s_d["height"] += foil_dist["rect"]
+                s_d["width"] += foil_dist["rect"]
             s_d_l.append(s_d_copy)
 
 
@@ -156,12 +158,18 @@ def place_shape_objects(d, layers_d):
         return
     for n, i_d in is_d.items():
         shapes = i_d["definition-here"].get("shapes", {})
+        group = et.SubElement(layers_d["outline"]["layer"], "g")
         for shape in shapes:
-            shape_o = shape["shape-object"]
+            place_layers = shape.get("place-in-layers", None)
+            place_sheets = shape.get("place-in-foils", None)
+            if place_layers == 'all':
+                place_layers = utils.get_all_layers_names()
+            print(place_layers, place_sheets)
+            shape_o = shape["shape-object"] 
             place.place_shape(shape_o, shape_group)
         place_shape_objects(i_d["definition-here"], layers_d)
     return
-    
+
 
 def create_svg(d):
     """
