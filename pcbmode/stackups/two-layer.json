@@ -1,81 +1,135 @@
 {
   "stackup": {
-    "info" {
+    "info": {
       "name": "info",
       "type": "info",
+      "place": true,
+      "hide": false,
+      "lock": true,
       "foils": [
         {
           "type": "documentation",
-          "name": "documentation"
-        }
+          "name": "documentation",
+          "place": true,
+          "hide": false,
+          "lock": false
+        },
         {
           "type": "dimensions",
-          "name": "dimensions"
+          "name": "dimensions",
+          "place": true,
+          "hide": false,
+          "lock": false
         },
         {
           "type": "origin",
-          "name": "origin"
+          "name": "origin",
+          "place": true,
+          "hide": true,
+          "lock": false
         }
       ]
     },
     "drills": {
       "type": "drills",
       "name": "drills",
+      "place": true,
+      "hide": false,
+      "lock": false,
       "foils": [
         {
           "type": "non-plated",
-          "name": "non-plated"
+          "name": "non-plated",
+          "place": true,
+          "hide": false,
+          "lock": false
         },
         {
           "type": "plated",
-          "name": "plated"
+          "name": "plated",
+          "place": true,
+          "hide": false,
+          "lock": false
         }
       ]
     },
     "outline": {
       "name": "outline",
-      "type": "outline"
+      "type": "outline",
+      "place": true,
+      "hide": false,
+      "lock": true
     },
     "top": {
       "name": "top",
       "type": "signal",
       "surface": true,
+      "place": true,
+      "hide": false,
+      "lock": false,
       "foils": [
         {
           "type": "placement",
-          "name": "placement"
+          "name": "placement",
+          "place": true,
+          "hide": false,
+          "lock": false
         },
         {
           "type": "assembly",
-          "name": "assembly"
+          "name": "assembly",
+          "place": true,
+          "hide": false,
+          "lock": false
         },
         {
           "type": "solderpaste",
-          "name": "solderpaste"
+          "name": "solderpaste",
+          "place": true,
+          "hide": true,
+          "lock": false
         },
         {
           "type": "silkscreen",
-          "name": "silkscreen"
+          "name": "silkscreen",
+          "place": true,
+          "hide": false,
+          "lock": false
         },
         {
           "type": "soldermask",
-          "name": "soldermask"
+          "name": "soldermask",
+          "place": true,
+          "hide": false,
+          "lock": false
         },
         {
           "type": "conductor",
           "name": "conductor",
+          "place": true,
+          "hide": false,
+          "lock": false,
           "foils": [
             {
               "type": "pours",
-              "name": "pours"
+              "name": "pours",
+              "place": true,
+              "hide": false,
+              "lock": true
             },
             {
               "type": "pads",
-              "name": "pads"
+              "name": "pads",
+              "place": true,
+              "hide": false,
+              "lock": false
             },
             {
               "type": "routing",
-              "name": "routing"
+              "name": "routing",
+              "place": true,
+              "hide": false,
+              "lock": false
             }
           ]
         }
@@ -85,42 +139,72 @@
       "name": "bottom",
       "type": "signal",
       "surface": true,
+      "place": true,
+      "hide": false,
+      "lock": false,
       "foils": [
         {
           "type": "placement",
-          "name": "placement"
+          "name": "placement",
+          "place": true,
+          "hide": false,
+          "lock": false
         },
         {
           "type": "assembly",
-          "name": "assembly"
+          "name": "assembly",
+          "place": true,
+          "hide": false,
+          "lock": false
         },
         {
           "type": "solderpaste",
-          "name": "solderpaste"
+          "name": "solderpaste",
+          "place": true,
+          "hide": true,
+          "lock": false
         },
         {
           "type": "silkscreen",
-          "name": "silkscreen"
+          "name": "silkscreen",
+          "place": true,
+          "hide": false,
+          "lock": false
         },
         {
           "type": "soldermask",
-          "name": "soldermask"
+          "name": "soldermask",
+          "place": true,
+          "hide": false,
+          "lock": false
         },
         {
           "type": "conductor",
           "name": "conductor",
+          "place": true,
+          "hide": false,
+          "lock": false,
           "foils": [
             {
               "type": "pours",
-              "name": "pours"
+              "name": "pours",
+              "place": true,
+              "hide": false,
+              "lock": true
             },
             {
               "type": "pads",
-              "name": "pads"
+              "name": "pads",
+              "place": true,
+              "hide": false,
+              "lock": false
             },
             {
               "type": "routing",
-              "name": "routing"
+              "name": "routing",
+              "place": true,
+              "hide": false,
+              "lock": false
             }
           ]
         }
