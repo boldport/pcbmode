@@ -1,9 +1,46 @@
 {
-  "stackup": [
-    {
-      "layer-name": "top",
-      "layer-type": "signal-layer-surface",
-      "foil-stack": [
+  "stackup": {
+    "info" {
+      "name": "info",
+      "type": "info",
+      "foils": [
+        {
+          "type": "documentation",
+          "name": "documentation"
+        }
+        {
+          "type": "dimensions",
+          "name": "dimensions"
+        },
+        {
+          "type": "origin",
+          "name": "origin"
+        }
+      ]
+    },
+    "drills": {
+      "type": "drills",
+      "name": "drills",
+      "foils": [
+        {
+          "type": "non-plated",
+          "name": "non-plated"
+        },
+        {
+          "type": "plated",
+          "name": "plated"
+        }
+      ]
+    },
+    "outline": {
+      "name": "outline",
+      "type": "outline"
+    },
+    "top": {
+      "name": "top",
+      "type": "signal",
+      "surface": true,
+      "foils": [
         {
           "type": "placement",
           "name": "placement"
@@ -26,50 +63,68 @@
         },
         {
           "type": "conductor",
-          "name": "copper",
-          "material": "copper"
+          "name": "conductor",
+          "foils": [
+            {
+              "type": "pours",
+              "name": "pours"
+            },
+            {
+              "type": "pads",
+              "name": "pads"
+            },
+            {
+              "type": "routing",
+              "name": "routing"
+            }
+          ]
         }
       ]
     },
-    {
-      "layer-name": "insulator",
-      "type": "insulator",
-      "stack": [
+    "bottom": {
+      "name": "bottom",
+      "type": "signal",
+      "surface": true,
+      "foils": [
         {
-          "material": "FR4"
-        }
-      ]
-    },
-    {
-      "layer-name": "bottom",
-      "layer-type": "signal-layer-surface",
-      "foil-stack": [
-        {
-          "type": "conductor",
-          "name": "copper",
-          "material": "copper"
-        },
-        {
-          "type": "soldermask",
-          "name": "soldermask"
-        },
-        {
-          "type": "silkscreen",
-          "name": "silkscreen"
-        },
-        {
-          "type": "solderpaste",
-          "name": "solderpaste"
+          "type": "placement",
+          "name": "placement"
         },
         {
           "type": "assembly",
           "name": "assembly"
         },
         {
-          "type": "placement",
-          "name": "placement"
+          "type": "solderpaste",
+          "name": "solderpaste"
+        },
+        {
+          "type": "silkscreen",
+          "name": "silkscreen"
+        },
+        {
+          "type": "soldermask",
+          "name": "soldermask"
+        },
+        {
+          "type": "conductor",
+          "name": "conductor",
+          "foils": [
+            {
+              "type": "pours",
+              "name": "pours"
+            },
+            {
+              "type": "pads",
+              "name": "pads"
+            },
+            {
+              "type": "routing",
+              "name": "routing"
+            }
+          ]
         }
       ]
     }
-  ]
+  }
 }
