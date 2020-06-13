@@ -152,7 +152,7 @@ def add_defs(svg_data, transform):
     ns_pcm = config.cfg["ns"]["pcbmode"]
     defs = et.SubElement(svg_data, "defs")
     masks_d = {}
-    for pcb_layer in config.stk["layer-names"]:
+    for pcb_layer in config.stk["stackup"]:
         el = et.SubElement(defs, "mask", id=f"mask-{pcb_layer}", transform=transform)
         el.set(f"{{{ns_pcm}}}pcb-layer", pcb_layer)
         masks_d[pcb_layer] = el

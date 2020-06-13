@@ -162,9 +162,9 @@ def place_shape_objects(d, layers_d):
         for shape in shapes:
             place_layers = shape.get("place-in-layers", None)
             place_sheets = shape.get("place-in-foils", None)
-            if place_layers == 'all':
-                place_layers = utils.get_all_layers_names()
-            print(place_layers, place_sheets)
+#            if place_layers == 'all':
+#                place_layers = utils.get_all_layers_names()
+#            print(place_layers, place_sheets)
             shape_o = shape["shape-object"] 
             place.place_shape(shape_o, shape_group)
         place_shape_objects(i_d["definition-here"], layers_d)

@@ -84,26 +84,33 @@ def load_stylesheet():
 
 def load_stackup():
     """
-    Load and process the stackup for the board
+    Load and process the stackup for the board. This also includes all the layers
+    for Inkscape anh their control (hide, lock)
     """
     filename = Path(config.cfg["stackup"]["definition-file"])
-
     if (config.tmp["project-path"] / filename).exists():
         config.stk = utils.json_to_dict(config.tmp["project-path"] / filename)
     else:
         config.stk = utils.json_to_dict(Path(__file__).parent / filename)
 
-    config.stk["layers-dict"], config.stk["layer-names"] = utils.getLayerList()
-    config.stk["surface-layers"] = [
-        config.stk["layers-dict"][0],
-        config.stk["layers-dict"][-1],
-    ]
-    config.stk["internal-layers"] = config.stk["layers-dict"][1:-1]
-    config.stk["surface-layer-names"] = [
-        config.stk["layer-names"][0],
-        config.stk["layer-names"][-1],
-    ]
-    config.stk["internal-layer-names"] = config.stk["layer-names"][1:-1]
+#    print(config.stk)
+
+    #config.stk["layers-dict"], config.stk["layer-names"] = utils.getLayerList()
+
+    # for layer, d in config.stk['stackup'].items():
+    #     if d.get('surface', None) == True:
+    #         print(layer) 
+
+    # config.stk["surface-layers"] = [
+    #     config.stk["layers-dict"][0],
+    #     config.stk["layers-dict"][-1],
+    # ]
+    # config.stk["internal-layers"] = config.stk["layers-dict"][1:-1]
+    # config.stk["surface-layer-names"] = [
+    #     config.stk["layer-names"][0],
+    #     config.stk["layer-names"][-1],
+    # ]
+    # config.stk["internal-layer-names"] = config.stk["layer-names"][1:-1]
 
 
 def load_cache():
@@ -152,7 +159,7 @@ def apply_overrides(cli_args):
 def main():
 
     # Add logging mechanism
-    logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.DEBUG)
+    logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.DEBUG)
 
     # License information
     print("PCBmodE, Copyright (C) 2020 Saar Drimer")
