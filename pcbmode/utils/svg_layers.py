@@ -31,7 +31,6 @@ def create_layers(parent_el, transform=None, refdef=None):
 
     # Create layers for the PCB according to the stackup. We need to reverse the
     # order so that Inkscape shows them in the 'correct' order.
-    #    for layer_dict in reversed(config.stk["layers-dict"]):
     for l_name, l_d in reversed(config.stk["stackup"].items()):
         if l_d.get("place", True) == False:
             continue
@@ -49,12 +48,13 @@ def create_layers(parent_el, transform=None, refdef=None):
             hide=l_d.get("hide", False),
         )
 
+        # Process the foils of the parent layer
         process_foils(
-            d=l_d, 
-            layers_d=layers_d, 
+            d=l_d,
+            layers_d=layers_d,
             parent_layer=layers_d[l_name]["layer"],
             refdef=refdef,
-            style_class_base=style_class
+            style_class_base=style_class,
         )
 
     return layers_d
@@ -62,6 +62,7 @@ def create_layers(parent_el, transform=None, refdef=None):
 
 def process_foils(d, layers_d, parent_layer, refdef, style_class_base):
     """
+    Recursive function to add sub-layer 'foils' to the layers
     """
     for f_d in reversed(d.get("foils", [])):
         if f_d.get("place", True) == False:
@@ -84,9 +85,9 @@ def process_foils(d, layers_d, parent_layer, refdef, style_class_base):
 
         process_foils(
             d=f_d,
-            layers_d=layers_d, 
-            parent_layer=layers_d[foil_type]["layer"], 
-            refdef=refdef, 
+            layers_d=layers_d,
+            parent_layer=layers_d[foil_type]["layer"],
+            refdef=refdef,
             style_class_base=style_class,
         )
 
