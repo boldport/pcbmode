@@ -31,101 +31,139 @@ def create_layers(parent_el, transform=None, refdef=None):
 
     # Create layers for the PCB according to the stackup. We need to reverse the
     # order so that Inkscape shows them in the 'correct' order.
-#    for layer_dict in reversed(config.stk["layers-dict"]):
+    #    for layer_dict in reversed(config.stk["layers-dict"]):
     for l_name, l_d in reversed(config.stk["stackup"].items()):
 
-        print(l_d)
+        #    print(l_d)
 
         # Maybe we don't want to place this layer?
         if l_d.get("place", True) == False:
             continue
 
-        l_type = l_d.get('type', None)
-        if l_type == 'signal':
-            style_class = None
-            #pcbmode_type = "pcb-layer"
-        else:
-            style_class = l_d.get("type", None)
-            #pcbmode_type = "other-layer"
+        # l_type = l_d.get('type', None)
+        # if l_type == 'signal':
+        #     style_class = None
+        #     #pcbmode_type = "pcb-layer"
+        # else:
+        #     style_class = l_d.get("type", None)
+        #     #pcbmode_type = "other-layer"
 
         layers_d[l_name] = {}
         layers_d[l_name]["layer"] = create_layer(
             parent=parent_el,
             name=l_d.get("name", l_name),
             transform=transform,
-            style_class=style_class,
+            style_class=l_d.get("name", l_name),
             refdef=refdef,
             pcbmode_type=l_d["type"],
             pcbmode_value=l_name,
             lock=l_d.get("lock", False),
-            hide=l_d.get("hide", False)
+            hide=l_d.get("hide", False),
         )
 
-        for s_d in reversed(l_d.get('foils', [])):
-            print(s_d) 
+        process_foils(
+            l_d, layers_d, layers_d[l_name]["layer"], refdef, l_d.get("name", l_name)
+        )
 
-    #     layer_name = layer_dict["name"]
-
-    #     # Each PCB layer is composed of 'foils' (silkscreen, soldermask, etc.)
-    #     # but also 'solderpaste' and 'assembly' and even 'placement' are part of
-    #     # the stackup, which is defined in the chosen stack JSON.
-    #     sheets = layer_dict["stack"]
-
-    #     for sheet in reversed(sheets):
-    #         sheet_type = sheet["type"]
-
-    #         layers_d[layer_name][sheet_type] = {}
-    #         layers_d[layer_name][sheet_type]["layer"] = create_layer(
-    #             parent=layers_d[layer_name]["layer"],
-    #             name=sheet["name"],
-    #             transform=None,
-    #             style_class=f"{layer_name}-{sheet_type}",
-    #             refdef=refdef,
-    #             pcbmode_prop="sheet",
-    #             pcbmode_value=sheet["type"],
-    #             lock=config.cfg["layer-control"][sheet["type"]].get("lock", False),
-    #             hide=config.cfg["layer-control"][sheet["type"]].get("hide", False),
-    #         )
-
-    #         # Sheet 'conductor' also gets sub-layers 'pours', 'pads', and 'routing'.
-    #         if sheet_type == "conductor":
-    #             conductor_types = ["routing", "pads", "pours"]
-    #             for cond_type in conductor_types:
-    #                 layers_d[layer_name]["conductor"][cond_type] = {}
-    #                 layers_d[layer_name]["conductor"][cond_type][
-    #                     "layer"
-    #                 ] = create_layer(
-    #                     parent=layers_d[layer_name]["conductor"]["layer"],
-    #                     name=cond_type,
-    #                     transform=None,
-    #                     style_class=f"{layer_name}-{sheet_type}-{cond_type}",
-    #                     refdef=refdef,
-    #                     pcbmode_prop="sheet",
-    #                     pcbmode_value=cond_type,
-    #                     lock=config.cfg["layer-control"]["conductor"][cond_type].get(
-    #                         "lock", False
-    #                     ),
-    #                     hide=config.cfg["layer-control"]["conductor"][cond_type].get(
-    #                         "hide", False
-    #                     ),
-    #                 )
-
-    # info_layers = ["drills", "outline", "origin", "dimensions", "documentation"]
-    # for info_layer in info_layers:
-    #     layers_d[info_layer] = {}
-    #     layers_d[info_layer]["layer"] = create_layer(
-    #         parent=parent_el,
-    #         name=info_layer,
-    #         transform=transform,
-    #         style_class=info_layer,
-    #         refdef=refdef,
-    #         pcbmode_prop="sheet",
-    #         pcbmode_value=info_layer,
-    #         lock=config.cfg["layer-control"][info_layer].get("lock", False),
-    #         hide=config.cfg["layer-control"][info_layer].get("hide", False),
-    #     )
+    #        for s_d in reversed(l_d.get('foils', [])):
+    #            print(s_d)
 
     return layers_d
+
+
+def process_foils(d, layers_d, parent_layer, refdef, style_class_base):
+    """
+    """
+    for f_d in reversed(d.get("foils", [])):
+        if f_d.get("place", True) == False:
+            continue
+        foil_type = f_d["type"]
+        style_class = f"{style_class_base}-{foil_type}"
+        layer_name = f_d["name"]
+        layers_d[foil_type] = {}
+        layers_d[foil_type]["layer"] = create_layer(
+            parent=parent_layer,
+            name=f_d["name"],
+            transform=None,
+            style_class=style_class,
+            refdef=refdef,
+            pcbmode_type="sheet",
+            pcbmode_value=f_d["type"],
+            lock=f_d.get("lock", False),
+            hide=f_d.get("hide", False),
+        )
+
+        process_foils(
+            f_d,
+            layers_d,
+            layers_d[foil_type]["layer"],
+            refdef,
+            style_class,
+        )
+
+    return
+
+
+#     layer_name = layer_dict["name"]
+
+#     # Each PCB layer is composed of 'foils' (silkscreen, soldermask, etc.)
+#     # but also 'solderpaste' and 'assembly' and even 'placement' are part of
+#     # the stackup, which is defined in the chosen stack JSON.
+#     sheets = layer_dict["stack"]
+
+#     for sheet in reversed(sheets):
+#         sheet_type = sheet["type"]
+
+#         layers_d[layer_name][sheet_type] = {}
+#         layers_d[layer_name][sheet_type]["layer"] = create_layer(
+#             parent=layers_d[layer_name]["layer"],
+#             name=sheet["name"],
+#             transform=None,
+#             style_class=f"{layer_name}-{sheet_type}",
+#             refdef=refdef,
+#             pcbmode_prop="sheet",
+#             pcbmode_value=sheet["type"],
+#             lock=config.cfg["layer-control"][sheet["type"]].get("lock", False),
+#             hide=config.cfg["layer-control"][sheet["type"]].get("hide", False),
+#         )
+
+#         # Sheet 'conductor' also gets sub-layers 'pours', 'pads', and 'routing'.
+#         if sheet_type == "conductor":
+#             conductor_types = ["routing", "pads", "pours"]
+#             for cond_type in conductor_types:
+#                 layers_d[layer_name]["conductor"][cond_type] = {}
+#                 layers_d[layer_name]["conductor"][cond_type][
+#                     "layer"
+#                 ] = create_layer(
+#                     parent=layers_d[layer_name]["conductor"]["layer"],
+#                     name=cond_type,
+#                     transform=None,
+#                     style_class=f"{layer_name}-{sheet_type}-{cond_type}",
+#                     refdef=refdef,
+#                     pcbmode_prop="sheet",
+#                     pcbmode_value=cond_type,
+#                     lock=config.cfg["layer-control"]["conductor"][cond_type].get(
+#                         "lock", False
+#                     ),
+#                     hide=config.cfg["layer-control"]["conductor"][cond_type].get(
+#                         "hide", False
+#                     ),
+#                 )
+
+# info_layers = ["drills", "outline", "origin", "dimensions", "documentation"]
+# for info_layer in info_layers:
+#     layers_d[info_layer] = {}
+#     layers_d[info_layer]["layer"] = create_layer(
+#         parent=parent_el,
+#         name=info_layer,
+#         transform=transform,
+#         style_class=info_layer,
+#         refdef=refdef,
+#         pcbmode_prop="sheet",
+#         pcbmode_value=info_layer,
+#         lock=config.cfg["layer-control"][info_layer].get("lock", False),
+#         hide=config.cfg["layer-control"][info_layer].get("hide", False),
+#     )
 
 
 def create_layer(
