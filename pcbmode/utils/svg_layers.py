@@ -51,7 +51,7 @@ def create_layers(parent_el, transform=None, refdef=None):
         # Process the foils of the parent layer
         process_foils(
             d=l_d,
-            layers_d=layers_d,
+            layers_d=layers_d[l_name],
             parent_layer=layers_d[l_name]["layer"],
             refdef=refdef,
             style_class_base=style_class,
@@ -85,7 +85,7 @@ def process_foils(d, layers_d, parent_layer, refdef, style_class_base):
 
         process_foils(
             d=f_d,
-            layers_d=layers_d,
+            layers_d=layers_d[foil_type],
             parent_layer=layers_d[foil_type]["layer"],
             refdef=refdef,
             style_class_base=style_class,
