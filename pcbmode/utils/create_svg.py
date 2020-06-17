@@ -160,12 +160,17 @@ def place_shape_objects(d, layers_d):
         shapes = i_d["definition-here"].get("shapes", {})
         group = et.SubElement(layers_d["outline"]["layer"], "g")
         for shape in shapes:
-            place_layers = shape.get("place-in-layers", None)
-            place_sheets = shape.get("place-in-foils", None)
-#            if place_layers == 'all':
-#                place_layers = utils.get_all_layers_names()
-#            print(place_layers, place_sheets)
-            shape_o = shape["shape-object"] 
+            place_in = shape.get("place-in", [])
+            place_in_new = []
+            for p in place_in:
+                p_l = p.split("/")
+                if p_l[0] == "*":  # replace '*' with all signal layers
+                    for signal_layer in config.stk["signal-layers"]:
+                        place_in_new.append(f"{signal_layer}/{'/'.join(p_l[1:])}")
+                else:
+                    place_in_new.append(p)
+            place_in_new = list(dict.fromkeys(place_in_new))  # remove duplicates
+            shape_o = shape["shape-object"]
             place.place_shape(shape_o, shape_group)
         place_shape_objects(i_d["definition-here"], layers_d)
     return
@@ -251,7 +256,7 @@ def create():
 
     # Expand all the declarations of definitions from other files, and create new objects for soldermask and solderpaste
     expand_instances(config.brd)
-    print(json.dumps(config.brd, indent=2))
+    # print(json.dumps(config.brd, indent=2))
 
     # Convert all the shape definitions in a dict to Shape objects
     create_shape_objects(config.brd)
