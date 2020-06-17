@@ -150,9 +150,6 @@ def place_shape_objects(d, layers_d):
 
     ns_pcm = config.cfg["ns"]["pcbmode"]
 
-    shape_group = et.SubElement(layers_d["outline"]["layer"], "g")
-    shape_group.set(f"{{{ns_pcm}}}type", "module-shapes")
-
     is_d = d.get("instances", None)
     if is_d == None:
         return
@@ -170,8 +167,22 @@ def place_shape_objects(d, layers_d):
                 else:
                     place_in_new.append(p)
             place_in_new = list(dict.fromkeys(place_in_new))  # remove duplicates
+
             shape_o = shape["shape-object"]
-            place.place_shape(shape_o, shape_group)
+
+            print(place_in_new)
+            place_layer = []
+            for p in place_in_new:
+                p_l = p.split("/")
+                place_layer = layers_d[p_l[0]]
+                for p_h in p_l[1:]:
+                    place_layer = place_layer[p_h]    
+
+            if place_layer != []:
+                shape_group = et.SubElement(place_layer['layer'], "g")
+                shape_group.set(f"{{{ns_pcm}}}type", "module-shapes")
+                place.place_shape(shape_o, shape_group)
+
         place_shape_objects(i_d["definition-here"], layers_d)
     return
 
@@ -189,7 +200,7 @@ def create_svg(d):
     # TODO: make work with multiple shapes. Right now it'll only consider the last
     # one (or the only one) for the abounding box calculation.
     for name, inst_d in instances_d.items():
-        if inst_d.get("place-in-foil", None) == "outline":
+        if "outline" in inst_d.get("place-in", []):
             shapes = inst_d["definition-here"]["shapes"]
             for shape in shapes:
                 dims_p = shape["shape-object"].get_dims()
@@ -208,6 +219,8 @@ def create_svg(d):
     # Place outline
     shape_group = et.SubElement(layers_d["outline"]["layer"], "g")
     shape_group.set(f"{{{ns_pcm}}}type", "module-shapes")
+
+    print(layers_d)
 
     place_shape_objects(d, layers_d)
 
