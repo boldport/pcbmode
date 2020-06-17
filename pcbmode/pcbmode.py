@@ -98,24 +98,6 @@ def load_stackup():
     for layer_name, layer_d in config.stk['stackup'].items():
         if layer_d['type'] == "signal":
             config.stk['signal-layers'].append(layer_name)
-    print(config.stk['signal-layers'])
-
-    #config.stk["layers-dict"], config.stk["layer-names"] = utils.getLayerList()
-
-    # for layer, d in config.stk['stackup'].items():
-    #     if d.get('surface', None) == True:
-    #         print(layer) 
-
-    # config.stk["surface-layers"] = [
-    #     config.stk["layers-dict"][0],
-    #     config.stk["layers-dict"][-1],
-    # ]
-    # config.stk["internal-layers"] = config.stk["layers-dict"][1:-1]
-    # config.stk["surface-layer-names"] = [
-    #     config.stk["layer-names"][0],
-    #     config.stk["layer-names"][-1],
-    # ]
-    # config.stk["internal-layer-names"] = config.stk["layer-names"][1:-1]
 
 
 def load_cache():
