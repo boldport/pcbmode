@@ -93,7 +93,12 @@ def load_stackup():
     else:
         config.stk = utils.json_to_dict(Path(__file__).parent / filename)
 
-#    print(config.stk)
+    # It's handy later on to have a ready list of signal layers
+    config.stk['signal-layers'] = []
+    for layer_name, layer_d in config.stk['stackup'].items():
+        if layer_d['type'] == "signal":
+            config.stk['signal-layers'].append(layer_name)
+    print(config.stk['signal-layers'])
 
     #config.stk["layers-dict"], config.stk["layer-names"] = utils.getLayerList()
 
