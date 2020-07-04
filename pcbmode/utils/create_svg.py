@@ -219,8 +219,6 @@ def create_svg(d):
     shape_group = et.SubElement(layers_d["outline"]["layer"], "g")
     shape_group.set(f"{{{ns_pcm}}}type", "module-shapes")
 
-    print(layers_d)
-
     place_shape_objects(d, layers_d)
 
     # for shape in create_d["outline"]:
