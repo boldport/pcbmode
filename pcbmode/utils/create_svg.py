@@ -169,7 +169,10 @@ def place_shape_objects(d, layers_d):
                     place_in_new.append(p)
             place_in_new = list(dict.fromkeys(place_in_new))  # remove duplicates
 
-            place_layer = []
+            # Place the shape in all the specified layers. First traverse the
+            # hierarchy of the layers dictionary to get the placement layer, then
+            # create a group for placement, and then place the shape
+            # TODO: don't replicate groups id different shapes go in the same layers
             for p in place_in_new:
                 p_l = p.split("/")  # split layer/foil hierarchy
                 place_layer = layers_d[p_l[0]]  # get the top-level layer
