@@ -170,7 +170,6 @@ def place_shape_objects(d, layers_d):
 
             shape_o = shape["shape-object"]
 
-            print(place_in_new)
             place_layer = []
             for p in place_in_new:
                 p_l = p.split("/")
