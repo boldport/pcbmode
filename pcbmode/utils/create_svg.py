@@ -92,60 +92,40 @@ def resolve_definition(name, inst_d, definitions_d):
 
 def expand_shapes(d_d):
     """
-    Some shape definitions will have extra shape copies to 'add'. This is convenient
-    way to just add the same shape into another foil without defining the same shape
-    again in the list of shapes. This is mostly used for 'conductor' pads that also need the same shape applied to soldermask and solderpaste, but with a
-    globally-defined scale.
+    When adding a soldering pad it's convenient to also add a slightly enlarged shape
+    on the soldermask layer and a slightly reduced shape on the solderpaste layer.
+    Here we use two directives (soldermask-in and solderpaste-in) to let the user
+    place those without needing to redefine these shapes in another entry. 
 
     This function copies the shape and adds it to the list of shapes after applying
-    the needed modifiers.
+    the default modifiers. If the user doesn't enter these directives, the shapes are
+    not added.
     """
-    foils = ["soldermask", "solderpaste"]
+    foils = ["solderpaste", "soldermask"]
     s_d_l = d_d.get("shapes", [])  # a list of shape dicts
-    for s_d in s_d_l:  # get the shape dicts
+    add_l = []  # List of new shapes
+    for s_d in s_d_l:  # iterate on shape dicts
         for foil in foils:
             sm_place = expand_layers(s_d.get(f"{foil}-in", []))
             if sm_place != []:
-                s_d_copy = s_d.copy()
-                del s_d_copy[f"{foil}-in"]
-                s_d_copy["place-in"] = sm_place  # assign to new foil
+                s_d_c = s_d.copy()  # work on the copy!
+                del s_d_c[f"{foil}-in"]
+                s_d_c["place-in"] = sm_place  # assign to new foil
                 foil_dist = config.cfg["distances"][foil]
-                if s_d["shape-type"] == "path":
-                    # We need to 'add' the Transforms in order to create a new shape that's
-                    # only different by the scale defined in the global configuration
+                if s_d_c["shape-type"] == "path":
+                    # We need to 'add' the Transforms in order to create a new shape
+                    # that's only different by the scale defined in the global
+                    # configuration
                     t_add_o = Transform(f"scale({foil_dist['path']})")
-                    t_shape_o = Transform(s_d.get("transform", ""))
-                    s_d["transform"] = (t_shape_o + t_add_o).get_str()
-                elif s_d["shape-type"] == "circle":
-                    s_d["diameter"] += foil_dist["circle"]
-                elif s_d["shape-type"] == "rect":
-                    s_d["height"] += foil_dist["rect"]
-                    s_d["width"] += foil_dist["rect"]
-                s_d_l.append(s_d_copy)
-
-        # add_d = s_d.get("add", {})
-        # for foil in add_d:
-        #     if foil not in foils:
-        #         logging.warning(
-        #             f"Can't recognise foil '{foil}' in 'add' shape attribute; ignoring"
-        #         )
-        #         continue
-        #     s_d_copy = s_d.copy()
-        #     del s_d_copy["add"]
-        #     s_d_copy["place-in-foils"] = [foil]  # assign to new foil
-        #     foil_dist = config.cfg["distances"][foil]
-        #     if s_d["shape-type"] == "path":
-        #         # We need to 'add' the Transforms in order to create a new shape that's
-        #         # only different by the scale defined in the global configuration
-        #         t_add_o = Transform(f"scale({foil_dist['path']})")
-        #         t_shape_o = Transform(s_d.get("transform", ""))
-        #         s_d["transform"] = (t_shape_o + t_add_o).get_str()
-        #     elif s_d["shape-type"] == "circle":
-        #         s_d["diameter"] += foil_dist["circle"]
-        #     elif s_d["shape-type"] == "rect":
-        #         s_d["height"] += foil_dist["rect"]
-        #         s_d["width"] += foil_dist["rect"]
-        #     s_d_l.append(s_d_copy)
+                    t_shape_o = Transform(s_d_c.get("transform", ""))
+                    s_d_c["transform"] = (t_shape_o + t_add_o).get_str()
+                elif s_d_c["shape-type"] == "circle":
+                    s_d_c["diameter"] += foil_dist["circle"]
+                elif s_d_c["shape-type"] == "rect":
+                    s_d_c["height"] += foil_dist["rect"]
+                    s_d_c["width"] += foil_dist["rect"]
+                add_l.append(s_d_c)
+    s_d_l += add_l  # add the new shapes to list of shapes
 
 
 def create_shape_objects(d):
@@ -172,7 +152,6 @@ def expand_layers(l):
     n_l = []
     for p in l:
         p_l = p.split("/")
-        print(p_l)
         if p_l[0] == "*":  #  expand '*' wildcard to all signal layers
             for signal_layer in config.stk["signal-layers"]:
                 n_l.append(f"{signal_layer}/{'/'.join(p_l[1:])}")
@@ -202,6 +181,7 @@ def place_shape_objects(d, layers_d):
             # hierarchy of the layers dictionary to get the placement layer, then
             # create a group for placement, and then place the shape
             # TODO: don't replicate groups id different shapes go in the same layers
+            print(place_in_new)
             for p in place_in_new:
                 p_l = p.split("/")  # split layer/foil hierarchy
                 place_layer = layers_d[p_l[0]]  # get the top-level layer
