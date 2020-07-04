@@ -150,37 +150,34 @@ def place_shape_objects(d, layers_d):
 
     ns_pcm = config.cfg["ns"]["pcbmode"]
 
-    is_d = d.get("instances", None)
+    is_d = d.get("instances", None)  # instances dict
     if is_d == None:
         return
     for n, i_d in is_d.items():
+        # Since we 'flattened' the instantiations, all the shapes are at ["definition-here"]
         shapes = i_d["definition-here"].get("shapes", {})
-        group = et.SubElement(layers_d["outline"]["layer"], "g")
+
         for shape in shapes:
-            place_in = shape.get("place-in", [])
+            place_in = shape.get("place-in", [])  # 'path' to where layer/foil placement
             place_in_new = []
             for p in place_in:
                 p_l = p.split("/")
-                if p_l[0] == "*":  # replace '*' with all signal layers
+                if p_l[0] == "*":  #  expand '*' wildcard to all signal layers
                     for signal_layer in config.stk["signal-layers"]:
                         place_in_new.append(f"{signal_layer}/{'/'.join(p_l[1:])}")
                 else:
                     place_in_new.append(p)
             place_in_new = list(dict.fromkeys(place_in_new))  # remove duplicates
 
-            shape_o = shape["shape-object"]
-
             place_layer = []
             for p in place_in_new:
-                p_l = p.split("/")
-                place_layer = layers_d[p_l[0]]
+                p_l = p.split("/")  # split layer/foil hierarchy
+                place_layer = layers_d[p_l[0]]  # get the top-level layer
                 for p_h in p_l[1:]:
-                    place_layer = place_layer[p_h]
-
-            if place_layer != []:
+                    place_layer = place_layer[p_h]  # traverse hierarchy for layer
                 shape_group = et.SubElement(place_layer["layer"], "g")
                 shape_group.set(f"{{{ns_pcm}}}type", "module-shapes")
-                place.place_shape(shape_o, shape_group)
+                place.place_shape(shape["shape-object"], shape_group)
 
         place_shape_objects(i_d["definition-here"], layers_d)
     return
