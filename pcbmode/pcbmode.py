@@ -94,10 +94,10 @@ def load_stackup():
         config.stk = utils.json_to_dict(Path(__file__).parent / filename)
 
     # It's handy later on to have a ready list of signal layers
-    config.stk['signal-layers'] = []
-    for layer_name, layer_d in config.stk['stackup'].items():
-        if layer_d['type'] == "signal":
-            config.stk['signal-layers'].append(layer_name)
+    config.stk["signal-layers"] = []
+    for layer_name, layer_d in config.stk["stackup"].items():
+        if layer_d["type"] == "signal":
+            config.stk["signal-layers"].append(layer_name)
 
 
 def load_cache():
@@ -131,7 +131,7 @@ def set_y_axis_invert():
 
 def apply_overrides(cli_args):
     """
-    Apply commandline switches's overrides 
+    Apply commandline switchs's overrides 
     """
     if cli_args.show_layer_index is not None:
         config.cfg["create"]["layer-index"] = cli_args.show_layer_index

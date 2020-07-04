@@ -83,7 +83,7 @@ def process_foils(d, layers_d, parent_layer, refdef, style_class_base):
             hide=f_d.get("hide", False),
         )
 
-        process_foils(
+        process_foils(  # recursive call
             d=f_d,
             layers_d=layers_d[foil_type],
             parent_layer=layers_d[foil_type]["layer"],

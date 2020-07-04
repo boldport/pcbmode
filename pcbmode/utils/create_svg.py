@@ -176,10 +176,10 @@ def place_shape_objects(d, layers_d):
                 p_l = p.split("/")
                 place_layer = layers_d[p_l[0]]
                 for p_h in p_l[1:]:
-                    place_layer = place_layer[p_h]    
+                    place_layer = place_layer[p_h]
 
             if place_layer != []:
-                shape_group = et.SubElement(place_layer['layer'], "g")
+                shape_group = et.SubElement(place_layer["layer"], "g")
                 shape_group.set(f"{{{ns_pcm}}}type", "module-shapes")
                 place.place_shape(shape_o, shape_group)
 
