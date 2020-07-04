@@ -121,8 +121,7 @@ def expand_shapes(d_d):
                 elif s_d["shape-type"] == "rect":
                     s_d["height"] += foil_dist["rect"]
                     s_d["width"] += foil_dist["rect"]
-                s_d_l.append(s_d_copy)            
-
+                s_d_l.append(s_d_copy)
 
         # add_d = s_d.get("add", {})
         # for foil in add_d:
@@ -198,17 +197,7 @@ def place_shape_objects(d, layers_d):
         shapes = i_d["definition-here"].get("shapes", {})
 
         for shape in shapes:
-            place_in_new = expand_layers(shape.get("place-in", []))  
-
-            # for p in place_in:
-            #     p_l = p.split("/")
-            #     if p_l[0] == "*":  #  expand '*' wildcard to all signal layers
-            #         for signal_layer in config.stk["signal-layers"]:
-            #             place_in_new.append(f"{signal_layer}/{'/'.join(p_l[1:])}")
-            #     else:
-            #         place_in_new.append(p)
-            # place_in_new = list(dict.fromkeys(place_in_new))  # remove duplicates
-
+            place_in_new = expand_layers(shape.get("place-in", []))
             # Place the shape in all the specified layers. First traverse the
             # hierarchy of the layers dictionary to get the placement layer, then
             # create a group for placement, and then place the shape
