@@ -39,16 +39,16 @@ class Shape:
     def __init__(self, shape_dict, rel_to_dim="itself"):
         """
         'rel_to_dim': if a Point() is given, shape will be centered relative to the
-        dimensions specified. Otherwise it'll be centered around the dimentsions of the
+        dimensions specified. Otherwise it'll be centered around the dimensions of the
         shape itself (routing shapes are placed relative to the outline, not themselves) 
         """
 
-#        print(shape_dict.get("transform", None))
+        #        print(shape_dict.get("transform", None))
         transform_o = Transform(shape_dict.get("transform", None))
-#        print(transform_o.get_list())
-#        print(transform_o.get_str())
-#        if transform is not None:
-#            utils.parse_transform(transform)
+        #print(transform_o.get_dict())
+        #        print(transform_o.get_str())
+        #        if transform is not None:
+        #            utils.parse_transform(transform)
 
         self._shape_dict = self._process_shape_dict(shape_dict)
         self._p_r_path = self._path_from_shape_type()
