@@ -21,6 +21,7 @@ from pathlib import Path
 
 import logging
 import json
+import copy
 
 from pcbmode.config import config
 from pcbmode.utils import inkscape_svg
@@ -34,16 +35,24 @@ from pcbmode.utils.transform import Transform
 
 def expand_instances(d):
     """
-    Recursive function to fine and resolve all instantiation definitions that need
+    Recursive function to find and resolve all instantiation definitions that need
     to be expanded.
     """
-    is_d = d.get("instances", None)
-    if is_d == None:
+    is_d = d.get("instances", None)  # get the instantiations
+    if is_d == None:  # we're at the end, expand the shapes (soldermask, solderpaste)
+        # s_d_l = d.get("shapes", [])  # shape dicts list
         expand_shapes(d)
         return
+
+    # Resolve where the definitions are, and place them in 'definitions-here'
     ds_d = d.get("definitions", None)
+
+    # Iterate on the named instances (like pins 1, 2, 3, etc.). Each of those
+    # instances will indicate where a definition for it is (-here, -name, -file)
     for n, i_d in is_d.items():
         i_d["definition-here"] = resolve_definition(n, i_d, ds_d)
+        # Recursive call to get through the hierarchy, looking for more instance
+        # definitions
         expand_instances(i_d["definition-here"])
     return
 
@@ -58,6 +67,8 @@ def resolve_definition(name, inst_d, definitions_d):
     Here we try to find where the instance information is with some error checking.
     For files it's done in a way that should work also with OSs that use a different
     path hierarchy delimeter, like Windows.
+
+    The outcome is that each instance has a 'definition-here' rather than a reference
     """
 
     # Check if none, or more than one definition is specified
@@ -72,7 +83,7 @@ def resolve_definition(name, inst_d, definitions_d):
         logging.error(f"'{name}' has multiple definitions but should have only one")
         raise Exception  # TODO: is this the right one to raise?
 
-    # Get defintions. ('-here' is implicitly already there if other are not)
+    # Get defintions. ('-here' is implicitly already there if others are not)
     if def_file is not None:
         path_o = Path(config.tmp["project-path"])
         def_file = def_file.split("/")
@@ -82,7 +93,7 @@ def resolve_definition(name, inst_d, definitions_d):
         logging.info(f"Processed '{path_o}' for '{name}'")
     elif def_name is not None:
         try:
-            inst_d["definition-here"] = definitions_d[def_name]
+            inst_d["definition-here"] = copy.deepcopy(definitions_d[def_name])
         except:
             logging.error(f"'{def_name}' not found for '{name}'")
             raise Exception  # TODO: is this the right one to raise?
@@ -102,14 +113,16 @@ def expand_shapes(d_d):
     not added.
     """
     foils = ["solderpaste", "soldermask"]
-    s_d_l = d_d.get("shapes", [])  # a list of shape dicts
+    s_d_l = d_d.get("shapes", [])  # shape dicts list
     add_l = []  # List of new shapes
+    #    print(f"before: {s_d_l}")
     for s_d in s_d_l:  # iterate on shape dicts
         for foil in foils:
             sm_place = expand_layers(s_d.get(f"{foil}-in", []))
             if sm_place != []:
-                s_d_c = s_d.copy()  # work on the copy!
-                del s_d_c[f"{foil}-in"]
+                del s_d[f"{foil}-in"]
+                s_d_c = copy.deepcopy(s_d)  # work on the copy!
+                # del s_d_c[f"{foil}-in"]
                 s_d_c["place-in"] = sm_place  # assign to new foil
                 foil_dist = config.cfg["distances"][foil]
                 if s_d_c["shape-type"] == "path":
@@ -125,7 +138,12 @@ def expand_shapes(d_d):
                     s_d_c["height"] += foil_dist["rect"]
                     s_d_c["width"] += foil_dist["rect"]
                 add_l.append(s_d_c)
+    # print(add_l)
     s_d_l += add_l  # add the new shapes to list of shapes
+
+
+#   print(f"after: {s_d_l}")
+#   print("")
 
 
 def create_shape_objects(d):
