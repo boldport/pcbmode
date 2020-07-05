@@ -40,7 +40,6 @@ def expand_instances(d):
     """
     is_d = d.get("instances", None)  # get the instantiations
     if is_d == None:  # we're at the end, expand the shapes (soldermask, solderpaste)
-        # s_d_l = d.get("shapes", [])  # shape dicts list
         expand_shapes(d)
         return
 
@@ -115,7 +114,6 @@ def expand_shapes(d_d):
     foils = ["solderpaste", "soldermask"]
     s_d_l = d_d.get("shapes", [])  # shape dicts list
     add_l = []  # List of new shapes
-    #    print(f"before: {s_d_l}")
     for s_d in s_d_l:  # iterate on shape dicts
         for foil in foils:
             sm_place = expand_layers(s_d.get(f"{foil}-in", []))
@@ -138,12 +136,7 @@ def expand_shapes(d_d):
                     s_d_c["height"] += foil_dist["rect"]
                     s_d_c["width"] += foil_dist["rect"]
                 add_l.append(s_d_c)
-    # print(add_l)
     s_d_l += add_l  # add the new shapes to list of shapes
-
-
-#   print(f"after: {s_d_l}")
-#   print("")
 
 
 def create_shape_objects(d):
