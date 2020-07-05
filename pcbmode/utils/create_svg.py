@@ -118,9 +118,7 @@ def expand_shapes(d_d):
         for foil in foils:
             sm_place = expand_layers(s_d.get(f"{foil}-in", []))
             if sm_place != []:
-                del s_d[f"{foil}-in"]
                 s_d_c = copy.deepcopy(s_d)  # work on the copy!
-                # del s_d_c[f"{foil}-in"]
                 s_d_c["place-in"] = sm_place  # assign to new foil
                 foil_dist = config.cfg["distances"][foil]
                 if s_d_c["shape-type"] == "path":
@@ -188,7 +186,8 @@ def place_shape_objects(d, layers_d):
     stored_groups = {}
 
     for n, i_d in instances_d.items():
-        # Since we 'flattened' the instantiations, all the shapes are at ["definition-here"]
+        # Since we 'flattened' the instantiations, all the shapes are at
+        # ["definition-here"]
         shapes = i_d["definition-here"].get("shapes", {})
 
         for shape in shapes:
