@@ -168,10 +168,15 @@ def place_shape_objects(d, layers_d):
 
     ns_pcm = config.cfg["ns"]["pcbmode"]
 
-    is_d = d.get("instances", None)  # instances dict
-    if is_d == None:
+    instances_d = d.get("instances", None)  # instances dict
+    if instances_d == None:
         return
-    for n, i_d in is_d.items():
+
+    # Keep track of the placement groups we've already used so that shapes are
+    # grouped appropriately
+    stored_groups = {}
+
+    for n, i_d in instances_d.items():
         # Since we 'flattened' the instantiations, all the shapes are at ["definition-here"]
         shapes = i_d["definition-here"].get("shapes", {})
 
@@ -180,15 +185,18 @@ def place_shape_objects(d, layers_d):
             # Place the shape in all the specified layers. First traverse the
             # hierarchy of the layers dictionary to get the placement layer, then
             # create a group for placement, and then place the shape
-            # TODO: don't replicate groups id different shapes go in the same layers
-            print(place_in_new)
             for p in place_in_new:
                 p_l = p.split("/")  # split layer/foil hierarchy
                 place_layer = layers_d[p_l[0]]  # get the top-level layer
                 for p_h in p_l[1:]:
                     place_layer = place_layer[p_h]  # traverse hierarchy for layer
-                shape_group = et.SubElement(place_layer["layer"], "g")
-                shape_group.set(f"{{{ns_pcm}}}type", "module-shapes")
+
+                shape_group = stored_groups.get(p, None)
+                if shape_group is None:
+                    shape_group = et.SubElement(place_layer["layer"], "g")
+                    shape_group.set(f"{{{ns_pcm}}}type", "module-shapes")
+                    stored_groups[p] = shape_group
+
                 place.place_shape(shape["shape-object"], shape_group)
 
         place_shape_objects(i_d["definition-here"], layers_d)
