@@ -43,7 +43,7 @@ class Shape:
         shape itself (routing shapes are placed relative to the outline, not themselves) 
         """
 
-        transform_o = Transform(shape_dict.get("transform", None))
+        transform_o = shape_dict.get("t-g-o", Transform())
 
         self._shape_dict = self._process_shape_dict(shape_dict)
         self._p_r_path = self._path_from_shape_type()
@@ -51,7 +51,7 @@ class Shape:
         trans_dict = {  # transform dictionary
             "scale": self._shape_dict["scale"],
             "rotate": self._shape_dict["rotate"],
-            "rotate_p": self._shape_dict["rotate_p"],
+#            "rotate_p": self._shape_dict["rotate_p"],
             "mirror_y": self._shape_dict["mirror-y"],
             "mirror_x": self._shape_dict["mirror-x"],
             "rel_to_dim": rel_to_dim,
@@ -71,13 +71,18 @@ class Shape:
         sd["rotate_p"] = sd.get("rotate_p", Point([0, 0]))
         sd["scale"] = sd.get("scale", 1)
         sd["buffer-to-pour"] = sd.get("buffer-to-pour")
-        sd["location"] = sd.get("location", Point([0, 0]))
+
+        # From transform
+        t_d = sd["t-g-o"].get_dict()
+        sd["location"] = Point(t_d.get("translate", [0, 0]))
+#        sd["rotate"] = t_d.get("rotate", 0)
+#        sd["scale"] = t_d.get("scale", [1,1])
 
         # Somewhere the location input isn't being converted to Point()
         # This checks.
-        # TODO: remove this check eventually
-        if isinstance(sd["location"], Point) is False:
-            sd["location"] = Point(sd["location"])
+#        # TODO: remove this check eventually
+#        if isinstance(sd["location"], Point) is False:
+#            sd["location"] = Point(sd["location"])
 
         sd["style-class"] = sd.get("style_class", None)
         sd["style"] = sd.get("style", None)

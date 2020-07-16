@@ -74,7 +74,7 @@ def resolve_definition(name, inst_d, definitions_d):
     def_here = inst_d.get("definition-here", None)
     def_name = inst_d.get("definition-name", None)
     def_file = inst_d.get("definition-file", None)
-    count = [def_here, def_name, def_file].count(None)
+    count = [def_here, def_name, def_file].count(None)  # how many 'None'?
     if count == 3:
         logging.warning(f"'{name}' has no definition; proceeding with an empty one")
         def_here = {}
@@ -135,6 +135,31 @@ def expand_shapes(d_d):
                     s_d_c["width"] += foil_dist["rect"]
                 add_l.append(s_d_c)
     s_d_l += add_l  # add the new shapes to list of shapes
+
+
+def apply_transformations(d, t_o_in=None):
+    """
+    Recursively stacks up transformations from the top level down to the shapes.
+    The -g stands for 'global', which represents the absolute position on the canvas.
+    """
+    if t_o_in == None:
+        t_o_in = Transform()
+
+    d["t-o"] = Transform(d.get("transform", ""))
+    d["t-g-o"] = Transform(d["t-o"].get_str()) + t_o_in
+
+    is_d = d.get("instances", None)
+    if is_d == None:
+        return
+    for n, i_d in is_d.items():
+        i_d["t-o"] = Transform(i_d.get("transform", ""))
+        i_d["t-g-o"] = Transform(i_d["t-o"].get_str()) + d["t-g-o"]
+        shapes = i_d["definition-here"].get("shapes", {})
+        for shape in shapes:
+            shape["t-o"] = Transform(shape.get("transform", ""))
+            shape["t-g-o"] = Transform(shape["t-o"].get_str()) + i_d["t-g-o"]
+        apply_transformations(i_d["definition-here"], i_d["t-g-o"])
+    return
 
 
 def create_shape_objects(d):
@@ -294,6 +319,8 @@ def create():
     # Expand all the declarations of definitions from other files, and create new objects for soldermask and solderpaste
     expand_instances(config.brd)
     # print(json.dumps(config.brd, indent=2))
+
+    apply_transformations(config.brd)
 
     # Convert all the shape definitions in a dict to Shape objects
     create_shape_objects(config.brd)
