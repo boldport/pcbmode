@@ -49,6 +49,7 @@ class Shape:
         self._p_r_path = self._path_from_shape_type()
 
         trans_d = {  # transform dictionary
+            "location": self._shape_dict["location"],
             "scale": self._shape_dict["scale"],
             "rotate": self._shape_dict["rotate"],
             "mirror_y": self._shape_dict["mirror-y"],
