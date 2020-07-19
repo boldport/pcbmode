@@ -119,41 +119,33 @@ class Transform:
                         f"In transform '{t}', '{cmd}' can only have 1 or 2 argument; ignoring"
                     )
                 elif a_n == 0:
-                    v_l.append(0)
-                    v_l.append(0)
+                    v_l = [0, 0]
                 elif a_n == 1:
-                    v_l.append(a_d["a1"])
-                    v_l.append(0)
+                    v_l = [a_d["a1"], 0]
                 else:
-                    v_l.append(a_d["a1"])
-                    v_l.append(a_d["a2"])
+                    v_l = [a_d["a1"], a_d["a2"]]
             elif cmd == "scale":
                 if a_n > 2:
                     logging.warning(
                         f"In transform '{t}', '{cmd}' can have only 1 or 2 arguments; ignoring"
                     )
                 elif a_n == 0:
-                    v_l.append(1)
-                    v_l.append(1)
+                    v_l = [1, 1]
                 elif a_n == 1:
-                    v_l.append(a_d["a1"])
-                    v_l.append(a_d["a1"])
+                    v_l = [a_d["a1"], a_d["a1"]]
                 else:
-                    v_l.append(a_d["a1"])
-                    v_l.append(a_d["a2"])
+                    v_l = [a_d["a1"], a_d["a2"]]
             elif cmd == "rotate":
                 if (a_n > 3) or (a_n == 2):
                     logging.warning(
                         f"In transform '{t}', '{cmd}' can only have 1 or 3 arguments; ignoring"
                     )
                 elif a_n == 0:
-                    v_l.append(0)
+                    v_l = [0, 0, 0]
                 elif a_n == 1:
-                    v_l.append(a_d["a1"])
+                    v_l = [a_d["a1"], 0, 0]
                 else:
-                    v_l.append(a_d["a1"])
-                    v_l.append(a_d["a2"])
-                    v_l.append(a_d["a3"])
+                    v_l = [a_d["a1"], a_d["a2"], a_d["a3"]]
             elif cmd == "matrix":
                 if a_n != 6:
                     logging.warning(
@@ -169,7 +161,7 @@ class Transform:
                         f"In transform '{t}', {cmd} must have only 1 arguments; ignoring"
                     )
                 else:
-                    v_l.append(a_d["a1"])
+                    v_l = [a_d["a1"]]
             else:
                 logging.warning(f"In transform '{t}', '{cmd}' is not yet supported")
 
