@@ -72,13 +72,14 @@ class SvgPath:
 
     def _rotate_path(self, p_r_path):
         """ Rotate a parsed relative path """
-        deg = self._t_dict.get("rotate", 0)
-        # rotate_p = self._t_dict.get("rotate_p", Point([0,0]))
-        if deg != 0:
+        r = self._t_dict.get("rotate", [0, 0, 0])  # rotate parameters
+        d = r[0]  # degrees
+        o = Point(r[1:3])  # origin
+        if d != 0:
             for seg in p_r_path:
                 # TODO: figure out why the negation of 'deg' is necessary for expected
                 # bahaviour :(
-                [c.rotate(-deg) for c in seg[1:]]
+                [c.rotate(-d, o) for c in seg[1:]]
                 # The following deals with the case where we have a 'h' or 'v' but with
                 # the rotation they should now be 'l' or flipped h->v ot v-h. Here we
                 # simple change the command to 'l', but it could be done better by
