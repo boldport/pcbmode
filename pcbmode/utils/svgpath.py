@@ -64,8 +64,8 @@ class SvgPath:
 
     def _scale_path(self, p_r_path):
         """ Scale a parsed relative path """
-        scale = self._t_dict.get("scale", 1)
-        if scale != 1:
+        scale = self._t_dict.get("scale", [1, 1])
+        if scale != [1, 1]:
             for seg in p_r_path:
                 [c.mult(scale) for c in seg[1:]]
         return p_r_path
