@@ -51,7 +51,6 @@ class Shape:
         trans_d = {  # transform dictionary
             "scale": self._shape_dict["scale"],
             "rotate": self._shape_dict["rotate"],
-            #            "rotate_p": self._shape_dict["rotate_p"],
             "mirror_y": self._shape_dict["mirror-y"],
             "mirror_x": self._shape_dict["mirror-x"],
             "rel_to_dim": rel_to_dim,
@@ -67,16 +66,13 @@ class Shape:
         sd["gerber-lp"] = sd.get("gerber-lp", None)
         sd["mirror-y"] = sd.get("mirror-y", False)
         sd["mirror-x"] = sd.get("mirror-x", False)
-        sd["rotate"] = sd.get("rotate", 0)
-        sd["rotate_p"] = sd.get("rotate_p", Point([0, 0]))
         sd["buffer-to-pour"] = sd.get("buffer-to-pour")
 
         # From transform
         t_d = sd["t-g-o"].get_dict()
         sd["location"] = Point(t_d.get("translate", [0, 0]))
-        #        sd["rotate"] = t_d.get("rotate", 0)
-        sd["scale"] = t_d.get("scale", [1,1])
-
+        sd["rotate"] = t_d.get("rotate", [0, 0, 0])
+        sd["scale"] = t_d.get("scale", [1, 1])
 
         sd["style-class"] = sd.get("style_class", None)
         sd["style"] = sd.get("style", None)
