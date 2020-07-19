@@ -69,20 +69,14 @@ class Shape:
         sd["mirror-x"] = sd.get("mirror-x", False)
         sd["rotate"] = sd.get("rotate", 0)
         sd["rotate_p"] = sd.get("rotate_p", Point([0, 0]))
-        sd["scale"] = sd.get("scale", 1)
         sd["buffer-to-pour"] = sd.get("buffer-to-pour")
 
         # From transform
         t_d = sd["t-g-o"].get_dict()
         sd["location"] = Point(t_d.get("translate", [0, 0]))
         #        sd["rotate"] = t_d.get("rotate", 0)
-        #        sd["scale"] = t_d.get("scale", [1,1])
+        sd["scale"] = t_d.get("scale", [1,1])
 
-        # Somewhere the location input isn't being converted to Point()
-        # This checks.
-        #        # TODO: remove this check eventually
-        #        if isinstance(sd["location"], Point) is False:
-        #            sd["location"] = Point(sd["location"])
 
         sd["style-class"] = sd.get("style_class", None)
         sd["style"] = sd.get("style", None)
