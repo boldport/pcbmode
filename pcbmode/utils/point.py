@@ -76,9 +76,14 @@ class Point:
         self.y = o.y + math.sin(r) * (x - o.x) + math.cos(r) * (y - o.y)
 
     def mult(self, scalar):
-        """ multiply by scalar """
-        self.x *= float(scalar)
-        self.y *= float(scalar)
+        """ Multiply point by scalar=[sx,sy] """
+        try:
+            sx = scalar[0]
+            sy = scalar[1]
+        except:
+            sx = sy = scalar
+        self.x *= float(sx)
+        self.y *= float(sy)
 
     def px(self, sd=None):
         """ Apply significant digits and int() floats """
