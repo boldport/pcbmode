@@ -6,7 +6,7 @@ PCBmodE is a circuit board design software written in Python. Its main advantage
 
 ## Workflow
 
-PCBmodE folows a layout-driven design flow. There's no schematic functionality or DRC other than the designer's eyes. It's essentiallya script that runs from commandline generating files depending on the stage of the design.
+PCBmodE folows a layout-driven design flow. There's no schematic functionality or DRC other than the designer's eyes. It's essentially a script that runs from commandline generating files depending on the stage of the design.
 
 1. Text editor: edit input [JSON](http://en.wikipedia.org/wiki/JSON) files
 2. PCBmodE: convert JSON files to Inkscape SVG
